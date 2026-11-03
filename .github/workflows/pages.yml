@@ -42,14 +42,17 @@ jobs:
           OPENALEX_API_KEY: ${{ secrets.OPENALEX_API_KEY }}
           OPENALEX_BATCH_SIZE: '10'
         run: python -m scripts.enrich
-      - name: Commit refreshed feed
-        if: steps.refresh.outcome == 'success'
+      - name: Commit refreshed feed to default branch
+        if: steps.refresh.outcome == 'success' && github.event_name != 'push'
+        continue-on-error: true
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add docs/data/feed.json
           if ! git diff --cached --quiet; then
             git commit -m "data: refresh arXiv index [skip ci]"
+            git fetch origin main
+            git rebase -X theirs origin/main
             git push origin HEAD:main
           fi
       - uses: actions/configure-pages@v5
