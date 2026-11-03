@@ -22,6 +22,12 @@ function init(){
    window.history.replaceState({source:wider?"scholarly":"arxiv"},"",u.pathname+u.search+"#discover");
   }
  }
+ window.addEventListener("researchlens:focus-change",e=>{
+  const detail=e.detail||{};
+  // A chosen field/topic/subtopic searches all arXiv-hosted literature
+  // instead of restricting the researcher to the limited latest JSON feed.
+  if(detail.reason!=="external")show("scholarly");
+ });
  a.addEventListener("click",()=>show("arxiv"));
  b.addEventListener("click",()=>show("scholarly"));
  window.addEventListener("popstate",()=>show(new URLSearchParams(location.search).get("view")==="scholarly"?"scholarly":"arxiv",false));
