@@ -73,20 +73,20 @@
    // Contextuality is polysemous across disciplines. Require actual quantum
    // contextuality, not ANAs, housing, educational context or nursing practice.
    return CONTEXT.test(combined)&&
-    (STRONG_QUANTUM.test(title+" "+abs)||/quantum|physics|physical sciences/i.test(labels));
+    (STRONG_QUANTUM.test(title+" "+abs)||/quantum|kochen/i.test(labels));
   }
   if(p.field==="quantum"&&p.browse){
    if(!PHYSICS.test(combined))return false;
   }
   // User typed searches remain field restricted, with lexical evidence in
   // titles/abstracts/topics. A bare "contextuality" query also needs physics.
-  const hits=qt.filter(t=>src.includes(t)||meta.includes(t));
+  const hits=qt.filter(t=>src.includes(t)||meta.includes(t)||(t.length>4&&t.endsWith("s")&&(src.includes(t.slice(0,-1))||meta.includes(t.slice(0,-1)))));
   if(!hits.length)return false;
   if(p.browse){
    const min=qt.length>=4?2:1;
    if(hits.length<min)return false;
   }
-  if(p.field==="quantum"&&CONTEXT.test(p.query)&&!STRONG_QUANTUM.test(title+" "+abs)&&!/quantum|physics/i.test(labels))return false;
+  if(p.field==="quantum"&&CONTEXT.test(p.query)&&!STRONG_QUANTUM.test(title+" "+abs)&&!/quantum|kochen/i.test(labels))return false;
   return true;
  }
  function select(results,p){return (Array.isArray(results)?results:[]).filter(w=>match(w,p));}
