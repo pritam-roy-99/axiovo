@@ -70,13 +70,31 @@ el("follow-topic").onclick=()=>{if(!activeTopic)return;followed=followed.include
 el("following-only").onclick=()=>{followingOnly=!followingOnly;page=0;updateFollowing();render()};
 el("export-bib").onclick=()=>{const selected=all.filter(p=>saved.includes(p.id));if(!selected.length){alert("Your reading list is empty.");return}const bib=selected.map(p=>{const y=(p.published||"").slice(0,4);return "@misc{arxiv"+p.id.replace(/[^A-Za-z0-9]/g,"")+",\n  title={"+p.title.replace(/[{}]/g,"")+"},\n  author={"+(p.authors||[]).join(" and ")+"},\n  year={"+y+"},\n  eprint={"+p.id+"},\n  archivePrefix={arXiv},\n  url={https://arxiv.org/abs/"+p.id+"}\n}"}).join("\n\n");const blob=new Blob([bib],{type:"text/plain;charset=utf-8"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="researchlens-reading-list.bib";document.body.append(a);a.click();a.remove();URL.revokeObjectURL(url)};
 
-for(const id of ["date-from","date-to"])el(id).addEventListener("change",()=>{page=0;render()});el("reset-dates").onclick=()=>{el("date-from").value="";el("date-to").value="";page=0;render()};
+function updateArchiveLink(){
+ const term=el("q").value.trim(),from=el("date-from").value,to=el("date-to").value;
+ const params=new URLSearchParams();
+ params.set("advanced","");
+ params.set("terms-0-operator","AND");
+ params.set("terms-0-term",term);
+ params.set("terms-0-field","all");
+ params.set("classification-include_cross_list","include");
+ params.set("date-year","");
+ if(from||to){
+  params.set("date-filter_by","date_range");
+  params.set("date-from_date",from);
+  params.set("date-to_date",to);
+  params.set("date-date_type","submitted_date_first");
+ }
+ params.set("abstracts","show");params.set("size","100");params.set("order","-announced_date_first");
+ el("all-arxiv").href="https://arxiv.org/search/advanced?"+params.toString();
+}
+for(const id of ["date-from","date-to"])el(id).addEventListener("change",()=>{page=0;render();updateArchiveLink()});el("reset-dates").onclick=()=>{el("date-from").value="";el("date-to").value="";page=0;render();updateArchiveLink()};
 function utcDay(delta){const d=new Date(Date.now()+delta*86400000);return d.toISOString().slice(0,10)}
-el("date-today").onclick=()=>{el("date-from").value=utcDay(0);el("date-to").value=utcDay(0);page=0;render()};
-el("date-yesterday").onclick=()=>{el("date-from").value=utcDay(-1);el("date-to").value=utcDay(-1);page=0;render()};
+el("date-today").onclick=()=>{el("date-from").value=utcDay(0);el("date-to").value=utcDay(0);page=0;render();updateArchiveLink()};
+el("date-yesterday").onclick=()=>{el("date-from").value=utcDay(-1);el("date-to").value=utcDay(-1);page=0;render();updateArchiveLink()};
 el("date-week").onclick=()=>{el("date-from").value=utcDay(-6);el("date-to").value=utcDay(0);page=0;render()};
 
-for(const id of ["q","category","order"])el(id).addEventListener(id==="q"?"input":"change",()=>{page=0;render()});
-{const q=new URLSearchParams(location.search).get("q");if(q)el("q").value=q.slice(0,200)}
+for(const id of ["q","category","order"])el(id).addEventListener(id==="q"?"input":"change",()=>{page=0;render();updateArchiveLink()});
+{const q=new URLSearchParams(location.search).get("q");if(q)el("q").value=q.slice(0,200);if(new URLSearchParams(location.search).get("sort")==="recommended")el("order").value="recommended";updateArchiveLink()}
 fetch("data/feed.json",{cache:"no-cache"}).then(r=>{if(!r.ok)throw Error("Feed unavailable");return r.json()}).then(d=>{all=(d.papers||[]).filter(p=>p&&p.id&&p.title);topicCatalog=d.topic_catalog||[];showTopics();el("updated").textContent=d.generated_at?fmt(d.generated_at):"Not yet";const dates=all.map(p=>p.published||p.updated).filter(Boolean).sort();el("coverage").textContent=all.length+" indexed papers · source v1 dates "+(dates[0]||"?").slice(0,10)+" to "+(dates.at(-1)||"?").slice(0,10)+" · synchronized "+(d.generated_at||"unknown")+" · arXiv quant-ph, cs.IT, hep-th, physics.optics, cond-mat.mes-hall + selected historical IDs. This is not full arXiv coverage.";render();persistState()}).catch(e=>{el("count").textContent="Snapshot shown; live data refresh failed";console.error(e)});
 </script></body></html>
