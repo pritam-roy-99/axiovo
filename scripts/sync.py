@@ -11,6 +11,7 @@ import time
 import urllib.parse
 import urllib.request
 import xml.etree.ElementTree as ET
+from scripts.quantum_topics import assign_topics, topic_catalog
 
 ROOT = Path(__file__).resolve().parents[1]
 TARGET = ROOT / "docs" / "data" / "feed.json"
@@ -52,38 +53,63 @@ def parse_atom(data):
             "primary_category": primary.get("term", "") if primary is not None else (categories[0] if categories else ""),
             "published": e.findtext(ATOM + "published", default=""),
             "updated": e.findtext(ATOM + "updated", default=""),
-            "link": "https://arxiv.org/abs/" + identifier
+            "link": "https://arxiv.org/abs/" + identifier,
+            "topics": [],
+            "doi": normalize(e.findtext(ARXIV + "doi", default=""))
         })
     return papers
 
-def merge(existing, incoming, limit=600):
+def merge(existing, incoming, limit=3000):
     index = {p["id"]: p for p in existing if p.get("id") and p.get("title")}
     for item in incoming:
         old = index.get(item["id"])
         if old is None or (item.get("version", 1), item.get("updated", "")) >= (old.get("version", 1), old.get("updated", "")):
             index[item["id"]] = item
+    for item in index.values():
+        item["topics"] = assign_topics(item)
     return sorted(index.values(), key=lambda p: p.get("updated") or p.get("published") or "", reverse=True)[:limit]
 
 def fetch_recent():
-    categories = os.environ.get("ARXIV_CATEGORIES", "quant-ph,hep-th,cs.IT").split(",")
-    query = " OR ".join("cat:" + category for category in categories)
-    args = urllib.parse.urlencode({
-        "search_query": query, "start": 0,
-        "max_results": min(200, max(1, int(os.environ.get("ARXIV_MAX_RESULTS", "120")))),
-        "sortBy": "lastUpdatedDate", "sortOrder": "descending"
-    })
-    req = urllib.request.Request(
-        "https://export.arxiv.org/api/query?" + args,
-        headers={"User-Agent": os.environ.get("ARXIV_USER_AGENT", "ResearchLens-MVP/0.1 (https://github.com/pritam-roy-99/researchlens)")}
-    )
-    for attempt in range(3):
-        try:
-            with urllib.request.urlopen(req, timeout=35) as response:
-                return parse_atom(response.read())
-        except (OSError, ET.ParseError, ValueError):
-            if attempt == 2:
-                raise
-            time.sleep((attempt + 1) * 5)
+    """Ingest separate subject feeds, including adjacent interdisciplinary work.
+
+    Poll at a deliberately modest pace and preserve existing metadata on failures.
+    """
+    categories = os.environ.get("ARXIV_CATEGORIES", "quant-ph,cs.IT,hep-th,physics.optics,cond-mat.mes-hall").split(",")
+    page_size = min(200, max(1, int(os.environ.get("ARXIV_MAX_RESULTS", "150"))))
+    results = []
+    failures = []
+    for i, category in enumerate(categories):
+        category = category.strip()
+        if not re.fullmatch(r"[A-Za-z0-9.\-]+", category):
+            continue
+        args = urllib.parse.urlencode({
+            "search_query": "cat:" + category, "start": 0,
+            "max_results": page_size,
+            "sortBy": "lastUpdatedDate", "sortOrder": "descending"
+        })
+        req = urllib.request.Request(
+            "https://export.arxiv.org/api/query?" + args,
+            headers={"User-Agent": os.environ.get("ARXIV_USER_AGENT", "ResearchLens-MVP/0.2 (https://github.com/pritam-roy-99/researchlens; research metadata discovery)")}
+        )
+        for attempt in range(2):
+            try:
+                with urllib.request.urlopen(req, timeout=45) as response:
+                    papers = parse_atom(response.read())
+                    if papers:
+                        results.extend(papers)
+                    break
+            except (OSError, ET.ParseError, ValueError) as exc:
+                if attempt == 1:
+                    failures.append(category + ": " + str(exc)[:120])
+                else:
+                    time.sleep(5)
+        if i < len(categories)-1:
+            time.sleep(3.2)
+    if failures:
+        print("WARNING: Some arXiv categories failed:", "; ".join(failures))
+    if not results:
+        raise RuntimeError("All arXiv feeds unavailable, preserving previous data")
+    return results
 
 def main():
     try:
@@ -97,7 +123,7 @@ def main():
     payload = {
         "generated_at": dt.datetime.now(dt.timezone.utc).isoformat(),
         "source": "arXiv Atom API",
-        "paper_count": len(papers), "papers": papers
+        "paper_count": len(papers), "topic_catalog": topic_catalog(), "papers": papers
     }
     TARGET.parent.mkdir(parents=True, exist_ok=True)
     with tempfile.NamedTemporaryFile("w", encoding="utf-8", dir=TARGET.parent, delete=False) as f:
