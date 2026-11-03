@@ -43,7 +43,7 @@
   const context=field==="quantum"&&
     [raw,state.topic,state.subtopic].some(x=>CONTEXT.test(x||""))&&browse;
   const search=context?"quantum "+(raw||"contextuality"):raw;
-  const filters=["primary_topic.field.id:"+FIELDS[field].join("|")];
+  const filters=["locations.source.id:S4306400194","primary_topic.field.id:"+FIELDS[field].join("|")];
   const maxDate=String(opts.today||new Date().toISOString().slice(0,10));
   const from=String(opts.from||"");
   const to=String(opts.to||"");

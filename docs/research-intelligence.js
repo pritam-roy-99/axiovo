@@ -17,6 +17,7 @@ if(!settings||typeof settings!=="object")settings={interests:[],authors:[]};
 settings.interests=Array.isArray(settings.interests)?settings.interests.slice(0,15):[];
 settings.authors=Array.isArray(settings.authors)?settings.authors.slice(0,20):[];
 let feed=[],filtered=[],pickedProject="";
+const Arxiv=window.ResearchLensArxiv;
 function persistProjects(){write(PROJECTS,projects)}
 function persistSettings(){write(META,settings)}
 function link(parent,url,label){if(!/^https:\/\//.test(url||""))return;const a=texts(parent,"a",label);a.href=url;a.target="_blank";a.rel="noopener noreferrer"}
@@ -84,25 +85,33 @@ function renderRecommendations(){
  filtered=scored;
  const list=scored.slice(0,12);
  message($("research-rec-count"),list.length+" of "+scored.length+" matching papers");
- if(!feed.length){texts(root,"div","No current feed data. This feature uses the indexed arXiv snapshot; it cannot create or retrieve new arXiv records.","rl-empty");return}
- if(!list.length){texts(root,"div","No matching papers in the current index. Add specific research interests or question keywords, or use Field Explorer to search wider literature.","rl-empty");return}
+ if(!feed.length){texts(root,"div","No arXiv metadata available yet. Search any historical arXiv identifier directly in Discover.","rl-empty");return}
+ if(!list.length){texts(root,"div","No matching arXiv-linked papers among the retrieved candidates. Broaden the research interest or search arXiv history directly.","rl-empty");return}
  for(const hit of list){
   const pp=hit.paper;
   const item=texts(root,"article","","rl-paper");
   const title=texts(item,"h3","");
-  const a=texts(title,"a",pp.title||"Untitled paper");a.href="https://arxiv.org/abs/"+encodeURIComponent(pp.id);a.target="_blank";a.rel="noopener noreferrer";
+  const a=texts(title,"a",pp.title||"Untitled paper");a.href=Arxiv?.abs(pp.id)||"https://arxiv.org/";a.target="_blank";a.rel="noopener noreferrer";
   texts(item,"p",(pp.authors||[]).slice(0,4).join(", ")+(pp.published?" · "+pp.published.slice(0,10):""),"rl-paper-meta");
   texts(item,"p",hit.reasons.filter(x=>x!=="Already saved").slice(0,3).join(" · "),"rl-relevance-reason");
   if(hit.reasons.includes("Already saved"))texts(item,"span","In your reading list","rl-counter");
   const row=texts(item,"div","","rl-paper-actions");
-  link(row,"https://arxiv.org/abs/"+encodeURIComponent(pp.id),"Read on arXiv");
-  const cop=texts(row,"a","Ask Copilot");cop.href="./copilot.html?id="+encodeURIComponent(pp.id);
-  const save=texts(row,"button","Save to reading list");save.type="button";
+  const parsed=Arxiv?.parse(pp.id),sourceId=parsed?.requested||String(pp.id||"");
+  const original=Arxiv?.abs(sourceId)||"https://arxiv.org/";
+  const readLink=texts(row,"a","Read on arXiv");readLink.href=original;readLink.target="_blank";readLink.rel="noopener noreferrer";readLink.className="rl-paper-primary";
+  const cop=texts(row,"a","✦ Research Assistant");cop.href="./copilot.html?id="+encodeURIComponent(sourceId);
+  const current=read(OLD_SAVED,[]);const savedHere=Array.isArray(current)&&current.includes(sourceId);
+  const save=texts(row,"button",savedHere?"✓ Saved":"☆ Save paper");save.type="button";
+  save.setAttribute("aria-pressed",String(savedHere));save.setAttribute("aria-label",(savedHere?"Remove ":"Save ")+"arXiv:"+sourceId+" from your reading list");
   save.onclick=()=>{
     const current=read(OLD_SAVED,[]);const ids=Array.isArray(current)?current:[];
-    const id=R.normalizeId(pp.id);if(!ids.includes(id))ids.push(id);
-    if(write(OLD_SAVED,ids)){window.dispatchEvent(new CustomEvent("researchlens-library-change"));message($("research-rec-status"),"Saved arXiv:"+id+" to your reading list.");renderRecommendations()}
-    else message($("research-rec-status"),"Could not save. Local browser storage may be disabled.")
+    const present=ids.includes(sourceId);
+    const next=present?ids.filter(x=>x!==sourceId):[...ids,sourceId];
+    if(write(OLD_SAVED,next)){
+      window.dispatchEvent(new CustomEvent("researchlens-library-change"));
+      message($("research-rec-status"),(present?"Removed ":"Saved ")+"arXiv:"+sourceId+(present?" from":" to")+" your reading list.");
+      renderRecommendations()
+    }else message($("research-rec-status"),"Could not save. Browser storage may be unavailable.")
   };
   if(projects.length){
    const selector=document.createElement("select");selector.setAttribute("aria-label","Choose a research question for "+pp.title);
@@ -118,6 +127,38 @@ function renderRecommendations(){
  }
 }
 function render(){renderProjects();renderRecommendations()}
+function abstractFromInverted(index){
+ if(!index||typeof index!=="object")return"";
+ const words=[];for(const [word,positions] of Object.entries(index))if(Array.isArray(positions))for(const k of positions)if(Number.isInteger(k)&&k>=0&&k<500)words[k]=word;
+ return words.filter(Boolean).join(" ").slice(0,2000)
+}
+async function loadLiveArxiv(){
+ const prefs=read("researchlens-field-explorer-v1",{});
+ const interest=String(prefs.subtopic||prefs.topic||settings.interests[0]||"quantum information").trim();
+ if(!interest)return;
+ const params=new URLSearchParams({search:interest,filter:"locations.source.id:S4306400194",per_page:"40",
+  select:"id,display_name,publication_date,authorships,locations,primary_location,best_oa_location,abstract_inverted_index"});
+ const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),17000);
+ try{
+  const response=await fetch("https://api.openalex.org/works?"+params,{signal:controller.signal,headers:{Accept:"application/json"}});
+  if(!response.ok)throw Error("OpenAlex "+response.status);
+  const data=await response.json(),incoming=[];
+  for(const work of data.results||[]){
+    const arxiv=Arxiv?.candidates(work)[0];if(!arxiv||!work.display_name)continue;
+    incoming.push({id:arxiv.requested,title:work.display_name,
+      abstract:abstractFromInverted(work.abstract_inverted_index),
+      authors:(work.authorships||[]).map(a=>a.author?.display_name).filter(Boolean),
+      published:work.publication_date||"",provider:"OpenAlex arXiv-linked metadata"});
+  }
+  const unique=new Map();
+  for(const paper of [...incoming,...feed]){const key=Arxiv?.base(paper.id)||paper.id;if(!key||unique.has(key))continue;unique.set(key,paper)}
+  feed=[...unique.values()];
+  message($("research-rec-status"),"Retrieved "+incoming.length+" additional arXiv-linked records for “"+interest+"” through live OpenAlex metadata. Coverage is not exhaustive; dates on those records may not be arXiv submission dates.");
+  renderRecommendations();
+ }catch(err){
+  message($("research-rec-status"),"Live arXiv-linked discovery unavailable: "+String(err.message||err)+". New-announcement metadata and saved records remain accessible.");
+ }finally{clearTimeout(timer)}
+}
 function startup(){
  if(!$("research-project-list")||!R)return;
  drawSettings();
@@ -169,8 +210,8 @@ function startup(){
  });
  fetch("./data/feed.json",{cache:"no-store"}).then(r=>{if(!r.ok)throw Error("HTTP "+r.status);return r.json()})
   .then(j=>{feed=Array.isArray(j.papers)?j.papers:[];message($("research-rec-status"),
-    "Scored "+feed.length+" locally indexed arXiv records. This is lexical matching, not a novelty assessment.");renderRecommendations()})
-  .catch(()=>message($("research-rec-status"),"Feed unavailable. Saved questions remain on this device."));
+    "Scored "+feed.length+" locally indexed arXiv records. This is lexical matching, not a novelty assessment.");renderRecommendations();loadLiveArxiv()})
+  .catch(()=>{message($("research-rec-status"),"Announcement snapshot unavailable; trying live arXiv-linked literature.");loadLiveArxiv()});
  render();
 }
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",startup);else startup();
