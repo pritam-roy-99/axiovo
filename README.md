@@ -22,6 +22,18 @@
 
 An optional localhost-only Qwen/Ollama HTTP service is included in `api/server.py`, but the public static website does not call it. The original ZIP contains a more extensive FastAPI/SQLite development implementation that has not been fully imported.
 
+## AI Lab (new, public, experimental)
+
+Open **[ResearchLens AI Lab](https://pritam-roy-99.github.io/researchlens/ai.html)** from the homepage or from any paper card.
+
+**Immediately usable without AI hardware:** Select a paper or paste your own manuscript title and abstract, click **Generate evidence report**, and inspect the title/abstract-derived key concepts, publication-dated candidate related papers, and source links. The report can be exported as text. This is deterministic lexical retrieval, not machine learning or proof verification.
+
+**Optional in-browser open-weight AI:** Click **Load open-weight AI model**. On a compatible WebGPU browser and sufficiently capable GPU, the site imports [WebLLM v0.2.86](https://github.com/mlc-ai/web-llm) from a CDN and downloads **Qwen2.5-0.5B-Instruct-q4f16_1-MLC** model files (approximately 1 GB graphics memory required, plus downloads and headroom). After the first load, model assets can be cached. The generative assistant explains claimed contributions, discusses limitations, and compares *the supplied abstracts* with citations to selected arXiv identifiers. It does **not** establish novelty or review proofs. Model accuracy has not been benchmarked.
+
+The optional model runs in the user's browser, not in the GitHub Pages server. **It is experimental, may fail on unsupported WebGPU browsers or devices, and is not claimed to work on every machine.** No API key is needed; browser model downloads use third-party CDNs and Hugging Face. The draft's title and abstract are not sent to ResearchLens's server. Do not insert confidential data unless comfortable with local device and browser risks.
+
+The local Ollama API (`api/server.py`) is a separate experimental developer mode and is **not automatically connected to the public site**.
+
 ## Publish on GitHub Pages
 
 1. Open **Settings → Pages** in this repository.
