@@ -4,6 +4,7 @@
 /* Field Explorer: public scholarly search and browser-local reading collections. */
 const $=id=>document.getElementById("scholar-"+id);
 const {FIELDS,fieldTopics,fieldKey}=window.ResearchLensFields;
+const SearchCore=window.ResearchLensSearch;
 
 const KEY="researchlens-field-explorer-v1", SAVED="researchlens-field-saved-v1";
 const interestsAPI=window.ResearchLensInterests;
@@ -65,14 +66,47 @@ const isSaved=saved.some(p=>recordID(p)===recordID(w));const b=node("button",isS
 const cite=node("button","Copy BibTeX");cite.type="button";cite.onclick=async()=>{try{await navigator.clipboard.writeText(bib(w));cite.textContent="Copied"}catch{download("researchlens-citation.bib",bib(w),"text/plain")}};row.append(cite);
 const cop=node("a","✦ Research Assistant");const arxiv=arxivURL(w);const matched=arxiv?.match(/arxiv\.org\/(?:abs|pdf)\/([^?#]+)/i);const aid=matched?matched[1].replace(/\.pdf$/,"").replace(/v\d+$/,""):"";cop.href="./copilot.html?"+new URLSearchParams(aid?{id:aid}:{q:w.display_name||w.title||""});row.append(cop);art.append(row);return art}
 function render(){const root=$("results");root.replaceChildren();const display=showingSaved?saved.slice().reverse():items;$("result-heading").textContent=showingSaved?"Your saved papers":"Literature results";if(!display.length){root.append(node("div",showingSaved?"No papers saved yet. Save papers from your search results.":"No matching records to display.","empty"))}else for(const w of display)root.append(renderPaper(w));
-$("pagination").textContent=showingSaved?saved.length+" locally saved":("Page "+page+" · "+total.toLocaleString()+" records");$("prev").disabled=showingSaved||busy||page===1;$("next").disabled=showingSaved||busy||page*20>=Math.min(total,10000)}
-async function search(){if(busy&&requestController)requestController.abort();busy=true;showingSaved=false;persist();const q=$("query").value.trim();const from=$("from").value,to=$("to").value;if(!q&&!from&&!to){busy=false;setStatus("Enter a topic or a publication date.");return}if(from&&to&&from>to){busy=false;setStatus("Start date must be before end date.");return}setStatus("Searching live scholarly literature…");$("results").replaceChildren(node("div","Retrieving research records…","empty"));renderControls();
-const p=new URLSearchParams({page:String(page),per_page:"20",select:"id,display_name,title,publication_year,cited_by_count,authorships,doi,primary_location,best_oa_location,locations,open_access"});
-if(q)p.set("search",q);const filters=[];if(from)filters.push("from_publication_date:"+from);if(to)filters.push("to_publication_date:"+to);if(filters.length)p.set("filter",filters.join(","));if($("sort").value!=="relevance")p.set("sort",$("sort").value);
-const ctl=new AbortController();requestController=ctl;
-try{const res=await fetch("https://api.openalex.org/works?"+p.toString(),{signal:ctl.signal,headers:{Accept:"application/json"}});if(!res.ok)throw new Error("OpenAlex returned HTTP "+res.status);const data=await res.json();items=data.results||[];total=data.meta?.count||0;setStatus(total.toLocaleString()+" matching scholarly records. Results from OpenAlex.");}
-catch(err){if(err.name==="AbortError")return;items=[];total=0;setStatus("Search unavailable: "+err.message+". Retry or use the global search.");}
-finally{if(requestController===ctl){busy=false;requestController=null;render()}}}
+$("pagination").textContent=showingSaved?saved.length+" locally saved":("Search batch "+page+" · "+items.length+" relevant papers shown");$("prev").disabled=showingSaved||busy||page===1;$("next").disabled=showingSaved||busy||page*100>=Math.min(total,10000)}
+async function search(){
+ if(busy&&requestController)requestController.abort();
+ busy=true;showingSaved=false;persist();
+ const q=$("query").value.trim(),from=$("from").value,to=$("to").value;
+ if(!q){busy=false;setStatus("Enter a research topic, subtopic or specific paper query.");return}
+ if(from&&to&&from>to){busy=false;setStatus("Start date must be before end date.");return}
+ if(!SearchCore){busy=false;setStatus("Field-aware search unavailable. Please refresh ResearchLens.");return}
+ const today=new Date().toISOString().slice(0,10);
+ const effectiveEnd=to&&to<today?to:today;
+ if(from&&from>effectiveEnd){
+  busy=false;items=[];total=0;render();
+  setStatus("The start date is after today's date. Choose an earlier date.");return
+ }
+ const plan=SearchCore.plan(state,q,{page,from,to,sort:$("sort").value,today});
+ setStatus("Searching "+FIELDS[plan.field].name+" with field and topic relevance checks…");
+ $("results").replaceChildren(node("div","Checking field-specific research records…","empty"));
+ renderControls();
+ const ctl=new AbortController();requestController=ctl;
+ try{
+  const url="https://api.openalex.org/works?"+plan.params.toString();
+  const res=await fetch(url,{signal:ctl.signal,headers:{Accept:"application/json"}});
+  if(!res.ok)throw new Error("OpenAlex returned HTTP "+res.status);
+  const data=await res.json();
+  const candidates=Array.isArray(data.results)?data.results:[];
+  items=SearchCore.select(candidates,plan).slice(0,20);
+  // Count only validated results actually on this batch, not OpenAlex's broad
+  // total which includes other meanings of the keyword.
+  total=Number(data.meta?.count)||0;
+  const coverage=items.length+" relevant papers from "+candidates.length+" OpenAlex candidates on batch "+page;
+  setStatus(coverage+(plan.context?" · Quantum contextuality disambiguation applied.":".")+
+   (items.length<20?" Try a more specific subtopic if needed.":"")+
+   " Field classification and title/abstract matching are approximate; source dates are publication metadata.");
+ }catch(err){
+  if(err.name==="AbortError")return;
+  items=[];total=0;
+  setStatus("Field-filtered search unavailable: "+err.message+". Retry or change your query.");
+ }finally{
+  if(requestController===ctl){busy=false;requestController=null;render()}
+ }
+}
 function renderControls(){$("prev").disabled=true;$("next").disabled=true}
 function init(){
 const latest=read(KEY,{});
@@ -102,7 +136,7 @@ $("sort").onchange=()=>{page=1;search()};
 $("latest").onclick=()=>{$("sort").value="publication_date:desc";$("from").value="";$("to").value="";page=1;search()};
 $("clear-dates").onclick=()=>{$("from").value="";$("to").value="";persist();page=1;search()};
 $("show-saved").onclick=()=>{showingSaved=true;setStatus("This collection is stored only in your current browser.");render()};
-$("prev").onclick=()=>{if(page>1){page--;search()}};$("next").onclick=()=>{if(page*20<Math.min(total,10000)){page++;search()}};
+$("prev").onclick=()=>{if(page>1){page--;search()}};$("next").onclick=()=>{if(page*100<Math.min(total,10000)){page++;search()}};
 $("export-bib").onclick=()=>{if(!saved.length){setStatus("Save a paper before exporting citations.");return}download("researchlens-reading-list.bib",saved.map(bib).join("\n"),"text/plain;charset=utf-8")};
 $("export-json").onclick=()=>download("researchlens-field-reading-list.json",JSON.stringify(saved,null,2),"application/json");
 const u=new URLSearchParams(location.search);if(u.get("field")&&FIELDS[u.get("field")]){state.field=u.get("field");if(!FIELDS[state.field].topics.includes(state.topic)){state.topic=FIELDS[state.field].topics[0];state.subtopic=""}$("field").value=state.field;drawField()}if(u.get("q")){$("query").value=u.get("q").slice(0,250);state.query=$("query").value}persist();if($("query").value.trim())search();

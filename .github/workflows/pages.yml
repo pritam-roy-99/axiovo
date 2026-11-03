@@ -38,6 +38,8 @@ jobs:
           node tests/field-taxonomy.test.js
       - name: Test field-interest preferences
         run: node tests/interests.test.js
+      - name: Validate discipline-specific search
+        run: node tests/scholar-search.test.js
       - name: Refresh research metadata
         id: refresh
         continue-on-error: true

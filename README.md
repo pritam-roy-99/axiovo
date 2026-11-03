@@ -94,6 +94,18 @@ Paper cards now have one **Analyze / Ask AI** link to the unified Research Assis
 
 The preferences live in `localStorage` under `researchlens-field-explorer-v1` and `researchlens-interests-by-field-v1`. To transfer them across devices, use browser data migration or a future authenticated sync feature. A local preference does not expand the underlying arXiv metadata coverage.
 
+## Discipline-specific OpenAlex search relevance
+
+ResearchLens Discover no longer treats a bare broad keyword as a complete field-specific search. The integrated `scholar-search.js` adds:
+- OpenAlex `primary_topic.field.id` filters using discipline-related fields, with explicit selection of the relevant main field.
+- Quantum-specific contextuality disambiguation, distinguishing mathematical/physical contextuality from unrelated clinical, educational and social-science uses.
+- Client-side title/abstract/topic screening of 100 API candidates per batch. Results without a matching classified field or topical evidence are excluded.
+- Publication date checks to prevent future-dated works from appearing before today's date.
+- Relevant-record counts for the screened batch rather than unqualified counts of broad OpenAlex keyword matches.
+- Regression cases for real unrelated examples such as ANA pretest screening and urban heritage, as well as positive quantum contextuality cases.
+
+**Important:** Field classification in OpenAlex is approximate, and stronger filtering trades recall for precision. It may omit interdisciplinary papers or records with incomplete topic metadata. This is not exhaustive research retrieval; for complete prior-art work, cross-check additional source databases and original papers. OpenAlex's live API and indexing limits still apply.
+
 ## Current features (deployed GitHub Pages prototype)
 
 - Responsive scientific-paper website with title, abstract, author, and arXiv identifier search.
