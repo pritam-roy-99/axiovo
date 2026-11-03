@@ -21,6 +21,18 @@ Open **[Explore by field](https://pritam-roy-99.github.io/researchlens/fields.ht
 
 **Data limitations:** Library entries are aggregated from two existing localStorage collections; this is not a server-side account, sync service, verified literature database, or complete arXiv archive. Notes and reading states are stored on the current device. Exported JSON is a backup, not yet an import mechanism for the new unified workspace. External academic metadata retain their source caveats. The workspace displays recent papers already present in the locally indexed feed; it cannot accelerate arXiv ingestion itself.
 
+## Personalized research discovery and question tracking
+
+The [research workspace](https://pritam-roy-99.github.io/researchlens/workspace.html) now includes **Relevant to your research** and **My research questions**.
+
+- Choose specific research interests or exact author names; ResearchLens additionally uses your Field Explorer topic and followed topics.
+- Rank papers from the **existing local arXiv snapshot** with transparent title, abstract, topic, project keyword and author matching. Each suggestion explains its match; existing saved papers are down-ranked and hidden papers are excluded.
+- Save a suggested paper into the existing arXiv reading list, view it on arXiv, or open the Copilot with its identifier.
+- Record research questions with an objective, searchable keywords and progress status; attach or remove papers, edit questions, or export/import your question data as JSON.
+- Regression tests for retrieval scoring and normalization are included in the deployment workflow.
+
+**Limitations:** Ranking is deterministic lexical matching rather than an evaluated embedding or AI recommendation service. It does not automatically search the whole arXiv archive, assess importance or prove novelty, and cannot notify users of new papers on its own. Research interests, questions and attached paper IDs stay in local browser storage. The [integrated roadmap](ROADMAP.md) describes future ingestion, PDF, citation and secure account milestones.
+
 ## Current features (deployed GitHub Pages prototype)
 
 - Responsive scientific-paper website with title, abstract, author, and arXiv identifier search.
