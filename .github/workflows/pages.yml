@@ -55,6 +55,8 @@ jobs:
             git rebase -X theirs origin/main
             git push origin HEAD:main
           fi
+      - name: Render first-paint snapshot with actual index counts
+        run: python -m scripts.build_snapshot
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
