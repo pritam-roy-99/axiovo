@@ -11,7 +11,10 @@ import time
 import urllib.parse
 import urllib.request
 import xml.etree.ElementTree as ET
-from scripts.quantum_topics import assign_topics, topic_catalog
+try:
+    from .quantum_topics import assign_topics, topic_catalog
+except ImportError:
+    from quantum_topics import assign_topics, topic_catalog
 
 ROOT = Path(__file__).resolve().parents[1]
 TARGET = ROOT / "docs" / "data" / "feed.json"
