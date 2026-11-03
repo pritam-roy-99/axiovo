@@ -1,6 +1,6 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Research Copilot | ResearchLens</title><meta name="description" content="Ask research questions, retrieve cited scientific literature and work with local open-weight Qwen models.">
-<link rel="stylesheet" href="./theme.css"><script defer src="./theme.js"></script><link rel="stylesheet" href="./workspace.css"><script defer src="./navigation.js"></script>
+<title>Research Assistant | ResearchLens</title><meta name="description" content="Unified ResearchLens research assistant: paper selection, evidence analysis, literature comparison, reviewer checks and optional open-weight AI.">
+<link rel="stylesheet" href="./theme.css"><script defer src="./theme.js"></script><link rel="stylesheet" href="./workspace.css"><script defer src="./navigation.js"></script><script defer src="./assistant-core.js"></script>
 <style>
 :root{font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;color:#18324b;background:#f2f7fa}*{box-sizing:border-box}body{margin:0}a{color:#096da1;text-decoration:none}a:hover{text-decoration:underline}
 button,input,textarea,select{font:inherit}button{cursor:pointer}button:disabled{opacity:.5;cursor:not-allowed}
@@ -22,23 +22,41 @@ hr{border:0;border-top:1px solid #e0e9f0;margin:16px 0}.info{border-left:3px sol
 #draft{min-height:95px}.tiny{font-size:11px;color:#7890a4}.link{font-size:12px}.busy{display:inline-block;width:8px;height:8px;border-radius:50%;background:#29a2b7;animation:pulse 1.1s infinite alternate}@keyframes pulse{to{opacity:.2}}
 @media(max-width:1100px){.columns{grid-template-columns:235px minmax(300px,1fr)}.evidence-panel{grid-column:1/-1}#evidence-list{max-height:360px;display:grid;grid-template-columns:1fr 1fr;gap:0 16px}}
 @media(max-width:690px){main{padding:13px}.columns{grid-template-columns:1fr}.evidence-panel{grid-column:auto}#evidence-list{display:block}#conversation{min-height:290px;max-height:55vh}.message{margin-left:0!important;margin-right:0!important}}
+
+/* Unified paper investigation controls, mobile-friendly and theme-aware. */
+#paper-picker,#comparison-paper{max-width:100%}#paper-status{overflow-wrap:anywhere}
+.rl-selected-paper{border:1px solid #c3dfeb;background:#ebf6fb;border-radius:10px;padding:11px;margin:10px 0;font-size:12px;line-height:1.6;color:#194c69}
+.rl-evidence-controls{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px}
+.rl-evidence-controls button{font-size:11px;padding:6px 9px}
+.source[aria-selected=true]{background:#e7f3fb;border-radius:8px;padding:9px;border:1px solid #8cbddc}
+#paper-compare-fields{border-top:1px solid #dce8f0;padding-top:8px;margin-top:7px}
+:root[data-theme=dark] .rl-selected-paper{background:#173248;color:#d4eef9;border-color:#346987}
+@media(max-width:690px){.columns{grid-template-columns:minmax(0,1fr)}.panel{padding:14px}main{padding:11px}.intro{padding:5px}}
 </style></head><body>
-<header><b><span class="mark">R</span> ResearchLens Copilot</b><a href="./">Paper feed</a><a href="./ai.html">AI Lab</a><a href="./search.html">Global literature</a><a href="./profiles.html">Researcher workspace</a></header>
-<main><section class="intro"><h1>Your scientific research copilot</h1><p>Retrieve relevant literature, organize evidence, compare abstract-level claims, and ask an optional open-weight Qwen model to explain research. Designed for research questions, not automatic novelty verdicts.</p></section>
+<header><b><span class="mark">R</span> ResearchLens Assistant</b><a href="./">Paper feed</a><a href="./workspace.html">My workspace</a><a href="./lab.html">Research tools</a></header>
+<main><section class="intro"><h1>Your scientific research assistant</h1><p>One place to discover prior literature, analyze a paper, compare contributions, organize source-linked evidence, and ask an optional local AI model. All scientific conclusions require source verification.</p></section>
 <div class="columns"><aside class="panel">
-<h2>Research tools</h2>
+<h2>Choose your task</h2>
 <button class="btn mode block active" data-mode="literature">Find relevant papers</button>
 <button class="btn mode block" data-mode="compare">Compare contributions</button>
 <button class="btn mode block" data-mode="explain">Explain a result</button>
 <button class="btn mode block" data-mode="review">Reviewer checklist</button>
 <button class="btn mode block" data-mode="ideas">Research directions</button>
+<button class="btn mode block" data-mode="claims">Analyze a paper’s claims</button>
+<hr>
+<h2>Choose a paper</h2>
+<label for="paper-search">Find an indexed paper by title or arXiv ID</label><input id="paper-search" type="search" maxlength="260" placeholder="Search titles, author, arXiv ID"><label for="paper-picker">Indexed papers</label><select id="paper-picker" aria-label="Select paper"><option value="">Select a paper…</option></select>
+<button type="button" id="analyze-paper" class="btn block" style="margin-top:9px">Analyze selected paper</button>
+<button type="button" id="compare-papers" class="btn block" style="margin-top:8px">Compare two papers</button>
+<div id="paper-compare-fields" hidden><label for="comparison-paper">Second indexed paper</label><select id="comparison-paper"><option value="">Select another paper…</option></select><button type="button" class="btn block" id="run-paper-compare" style="margin-top:8px">Generate source comparison</button></div>
+<p class="muted" id="paper-status">Indexed papers load with the source feed. You can also ask a question without choosing a paper.</p>
 <hr>
 <h2>AI engine</h2><label for="engine">Inference mode</label>
 <select id="engine"><option value="evidence">Evidence-only (no model, immediate)</option><option value="ollama">Local Qwen via Ollama (stronger)</option><option value="browser">On-device Qwen in browser (experimental)</option></select>
 <div id="ollama-settings" hidden><label for="model">Ollama model</label><select id="model"><option value="qwen3.5:9b">Qwen3.5 9B · recommended</option><option value="qwen3.5:27b">Qwen3.5 27B · stronger</option><option value="qwen3.5:4b">Qwen3.5 4B · lighter</option></select><label for="ollama-url">Local Ollama address</label><input id="ollama-url" value="http://127.0.0.1:11434" readonly><button class="btn block" id="test-ollama" style="margin-top:9px">Check local model connection</button><p class="muted">Start Ollama on your computer and allow this site's origin via OLLAMA_ORIGINS. This connection stays on your computer. No public API keys.</p></div>
 <div id="browser-settings" hidden><label for="browser-model">WebGPU model</label><select id="browser-model"><option value="Qwen2.5-0.5B-Instruct-q4f16_1-MLC">Qwen2.5 0.5B · small</option><option value="Qwen2.5-1.5B-Instruct-q4f16_1-MLC">Qwen2.5 1.5B · moderate</option></select><button class="btn block" id="load-browser" style="margin-top:9px">Download and load model</button><p class="muted">Downloads can be large. Requires compatible WebGPU graphics hardware. Outputs are experimental.</p></div>
 <p id="engine-status" class="status" role="status">Evidence retrieval is ready. No model is running.</p>
-<hr><h2>Workspace</h2><button class="btn block" id="new-chat">New conversation</button><button class="btn block" id="export-chat" style="margin-top:8px">Export conversation + sources</button>
+<hr><h2>Workspace</h2><button class="btn block" id="download-evidence">Export evidence report</button><button class="btn block" id="new-chat" style="margin-top:8px">New conversation</button><button class="btn block" id="export-chat" style="margin-top:8px">Export conversation + sources</button>
 <p class="muted">Conversation content stays in this tab unless you explicitly export it. Ollama requests go to your local computer; browser model downloads use third-party infrastructure.</p>
 </aside>
 <section class="panel">
@@ -46,9 +64,10 @@ hr{border:0;border-top:1px solid #e0e9f0;margin:16px 0}.info{border-left:3px sol
 <div id="conversation" aria-live="polite"><div class="message assistant"><h4>ResearchLens Copilot</h4>Ask a quantum-information question, paste an arXiv ID, or describe a claim you are investigating. I'll retrieve candidate literature and show verifiable source links. Select a local model to enable multi-turn AI answers.</div></div>
 <div class="compose"><label for="question">Research question</label><textarea id="question" maxlength="3500" placeholder="Example: What earlier work studies device-independent quantum steering in networks?"></textarea>
 <details style="margin:8px 0"><summary class="muted" style="cursor:pointer">Optional: include your own title, abstract, or technical claim</summary><label for="draft">Unpublished text (processed locally in this browser, or sent only to your selected local model)</label><textarea id="draft" maxlength="7500" placeholder="Paste a manuscript abstract or a precise theorem statement for preliminary comparison"></textarea></details>
+<label for="retrieval-scope">Evidence search scope</label><select id="retrieval-scope"><option value="all">Indexed arXiv + live OpenAlex (for public questions)</option><option value="local">Indexed arXiv only (private)</option></select><p class="tiny">For unpublished drafts, automatic external search is disabled. Use the wider-literature button only when you want to send a query to OpenAlex.</p>
 <div class="composerow"><button class="btn primary" id="ask">Search evidence</button><button class="btn" id="search-openalex">Search wider literature</button><button class="btn" id="clear-draft">Clear draft</button><span id="busy" class="status"></span></div><p class="tiny">Enter to submit; Shift+Enter for a new line. Results are leads, not proof of priority, novelty or correctness.</p></div>
 </section>
-<aside class="panel evidence-panel"><h2>Grounded references <span id="source-count" class="pill">0</span></h2><p class="muted">Every retrieved candidate is linked to its source. A model can cite the numbered records below; citations must be verified manually.</p><div class="row"><button class="btn" id="copy-sources">Copy references</button><button class="btn" id="clear-sources">Clear</button></div><p id="retrieval-status" class="status">No search performed.</p><div id="evidence-list"></div>
+<aside class="panel evidence-panel"><h2>Source library <span id="source-count" class="pill">0</span></h2><p class="muted">Every retrieved candidate is linked to its source. A model can cite the numbered records below; citations must be verified manually.</p><div class="row"><button class="btn" id="copy-sources">Copy references</button><button class="btn" id="clear-sources">Clear</button></div><p id="retrieval-status" class="status">No search performed.</p><div id="evidence-list"></div><hr><div class="row"><button class="btn" id="search-current">Expand sources with OpenAlex</button><a class="btn" href="./lab.html#reader">Open PDF reader</a></div>
 <hr><div class="warning"><b>Scientific limitation:</b> Local matching is based on metadata and lexical relevance. OpenAlex search is external and may be incomplete. This copilot does not read full proofs, verify equations, or establish novelty automatically.</div>
 </aside></div>
 </main><script defer src="./copilot.js"></script></body></html>
