@@ -43,3 +43,22 @@ jobs:
           ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1 docs/assets/researchlens-tour.mp4
           test -s docs/assets/researchlens-tour-poster.jpg
           test -s docs/assets/researchlens-tour.vtt
+
+  browser-smoke:
+    name: Smoke test ResearchLens in Chromium
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install browser test tools
+        run: |
+          npm install --no-save --ignore-scripts playwright@1.56.1
+          npx playwright install --with-deps chromium
+      - name: Run local ResearchLens browser walkthrough
+        run: |
+          python3 -m http.server 8765 --directory docs >/tmp/researchlens-server.log 2>&1 &
+          sleep 2
+          node tests/site-browser-smoke.cjs

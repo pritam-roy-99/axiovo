@@ -22,7 +22,7 @@ external(links,"PDF ↗","https://arxiv.org/pdf/"+id);
 external(links,"Read & annotate","./lab.html?arxiv="+encodeURIComponent(id)+"#reader");
 if(p.doi)external(links,"DOI ↗","https://doi.org/"+p.doi.replace(/^https?:\/\/doi.org\//,""));
 external(links,"SciRate ↗","https://scirate.com/arxiv/"+id);
-external(links,"Similar literature ↗","./search.html?q="+encodeURIComponent(p.title),"btn");
+external(links,"Find related arXiv literature ↗","./?view=scholarly&q="+encodeURIComponent(p.title)+"#discover","btn");
 external(links,"Research Assistant ↗","./copilot.html?id="+encodeURIComponent(id),"btn primary");
 const e=document.createElement("button");e.className="btn";e.textContent="Copy BibTeX";e.onclick=()=>navigator.clipboard?.writeText(bibEntry(p));links.append(e);
 const fields=$("fields");fields.replaceChildren();
@@ -57,7 +57,7 @@ async function renderGithubComments(number){
 async function findDiscussion(){
 $("new-thread").href=issueCreate;$("browse-threads").href=issueSearch;
 $("report-error").href="https://github.com/"+repoName+"/issues/new?"+new URLSearchParams({title:"Metadata issue for "+issueTerm,body:"https://arxiv.org/abs/"+id+"\n\nDescribe the correction needed:"});
-if(curatedIssue[baseId]){$("discussion-status").textContent="Dedicated paper discussion is available. Add a comment or 👍 reaction on GitHub.";const a=$("existing-thread");a.href="https://github.com/"+repoName+"/issues/"+curatedIssue[baseId];a.hidden=false;$("new-thread").hidden=true;renderGithubComments(curatedIssue[baseId]);try{const r=await fetch("https://api.github.com/repos/"+repoName+"/issues/"+curatedIssue[id]);if(r.ok){const d=await r.json();$("discussion-status").textContent="Dedicated discussion: "+(d.comments||0)+" public comments · "+(d.reactions?.["+1"]||0)+" 👍 reactions (GitHub)."}}catch(err){}return}
+if(curatedIssue[baseId]){$("discussion-status").textContent="Dedicated paper discussion is available. Add a comment or 👍 reaction on GitHub.";const a=$("existing-thread");a.href="https://github.com/"+repoName+"/issues/"+curatedIssue[baseId];a.hidden=false;$("new-thread").hidden=true;renderGithubComments(curatedIssue[baseId]);try{const r=await fetch("https://api.github.com/repos/"+repoName+"/issues/"+curatedIssue[baseId]);if(r.ok){const d=await r.json();$("discussion-status").textContent="Dedicated discussion: "+(d.comments||0)+" public comments · "+(d.reactions?.["+1"]||0)+" 👍 reactions (GitHub)."}}catch(err){}return}
 try{
  const url="https://api.github.com/search/issues?"+new URLSearchParams({q:"repo:"+repoName+" is:issue in:title "+issueTerm,per_page:"20"});
  const response=await fetch(url,{headers:{Accept:"application/vnd.github+json"}});

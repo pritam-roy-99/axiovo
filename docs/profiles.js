@@ -10,15 +10,37 @@ function save(){const profile={version:1,updated_at:new Date().toISOString()};fo
 if(!validateURL(profile.orcid,"orcid.org")||!validateURL(profile.github,"github.com")){$("state").textContent="ORCID and GitHub links must use the matching official HTTPS domain.";return}
 try{localStorage.setItem(key,JSON.stringify(profile));$("state").textContent="Profile saved only on this device. Not published or verified."}catch(err){$("state").textContent="Device storage unavailable."}}
 function download(obj,name){const url=URL.createObjectURL(new Blob([JSON.stringify(obj,null,2)],{type:"application/json"}));const a=document.createElement("a");a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),500)}
-function library(){
-const bookmarks=safeArray("researchlens-reading-list"),hidden=safeArray("researchlens-hidden"),topics=safeArray("researchlens-followed-topics");
-$("counts").textContent=bookmarks.length+" saved papers · "+topics.length+" followed topics · "+hidden.length+" hidden papers";
-fetch("data/feed.json").then(r=>r.json()).then(doc=>{
-const list=$("papers");list.replaceChildren();
-const chosen=(doc.papers||[]).filter(p=>bookmarks.includes(p.id)).slice(0,50);
-if(!chosen.length){const p=document.createElement("p");p.className="muted";p.textContent="No saved papers in the current local index. Save them from the research feed.";list.append(p)}
-for(const p of chosen){const d=document.createElement("div");d.className="paper";const a=document.createElement("a");a.href="./paper.html?id="+encodeURIComponent(p.id);a.textContent=p.title;d.append(a);const meta=document.createElement("div");meta.className="muted";meta.textContent=p.id+" · "+(p.published||"").slice(0,10);d.append(meta);list.append(d)}
-}).catch(()=>{$("papers").textContent="Could not load the current research index."})}
+async function library(){
+ const bookmarks=safeArray("researchlens-reading-list"),hidden=safeArray("researchlens-hidden"),topics=safeArray("researchlens-followed-topics");
+ $("counts").textContent=bookmarks.length+" saved arXiv identifiers · "+topics.length+" followed topics · "+hidden.length+" hidden papers";
+ const root=$("papers");root.replaceChildren();
+ const A=window.ResearchLensArxiv;
+ let indexed=[];
+ try{const res=await fetch("./data/feed.json",{cache:"no-store"});if(res.ok)indexed=(await res.json()).papers||[]}catch{}
+ const byBase=new Map(indexed.map(p=>[A?.base(p.id)||p.id,p]));
+ let shown=0;
+ for(const raw of bookmarks){
+  const p=A?.parse(raw);if(!p)continue;
+  if(shown++>=80)break;
+  const data=byBase.get(p.base);
+  const item=document.createElement("div");item.className="paper";
+  const title=document.createElement("a");title.href="./paper.html?id="+encodeURIComponent(p.requested);
+  title.textContent=(data?.title||"arXiv:"+p.base)+(p.explicit?" (v"+p.version+")":"");
+  item.append(title);
+  const source=document.createElement("div");source.className="muted";
+  const link=document.createElement("a");link.href=A.abs(p.requested);link.target="_blank";link.rel="noopener noreferrer";
+  link.textContent="Open original arXiv "+(p.explicit?"v"+p.version:"latest")+" ↗";
+  source.append(link);item.append(source);root.append(item);
+ }
+ if(!shown){
+  const empty=document.createElement("p");empty.className="muted";
+  empty.textContent="No arXiv papers saved in this browser. Save any historical arXiv ID in Discover.";
+  root.append(empty);
+ }
+ if(bookmarks.length>80){
+  const note=document.createElement("p");note.className="muted";note.textContent="Showing the first 80 saved identifiers. Use Workspace to search the full reading list.";root.append(note)
+ }
+}
 $("save").onclick=save;$("export").onclick=()=>download(readProfile(),"researchlens-profile.json");
 $("import").onclick=()=>$("import-file").click();
 $("import-file").onchange=async event=>{
