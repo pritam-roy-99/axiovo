@@ -14,6 +14,7 @@ ResearchLens should connect **discover → evaluate → organize → follow up**
 Success criteria: a researcher can create a question, select relevant interests, see reasons for suggested papers, attach an indexed paper to a question, and restore questions from export. No external service credentials are needed.
 
 ## Stage 2: Reliable literature coverage and search
+Partial deployment: bounded OAI-PMH recent-metadata harvester and combined on-site local/OpenAlex search are implemented. Full historical database and evaluated hybrid semantic search are still outstanding.
 - Persistent historical arXiv metadata via OAI-PMH, incremental harvesting with resumption tokens, idempotent version handling and source timestamps.
 - Semantic and lexical hybrid retrieval with explicit source/coverage controls. Benchmark against a curated field-specific evaluation set before claiming improved recall.
 - OpenAlex/Crossref reconciliation using DOI/arXiv ID and careful duplicate handling.
@@ -23,6 +24,7 @@ Success criteria: a researcher can create a question, select relevant interests,
 Dependencies: robust ingestion storage, query indexes and source API terms/rate limits. Static GitHub Pages alone cannot host a complete searchable archive.
 
 ## Stage 3: PDF reading and comparison
+Partial deployment: local PDF.js rendering and browser-local page notes, plus side-by-side source metadata comparison with user-entered evidence notes. Full-text RAG and anchored AI citations remain outstanding.
 - PDF.js-based in-page reader with accessible page navigation, highlights, notes and reliable cross-page anchors.
 - Structured comparison of mathematical assumptions, data, methods, claims and limitations with explicit page citations.
 - AI should use retrieved passages and abstain from unsupported claims; benchmark citation faithfulness and include full-text licensing checks.
@@ -31,6 +33,7 @@ Dependencies: robust ingestion storage, query indexes and source API terms/rate 
 Dependencies: indexed full text, user-granted document access, PDF licenses and compute for retrieval/inference.
 
 ## Stage 4: Researcher identity, sync and community
+Optional integration: native profiles, votes and comments use Supabase when configured. Owner-only workspace backup/restore now has an RLS SQL schema and opt-in client controls, but is not active by default; moderation and collaborative controls remain.
 - Optional accounts, ORCID linkage, synchronized reading/project notes, permission controls, data export/deletion and private-by-default data.
 - Versioned paper discussions, author responses, abuse reporting, moderation and provenance for claims.
 - Shared project folders and collaboration with clear role controls.
@@ -38,6 +41,7 @@ Dependencies: indexed full text, user-granted document access, PDF licenses and 
 Dependencies: authenticated backend and moderation; never expose private manuscripts or API keys from static pages.
 
 ## Stage 5: Advanced research assistance
+Partial deployment: OpenAlex citation-neighborhood view and visit-time local interest matching. No email/push notifications, claim verification or continuous monitor is deployed.
 - Citation network visualizations, claim maps and structured follow-up experiments.
 - Domain-sensitive literature reviews with confidence limits, evaluation of factual accuracy, scientific counterexamples and field-specific benchmarks.
 - Scheduled, user-consented alerts for new papers matching active research questions.
