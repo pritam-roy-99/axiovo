@@ -15,7 +15,7 @@ function el(tag,text,cls){
  const x=document.createElement(tag);if(text!==undefined)x.textContent=text;if(cls)x.className=cls;return x;
 }
 function addLink(parent,text,url,cls="btn"){
- try{const u=new URL(url);if(u.protocol!=="https:")return null;const a=el("a",text,cls);a.href=u.href;a.target="_blank";a.rel="noopener noreferrer";parent.append(a);return a}catch(e){return null}
+ try{const u=new URL(url,location.href);if(u.protocol!=="https:"||(!String(url).startsWith("https:")&&u.origin!==location.origin))return null;const a=el("a",text,cls);a.href=u.href;a.target="_blank";a.rel="noopener noreferrer";parent.append(a);return a}catch(e){return null}
 }
 function pageInfo(){return {q:$("q").value.trim(),from:$("date-from").value,to:$("date-to").value,sort:$("order").value}}
 function switchView(on){
@@ -91,7 +91,7 @@ async function search(n=1,fromUrl=false){
  }
  if(p.sort==="old")qs.set("sort","publication_date:asc");
  else if(p.sort==="new")qs.set("sort","publication_date:desc");
- else if(p.sort==="title")qs.set("sort","display_name:asc");
+ 
  lastRequest=qs.toString();
  const url=new URL(window.location.href);
  url.searchParams.set("history","1");
@@ -102,12 +102,13 @@ async function search(n=1,fromUrl=false){
   if(!result.ok)throw Error("OpenAlex returned HTTP "+result.status);
   const payload=await result.json();found=payload.meta?.count??0;
   root.replaceChildren();
-  const rows=payload.results||[];
+  let rows=payload.results||[];
+  if(p.sort==="title")rows=[...rows].sort((a,b)=>(a.display_name||"").localeCompare(b.display_name||""));
   $("history-count").textContent=found.toLocaleString()+" arXiv-linked records found";
   if(!rows.length)root.append(el("div","No matching arXiv-linked records in OpenAlex. Try a broader date range or fewer keywords. This does not establish that arXiv has no papers.","empty"));
   else for(const w of rows)root.append(paperCard(w));
   if(/^\d{4}\.\d{4,5}(?:v\d+)?$/.test(p.q)&&!rows.length){
-   const x=el("div","Look up the exact identifier at the authoritative arXiv record: ","empty");
+   const x=el("div","This paper may not be indexed by OpenAlex. Open the source record: ","empty");
    addLink(x,"arXiv:"+p.q+" ↗","https://arxiv.org/abs/"+p.q);
    root.append(x);
   }
