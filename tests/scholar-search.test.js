@@ -15,7 +15,8 @@ const future={...quantum,id:"https://openalex.org/W5",publication_date:"2027-08-
 const plan=S.plan(contextual,"Contextuality",{today:"2026-11-03"});
 assert.equal(plan.context,true);
 assert.equal(plan.search,"quantum Contextuality");
-assert.ok(plan.params.get("filter").includes("primary_topic.field.id:31|17|26"));
+assert.ok(plan.params.get("filter").includes("locations.source.id:S4306400194"));
+assert.ok(!plan.params.get("filter").includes("primary_topic.field.id:"));
 assert.ok(plan.params.get("filter").includes("to_publication_date:2026-11-03"));
 assert.deepEqual(S.select([medical,social,wrong,quantum,future],plan).map(w=>w.id),[quantum.id]);
 const prep=S.plan({...contextual,subtopic:"Preparation contextuality"},"Preparation contextuality",{today:"2026-11-03"});
