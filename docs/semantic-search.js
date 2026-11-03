@@ -69,7 +69,8 @@
    social:"social science and economics"
   }[field]||"scientific research";
   const base=p&&field==="quantum"?p.prompts:fieldText+" research on "+distinct;
-  const sub=String(base===undefined?"":state?.subtopic||"").trim();
+  const browsing=[state?.topic,state?.subtopic].some(x=>String(x||"").toLowerCase()===distinct.toLowerCase());
+  const sub=browsing?String(state?.subtopic||"").trim():"";
   // Keep named specializations in the embedding query, not only a broad category.
   return (base+(sub&&!base.toLowerCase().includes(sub.toLowerCase())?". Specific topic: "+sub+".":"")).slice(0,1800);
  }
