@@ -152,6 +152,7 @@ async function search(){
  if(requestController)requestController.abort();
  busy=true;showingSaved=false;persist();
  const q=$("query").value.trim();
+ const official=$("official-search");if(official&&Arxiv)official.href=Arxiv.officialSearchUrl(q);
  if(!q){busy=false;setStatus("Enter a research topic, paper title or arXiv identifier.");return}
  const dates=normalizeSearchDates();
  if(!SearchCore){busy=false;setStatus("Search tools unavailable. Reload ResearchLens.");return}
