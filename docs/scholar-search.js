@@ -43,7 +43,7 @@
   const context=field==="quantum"&&
     [raw,state.topic,state.subtopic].some(x=>CONTEXT.test(x||""))&&browse;
   const search=context?"quantum "+(raw||"contextuality"):raw;
-  const filters=["locations.source.id:S4306400194","primary_topic.field.id:"+FIELDS[field].join("|")];
+  const filters=["locations.source.id:S4306400194"]; // Screen returned works against primary and secondary fields, not a restrictive primary-only API gate.
   const maxDate=String(opts.today||new Date().toISOString().slice(0,10));
   const from=String(opts.from||"");
   const to=String(opts.to||"");
@@ -60,9 +60,9 @@
  }
  function match(work,p){
   if(!work||!work.id||!(work.display_name||work.title))return false;
-  const id=fieldId(work.primary_topic?.field?.id);
-  // Most importantly, never let a record in an unrelated classified field through.
-  if(!id||!p.allowed.includes(id))return false;
+  const classifications=[work.primary_topic,...(work.topics||[])].map(t=>fieldId(t?.field?.id)).filter(Boolean);
+  // Interdisciplinary works may be classified primarily outside their relevant subfield.
+  if(!classifications.some(id=>p.allowed.includes(id)))return false;
   if(work.publication_date&&String(work.publication_date)>p.maxDate)return false;
   const {title,abs,labels,combined}=textFor(work);
   const src=norm(title+" "+abs);
