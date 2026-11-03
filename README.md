@@ -74,6 +74,16 @@ ResearchLens combines the former AI Lab and Research Copilot into **one** interf
 
 **Limits:** This is metadata/abstract-based research assistance, not complete full-text semantic retrieval, theorem verification, proof equivalence, automated novelty certification or a hosted AI API. OpenAlex availability is external, and local AI modes need device-specific setup.
 
+## Researcher-friendly discovery and reading-list controls
+
+ResearchLens now prioritizes **Discover** before **Workspace** in the top navigation and homepage actions. The arXiv and wider scholarly discovery interfaces share a **primary research field** preference. Researchers can select a main discipline, one of its established research areas, and then a curated specialized interest. The nine supported discipline presets have **246 field-specific subtopic suggestions**. Selecting a subtopic starts a corresponding live OpenAlex metadata search and updates the browser-local research interest used by the workspace and recommendations.
+
+The limited local arXiv feed is primarily a quantum/physics snapshot. Choosing another discipline switches to broader OpenAlex discovery instead of presenting quantum papers as if they matched that discipline. Field menus are compact in-page controls rather than Android's full-screen native selectors.
+
+Paper cards now have one **Analyze / Ask AI** link to the unified Research Assistant (the former AI Lab and Copilot are already merged). A modern, accessible bookmark button saves papers to reading lists with a clear saved/unsaved state. Both arXiv and OpenAlex saved collections remain browser-local and are aggregated in the research workspace.
+
+**Scope:** Research subtopics are curated search suggestions, not a disciplinary ontology or a validated paper classifier. The local arXiv snapshot is incomplete, and OpenAlex results depend on source indexing and API availability. Saved reading lists and preferences stay on the current device unless explicitly exported or backed up through an independently configured account service.
+
 ## Current features (deployed GitHub Pages prototype)
 
 - Responsive scientific-paper website with title, abstract, author, and arXiv identifier search.
