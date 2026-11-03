@@ -44,6 +44,12 @@ Open [Research Tools](https://pritam-roy-99.github.io/researchlens/lab.html) fro
 
 The OAI workflow can run daily and stores at most 4,000 recently modified metadata records. For requirements, operational limits, privacy and setup, see [RESEARCH_TOOLS_SETUP.md](RESEARCH_TOOLS_SETUP.md). These are functional foundations, not claims of complete full-corpus semantic retrieval, reliable PDF theorem comparison, production community moderation, or automated scientific alerts.
 
+## Homepage guided video
+
+The homepage now includes a 48-second narrated, illustrated walkthrough explaining paper discovery, field-aware search, recommendations, reading lists, PDF notes, citation links and research questions. It is **a scripted product animation**, not a recording of live interactions or a claim that an AI video model generated live screenshots. The video uses accessible native browser controls, English captions (WebVTT), a poster image, a text transcript and no autoplay.
+
+The source is `scripts/build_intro_video.py`. GitHub Actions generates `docs/assets/researchlens-tour.mp4`, the poster and captions during deployment, then caches the assets so routine hourly metadata updates don't re-encode the video. The build uses Pillow, FFmpeg and espeak-ng. No commercial video API credentials are needed. Media is served directly from GitHub Pages.
+
 ## Current features (deployed GitHub Pages prototype)
 
 - Responsive scientific-paper website with title, abstract, author, and arXiv identifier search.

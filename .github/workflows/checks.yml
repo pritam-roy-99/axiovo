@@ -20,3 +20,12 @@ jobs:
         run: python -m scripts.validate_site
       - name: Research relevance tests
         run: node tests/relevance.test.js
+      - name: Build homepage video preview
+        run: |
+          python -m pip install --disable-pip-version-check Pillow
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg espeak-ng
+          python scripts/build_intro_video.py
+          ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1 docs/assets/researchlens-tour.mp4
+          test -s docs/assets/researchlens-tour-poster.jpg
+          test -s docs/assets/researchlens-tour.vtt
