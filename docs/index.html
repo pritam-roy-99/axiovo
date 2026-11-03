@@ -49,7 +49,7 @@ dialog{border:0;border-radius:13px;box-shadow:0 20px 90px #061e3977;width:min(74
 <span class="rl-home-kicker">A RESEARCH PLATFORM FOR SCIENTISTS</span>
 <h1 id="rl-home-title">Find the papers that move your research forward.</h1>
 <p>From discovering new arXiv papers to reading, comparing, saving and following the questions that matter to your field.</p>
-<p class="rl-home-hero-actions"><a class="rl-home-start" href="./workspace.html">Open my workspace</a><a class="rl-home-explore" href="./?view=scholarly#discover">Explore research fields</a></p>
+<p class="rl-home-hero-actions"><a class="rl-home-start" href="./#discover">Discover research</a><a class="rl-home-explore" href="./workspace.html">My workspace</a></p>
 <p class="rl-home-explainer-meta">Free and open source · No account needed for local reading and notes</p>
 </section>
 <figure class="rl-home-demo">
@@ -217,5 +217,37 @@ el("date-week").onclick=()=>{el("date-from").value=utcDay(-6);el("date-to").valu
 
 for(const id of ["q","category","order"])el(id).addEventListener(id==="q"?"input":"change",()=>{page=0;render();updateArchiveLink()});
 {const q=new URLSearchParams(location.search).get("q");if(q)el("q").value=q.slice(0,200);if(new URLSearchParams(location.search).get("sort")==="recommended")el("order").value="recommended";updateArchiveLink()}
+// Keep the main research field synchronized with the wider scholarly explorer.
+(function connectMainField(){
+ const config=window.ResearchLensFields;
+ if(!config)return;
+ const selector=el("arxiv-main-field");
+ const stored=()=>{try{return JSON.parse(localStorage.getItem("researchlens-field-explorer-v1")||"{}")}catch{return{}}};
+ const prefs=stored();
+ for(const [key,definition] of Object.entries(config.FIELDS)){
+  const opt=document.createElement("option");opt.value=key;opt.textContent=definition.name;selector.append(opt);
+ }
+ function showSelected(field){
+  const key=config.fieldKey(field);selector.value=key;
+  el("arxiv-field-heading").textContent=key==="quantum"?"Explore quantum research":"Explore "+config.FIELDS[key].name.toLowerCase();
+  el("arxiv-field-hint").textContent=key==="quantum"?
+   "Choose a topic to focus the local quantum arXiv feed":
+   "This field uses the wider scholarly search with specialized subtopics";
+ }
+ showSelected(prefs.field||"quantum");
+ selector.addEventListener("change",()=>{
+  const field=config.fieldKey(selector.value),p=stored();
+  p.field=field;p.topic=config.FIELDS[field].topics[0];p.subtopic="";p.query=p.topic;
+  try{localStorage.setItem("researchlens-field-explorer-v1",JSON.stringify(p))}catch{}
+  showSelected(field);
+  if(field!=="quantum"){
+   el("rl-source-scholarly").click();
+   window.dispatchEvent(new CustomEvent("researchlens:choose-field",{detail:{field}}))
+  }else if(el("scholarly-discovery").hidden===false){
+   window.dispatchEvent(new CustomEvent("researchlens:choose-field",{detail:{field}}))
+  }
+ });
+ window.addEventListener("researchlens:field-changed",e=>showSelected(e.detail?.field));
+})();
 fetch("data/feed.json",{cache:"no-cache"}).then(r=>{if(!r.ok)throw Error("Feed unavailable");return r.json()}).then(d=>{all=(d.papers||[]).filter(p=>p&&p.id&&p.title);topicCatalog=d.topic_catalog||[];showTopics();el("updated").textContent=d.generated_at?fmt(d.generated_at):"Not yet";const dates=all.map(p=>p.published||p.updated).filter(Boolean).sort();el("coverage").textContent=all.length+" indexed papers · source v1 dates "+(dates[0]||"?").slice(0,10)+" to "+(dates.at(-1)||"?").slice(0,10)+" · synchronized "+(d.generated_at||"unknown")+" · arXiv quant-ph, cs.IT, hep-th, physics.optics, cond-mat.mes-hall + selected historical IDs. This is not full arXiv coverage.";render();persistState()}).catch(e=>{el("count").textContent="Snapshot shown; live data refresh failed";console.error(e)});
 </script><script defer src="./history.js"></script></body></html>
