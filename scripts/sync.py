@@ -177,7 +177,7 @@ def main():
         raise RuntimeError("Empty response; retaining existing data")
     papers = merge(old.get("papers", []), fresh)
     # Preserve curated historical records even if the rolling feed reaches its limit.
-    pinned_ids = {re.sub(r"v\\d+$", "", x) for x in pinned}
+    pinned_ids = {re.sub(r"v\d+$", "", x) for x in pinned}
     pinned_records = [p for p in (old.get("papers", []) + historical) if p.get("id") in pinned_ids]
     papers = merge(papers, pinned_records, limit=3500)
     payload = {
