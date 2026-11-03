@@ -114,19 +114,76 @@ def fetch_recent():
         raise RuntimeError("All arXiv feeds unavailable, preserving previous data")
     return results
 
+
+def read_pinned_ids():
+    """Curated historical IDs are requested directly, regardless of recency."""
+    source = ROOT / "data" / "pinned_arxiv_ids.txt"
+    if not source.exists():
+        return []
+    values = []
+    for line in source.read_text(encoding="utf-8").splitlines():
+        ident = line.split("#", 1)[0].strip()
+        if not ident:
+            continue
+        if not re.fullmatch(r"(?:\d{4}\.\d{4,5}|[a-z-]+(?:\.[A-Z]{2})?/\d{7})(?:v\d+)?", ident):
+            print("WARNING: invalid pinned ID:", ident)
+            continue
+        if ident not in values:
+            values.append(ident)
+    return values
+
+def fetch_by_ids(ids):
+    """Look up older records using arXiv ID query; no made-up metadata."""
+    if not ids:
+        return []
+    found = []
+    for start in range(0, len(ids), 20):
+        group = ids[start:start+20]
+        query = urllib.parse.urlencode({"id_list": ",".join(group),
+                                        "max_results": len(group)})
+        request = urllib.request.Request(
+            "https://export.arxiv.org/api/query?" + query,
+            headers={"User-Agent": os.getenv(
+                "ARXIV_USER_AGENT",
+                "ResearchLens-MVP/0.3 (https://github.com/pritam-roy-99/researchlens)")})
+        for attempt in range(2):
+            try:
+                with urllib.request.urlopen(request, timeout=45) as response:
+                    parsed = parse_atom(response.read())
+                matched = {re.sub(r"v\d+$", "", x): x for x in group}
+                found.extend(p for p in parsed if p["id"] in matched)
+                break
+            except (OSError, ValueError, ET.ParseError) as exc:
+                if attempt == 1:
+                    print("WARNING: pinned ID query failed:", str(exc)[:160])
+                else:
+                    time.sleep(5)
+        if start + 20 < len(ids):
+            time.sleep(3.2)
+    return found
+
 def main():
     try:
         old = json.loads(TARGET.read_text(encoding="utf-8")) if TARGET.exists() else {}
     except (ValueError, OSError):
         old = {}
     fresh = fetch_recent()
+    pinned = read_pinned_ids()
+    historical = fetch_by_ids(pinned)
+    if pinned:
+        print("Pinned ID lookup:", len(historical), "resolved of", len(pinned))
+    fresh.extend(historical)
     if not fresh:
         raise RuntimeError("Empty response; retaining existing data")
     papers = merge(old.get("papers", []), fresh)
+    # Preserve curated historical records even if the rolling feed reaches its limit.
+    pinned_ids = {re.sub(r"v\\d+$", "", x) for x in pinned}
+    pinned_records = [p for p in (old.get("papers", []) + historical) if p.get("id") in pinned_ids]
+    papers = merge(papers, pinned_records, limit=3500)
     payload = {
         "generated_at": dt.datetime.now(dt.timezone.utc).isoformat(),
         "source": "arXiv Atom API",
-        "paper_count": len(papers), "topic_catalog": topic_catalog(), "papers": papers
+        "paper_count": len(papers), "pinned_ids": pinned, "topic_catalog": topic_catalog(), "papers": papers
     }
     TARGET.parent.mkdir(parents=True, exist_ok=True)
     with tempfile.NamedTemporaryFile("w", encoding="utf-8", dir=TARGET.parent, delete=False) as f:
