@@ -24,7 +24,7 @@ def fmt_date(value):
 
 def first_paint(data):
     papers=[p for p in data.get("papers",[]) if p.get("id") and p.get("title")]
-    papers=sorted(papers,key=lambda p:p.get("updated") or p.get("published") or "",reverse=True)
+    papers=sorted(papers,key=lambda p:p.get("published") or p.get("updated") or "",reverse=True)
     items=[]
     for p in papers[:30]:
         identifier=p["id"]
@@ -40,7 +40,7 @@ def first_paint(data):
             f'<h2>{title}</h2><div class="meta">{authors} · {fmt_date(p.get("published",""))}'
             f' · {escape(identifier)}</div><p>{abstract}</p>'
             f'<a class="btn primary" href="{url}" target="_blank" rel="noopener noreferrer">Read on arXiv ↗</a> '
-            f'<a class="btn" href="./ai.html?id={escape(identifier,quote=True)}">✦ Analyze with AI</a></article>')
+            f'<a class="btn" href="./copilot.html?id={escape(identifier,quote=True)}">✦ Analyze / Ask AI</a></article>')
     if not items:
         return "<div class='empty'>No paper snapshot is available. Check the status of the arXiv synchronization.</div>"
     return "".join(items)
