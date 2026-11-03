@@ -57,6 +57,8 @@ jobs:
           fi
       - name: Render first-paint snapshot with actual index counts
         run: python -m scripts.build_snapshot
+      - name: Build Atom topic subscriptions
+        run: python -m scripts.build_feeds
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
