@@ -26,7 +26,9 @@ function init(){
  b.addEventListener("click",()=>show("scholarly"));
  window.addEventListener("popstate",()=>show(new URLSearchParams(location.search).get("view")==="scholarly"?"scholarly":"arxiv",false));
  const params=new URLSearchParams(location.search);
- show(params.get("view")==="scholarly"?"scholarly":"arxiv",false);
+ let primary="quantum";try{primary=JSON.parse(localStorage.getItem("researchlens-field-explorer-v1")||"{}").field||"quantum"}catch{}
+ const requested=params.get("view");
+ show(requested==="scholarly"||(!requested&&primary!=="quantum")?"scholarly":"arxiv",false);
 }
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
 })();
