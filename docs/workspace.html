@@ -1,0 +1,22 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>My workspace | ResearchLens</title><meta name="description" content="Your personal research reading workspace, recent arXiv papers, saved literature and next research actions.">
+<link rel="stylesheet" href="./theme.css"><script defer src="./theme.js"></script><link rel="stylesheet" href="./workspace.css"><script defer src="./navigation.js"></script><script defer src="./workspace.js"></script>
+</head><body><header></header>
+<main class="rl-workspace">
+<section class="rl-welcome"><div><span class="rl-eyebrow">RESEARCHLENS / MY WORKSPACE</span><h1>Pick up where your research left off.</h1><p>A simpler place to find relevant papers, review your reading list, and continue your research. Everything in this workspace is stored on this device.</p></div><div class="rl-welcome-actions"><a class="rl-button primary" href="./fields.html">Find papers</a><a class="rl-button secondary" href="./copilot.html">Open Copilot</a></div></section>
+<div class="rl-focusbar"><div><span class="rl-eyebrow">CURRENT FOCUS</span><strong id="focus-name">Loading your field…</strong><p id="focus-summary">Your discipline and topic preferences can be changed in Field Explorer.</p></div><a class="rl-button secondary" href="./fields.html">Change research field</a></div>
+<div class="rl-shortcuts" aria-label="Common researcher tasks">
+<a href="./"><span class="rl-shortcut-icon">01</span><strong>Today's arXiv feed</strong><small>New submissions in the indexed categories</small></a>
+<a href="./fields.html"><span class="rl-shortcut-icon">02</span><strong>Search my field</strong><small>Live broader scholarly search</small></a>
+<a href="./copilot.html"><span class="rl-shortcut-icon">03</span><strong>Compare literature</strong><small>Research copilot and source links</small></a>
+<a href="./profiles.html"><span class="rl-shortcut-icon">04</span><strong>Research profile</strong><small>Manage your researcher interests</small></a>
+</div>
+<div class="rl-workspace-columns">
+<section class="rl-section" aria-labelledby="latest-heading"><div class="rl-section-head"><div><span class="rl-eyebrow">RECENTLY INDEXED</span><h2 id="latest-heading">Recent papers</h2></div><a href="./">Full feed</a></div><p class="rl-subtext" id="feed-status" role="status" aria-live="polite">Loading publication metadata…</p><div id="recent-list" class="rl-stack"></div><p class="rl-note">The local index covers selected arXiv categories, not all research papers. Dates are original submission dates; announcements and source APIs can lag.</p></section>
+<section class="rl-section" aria-labelledby="library-heading"><div class="rl-section-head"><div><span class="rl-eyebrow">YOUR LIBRARY</span><h2 id="library-heading">Saved reading</h2></div><span id="library-count" class="rl-counter">0 papers</span></div><p class="rl-subtext">Combines papers saved from the arXiv feed and Field Explorer in this browser.</p>
+<div class="rl-library-controls"><input type="search" id="library-search" placeholder="Filter saved papers" aria-label="Filter saved papers"><select id="library-filter" aria-label="Reading status"><option value="all">All papers</option><option value="to-read">To read</option><option value="reading">Reading</option><option value="done">Finished</option></select></div>
+<div id="library-list" class="rl-stack"></div><div class="rl-library-footer"><button type="button" id="export-library" class="rl-button secondary">Export library JSON</button><button type="button" id="export-citations" class="rl-button secondary">Export BibTeX</button></div>
+<p class="rl-note">Your reading statuses and notes stay in this browser. Export a backup before switching devices or clearing site data.</p></section>
+</div>
+<section class="rl-section rl-bottom"><div><span class="rl-eyebrow">FIND AN ANSWER</span><h2>Explore your next research question</h2><p class="rl-subtext">Search by concept, method, theorem, title, or author. Results stay inside ResearchLens.</p></div><form id="quick-search" class="rl-quick-search"><label class="rl-visually-hidden" for="research-query">Research question</label><input type="search" id="research-query" maxlength="220" placeholder="e.g. contextuality and quantum sensing" required><button class="rl-button primary" type="submit">Search papers</button></form></section>
+</main><footer class="rl-page-footer">ResearchLens · Research assistance and metadata exploration, not automated scientific verification.</footer></body></html>
