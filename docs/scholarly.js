@@ -21,7 +21,15 @@ if(state.subtopic&&!state.customSubtopic&&!fieldTopics(state.field,state.topic).
 let saved=read(SAVED,[]);if(!Array.isArray(saved))saved=[];
 let page=1,total=0,busy=false,items=[],showingSaved=false,requestController=null;
 function node(tag,text,className){const el=document.createElement(tag);if(text!==undefined)el.textContent=text;if(className)el.className=className;return el}
-function link(parent,label,url){if(!/^https:\/\//.test(url||""))return;const a=node("a",label);a.href=url;a.target="_blank";a.rel="noopener noreferrer";parent.append(a)}
+function link(parent,label,url){
+ try{
+  const target=new URL(url,location.href);
+  if(target.protocol!=="https:"||(!String(url||"").startsWith("https://")&&target.origin!==location.origin))return null;
+  const a=node("a",label);a.href=target.href;
+  if(target.origin!==location.origin){a.target="_blank";a.rel="noopener noreferrer"}
+  parent.append(a);return a
+ }catch{return null}
+}
 function recordID(w){return w.id||w.doi||w.display_name}
 function arxivURL(w){const p=Arxiv?.candidates(w)[0];return p?Arxiv.abs(p.requested):null}
 function bib(w){const author=(w.authorships||[]).map(a=>a.author?.display_name).filter(Boolean).join(" and ");const key=(author.split(" ").slice(-1)[0]||"Research")+"_"+(w.publication_year||"n.d.")+"_"+String(w.display_name||"work").split(/\W+/).slice(0,2).join("");const val=x=>String(x||"").replace(/[{}]/g,"").replace(/\s+/g," ").trim();return "@article{"+key.replace(/\W/g,"")+"\n  title = {"+val(w.display_name||w.title)+"},\n  author = {"+val(author)+"},\n  year = {"+val(w.publication_year)+"},\n  doi = {"+val((w.doi||"").replace(/^https:\/\/doi.org\//,""))+"},\n  url = {"+val(w.id)+"}\n}\n"}
