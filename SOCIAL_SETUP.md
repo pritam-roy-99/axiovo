@@ -5,9 +5,9 @@ This is an optional upgrade beyond the currently working GitHub Issues comments 
 ## Hosted authentication and user content
 
 1. Create a Supabase project (free tier may be sufficient for a beta, subject to provider limits).
-2. Open SQL Editor and execute the schema in supabase/schema.sql.
+2. Open SQL Editor and execute the schema in supabase/schema.sql. For optional private research backups also run supabase/user_data.sql.
 3. Enable GitHub OAuth in Supabase Authentication > Providers; configure the GitHub OAuth application callback URL exactly as Supabase specifies.
-4. In Supabase Authentication > URL Configuration, allow your GitHub Pages URLs, including https://pritam-roy-99.github.io/researchlens/paper.html and https://pritam-roy-99.github.io/researchlens/profiles.html.
+4. In Supabase Authentication > URL Configuration, allow your GitHub Pages URLs, including https://pritam-roy-99.github.io/researchlens/paper.html and https://pritam-roy-99.github.io/researchlens/profiles.html and https://pritam-roy-99.github.io/researchlens/lab.html.
 5. Copy your project's HTTPS URL and public/publishable anon key into docs/social-config.js. Never put a service_role secret, Supabase secret key or GitHub OAuth client secret into this public repository.
 6. Deploy. The native comment and endorse panel on individual paper pages will appear automatically, and the researcher workspace will enable public profiles, GitHub sign-in, and follows.
 
@@ -19,6 +19,7 @@ Before allowing unrestricted public use, add content moderation, abuse/rate prot
 - paper_votes: one reversible endorsement per authenticated user per paper
 - paper_comments: public read, authenticated write; owners may edit/delete
 - profile_follows: follower relationships and unfollow controls
+- research_user_data: opt-in owner-only workspace backups, after running supabase/user_data.sql
 
 RLS is enabled for all tables. Do not disable it.
 
@@ -30,6 +31,10 @@ RLS is enabled for all tables. Do not disable it.
 - GitHub Issues-based public comments and reactions, using GitHub accounts
 - Day and night theme
 - AI Lab deterministic literature report and optional WebGPU model
+
+## Private sync caveats
+
+Backups are explicit, not continuous. Row-level security only grants the signed-in owner access to their private payload. Restores overwrite corresponding browser-local keys after confirmation. See [RESEARCH_TOOLS_SETUP.md](RESEARCH_TOOLS_SETUP.md).
 
 ## Still planned
 
