@@ -229,10 +229,10 @@ for(const id of ["q","category","order"])el(id).addEventListener(id==="q"?"input
  }
  function showSelected(field){
   const key=config.fieldKey(field);selector.value=key;
-  el("arxiv-field-heading").textContent=key==="quantum"?"Explore quantum research":"Explore "+config.FIELDS[key].name.toLowerCase();
+  el("arxiv-field-heading").textContent=key==="quantum"?"Explore quantum research":"Quantum arXiv snapshot";
   el("arxiv-field-hint").textContent=key==="quantum"?
    "Choose a topic to focus the local quantum arXiv feed":
-   "This field uses the wider scholarly search with specialized subtopics";
+   "Your main field is "+config.FIELDS[key].name+". Select Search all fields for relevant research areas and subtopics.";
  }
  showSelected(prefs.field||"quantum");
  selector.addEventListener("change",()=>{
