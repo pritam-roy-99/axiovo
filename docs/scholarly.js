@@ -197,8 +197,13 @@ function directArxivPaper(raw){
 function renderControls(){$("prev").disabled=true;$("next").disabled=true}
 function init(){
 const latest=read(KEY,{});
-if(latest.field&&FIELDS[latest.field]&&latest.field!==state.field){
- state.field=latest.field;state.topic=FIELDS[state.field].topics[0];state.subtopic="";state.query=state.topic
+if(latest.field&&FIELDS[latest.field]){
+ state.field=latest.field;
+ state.topic=FIELDS[state.field].topics.includes(latest.topic)?latest.topic:FIELDS[state.field].topics[0];
+ state.subtopic=String(latest.subtopic||"");
+ if(state.subtopic&&!fieldTopics(state.field,state.topic).includes(state.subtopic)&&!latest.customSubtopic)state.subtopic="";
+ state.customSubtopic=Boolean(latest.customSubtopic);
+ state.query=state.subtopic||state.topic;
 }
 const opts=$("field"), choices=$("field-choices");
 for(const [id,f] of Object.entries(FIELDS)){
