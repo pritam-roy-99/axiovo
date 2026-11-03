@@ -18,6 +18,7 @@ $("abstract").textContent=p.abstract||"Abstract unavailable in this index";
 const links=$("links");links.replaceChildren();
 external(links,"arXiv abstract ↗","https://arxiv.org/abs/"+id,"btn primary");
 external(links,"PDF ↗","https://arxiv.org/pdf/"+id);
+external(links,"Read & annotate","./lab.html?arxiv="+encodeURIComponent(id)+"#reader");
 if(p.doi)external(links,"DOI ↗","https://doi.org/"+p.doi.replace(/^https?:\/\/doi.org\//,""));
 external(links,"SciRate ↗","https://scirate.com/arxiv/"+id);
 external(links,"Similar literature ↗","./search.html?q="+encodeURIComponent(p.title),"btn");

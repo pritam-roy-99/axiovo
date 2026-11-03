@@ -1,0 +1,80 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Research Tools | ResearchLens</title>
+<meta name="description" content="ResearchLens tools for source-linked literature search, PDF reading, structured paper comparison, citation exploration and personal alerts.">
+<link rel="stylesheet" href="./theme.css"><script defer src="./theme.js"></script>
+<link rel="stylesheet" href="./workspace.css"><script defer src="./navigation.js"></script><link rel="stylesheet" href="./lab.css">
+<script defer src="./social-config.js"></script><script defer src="./lab.js"></script><script defer src="./cloud-sync.js"></script></head>
+<body><header></header>
+<main class="rl-workspace rl-lab">
+<section class="rl-welcome"><div><span class="rl-eyebrow">RESEARCH TOOLS</span><h1>From reading papers to making progress.</h1>
+<p>Search source metadata, read a local PDF, compare two papers, examine citation relationships, and review new papers matching your interests.</p></div>
+<a class="rl-button secondary" href="./workspace.html">Back to my workspace</a></section>
+<nav class="lab-tabs" aria-label="Research tools">
+<a href="#archive">Archive search</a><a href="#reader">PDF reader</a><a href="#compare">Paper comparison</a>
+<a href="#citations">Citation explorer</a><a href="#alerts">Research alerts</a><a href="#sync">Account sync</a></nav>
+<section class="rl-section lab-block" id="archive">
+<span class="rl-eyebrow">STAGE 2 / DISCOVERY</span><h2>Search arXiv metadata and wider scholarship</h2>
+<p class="rl-subtext">The local OAI mirror contains a bounded, recently modified subset. For broad historical literature, ResearchLens queries OpenAlex and returns results on this page.</p>
+<form id="lab-search-form" class="lab-form-inline"><label for="lab-query">Search title, abstract or author</label><input id="lab-query" type="search" maxlength="220" required placeholder="e.g. measurement incompatibility">
+<label for="lab-source">Source</label><select id="lab-source"><option value="all">Local arXiv + OpenAlex</option><option value="local">Local arXiv only</option><option value="openalex">OpenAlex only</option></select>
+<button class="rl-button primary" type="submit">Search literature</button></form>
+<p class="rl-subtext" id="lab-search-status" role="status">Enter a research topic to search.</p><div id="lab-search-results" class="lab-result-list"></div>
+</section>
+<section class="rl-section lab-block" id="reader">
+<span class="rl-eyebrow">STAGE 3 / READING</span><h2>Read and annotate a scientific PDF</h2>
+<p class="rl-subtext">Select a PDF from your device to render and annotate locally using PDF.js. Uploaded bytes are processed in your browser, not sent to ResearchLens. For an arXiv ID, open its authoritative hosted PDF.</p>
+<div class="lab-form-inline"><label for="lab-local-pdf">Local PDF</label><input id="lab-local-pdf" type="file" accept="application/pdf,.pdf">
+<label for="lab-arxiv-id">Or arXiv ID</label><input id="lab-arxiv-id" type="text" maxlength="40" placeholder="2608.13942">
+<button type="button" id="lab-open-arxiv" class="rl-button secondary">Open arXiv PDF</button></div>
+<p class="rl-subtext" id="lab-pdf-status" role="status">No PDF loaded.</p>
+<div class="lab-reader-grid"><div class="lab-viewer"><div class="lab-pdf-toolbar">
+<button id="lab-prev-page" type="button" disabled>Previous</button><span id="lab-page-count">Page 0 of 0</span><button id="lab-next-page" type="button" disabled>Next</button>
+<label for="lab-pdf-scale">Zoom</label><select id="lab-pdf-scale"><option value="1">100%</option><option value="1.3" selected>130%</option><option value="1.6">160%</option></select></div>
+<div class="lab-canvas-shell"><canvas id="lab-pdf-canvas" aria-label="Rendered PDF page"></canvas></div>
+</div><aside class="lab-notes"><h3>Page notes</h3><p class="rl-subtext">Notes are linked to this PDF and page number, on this device.</p>
+<label for="lab-page-note">Your observation or question</label><textarea id="lab-page-note" rows="6" maxlength="5000" placeholder="Write a method assumption, equation reference or question about this page."></textarea>
+<div class="rl-paper-actions"><button type="button" id="lab-save-note" disabled>Save page note</button><button type="button" id="lab-export-notes">Export notes</button></div>
+<p class="rl-subtext" id="lab-note-status" role="status"></p></aside></div>
+</section>
+<section class="rl-section lab-block" id="compare">
+<span class="rl-eyebrow">STAGE 3 / EVIDENCE</span><h2>Compare two papers</h2>
+<p class="rl-subtext">Use arXiv IDs present in the local feed or OAI mirror. The comparison quotes their metadata and abstracts; it does not automatically evaluate mathematical correctness or prove equivalence.</p>
+<form id="lab-compare-form" class="lab-form-inline">
+<label for="lab-paper-a">First arXiv ID</label><input id="lab-paper-a" maxlength="40" placeholder="2608.13942" required>
+<label for="lab-paper-b">Second arXiv ID</label><input id="lab-paper-b" maxlength="40" placeholder="2609.36080" required>
+<button class="rl-button primary" type="submit">Compare evidence</button></form>
+<p class="rl-subtext" id="lab-compare-status" role="status"></p><div class="lab-compare-grid" id="lab-compare-results"></div>
+<details class="rl-preferences"><summary>Structured researcher comparison notes</summary>
+<p class="rl-subtext">Write only what you have verified in the source PDFs. Cite exact pages, equations or sections. Entries are not AI-derived.</p>
+<div class="lab-compare-grid">
+<div><label for="lab-compare-a-note">Paper A: assumptions, results and evidence</label><textarea id="lab-compare-a-note" rows="5" maxlength="5000" placeholder="Assumptions, main claim, exact page or equation"></textarea></div>
+<div><label for="lab-compare-b-note">Paper B: assumptions, results and evidence</label><textarea id="lab-compare-b-note" rows="5" maxlength="5000" placeholder="Assumptions, main claim, exact page or equation"></textarea></div>
+</div><div class="rl-paper-actions"><button id="lab-compare-save" type="button">Save comparison notes</button>
+<button id="lab-compare-export" type="button">Export Markdown comparison</button></div>
+<p class="rl-subtext" id="lab-compare-note-status" role="status"></p></details></section>
+<section class="rl-section lab-block" id="citations">
+<span class="rl-eyebrow">STAGE 5 / CONNECTIONS</span><h2>Explore a citation neighborhood</h2>
+<p class="rl-subtext">Enter a DOI or OpenAlex work ID. Relationships are retrieved directly from OpenAlex. This is a limited citation neighborhood, not a complete citation network.</p>
+<form id="lab-citation-form" class="lab-form-inline"><label for="lab-citation-id">DOI / OpenAlex ID</label>
+<input id="lab-citation-id" maxlength="220" required placeholder="10.1103/PhysRevA.113.022611 or W12345">
+<button type="submit" class="rl-button primary">Show citation connections</button></form>
+<p class="rl-subtext" id="lab-citation-status" role="status"></p><div id="lab-graph" class="lab-graph"></div>
+<div id="lab-citation-list" class="lab-result-list"></div>
+</section>
+<section class="rl-section lab-block" id="alerts">
+<span class="rl-eyebrow">STAGE 5 / FOLLOW-UP</span><h2>My research updates</h2>
+<p class="rl-subtext">On each visit, compare your research interests against the latest locally indexed arXiv snapshot. New matches since your last check are highlighted. No background notifications or external messages are sent.</p>
+<div class="rl-paper-actions"><button type="button" id="lab-check-updates" class="rl-button primary">Check new matching papers</button><button type="button" id="lab-mark-seen">Mark current papers as seen</button></div>
+<p class="rl-subtext" id="lab-alert-status" role="status">No check performed.</p><div id="lab-alert-results" class="lab-result-list"></div>
+</section>
+<section class="rl-section lab-block" id="sync">
+<span class="rl-eyebrow">STAGE 4 / OPTIONAL ACCOUNT</span><h2>Researcher account and private sync</h2>
+<p class="rl-subtext">Native comments and public researcher profiles already have optional Supabase integration. Private project/reading-list synchronization requires configuring your own Supabase project and enabling GitHub OAuth.</p>
+<p id="lab-cloud-status" class="rl-subtext" role="status">Checking account configuration…</p>
+<div class="rl-paper-actions"><button type="button" id="lab-cloud-login" hidden>Sign in with GitHub</button>
+<button type="button" id="lab-cloud-logout" hidden>Sign out</button>
+<button type="button" id="lab-cloud-push" disabled>Back up local research data</button>
+<button type="button" id="lab-cloud-pull" disabled>Restore saved cloud data</button></div>
+<p class="rl-note">Sync is opt-in. Restoring data overwrites selected browser-local keys only after confirmation. Do not upload private manuscripts unless your service and privacy arrangements are appropriate.</p>
+<a href="https://github.com/pritam-roy-99/researchlens/blob/main/SOCIAL_SETUP.md" target="_blank" rel="noopener noreferrer">Account setup instructions</a>
+</section></main><footer class="rl-page-footer">ResearchLens | All evidence links should be checked against their original sources.</footer></body></html>

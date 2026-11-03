@@ -1,0 +1,10 @@
+{
+  "source": "https://oaipmh.arxiv.org/oai",
+  "source_format": "arXiv",
+  "generated_at": null,
+  "from_oai_datestamp": null,
+  "complete_window": false,
+  "note": "Not yet harvested. This is a bounded rolling metadata mirror, not the full arXiv archive.",
+  "paper_count": 0,
+  "papers": []
+}
