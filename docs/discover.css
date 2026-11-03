@@ -119,3 +119,57 @@
 .rl-scholar .rl-semantic-option input{display:inline-block;width:17px;height:17px;flex:0 0 17px;margin:0;accent-color:#126f9f}
 .rl-scholar .rl-semantic-badge{background:#e7f3f4!important;color:#105d65!important;border:1px solid #a8d5dc!important}
 :root[data-theme=dark] .rl-scholar .rl-semantic-badge{background:#17464d!important;color:#c4f1ef!important;border-color:#357980!important}
+
+
+/* One researcher focus hierarchy, spanning both arXiv modes.
+   Old duplicated selectors stay in the DOM for backwards compatibility,
+   but do not appear or compete with the actual primary control. */
+#arxiv-legacy-focus,.rl-scholar-legacy-focus{display:none!important}
+.rl-scholar-layout{grid-template-columns:minmax(0,1fr) minmax(0,245px)!important}
+.rl-focus-bar{padding:20px 22px;margin:0 0 17px;background:var(--rl-panel,#fff);
+ border:1px solid var(--rl-border,#dbe6ee);border-radius:16px;color:var(--rl-text,#19354b)}
+.rl-focus-bar-header{display:flex;justify-content:space-between;align-items:start;gap:15px;margin-bottom:15px}
+.rl-focus-bar-header h2{font-size:21px;letter-spacing:-.025em;line-height:1.25;margin:5px 0;color:var(--rl-text,#19354b)}
+.rl-focus-bar-header p{font-size:12px;color:var(--rl-muted,#607a91);margin:5px 0;line-height:1.55}
+.rl-focus-current{font-size:11px;font-weight:700;color:var(--rl-blue,#136ea3);background:var(--rl-soft,#eaf2f8);
+ padding:10px 13px;border-radius:10px;line-height:1.5;max-width:47%}
+.rl-focus-fields{display:grid;grid-template-columns:minmax(200px,265px) minmax(0,1fr);gap:15px;align-items:start}
+.rl-focus-field-control{min-width:0}
+.rl-focus-area,.rl-focus-submain{min-width:0}
+.rl-focus-label{display:block;color:var(--rl-muted,#607a91);font-size:11px;font-weight:800;letter-spacing:.015em;margin-bottom:8px}
+.rl-focus-chiplist{display:flex;flex-wrap:wrap;gap:7px;align-items:center}
+.rl-focus-chip,.rl-focus-choice{appearance:none;border:1px solid var(--rl-border,#dbe6ee);border-radius:999px;
+ background:var(--rl-soft,#eaf2f8);color:var(--rl-text,#19354b);cursor:pointer;padding:9px 13px;
+ font-size:12px;font-weight:700;line-height:1.35;text-align:center}
+.rl-focus-chip.active{background:#146f9d;border-color:#146f9d;color:#fff}
+.rl-focus-chip:hover,.rl-focus-choice:hover{border-color:#70b8de}
+.rl-focus-choice{display:block;width:100%;text-align:left;border:0;border-radius:8px;background:transparent;padding:11px}
+.rl-focus-choice[aria-pressed=true]{background:var(--rl-soft,#eaf2f8);color:var(--rl-blue,#136ea3)}
+.rl-focus-choice[aria-pressed=true]::after{content:"✓";float:right}
+.rl-focus-subrow{display:grid;grid-template-columns:minmax(0,1fr) minmax(220px,275px);gap:15px;
+ border-top:1px solid var(--rl-border,#dbe6ee);padding-top:15px;margin-top:15px}
+.rl-focus-interest{display:inline-flex;align-items:stretch;min-width:0;border:1px solid var(--rl-border,#dbe6ee);border-radius:999px;overflow:hidden}
+.rl-focus-interest .rl-focus-chip{border:0;border-radius:0}
+.rl-focus-star{border:0;border-left:1px solid var(--rl-border,#dbe6ee);padding:8px 10px;
+ background:var(--rl-panel,#fff);color:var(--rl-muted,#607a91);cursor:pointer;font-size:17px}
+.rl-focus-star.followed{background:#fff5dc;color:#a56f0e}
+.rl-focus-addrow{display:flex;gap:7px;align-items:center}
+.rl-focus-addrow input{width:100%;min-width:0;border:1px solid var(--rl-border,#dbe6ee);
+ background:var(--rl-panel,#fff);color:var(--rl-text,#19354b);border-radius:9px;padding:9px 10px;font-size:12px}
+.rl-focus-addrow button{flex-shrink:0;font-size:12px;padding:9px 11px}
+.rl-focus-bar button:focus-visible,.rl-focus-bar input:focus-visible,
+.rl-focus-bar summary:focus-visible{outline:3px solid #58b7e7;outline-offset:2px}
+@media(max-width:960px){
+ .rl-focus-subrow{grid-template-columns:1fr}
+ .rl-focus-add{max-width:460px}
+ .rl-scholar-layout{grid-template-columns:minmax(0,1fr)!important}
+}
+@media(max-width:680px){
+ .rl-focus-bar{padding:15px;margin:0 0 14px}
+ .rl-focus-bar-header{display:block}
+ .rl-focus-current{max-width:none;margin-top:10px}
+ .rl-focus-fields{grid-template-columns:1fr;gap:13px}
+ .rl-focus-chip{font-size:11px;padding:8px 11px}
+ .rl-focus-addrow{flex-wrap:wrap}
+ .rl-focus-addrow button{flex:1}
+}
