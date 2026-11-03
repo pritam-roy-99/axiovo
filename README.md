@@ -15,6 +15,12 @@ Open **[Explore by field](https://pritam-roy-99.github.io/researchlens/fields.ht
 
 **Scope and caveats:** Field selection is a query-preset mechanism rather than a validated classifier; search is not restricted to field-specific databases and is subject to OpenAlex coverage and rate limits. The feature does not add institutional subscriptions, paywalled full text, centrally synced accounts, hosted inference, or guaranteed coverage of historical arXiv. User selections and saved records remain in this browser. The field workflows are guidance rather than automatic quality judgments.
 
+## Researcher workspace and consistent navigation
+
+**New:** [My research workspace](https://pritam-roy-99.github.io/researchlens/workspace.html) gives researchers a single starting point with their selected Field Explorer focus, latest papers from the existing arXiv snapshot, unified browser-local saved reading from the arXiv feed and OpenAlex Field Explorer, reading progress (to-read/reading/finished), private notes, keyword filtering and library exports (JSON/BibTeX). A responsive navigation bar now appears on the site's primary pages, allowing one-click access to the Workspace, arXiv Feed, Field Explorer, Copilot, AI Lab and Profile. The homepage links directly to the workspace.
+
+**Data limitations:** Library entries are aggregated from two existing localStorage collections; this is not a server-side account, sync service, verified literature database, or complete arXiv archive. Notes and reading states are stored on the current device. Exported JSON is a backup, not yet an import mechanism for the new unified workspace. External academic metadata retain their source caveats. The workspace displays recent papers already present in the locally indexed feed; it cannot accelerate arXiv ingestion itself.
+
 ## Current features (deployed GitHub Pages prototype)
 
 - Responsive scientific-paper website with title, abstract, author, and arXiv identifier search.
