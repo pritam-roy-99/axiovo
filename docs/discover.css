@@ -113,3 +113,9 @@
 .rl-scholar .rl-interest-follow.is-followed{color:#b17d20!important;background:#fff4d7!important}
 .rl-scholar .rl-interest-follow:focus-visible{outline:3px solid #63b6df;outline-offset:-3px}
 @media(prefers-reduced-motion:reduce){.rl-save-button,.rl-scholar .rl-save-button{transition:none!important}}
+
+/* Search quality transparency and optional AI embedding fallback. */
+.rl-scholar .rl-semantic-option{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;color:var(--rl-text,#19354b);cursor:pointer}
+.rl-scholar .rl-semantic-option input{display:inline-block;width:17px;height:17px;flex:0 0 17px;margin:0;accent-color:#126f9f}
+.rl-scholar .rl-semantic-badge{background:#e7f3f4!important;color:#105d65!important;border:1px solid #a8d5dc!important}
+:root[data-theme=dark] .rl-scholar .rl-semantic-badge{background:#17464d!important;color:#c4f1ef!important;border-color:#357980!important}
