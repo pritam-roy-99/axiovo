@@ -53,6 +53,7 @@ def build():
     before,rest=html.split(START,1)
     _,after=rest.split(END,1)
     html=before+START+first_paint(feed)+END+after
+    html=html.replace('<div id="papers" class="empty">'+START, '<div id="papers" class="prefeed">'+START)
     papers=feed.get("papers",[])
     dates=sorted(p.get("published") for p in papers if p.get("published"))
     last=feed.get("generated_at") or "not yet"
