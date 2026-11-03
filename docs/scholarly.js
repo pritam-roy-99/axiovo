@@ -35,7 +35,7 @@ function drawSubtopics(){
  const custom=$("custom-subtopic");custom.placeholder="Your own "+state.topic.toLowerCase()+" research interest";
 }
 function drawTopics(){const holder=$("topic-list");holder.replaceChildren();for(const t of FIELDS[state.field].topics){const b=node("button",t,"topic"+(t===state.topic?" active":""));b.type="button";b.setAttribute("aria-pressed",String(t===state.topic));b.onclick=()=>topicSelect(t);holder.append(b)}}
-function drawField(){const f=FIELDS[state.field];$("field").value=state.field;$("field-summary").textContent=f.summary;$("field-heading").textContent="Explore "+f.name.toLowerCase();drawTopics();drawSubtopics();const holder=$("suggestions");holder.replaceChildren();for(const q of f.queries){const b=node("button",q,"template");b.type="button";b.onclick=()=>{state.subtopic="";state.query=q;$("query").value=q;persist();drawSubtopics();page=1;search()};holder.append(b)}const w=$("workflow");w.replaceChildren();const ol=document.createElement("ol");for(const step of f.workflow){ol.append(node("li",step))}ol.style.paddingLeft="20px";w.append(ol)}
+function drawField(){const f=FIELDS[state.field];$("field").value=state.field;$("field-label").textContent=f.name;for(const b of $("field-choices").querySelectorAll("button"))b.setAttribute("aria-pressed",String(b.dataset.field===state.field));$("field-summary").textContent=f.summary;$("field-heading").textContent="Explore "+f.name.toLowerCase();drawTopics();drawSubtopics();const holder=$("suggestions");holder.replaceChildren();for(const q of f.queries){const b=node("button",q,"template");b.type="button";b.onclick=()=>{state.subtopic="";state.query=q;$("query").value=q;persist();drawSubtopics();page=1;search()};holder.append(b)}const w=$("workflow");w.replaceChildren();const ol=document.createElement("ol");for(const step of f.workflow){ol.append(node("li",step))}ol.style.paddingLeft="20px";w.append(ol)}
 function drawSaved(){store(SAVED,saved);$("saved-count").textContent=saved.length;const root=$("saved-list");root.replaceChildren();if(!saved.length){root.append(node("p","No saved papers yet.","muted"));return}for(const w of saved.slice().reverse().slice(0,12)){const a=node("a",w.display_name||"Untitled");a.href=w.id||w.doi||"#";a.target="_blank";a.rel="noopener noreferrer";root.append(a)}}
 function renderPaper(w){const art=node("article",undefined,"paper");const header=node("div",undefined,"row");header.append(node("span",String(w.publication_year||"Year unknown"),"pill"));header.append(node("span",(w.cited_by_count??0)+" citations","pill"));const access=w.open_access?.is_oa;if(access)header.append(node("span","Open access","pill"));art.append(header);
 const h=node("h3",w.display_name||w.title||"Untitled research");art.append(h);
@@ -56,7 +56,13 @@ try{const res=await fetch("https://api.openalex.org/works?"+p.toString(),{signal
 catch(err){if(err.name==="AbortError")return;items=[];total=0;setStatus("Search unavailable: "+err.message+". Retry or use the global search.");}
 finally{if(requestController===ctl){busy=false;requestController=null;render()}}}
 function renderControls(){$("prev").disabled=true;$("next").disabled=true}
-function init(){const opts=$("field");for(const [id,f] of Object.entries(FIELDS)){const o=node("option",f.name);o.value=id;opts.append(o)}
+function init(){
+const opts=$("field"), choices=$("field-choices");
+for(const [id,f] of Object.entries(FIELDS)){
+ const button=node("button",f.name,"rl-field-choice");button.type="button";button.dataset.field=id;
+ button.onclick=()=>{opts.value=id;$("field-details").open=false;opts.dispatchEvent(new Event("change",{bubbles:true}))};
+ choices.append(button)
+}
 $("field").value=state.field;$("query").value=state.query||state.topic||"";$("sort").value=state.sort||"relevance";$("from").value=state.from||"";$("to").value=state.to||"";drawField();drawSaved();
 $("field").onchange=()=>{state.field=$("field").value;state.topic=FIELDS[state.field].topics[0];state.subtopic="";state.query=state.topic;$("query").value=state.query;persist();drawField();window.dispatchEvent(new CustomEvent("researchlens:field-changed",{detail:{field:state.field,topic:state.topic}}));page=1;search()};
 $("use-custom").onclick=()=>{const t=$("custom").value.trim();if(t.length<3){setStatus("Enter at least three characters for a custom topic.");return}state.subtopic=t;state.query=t;$("query").value=t;persist();drawSubtopics();page=1;search()};
