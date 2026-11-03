@@ -39,7 +39,8 @@
    anchors:/\b(entanglement|entangled|schmidt decomposition|entanglement witness|separability|partial transpose)\b/i}
  };
  function profile(state,query){
-  const sample=(String(state?.topic||"")+" "+String(state?.subtopic||"")+" "+String(query||"")).toLowerCase();
+  const q=String(query||"").trim().toLowerCase();const browse=q===String(state?.topic||"").trim().toLowerCase()||q===String(state?.subtopic||"").trim().toLowerCase();
+  const sample=(browse?String(state?.topic||"")+" "+String(state?.subtopic||"")+" ":"")+q;
   if(/contextual/.test(sample))return "contextuality";
   if(/steering|assemblage/.test(sample))return "steering";
   if(/key distribution|cryptograph|\bqkd\b/.test(sample))return "qkd";
@@ -68,7 +69,7 @@
    social:"social science and economics"
   }[field]||"scientific research";
   const base=p&&field==="quantum"?p.prompts:fieldText+" research on "+distinct;
-  const sub=String(state?.subtopic||"").trim();
+  const sub=String(base===undefined?"":state?.subtopic||"").trim();
   // Keep named specializations in the embedding query, not only a broad category.
   return (base+(sub&&!base.toLowerCase().includes(sub.toLowerCase())?". Specific topic: "+sub+".":"")).slice(0,1800);
  }
