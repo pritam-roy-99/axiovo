@@ -44,6 +44,8 @@ jobs:
         run: node tests/semantic-search.test.js
       - name: Exact arXiv version and history link tests
         run: node tests/arxiv-versions.test.js
+      - name: Validate shared Discover focus
+        run: node tests/focus-bar.test.js
       - name: Refresh research metadata
         id: refresh
         continue-on-error: true

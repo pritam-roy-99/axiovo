@@ -129,6 +129,12 @@ ResearchLens now treats the local JSON feed as **a latest-announcements cache**,
 
 **Coverage and technical limits:** A static GitHub Pages site cannot browser-fetch all arXiv API responses because of cross-origin restrictions; its on-site historical search therefore uses OpenAlex as a discovery index and **does not guarantee full arXiv recall** or authoritative version-date metadata. For exact versions, arXiv is authoritative; arXiv itself can confirm whether a requested `vN` exists. OpenAlex labels manuscript copy classes (submitted/accepted/published), not the arXiv revision sequence. Metadata from OpenAlex can lag or merge preprints with journal versions; complete arXiv archive hosting requires a durable harvester/database or backend. No proxy is used to send confidential manuscript content to third parties.
 
+## One connected research-focus selector
+
+The Discover page has a **single shared research focus bar** above the arXiv sources. Choose a **main field**, then a **research area**, then a **specialized subtopic**. Every selection updates the visible topic/subtopic choices using `docs/research-fields.js`, writes the browser-local preference `researchlens-field-explorer-v1`, and refreshes the arXiv-hosted OpenAlex search. Readers may star specialized interests per field/topic or add a custom subtopic, which is saved under `researchlens-interests-by-field-v1`.
+
+This replaces the confusing duplicate quantum-topic chip strip and repeated discipline/topic selectors from the former Field Explorer sidebar. Older controls remain invisible for compatibility with existing feed handlers; they no longer compete for attention. The latest-announcements source remains available, clearly labelled as a limited local snapshot. Selecting a field, research area, or subtopic switches to wider arXiv-hosted discovery, where subjects are not restricted to the five local snapshot categories. Field-specific search still relies on OpenAlex coverage and is not a complete arXiv archive.
+
 ## Current features (deployed GitHub Pages prototype)
 
 - Responsive scientific-paper website with title, abstract, author, and arXiv identifier search.

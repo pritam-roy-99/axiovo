@@ -197,8 +197,13 @@ function directArxivPaper(raw){
 function renderControls(){$("prev").disabled=true;$("next").disabled=true}
 function init(){
 const latest=read(KEY,{});
-if(latest.field&&FIELDS[latest.field]&&latest.field!==state.field){
- state.field=latest.field;state.topic=FIELDS[state.field].topics[0];state.subtopic="";state.query=state.topic
+if(latest.field&&FIELDS[latest.field]){
+ state.field=latest.field;
+ state.topic=FIELDS[state.field].topics.includes(latest.topic)?latest.topic:FIELDS[state.field].topics[0];
+ state.subtopic=String(latest.subtopic||"");
+ if(state.subtopic&&!fieldTopics(state.field,state.topic).includes(state.subtopic)&&!latest.customSubtopic)state.subtopic="";
+ state.customSubtopic=Boolean(latest.customSubtopic);
+ state.query=state.subtopic||state.topic;
 }
 const opts=$("field"), choices=$("field-choices");
 for(const [id,f] of Object.entries(FIELDS)){
@@ -213,6 +218,18 @@ $("field").onchange=()=>{state.field=$("field").value;state.topic=FIELDS[state.f
 $("use-custom").onclick=()=>{const t=$("custom").value.trim();if(t.length<3){setStatus("Enter at least three characters for a custom topic.");return}state.subtopic=t;state.customSubtopic=true;state.query=t;$("query").value=t;persist();drawSubtopics();page=1;search()};
 $("use-subtopic").onclick=()=>{const t=$("custom-subtopic").value.trim();if(t.length<3){setStatus("Enter at least three characters for a subtopic.");return}subtopicSelect(t);toggleInterest(t);$("custom-subtopic").value="";setStatus("Following the specialized interest: "+t)};
 window.addEventListener("researchlens:interests-changed",()=>{drawTopics();drawSubtopics()});
+window.addEventListener("researchlens:focus-change",e=>{
+ const focus=e.detail||{};
+ const newField=fieldKey(focus.field);
+ const newTopic=FIELDS[newField].topics.includes(focus.topic)?focus.topic:FIELDS[newField].topics[0];
+ const newSubtopic=String(focus.subtopic||"").trim();
+ if(state.field===newField&&state.topic===newTopic&&state.subtopic===newSubtopic)return;
+ state.field=newField;state.topic=newTopic;state.subtopic=newSubtopic;
+ state.customSubtopic=!!newSubtopic&&!fieldTopics(newField,newTopic).includes(newSubtopic);
+ state.query=newSubtopic||newTopic;
+ $("field").value=newField;$("query").value=state.query;
+ persist();drawField();page=1;search();
+});
 window.addEventListener("researchlens:choose-field",e=>{
  const field=fieldKey(e.detail?.field);if(state.field===field)return;
  state.field=field;state.topic=FIELDS[field].topics[0];state.subtopic="";state.query=state.topic;

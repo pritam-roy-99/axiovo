@@ -32,6 +32,8 @@ jobs:
         run: node tests/semantic-search.test.js
       - name: Exact arXiv version and history link tests
         run: node tests/arxiv-versions.test.js
+      - name: Unified discovery focus selection tests
+        run: node tests/focus-bar.test.js
       - name: Build homepage video preview
         run: |
           python -m pip install --disable-pip-version-check Pillow
