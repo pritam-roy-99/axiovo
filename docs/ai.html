@@ -18,7 +18,12 @@ main{max-width:1180px;margin:0 auto;padding:22px 20px 70px}.grid{display:grid;gr
 <label for="search">Search indexed titles, authors, or arXiv IDs</label><input id="search" placeholder="e.g. quantum steering, nonlocality, 2611...">
 <label for="paper">Paper to analyze</label><select id="paper"><option value="">Loading…</option></select>
 <div class="row" style="margin-top:13px"><button id="analyze" class="btn primary" disabled>Generate evidence report</button><button id="download" class="btn" disabled>Save report (.txt)</button></div>
-<p id="selected" class="muted">Choose a paper from the indexed arXiv feed.</p></section>
+<p id="selected" class="muted">Choose a paper from the indexed arXiv feed.</p>
+<div class="divider"></div><h3>Or check your own unpublished abstract</h3><p class="muted">Private preliminary assessment of a title and abstract. Text stays in this browser. Do not paste confidential material unless you are comfortable with your browser and device security. Model downloads come from external providers.</p>
+<label for="draft-title">Your paper title</label><input id="draft-title" placeholder="Title of your new result">
+<label for="draft-abstract">Your abstract</label><textarea id="draft-abstract" placeholder="Paste the abstract to search possible literature overlaps. It is not uploaded to ResearchLens." style="min-height:150px"></textarea>
+<button class="btn" id="draft-analyze" style="margin-top:10px">Check my abstract against indexed papers</button>
+</section>
 <section id="report" class="panel hidden"><div class="row" style="justify-content:space-between"><h2>2. Literature evidence report</h2><span class="tag">No model required</span></div>
 <div class="warning">This is title-and-abstract analysis of a limited index. It cannot prove scientific novelty or mathematical correctness. Related records may be newer than the selected paper and should not automatically be called prior art.</div>
 <div id="report-body"></div></section>
