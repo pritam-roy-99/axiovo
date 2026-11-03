@@ -2,6 +2,19 @@
 
 **ResearchLens is a free, open-source research-discovery prototype with preliminary prior-literature exploration.** It is independent from arXiv and SciRate.
 
+## Field Explorer (proposed ResearchLens 2.0 workspace)
+
+Open **[Explore by field](https://pritam-roy-99.github.io/researchlens/fields.html)** after this feature branch is merged and deployed.
+
+- Nine discipline presets: quantum information/physics, mathematics, astrophysics, computer science/AI, biology, medicine/public health, chemistry/materials, engineering/robotics, and social sciences/economics.
+- Topic chips, suggested literature searches, custom research topics, and field-specific evaluation checklists.
+- Live OpenAlex search that keeps results on ResearchLens, with publication date-range filtering, relevance/newest/citation sorting, and paging.
+- Source links to original OpenAlex, DOI, open-access and arXiv records when available.
+- A separate browser-local reading collection with BibTeX and JSON export, plus copy citation actions.
+- Responsive layout and shared day/night setting. The existing research feed, copilot, search, AI Lab and profiles are unchanged.
+
+**Scope and caveats:** Field selection is a query-preset mechanism rather than a validated classifier; search is not restricted to field-specific databases and is subject to OpenAlex coverage and rate limits. The feature does not add institutional subscriptions, paywalled full text, centrally synced accounts, hosted inference, or guaranteed coverage of historical arXiv. User selections and saved records remain in this browser. The field workflows are guidance rather than automatic quality judgments.
+
 ## Current features (deployed GitHub Pages prototype)
 
 - Responsive scientific-paper website with title, abstract, author, and arXiv identifier search.
