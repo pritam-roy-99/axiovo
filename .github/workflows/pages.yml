@@ -1,0 +1,46 @@
+name: Refresh arXiv and deploy ResearchLens
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  schedule:
+    - cron: '37 0,6,12,18 * * *'
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+concurrency:
+  group: researchlens-pages
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Test metadata processing
+        run: python -m unittest discover -s tests -v
+      - name: Refresh papers from arXiv (scheduled/manual runs)
+        if: github.event_name != 'push'
+        run: python scripts/sync.py || echo "arXiv unavailable; retaining existing feed"
+      - name: Commit refreshed metadata
+        if: github.event_name != 'push'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/data/feed.json
+          if ! git diff --cached --quiet; then
+            git commit -m "data: refresh arXiv feed"
+            git push origin HEAD:main
+          fi
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
