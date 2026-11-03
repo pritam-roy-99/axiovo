@@ -55,14 +55,17 @@ async function searchLiterature(e){
  }
  if(type==="local"){status("lab-search-status","Local-only search completed. This is not full historical arXiv coverage.");return}
  try{
-  const params=new URLSearchParams({search:query,per_page:"15",select:"id,display_name,authorships,doi,publication_date,best_oa_location,cited_by_count"});
+  const params=new URLSearchParams({search:query,filter:"locations.source.id:S4306400194",per_page:"15",select:"id,display_name,authorships,doi,publication_date,locations,primary_location,best_oa_location,cited_by_count"});
   const data=await fetchJson("https://api.openalex.org/works?"+params);
   if(type==="openalex")root.replaceChildren();
+  let count=0;
   for(const w of data.results||[]){
-   resultCard(root,{title:w.display_name,authors:(w.authorships||[]).map(x=>x.author?.display_name).filter(Boolean),date:w.publication_date,link:w.best_oa_location?.landing_page_url||w.doi||w.id},
-      "OpenAlex · "+(w.cited_by_count||0)+" indexed citations; publication metadata")
+   const source=window.ResearchLensArxiv?.candidates(w)[0];if(!source)continue;
+   count++;
+   resultCard(root,{id:source.requested,title:w.display_name,authors:(w.authorships||[]).map(x=>x.author?.display_name).filter(Boolean),date:w.publication_date,link:window.ResearchLensArxiv.abs(source.requested)},
+      "arXiv-hosted paper · OpenAlex metadata · "+(w.cited_by_count||0)+" indexed citations")
   }
-  status("lab-search-status","Returned "+(data.results||[]).length+" OpenAlex results and local matches. OpenAlex coverage is not guaranteed.")
+  status("lab-search-status","Found "+count+" source-confirmed arXiv-hosted records in this batch, plus local matches. Coverage is not exhaustive.")
  }catch(err){status("lab-search-status","OpenAlex unavailable: "+err.message+". Local results, if any, remain available.")}
 }
 async function loadPdf(file){
@@ -254,14 +257,14 @@ function init(){
  $("lab-pdf-scale").onchange=()=>{if(pdf)drawPage()};
  $("lab-save-note").onclick=saveNote;$("lab-export-notes").onclick=exportNotes;
  $("lab-open-arxiv").onclick=()=>{
-  const value=id($("lab-arxiv-id").value);
-  if(!value){status("lab-pdf-status","Enter a valid arXiv identifier.");return}
-  window.open("https://arxiv.org/pdf/"+encodeURIComponent(value),"_blank","noopener,noreferrer");
+  const value=window.ResearchLensArxiv?.parse($("lab-arxiv-id").value);
+  if(!value){status("lab-pdf-status","Enter a valid arXiv identifier, optionally ending in v1, v2, etc.");return}
+  window.open(window.ResearchLensArxiv.pdf(value.requested),"_blank","noopener,noreferrer");
   status("lab-pdf-status","Opened the official arXiv PDF in another tab. Load a local copy here to add page notes.")
  };
  $("lab-check-updates").onclick=checkAlerts;$("lab-mark-seen").onclick=markSeen;
  const u=new URLSearchParams(location.search);
- if(id(u.get("arxiv"))) $("lab-arxiv-id").value=id(u.get("arxiv"));
+ if(window.ResearchLensArxiv?.parse(u.get("arxiv"))) $("lab-arxiv-id").value=window.ResearchLensArxiv.parse(u.get("arxiv")).requested;
  if(u.get("q")) $("lab-query").value=u.get("q").slice(0,220);
  loadMetadata().then(()=>{if(u.get("q"))$("lab-search-form").requestSubmit()});
 }
