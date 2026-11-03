@@ -6,6 +6,7 @@ const $=id=>document.getElementById("scholar-"+id);
 const {FIELDS,fieldTopics,fieldKey}=window.ResearchLensFields;
 const SearchCore=window.ResearchLensSearch;
 const SemanticCore=window.ResearchLensSemanticSearch;
+const Arxiv=window.ResearchLensArxiv;
 
 const KEY="researchlens-field-explorer-v1", SAVED="researchlens-field-saved-v1";
 const interestsAPI=window.ResearchLensInterests;
@@ -22,7 +23,7 @@ let page=1,total=0,busy=false,items=[],showingSaved=false,requestController=null
 function node(tag,text,className){const el=document.createElement(tag);if(text!==undefined)el.textContent=text;if(className)el.className=className;return el}
 function link(parent,label,url){if(!/^https:\/\//.test(url||""))return;const a=node("a",label);a.href=url;a.target="_blank";a.rel="noopener noreferrer";parent.append(a)}
 function recordID(w){return w.id||w.doi||w.display_name}
-function arxivURL(w){const loc=[...(w.locations||[]),w.best_oa_location,w.primary_location].filter(Boolean);for(const x of loc){for(const u of [x.landing_page_url,x.pdf_url]){if(/^https:\/\/(?:export\.)?(?:www\.)?arxiv\.org\/(abs|pdf)\//.test(u||""))return u}}return null}
+function arxivURL(w){const p=Arxiv?.candidates(w)[0];return p?Arxiv.abs(p.requested):null}
 function bib(w){const author=(w.authorships||[]).map(a=>a.author?.display_name).filter(Boolean).join(" and ");const key=(author.split(" ").slice(-1)[0]||"Research")+"_"+(w.publication_year||"n.d.")+"_"+String(w.display_name||"work").split(/\W+/).slice(0,2).join("");const val=x=>String(x||"").replace(/[{}]/g,"").replace(/\s+/g," ").trim();return "@article{"+key.replace(/\W/g,"")+"\n  title = {"+val(w.display_name||w.title)+"},\n  author = {"+val(author)+"},\n  year = {"+val(w.publication_year)+"},\n  doi = {"+val((w.doi||"").replace(/^https:\/\/doi.org\//,""))+"},\n  url = {"+val(w.id)+"}\n}\n"}
 function download(name,contents,type){const b=new Blob([contents],{type});const url=URL.createObjectURL(b);const a=document.createElement("a");a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000)}
 function setStatus(s){$("status").textContent=s}
@@ -62,10 +63,20 @@ const h=node("h3",w.display_name||w.title||"Untitled research");art.append(h);
 const authors=(w.authorships||[]).slice(0,6).map(x=>x.author?.display_name).filter(Boolean);art.append(node("p",authors.join(", ")+(w.authorships?.length>6?" et al.":""),"authors"));
 const venue=w.primary_location?.source?.display_name;if(venue)art.append(node("p",venue,"authors"));
 if(w.abstract_inverted_index){const entries=[];for(const [term,positions] of Object.entries(w.abstract_inverted_index)){for(const pos of positions)if(pos<140)entries[pos]=term}if(entries.length)art.append(node("p",entries.filter(Boolean).join(" ").slice(0,820)+(entries.length>140?"…":""),"summary"))}
-const row=node("div",undefined,"row actions");link(row,"OpenAlex",w.id);link(row,"DOI",w.doi);link(row,"PDF / OA",w.best_oa_location?.pdf_url||w.best_oa_location?.landing_page_url);link(row,"arXiv",arxivURL(w));
+const row=node("div",undefined,"row actions rl-paper-actionbar");const original=Arxiv?.candidates(w)[0];if(original){link(row,"Read on arXiv",Arxiv.abs(original.base));link(row,"PDF",Arxiv.pdf(original.base));}else{link(row,"OpenAlex",w.id)}
 const isSaved=saved.some(p=>recordID(p)===recordID(w));const b=node("button",isSaved?"Saved":"Save paper","rl-save-button"+(isSaved?" is-saved":""));b.type="button";b.setAttribute("aria-pressed",String(isSaved));b.setAttribute("aria-label",(isSaved?"Remove from reading list: ":"Save to reading list: ")+(w.display_name||w.title||"Paper"));b.onclick=()=>{if(saved.some(p=>recordID(p)===recordID(w)))saved=saved.filter(p=>recordID(p)!==recordID(w));else saved.push(w);drawSaved();window.dispatchEvent(new Event("researchlens-library-change"));render()};const icon=document.createElementNS("http://www.w3.org/2000/svg","svg");icon.setAttribute("viewBox","0 0 24 24");icon.setAttribute("width","16");icon.setAttribute("height","16");icon.setAttribute("fill",isSaved?"currentColor":"none");icon.setAttribute("stroke","currentColor");icon.setAttribute("stroke-width","1.8");icon.setAttribute("aria-hidden","true");const mark=document.createElementNS("http://www.w3.org/2000/svg","path");mark.setAttribute("d","M6 4.5A1.5 1.5 0 0 1 7.5 3h9A1.5 1.5 0 0 1 18 4.5V21l-6-4-6 4z");icon.append(mark);b.prepend(icon);row.append(b);
 const cite=node("button","Copy BibTeX");cite.type="button";cite.onclick=async()=>{try{await navigator.clipboard.writeText(bib(w));cite.textContent="Copied"}catch{download("researchlens-citation.bib",bib(w),"text/plain")}};row.append(cite);
-const cop=node("a","✦ Research Assistant");const arxiv=arxivURL(w);const matched=arxiv?.match(/arxiv\.org\/(?:abs|pdf)\/([^?#]+)/i);const aid=matched?matched[1].replace(/\.pdf$/,"").replace(/v\d+$/,""):"";cop.href="./copilot.html?"+new URLSearchParams(aid?{id:aid}:{q:w.display_name||w.title||""});row.append(cop);art.append(row);return art}
+const cop=node("a","✦ Research Assistant");const arxiv=arxivURL(w);const matched=arxiv?.match(/arxiv\.org\/(?:abs|pdf)\/([^?#]+)/i);const aid=matched?matched[1].replace(/\.pdf$/,"").replace(/v\d+$/,""):"";cop.href="./copilot.html?"+new URLSearchParams(aid?{id:aid}:{q:w.display_name||w.title||""});row.append(cop);
+if(original){
+ const versions=node("div",undefined,"rl-paper-versions");
+ versions.append(node("span","Version:"));
+ const version=document.createElement("input");version.type="number";version.min="1";version.max="9999";version.placeholder="Latest";version.step="1";
+ version.setAttribute("aria-label","Select arXiv version for "+(w.display_name||"paper"));
+ const selected=node("a","Open latest on arXiv ↗");selected.href=Arxiv.abs(original.base);selected.target="_blank";selected.rel="noopener noreferrer";
+ version.oninput=()=>{const n=Number(version.value),good=version.value===""||Number.isInteger(n)&&n>=1&&n<=9999;selected.href=good?Arxiv.abs(original.base+(version.value?"v"+version.value:"")):Arxiv.abs(original.base);selected.textContent=version.value?"Open v"+version.value+" on arXiv ↗":"Open latest on arXiv ↗"};
+ versions.append(version,selected);art.append(versions);
+}
+art.append(row);return art}
 function render(){const root=$("results");root.replaceChildren();const display=showingSaved?saved.slice().reverse():items;$("result-heading").textContent=showingSaved?"Your saved papers":"Literature results";if(!display.length){root.append(node("div",showingSaved?"No papers saved yet. Save papers from your search results.":"No matching records to display.","empty"))}else for(const w of display)root.append(renderPaper(w));
 $("pagination").textContent=showingSaved?saved.length+" locally saved":("Search batch "+page+" · "+items.length+" relevant papers shown");$("prev").disabled=showingSaved||busy||page===1;$("next").disabled=showingSaved||busy||page*100>=Math.min(total,10000)}
 async function search(){
@@ -112,7 +123,7 @@ async function search(){
     const semanticPlan=SemanticCore.plan(plan,state);
     const data=await fetchResults(semanticPlan.params);
     if(ctl.signal.aborted||requestController!==ctl)return;
-    semantic=(data.results||[]).filter(w=>SemanticCore.screen(w,plan,state,SearchCore));
+    semantic=(data.results||[]).filter(w=>Boolean(arxivURL(w))&&SemanticCore.screen(w,plan,state,SearchCore));
    }catch(err){
     if(ctl.signal.aborted||requestController!==ctl)return;
     semanticError=String(err.message||err).slice(0,140);
@@ -121,7 +132,7 @@ async function search(){
   if(ctl.signal.aborted||requestController!==ctl)return;
   const selected=triedAI?SemanticCore.combine(lexical,semantic,plan,state,SearchCore,20):
    lexical.slice(0,20).map(work=>({work,source:"keyword"}));
-  items=selected.map(x=>({...x.work,__source:x.source}));
+  items=selected.map(x=>({...x.work,__source:x.source})).filter(w=>Boolean(arxivURL(w)));
   total=sourceTotal;
   const aiAdded=selected.filter(x=>x.source==="semantic").length;
   let summary=items.length+" field-relevant papers shown from "+scope+" (batch "+page+")."+fieldsRequested;
