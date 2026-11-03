@@ -219,11 +219,14 @@ async function search(){
   items=selected.map(x=>({...x.work,__source:x.source})).filter(w=>Boolean(arxivURL(w)));
   total=sourceTotal;
   let localNote="";
-  if(rateLimited||(!items.length&&mainError)){
+  if(!items.length&&(rateLimited||mainError)){
    const offline=await offlineArxivFallback(plan,{reason:mainError,from,to,sort,today});
    if(ctl.signal.aborted||requestController!==ctl)return;
    if(offline.items.length){items=offline.items;total=0}
    localNote=offline.message;
+  }else if(rateLimited){
+   localNote="OpenAlex semantic search reached its rate limit. Showing "+items.length+
+    " successfully retrieved standard-search papers. Semantic requests are paused for this browser session.";
   }
   if(ctl.signal.aborted||requestController!==ctl)return;
   const aiAdded=selected.filter(x=>x.source==="semantic").length;
