@@ -117,6 +117,18 @@ Discover now uses a staged retrieval strategy rather than relying solely on exac
 
 The semantic query and field preferences are transmitted to OpenAlex; a local AI model is not installed and no unpublished manuscript is uploaded. Semantic search is subject to OpenAlex availability, usage budgets, and rate limits. Only 50 records per semantic request are possible, and the fallback is attempted on the first search batch. This is a **relevance aid**, not an exhaustive review, a novelty assessment, or a guarantee that all papers are correctly classified. An OpenAlex field restriction and topical anchors can still omit relevant cross-disciplinary results. ResearchLens falls back to standard bibliographic results if the semantic service fails.
 
+## arXiv-first discovery, revisions and reading controls
+
+ResearchLens now treats the local JSON feed as **a latest-announcements cache**, not as the authority for which papers exist. The main paper search offers **Search all arXiv**: it queries public OpenAlex metadata restricted to works with an arXiv-hosted copy, with direct links to the authoritative arXiv abstract and PDF pages. The all-field scholarly explorer is also restricted to arXiv-hosted works. Any valid exact arXiv ID, such as `2608.13942v1`, can be opened **without either database containing the paper**.
+
+- The page understands modern identifiers (`2608.13942v1`) and legacy identifiers (`cond-mat/0207270v2`). An unversioned ID opens arXiv's latest revision, while a `vN` suffix opens that exact requested revision, if it exists. OpenAlex's `submittedVersion` designation is **not** treated as an arXiv version number.
+- Each result offers a responsive, high-contrast action bar: **Read on arXiv**, **PDF**, **Research Assistant**, and **Save paper**. Historical search and the wider field explorer include a revision-number control for opening the correct arXiv version.
+- Exact revision IDs saved from historical results or paper pages remain distinct in the browser reading library. The Workspace also accepts saved arXiv IDs never present in the local cache.
+- The Workspace's personalized feed supplements recent announcements with live arXiv-linked OpenAlex results for the researcher's chosen interest, when that external API is available.
+- The original arXiv website remains one click away even when OpenAlex search returns no matching metadata.
+
+**Coverage and technical limits:** A static GitHub Pages site cannot browser-fetch all arXiv API responses because of cross-origin restrictions; its on-site historical search therefore uses OpenAlex as a discovery index and **does not guarantee full arXiv recall** or authoritative version-date metadata. For exact versions, arXiv is authoritative; arXiv itself can confirm whether a requested `vN` exists. OpenAlex labels manuscript copy classes (submitted/accepted/published), not the arXiv revision sequence. Metadata from OpenAlex can lag or merge preprints with journal versions; complete arXiv archive hosting requires a durable harvester/database or backend. No proxy is used to send confidential manuscript content to third parties.
+
 ## Current features (deployed GitHub Pages prototype)
 
 - Responsive scientific-paper website with title, abstract, author, and arXiv identifier search.
