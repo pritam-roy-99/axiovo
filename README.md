@@ -50,6 +50,17 @@ The homepage now includes a 48-second narrated, illustrated walkthrough explaini
 
 The source is `scripts/build_intro_video.py`. GitHub Actions generates `docs/assets/researchlens-tour.mp4`, the poster and captions during deployment, then caches the assets so routine hourly metadata updates don't re-encode the video. The build uses Pillow, FFmpeg and espeak-ng. No commercial video API credentials are needed. Media is served directly from GitHub Pages.
 
+## Unified Discover (arXiv + field-aware scholarly search)
+
+ResearchLens now offers **one Discover page** at [ResearchLens](https://pritam-roy-99.github.io/researchlens/#discover), with two clearly labeled source modes:
+
+- **Latest arXiv:** the indexed new-submission feed, source categories, arXiv v1 date filters, followed quantum topics, saved and read status, keyboard shortcuts, recommendations, and historical arXiv-linked retrieval via OpenAlex.
+- **Search all fields:** discipline/topic presets, custom interests, live OpenAlex scholarly search, publication date and sort filters, pages, saved OpenAlex papers, and BibTeX/JSON export.
+
+Both modes are in the same homepage instead of separate destination pages, and mobile layouts adapt responsively. Field Explorer's existing localStorage keys and paper collections remain unchanged, so the Workspace still aggregates saved papers. Old `fields.html` bookmarks redirect to `/?view=scholarly#discover` and preserve query parameters.
+
+The two modes **do not claim the same source coverage or date semantics**: arXiv's local rolling index is incomplete and uses original submission dates, whereas OpenAlex can find a wider body of publications using indexed publication dates. This is a unified interface, not an assertion that OpenAlex and arXiv contain the same records.
+
 ## Current features (deployed GitHub Pages prototype)
 
 - Responsive scientific-paper website with title, abstract, author, and arXiv identifier search.
