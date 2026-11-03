@@ -30,6 +30,8 @@ jobs:
         run: python -m unittest discover -s tests -v
       - name: Validate website scripts
         run: python -m scripts.validate_site
+      - name: Test research relevance ranking
+        run: node tests/relevance.test.js
       - name: Refresh research metadata
         id: refresh
         continue-on-error: true
