@@ -47,6 +47,20 @@ function bib(w){const author=(w.authorships||[]).map(a=>a.author?.display_name).
 function download(name,contents,type){const b=new Blob([contents],{type});const url=URL.createObjectURL(b);const a=document.createElement("a");a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000)}
 function setStatus(s){$("status").textContent=s}
 function persist(){state.field=$("field").value;state.query=$("query").value;state.sort=$("sort").value;state.from=$("from").value;state.to=$("to").value;store(KEY,state)}
+function normalizeSearchDates(){
+ const now=new Date().toISOString().slice(0,10);
+ const from=$("from"),to=$("to");
+ const reasons=[];
+ if(from.value&&from.value>now){from.value="";reasons.push("future start")}
+ if(to.value&&to.value>now){to.value="";reasons.push("future end")}
+ if(from.value&&to.value&&from.value>to.value){from.value="";to.value="";reasons.push("reversed range")}
+ if(reasons.length){
+  state.from=from.value;state.to=to.value;
+  store(KEY,{...state,from:from.value,to:to.value});
+ }
+ return {changed:reasons.length>0,until:now,reasons}
+}
+
 function topicSelect(t){state.topic=t;state.subtopic="";state.customSubtopic=false;state.query=t;$("query").value=t;persist();drawTopics();drawSubtopics();page=1;search()}
 function subtopicSelect(t){state.subtopic=t;state.customSubtopic=!fieldTopics(state.field,state.topic).includes(t);state.query=t;$("query").value=t;persist();drawSubtopics();page=1;search()}
 function drawSubtopics(){
@@ -115,7 +129,11 @@ async function search(){
  busy=true;showingSaved=false;persist();
  const q=$("query").value.trim(),from=$("from").value,to=$("to").value;
  if(!q){busy=false;setStatus("Enter a topic, subtopic, paper title or research question.");return}
- if(from&&to&&from>to){busy=false;setStatus("Start date must be before end date.");return}
+ const dates=normalizeSearchDates();
+ if(dates.changed){
+  setStatus("Future or reversed dates were cleared; searching existing research through "+dates.until+".")
+ }
+
  if(!SearchCore){busy=false;setStatus("Search tools unavailable. Reload ResearchLens.");return}
  if(Arxiv?.parse(q)){
   if(requestController)requestController.abort();requestController=null;
@@ -124,9 +142,8 @@ async function search(){
   setStatus("Direct version-specific arXiv link. This result does not depend on the ResearchLens feed or OpenAlex indexing.");
   return;
  }
- const today=new Date().toISOString().slice(0,10),effectiveEnd=to&&to<today?to:today;
- if(from&&from>effectiveEnd){busy=false;items=[];total=0;render();setStatus("Start date is in the future. Choose an earlier date.");return}
- const plan=SearchCore.plan(state,q,{page,from,to,sort:$("sort").value,today});
+ const today=new Date().toISOString().slice(0,10);
+ const plan=SearchCore.plan(state,q,{page,from:$("from").value,to:$("to").value,sort:$("sort").value,today});
  const ctl=new AbortController();requestController=ctl;
  const scope=FIELDS[plan.field].name;
  const fieldsRequested=plan.context?" · Quantum contextuality disambiguation enabled.":"";
@@ -173,7 +190,7 @@ async function search(){
   items=selected.map(x=>({...x.work,__source:x.source})).filter(w=>Boolean(arxivURL(w)));
   total=sourceTotal;
   const aiAdded=selected.filter(x=>x.source==="semantic").length;
-  let summary=items.length+" field-relevant papers shown from "+scope+" (batch "+page+")."+fieldsRequested;
+  let summary=(dates.changed?"Future or reversed dates were cleared; searching available papers through "+dates.until+". ":"")+items.length+" field-relevant papers shown from "+scope+" (batch "+page+")."+fieldsRequested;
   if(triedAI)summary+=" AI semantic fallback "+(semanticError?"unavailable ("+semanticError+")":aiAdded+" additional candidates passed subject screening")+".";
   if(mainError)summary+=" Standard search issue: "+mainError+".";
   if(!items.length)summary+=" No adequately supported matches. Try a narrower query or a different topic.";
@@ -233,7 +250,7 @@ for(const [id,f] of Object.entries(FIELDS)){
 }
 $("field").value=state.field;$("query").value=state.query||state.topic||"";
 document.addEventListener("pointerdown",e=>{if(!$("field-details").contains(e.target))$("field-details").open=false});
-document.addEventListener("keydown",e=>{if(e.key==="Escape"&&$("field-details").open){$("field-details").open=false;$("field-trigger").focus()}});$("sort").value=state.sort||"relevance";$("from").value=state.from||"";$("to").value=state.to||"";drawField();drawSaved();
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&$("field-details").open){$("field-details").open=false;$("field-trigger").focus()}});$("sort").value=state.sort||"relevance";$("from").value=state.from||"";$("to").value=state.to||"";const dateRestore=normalizeSearchDates();drawField();drawSaved();if(dateRestore.changed)setStatus("Saved future publication dates were cleared. Research is available through "+dateRestore.until+".");
 $("field").onchange=()=>{state.field=$("field").value;state.topic=FIELDS[state.field].topics[0];state.subtopic="";state.customSubtopic=false;state.query=state.topic;$("query").value=state.query;persist();drawField();window.dispatchEvent(new CustomEvent("researchlens:field-changed",{detail:{field:state.field,topic:state.topic}}));page=1;search()};
 $("use-custom").onclick=()=>{const t=$("custom").value.trim();if(t.length<3){setStatus("Enter at least three characters for a custom topic.");return}state.subtopic=t;state.customSubtopic=true;state.query=t;$("query").value=t;persist();drawSubtopics();page=1;search()};
 $("use-subtopic").onclick=()=>{const t=$("custom-subtopic").value.trim();if(t.length<3){setStatus("Enter at least three characters for a subtopic.");return}subtopicSelect(t);toggleInterest(t);$("custom-subtopic").value="";setStatus("Following the specialized interest: "+t)};
@@ -263,7 +280,7 @@ $("show-saved").onclick=()=>{showingSaved=true;setStatus("This collection is sto
 $("prev").onclick=()=>{if(page>1){page--;search()}};$("next").onclick=()=>{if(page*100<Math.min(total,10000)){page++;search()}};
 $("export-bib").onclick=()=>{if(!saved.length){setStatus("Save a paper before exporting citations.");return}download("researchlens-reading-list.bib",saved.map(bib).join("\n"),"text/plain;charset=utf-8")};
 $("export-json").onclick=()=>download("researchlens-field-reading-list.json",JSON.stringify(saved,null,2),"application/json");
-const u=new URLSearchParams(location.search);if(u.get("field")&&FIELDS[u.get("field")]){state.field=u.get("field");if(!FIELDS[state.field].topics.includes(state.topic)){state.topic=FIELDS[state.field].topics[0];state.subtopic=""}$("field").value=state.field;drawField()}if(u.get("q")){$("query").value=u.get("q").slice(0,250);state.query=$("query").value}if(u.get("from"))$("from").value=u.get("from").slice(0,10);if(u.get("to"))$("to").value=u.get("to").slice(0,10);if(["relevance","publication_date:desc","cited_by_count:desc"].includes(u.get("sort")))$("sort").value=u.get("sort");persist();if($("query").value.trim())search();
+const u=new URLSearchParams(location.search);if(u.get("field")&&FIELDS[u.get("field")]){state.field=u.get("field");if(!FIELDS[state.field].topics.includes(state.topic)){state.topic=FIELDS[state.field].topics[0];state.subtopic=""}$("field").value=state.field;drawField()}if(u.get("q")){$("query").value=u.get("q").slice(0,250);state.query=$("query").value}if(u.get("from"))$("from").value=u.get("from").slice(0,10);if(u.get("to"))$("to").value=u.get("to").slice(0,10);if(["relevance","publication_date:desc","cited_by_count:desc"].includes(u.get("sort")))$("sort").value=u.get("sort");const dateLink=normalizeSearchDates();persist();if(dateLink.changed)setStatus("The requested future date range was removed; searching available papers.");if($("query").value.trim())search();
 }
 window.addEventListener("researchlens:scholarly-open",init,{once:true});
 })();
