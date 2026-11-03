@@ -47,3 +47,28 @@
 .rl-page-footer{font-size:12px;color:var(--rl-muted);text-align:center;padding:10px 16px 25px}
 @media(max-width:900px){.rl-workspace-columns{grid-template-columns:1fr}.rl-shortcuts{grid-template-columns:repeat(2,1fr)}.rl-bottom{display:block}.rl-quick-search{max-width:none}}
 @media(max-width:650px){.rl-global-header{padding:12px 14px!important}.rl-global-header .rl-logo{font-size:17px}.rl-global-header .rl-nav{order:3;flex-basis:100%;justify-content:flex-start}.rl-global-header .rl-nav a{padding:9px 10px}.rl-workspace{padding:14px 12px 45px}.rl-welcome{display:block;padding:23px 19px}.rl-welcome-actions{margin-top:19px}.rl-focusbar{align-items:flex-start;flex-direction:column}.rl-shortcuts{gap:9px}.rl-shortcuts a{padding:12px}.rl-section{padding:15px}.rl-bottom{margin-top:12px}.rl-quick-search{flex-direction:column;align-items:stretch}.rl-quick-search button{width:100%}.rl-library-controls{grid-template-columns:1fr}.rl-paper .rl-entry-tools{grid-template-columns:1fr}}
+
+
+/* Research intelligence: focused controls, matching reasons and question tracking. */
+.rl-intelligence{margin-bottom:18px}
+.rl-recs-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:13px 0}
+.rl-recs-grid .rl-paper{height:100%}
+.rl-relevance-reason{display:block;font-size:12px;color:var(--rl-blue)!important;line-height:1.5}
+.rl-preferences{margin:15px 0;padding:13px;border:1px solid var(--rl-border);border-radius:10px;background:var(--rl-panel)}
+.rl-preferences summary{cursor:pointer;color:var(--rl-text);font-size:13px;font-weight:750}
+.rl-settings-form,.rl-project-form{display:grid;gap:9px;padding-top:13px}
+.rl-settings-form label,.rl-project-form label,.rl-recommendation-controls label{font-size:12px;font-weight:700;color:var(--rl-text)}
+.rl-settings-form textarea,.rl-project-form textarea,.rl-project-form input,.rl-recommendation-controls select{width:100%;font-size:13px;padding:10px;border:1px solid var(--rl-border);border-radius:9px;background:var(--rl-panel);color:var(--rl-text)}
+.rl-recommendation-controls{display:flex;gap:10px;align-items:center;justify-content:flex-start;flex-wrap:wrap}
+.rl-recommendation-controls select{max-width:360px}
+.rl-project-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.rl-project-form-grid>div{display:grid;gap:7px}
+.rl-project-list{display:grid;gap:12px}
+.rl-project-card{border:1px solid var(--rl-border);border-radius:11px;padding:16px;background:var(--rl-panel)}
+.rl-project-card strong{font-size:15px;color:var(--rl-text)}
+.rl-project-card p{margin:8px 0}
+.rl-project-card .rl-paper-actions select,.rl-recs-grid .rl-paper-actions select{border:1px solid var(--rl-border);border-radius:8px;padding:7px;font-size:12px;max-width:230px;color:var(--rl-text);background:var(--rl-panel)}
+.rl-project-paper-row{display:flex;gap:9px;align-items:center;justify-content:space-between;margin:6px 0}
+.rl-project-paper-row a{font-size:12px;line-height:1.5}
+.rl-project-paper-row button{font-size:11px;border:1px solid var(--rl-border);border-radius:8px;background:var(--rl-panel);color:var(--rl-blue);padding:6px 8px}
+@media(max-width:740px){.rl-recs-grid,.rl-project-form-grid{grid-template-columns:1fr}.rl-recommendation-controls{align-items:flex-start;flex-direction:column}.rl-recommendation-controls select{max-width:100%}}
