@@ -1,0 +1,53 @@
+/* One Discover interface, two labelled source modes. Scoped styles avoid changing the arXiv feed. */
+.rl-discover-switch{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:21px 24px;margin:0 0 18px;background:var(--rl-panel,#fff);border:1px solid var(--rl-border,#dbe6ee);border-radius:16px}
+.rl-discover-switch h2{font-size:23px;line-height:1.2;margin:3px 0 5px;color:var(--rl-text,#19354b)}
+.rl-discover-switch p{font-size:12px;line-height:1.5;color:var(--rl-muted,#607a91);margin:0;max-width:480px}
+.rl-discover-eyebrow{letter-spacing:.12em;font-size:10px;font-weight:800;color:var(--rl-blue,#136ea3)}
+.rl-discover-options{display:grid;grid-template-columns:1fr 1fr;gap:8px;flex:0 0 min(480px,51%)}
+.rl-source-button{padding:13px 14px;border:1px solid var(--rl-border,#dbe6ee);border-radius:11px;background:var(--rl-panel,#fff);color:var(--rl-text,#19354b);font-size:14px;font-weight:750;text-align:left;cursor:pointer;min-width:0}
+.rl-source-button small{display:block;font-weight:450;font-size:11px;line-height:1.45;opacity:.76;margin-top:4px}
+.rl-source-button[aria-pressed=true]{background:#176c9b;border-color:#176c9b;color:#fff}
+.rl-source-button:focus-visible{outline:3px solid #69bfec;outline-offset:2px}
+#scholarly-discovery[hidden],#arxiv-discovery[hidden]{display:none!important}
+.rl-scholar{color:var(--rl-text,#19354b)}
+.rl-scholar-intro{padding:19px 20px;margin-bottom:15px;border:1px solid var(--rl-border,#dbe6ee);border-radius:13px;background:var(--rl-soft,#eaf2f8)}
+.rl-scholar-intro span{letter-spacing:.12em;font-size:10px;font-weight:800;color:var(--rl-blue,#136ea3)}
+.rl-scholar-intro h2{margin:5px 0 7px;font-size:23px;color:var(--rl-text,#19354b)}
+.rl-scholar-intro p{font-size:12px;line-height:1.6;color:var(--rl-muted,#607a91);margin:0;max-width:850px}
+.rl-scholar-layout{display:grid;grid-template-columns:minmax(0,245px) minmax(0,1fr) minmax(0,245px);gap:14px;align-items:start}
+.rl-scholar-layout>section,.rl-scholar-layout>aside{min-width:0}
+.rl-scholar .panel,.rl-scholar .paper{border:1px solid var(--rl-border,#dbe6ee);background:var(--rl-panel,#fff);border-radius:12px;padding:16px;box-shadow:none}
+.rl-scholar .panel{margin:0 0 13px}.rl-scholar .panel h2{font-size:16px;color:var(--rl-text,#19354b);margin:0 0 12px}.rl-scholar .panel h3{font-size:14px;color:var(--rl-text,#19354b);margin:15px 0 8px}
+.rl-scholar .muted{color:var(--rl-muted,#607a91);font-size:12px;line-height:1.6}
+.rl-scholar .label{display:block;font-size:12px;font-weight:750;margin:13px 0 7px;color:var(--rl-text,#19354b)}
+.rl-scholar select,.rl-scholar input{display:block;width:100%;padding:10px;border:1px solid var(--rl-border,#dbe6ee);border-radius:9px;background:var(--rl-panel,#fff);color:var(--rl-text,#19354b);font-size:13px}
+.rl-scholar button{border:1px solid var(--rl-border,#dbe6ee);border-radius:9px;background:var(--rl-panel,#fff);color:var(--rl-blue,#136ea3);padding:9px 12px;font-size:12px;font-weight:700;cursor:pointer}
+.rl-scholar button:hover{filter:brightness(.94)}
+.rl-scholar button:focus-visible,.rl-scholar input:focus-visible,.rl-scholar select:focus-visible,.rl-scholar a:focus-visible{outline:3px solid #64b8e2;outline-offset:2px}
+.rl-scholar button.primary{background:#126f9f;border-color:#126f9f;color:white}
+.rl-scholar button:disabled{opacity:.45;cursor:not-allowed}
+.rl-scholar .row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.rl-scholar .row.between{justify-content:space-between}
+.rl-scholar .topiclist{display:flex;gap:7px;flex-wrap:wrap}
+.rl-scholar .topic{border-radius:90px;padding:7px 10px;background:var(--rl-soft,#eaf2f8);font-size:11px;color:var(--rl-text,#19354b)}
+.rl-scholar .topic.active{background:#126f9f;color:#fff}
+.rl-scholar .template{display:block;width:100%;text-align:left;margin:6px 0;padding:9px;text-decoration:none}
+.rl-scholar .template small{display:block;font-size:11px;line-height:1.4;opacity:.75;margin-top:4px;font-weight:400}
+.rl-scholar .notion{border-radius:9px;background:var(--rl-soft,#eaf2f8);border:1px solid var(--rl-border,#dbe6ee);font-size:12px;padding:11px;line-height:1.5;color:var(--rl-text,#19354b)}
+.rl-scholar .search{display:grid;grid-template-columns:minmax(0,1fr) 135px 92px;gap:8px;align-items:stretch}
+.rl-scholar .datebar{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.rl-scholar #scholar-results{display:grid;gap:10px;margin-top:12px}
+.rl-scholar .paper{margin-bottom:0}
+.rl-scholar .paper h3{font-size:18px;line-height:1.35;margin:10px 0}
+.rl-scholar .paper .authors,.rl-scholar .paper .summary{font-size:12px;line-height:1.55;color:var(--rl-muted,#607a91)}
+.rl-scholar .paper .actions{margin-top:12px}
+.rl-scholar .paper .actions a{border:1px solid var(--rl-border,#dbe6ee);border-radius:8px;padding:8px 10px;font-size:12px;text-decoration:none;color:var(--rl-blue,#136ea3)}
+.rl-scholar .pill{display:inline-block;background:var(--rl-soft,#eaf2f8);color:var(--rl-blue,#136ea3);padding:4px 7px;font-size:11px;border-radius:6px;font-weight:750}
+.rl-scholar .empty{background:var(--rl-panel,#fff);border:1px dashed var(--rl-border,#dbe6ee);border-radius:12px;padding:25px;color:var(--rl-muted,#607a91);text-align:center}
+.rl-scholar .pager{justify-content:center;margin-top:15px}
+.rl-scholar #scholar-saved-list{max-height:240px;overflow-y:auto}
+.rl-scholar #scholar-saved-list a{display:block;font-size:12px;padding:8px 0;border-bottom:1px solid var(--rl-border,#dbe6ee);line-height:1.45}
+.rl-scholar #scholar-status{min-height:18px}
+@media(max-width:1120px){.rl-scholar-layout{grid-template-columns:220px minmax(0,1fr)}.rl-scholar .tools-panel{grid-column:1/-1}}
+@media(max-width:780px){.rl-discover-switch{flex-direction:column;align-items:stretch;padding:16px}.rl-discover-options{flex:auto}.rl-scholar-layout{grid-template-columns:1fr}.rl-scholar .tools-panel{grid-column:auto}.rl-scholar .search{grid-template-columns:1fr 1fr}.rl-scholar .search input{grid-column:1/-1}}
+@media(max-width:480px){.rl-discover-options{gap:6px}.rl-source-button{padding:10px;font-size:13px}.rl-source-button small{font-size:10px}.rl-scholar .search{grid-template-columns:1fr}.rl-scholar .search input{grid-column:auto}.rl-scholar .datebar{grid-template-columns:1fr}.rl-scholar .panel{padding:14px}}
