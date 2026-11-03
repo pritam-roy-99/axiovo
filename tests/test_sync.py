@@ -2,7 +2,7 @@ import sys
 import unittest
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from scripts.sync import parse_id, parse_atom, merge
+from scripts.sync import parse_id, parse_atom, merge, read_pinned_ids, fetch_by_ids
 
 class ArxivSyncTests(unittest.TestCase):
     def test_arxiv_id(self):
@@ -13,6 +13,12 @@ class ArxivSyncTests(unittest.TestCase):
         new={"id":"2601.00123","version":2,"title":"New","updated":"2026-01-02"}
         self.assertEqual(merge([old],[new])[0]["title"],"New")
         self.assertEqual(merge([new],[old])[0]["title"],"New")
+
+    def test_historical_index_has_requested_paper(self):
+        self.assertIn("2608.13942", read_pinned_ids())
+
+    def test_pinned_lookup_empty_does_not_make_network_request(self):
+        self.assertEqual(fetch_by_ids([]), [])
 
     def test_atom(self):
         xml=b'<feed xmlns="http://www.w3.org/2005/Atom"><entry><id>http://arxiv.org/abs/2601.00123v2</id><title> An  Example </title><summary> Abstract </summary><published>2026-01-01</published><updated>2026-01-02</updated><author><name>Researcher One</name></author><category term="quant-ph"/></entry></feed>'
