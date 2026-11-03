@@ -107,14 +107,15 @@ async function search(n=1,fromUrl=false){
  const direct=Arxiv?.parse(p.q);
  if(p.from&&p.to&&p.from>p.to){$("history-info").textContent="Start date must be before or equal to end date.";switchView(true);return}
  if(p.q.length>0&&p.q.length<3&& !/^\d{4}\.\d{4,5}(?:v\d+)?$/.test(p.q)){$("history-info").textContent="Enter at least 3 letters, or use the date fields alone.";switchView(true);return}
- if(!p.q&&!p.from&&!p.to){$("history-info").textContent="Choose a date range or enter keywords before searching the historic archive.";switchView(true);return}
+ // Empty keyword search lists the latest OpenAlex-indexed arXiv-hosted works.
  if(controller)controller.abort();
  controller=new AbortController();loading=true;page=n;switchView(true);
  const root=$("history-cards");root.replaceChildren(el("div","Searching arXiv-hosted papers through OpenAlex…","empty"));
  if(direct){const directBox=el("div",undefined,"rl-source-notice");directBox.textContent="Exact arXiv ID supplied. The official record is available independently of ResearchLens indexing: ";addLink(directBox,"Open arXiv:"+direct.requested+" ↗",Arxiv.abs(direct.requested),"rl-paper-action primary");root.append(directBox)}
  $("history-count").textContent="Searching…";
  $("history-pagination").replaceChildren();
- $("history-info").textContent="Works with an arXiv copy in OpenAlex. These are external search results, not the local index. Publication dates are not guaranteed arXiv v1 dates.";
+ $("history-info").textContent="External arXiv-hosted search via OpenAlex. Search and version links go to original arXiv; publication dates are not necessarily arXiv v1 submission dates.";
+ const official=$("history-official-link");if(official){official.href=Arxiv.officialSearchUrl(p.q);official.textContent=p.q?"Search this query directly on arXiv ↗":"Browse arXiv on the official website ↗"}
  const filters=["locations.source.id:"+ARXIV_SOURCE];
  if(p.from)filters.push("from_publication_date:"+p.from);
  if(p.to)filters.push("to_publication_date:"+p.to);
@@ -158,6 +159,7 @@ async function search(n=1,fromUrl=false){
  }finally{loading=false}
 }
 btn.addEventListener("click",()=>search(1));
+$("arxiv-live-search")?.addEventListener("click",()=>search(1));
 back.addEventListener("click",()=>{if(controller)controller.abort();switchView(false);const u=new URL(location.href);u.searchParams.delete("history");u.searchParams.delete("page");window.history.replaceState({},"",u.pathname+u.search)});
 $("q").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();search(1)}});
 const urlParams=new URLSearchParams(location.search);
