@@ -70,10 +70,13 @@
   const qt=terms(p.query);
   if(!qt.length)return false;
   if(p.context){
-   // Contextuality is polysemous across disciplines. Require actual quantum
-   // contextuality, not ANAs, housing, educational context or nursing practice.
-   return CONTEXT.test(combined)&&
-    (STRONG_QUANTUM.test(title+" "+abs)||/quantum|kochen/i.test(labels));
+   // Contextuality is polysemous. Require physical evidence and the requested
+   // specialized qualifier, e.g. "preparation" or "sensing", not merely
+   // generic contextuality from another branch of research.
+   const physical=STRONG_QUANTUM.test(title+" "+abs)||/quantum|kochen/i.test(labels);
+   const qualifiers=terms(p.query).filter(t=>!["quantum","contextuality","noncontextuality"].includes(t));
+   const qualifies=qualifiers.length===0||qualifiers.some(t=>src.includes(t)||meta.includes(t));
+   return CONTEXT.test(combined)&&physical&&qualifies;
   }
   if(p.field==="quantum"&&p.browse){
    if(!PHYSICS.test(combined))return false;
@@ -83,8 +86,12 @@
   const hits=qt.filter(t=>src.includes(t)||meta.includes(t)||(t.length>4&&t.endsWith("s")&&(src.includes(t.slice(0,-1))||meta.includes(t.slice(0,-1)))));
   if(!hits.length)return false;
   if(p.browse){
-   const min=qt.length>=4?2:1;
-   if(hits.length<min)return false;
+   // A two- or three-word research area must not pass on a generic
+   // anchor such as "quantum" alone. Prefer precision over broad recall.
+   const specific=qt.filter(t=>t!=="quantum");
+   const requireCount=specific.length<=2?specific.length:Math.ceil(specific.length*0.67);
+   const matchedSpecific=specific.filter(t=>hits.includes(t));
+   if(matchedSpecific.length<Math.max(1,requireCount))return false;
   }
   if(p.field==="quantum"&&CONTEXT.test(p.query)&&!STRONG_QUANTUM.test(title+" "+abs)&&!/quantum|kochen/i.test(labels))return false;
   return true;
