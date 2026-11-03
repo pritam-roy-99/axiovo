@@ -6,6 +6,9 @@ const $=id=>document.getElementById("scholar-"+id);
 const {FIELDS,fieldTopics,fieldKey}=window.ResearchLensFields;
 
 const KEY="researchlens-field-explorer-v1", SAVED="researchlens-field-saved-v1";
+const interestsAPI=window.ResearchLensInterests;
+const followedInterests=()=>interestsAPI?.get(read(interestsAPI.KEY,{}),state.field,state.topic)||[];
+function toggleInterest(value){if(!interestsAPI)return;const next=interestsAPI.toggle(read(interestsAPI.KEY,{}),state.field,state.topic,value);store(interestsAPI.KEY,next);drawTopics();drawSubtopics();window.dispatchEvent(new Event("researchlens:interests-changed"))}
 function read(key,fallback){try{const d=JSON.parse(localStorage.getItem(key)||"null");return d??fallback}catch{return fallback}}
 function store(key,value){try{localStorage.setItem(key,JSON.stringify(value))}catch{}}
 let state=read(KEY,{field:"quantum",topic:"Quantum key distribution",subtopic:"",query:"",sort:"relevance",from:"",to:""});
@@ -26,15 +29,30 @@ function topicSelect(t){state.topic=t;state.subtopic="";state.customSubtopic=fal
 function subtopicSelect(t){state.subtopic=t;state.customSubtopic=!fieldTopics(state.field,state.topic).includes(t);state.query=t;$("query").value=t;persist();drawSubtopics();page=1;search()}
 function drawSubtopics(){
  const holder=$("subtopic-list");holder.replaceChildren();
- const items=fieldTopics(state.field,state.topic);
- $("subtopic-label").textContent="Interests within "+state.topic;
+ const followed=followedInterests();
+ const curated=fieldTopics(state.field,state.topic);
+ const items=interestsAPI?interestsAPI.order([...new Set([...curated,...followed])],followed):curated;
+ $("subtopic-label").textContent="Research interests within "+state.topic;
+ const note=node("p",followed.length?
+  "Following "+followed.length+" interests in this topic. Select a subtopic to search, or use its star to follow or unfollow.":
+  "Choose a specific area, then star your interests for future visits.","rl-interest-help");
+ holder.append(note);
  for(const t of items){
+  const row=node("span",undefined,"rl-interest-chip");
   const b=node("button",t,"topic"+(t===state.subtopic?" active":""));b.type="button";
-  b.setAttribute("aria-pressed",String(t===state.subtopic));b.onclick=()=>subtopicSelect(t);holder.append(b)
+  b.setAttribute("aria-pressed",String(t===state.subtopic));b.onclick=()=>subtopicSelect(t);
+  const marked=followed.some(x=>x.toLowerCase()===t.toLowerCase());
+  const follow=node("button",marked?"★":"☆","rl-interest-follow"+(marked?" is-followed":""));
+  follow.type="button";follow.setAttribute("aria-pressed",String(marked));
+  follow.setAttribute("aria-label",(marked?"Unfollow ":"Follow ")+t+" in "+state.topic);
+  follow.title=marked?"Unfollow interest":"Follow interest";follow.onclick=()=>toggleInterest(t);
+  row.append(b,follow);holder.append(row);
  }
- const custom=$("custom-subtopic");custom.placeholder="Your own "+state.topic.toLowerCase()+" research interest";
+ const custom=$("custom-subtopic");
+ custom.placeholder="Add a specialized interest in "+state.topic.toLowerCase();
 }
-function drawTopics(){const holder=$("topic-list");holder.replaceChildren();for(const t of FIELDS[state.field].topics){const b=node("button",t,"topic"+(t===state.topic?" active":""));b.type="button";b.setAttribute("aria-pressed",String(t===state.topic));b.onclick=()=>topicSelect(t);holder.append(b)}}
+function followedCount(topic){return interestsAPI?.get(read(interestsAPI.KEY,{}),state.field,topic).length||0}
+function drawTopics(){const holder=$("topic-list");holder.replaceChildren();const topics=FIELDS[state.field].topics.slice().sort((a,b)=>followedCount(b)-followedCount(a));for(const t of topics){const b=node("button",t,"topic"+(t===state.topic?" active":""));b.type="button";b.setAttribute("aria-pressed",String(t===state.topic));b.onclick=()=>topicSelect(t);holder.append(b)}}
 function drawField(){const f=FIELDS[state.field];$("field").value=state.field;$("field-label").textContent=f.name;for(const b of $("field-choices").querySelectorAll("button"))b.setAttribute("aria-pressed",String(b.dataset.field===state.field));$("field-summary").textContent=f.summary;$("field-heading").textContent="Explore "+f.name.toLowerCase();drawTopics();drawSubtopics();const holder=$("suggestions");holder.replaceChildren();for(const q of f.queries){const b=node("button",q,"template");b.type="button";b.onclick=()=>{state.subtopic="";state.query=q;$("query").value=q;persist();drawSubtopics();page=1;search()};holder.append(b)}const w=$("workflow");w.replaceChildren();const ol=document.createElement("ol");for(const step of f.workflow){ol.append(node("li",step))}ol.style.paddingLeft="20px";w.append(ol)}
 function drawSaved(){store(SAVED,saved);$("saved-count").textContent=saved.length;const root=$("saved-list");root.replaceChildren();if(!saved.length){root.append(node("p","No saved papers yet.","muted"));return}for(const w of saved.slice().reverse().slice(0,12)){const a=node("a",w.display_name||"Untitled");a.href=w.id||w.doi||"#";a.target="_blank";a.rel="noopener noreferrer";root.append(a)}}
 function renderPaper(w){const art=node("article",undefined,"paper");const header=node("div",undefined,"row");header.append(node("span",String(w.publication_year||"Year unknown"),"pill"));header.append(node("span",(w.cited_by_count??0)+" citations","pill"));const access=w.open_access?.is_oa;if(access)header.append(node("span","Open access","pill"));art.append(header);
@@ -72,7 +90,8 @@ document.addEventListener("pointerdown",e=>{if(!$("field-details").contains(e.ta
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&$("field-details").open){$("field-details").open=false;$("field-trigger").focus()}});$("sort").value=state.sort||"relevance";$("from").value=state.from||"";$("to").value=state.to||"";drawField();drawSaved();
 $("field").onchange=()=>{state.field=$("field").value;state.topic=FIELDS[state.field].topics[0];state.subtopic="";state.customSubtopic=false;state.query=state.topic;$("query").value=state.query;persist();drawField();window.dispatchEvent(new CustomEvent("researchlens:field-changed",{detail:{field:state.field,topic:state.topic}}));page=1;search()};
 $("use-custom").onclick=()=>{const t=$("custom").value.trim();if(t.length<3){setStatus("Enter at least three characters for a custom topic.");return}state.subtopic=t;state.customSubtopic=true;state.query=t;$("query").value=t;persist();drawSubtopics();page=1;search()};
-$("use-subtopic").onclick=()=>{const t=$("custom-subtopic").value.trim();if(t.length<3){setStatus("Enter at least three characters for a subtopic.");return}subtopicSelect(t)};
+$("use-subtopic").onclick=()=>{const t=$("custom-subtopic").value.trim();if(t.length<3){setStatus("Enter at least three characters for a subtopic.");return}subtopicSelect(t);toggleInterest(t);$("custom-subtopic").value="";setStatus("Following the specialized interest: "+t)};
+window.addEventListener("researchlens:interests-changed",()=>{drawTopics();drawSubtopics()});
 window.addEventListener("researchlens:choose-field",e=>{
  const field=fieldKey(e.detail?.field);if(state.field===field)return;
  state.field=field;state.topic=FIELDS[field].topics[0];state.subtopic="";state.query=state.topic;
