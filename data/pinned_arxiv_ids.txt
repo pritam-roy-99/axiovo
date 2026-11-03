@@ -1,0 +1,3 @@
+# ResearchLens historical arXiv IDs, fetched explicitly on every refresh.
+# One canonical identifier per line. Do not include unverified metadata.
+2608.13942
