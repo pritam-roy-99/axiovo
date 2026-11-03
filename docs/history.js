@@ -18,6 +18,13 @@ function el(tag,text,cls){
 function addLink(parent,text,url,cls="btn"){
  try{const u=new URL(url,location.href);if(u.protocol!=="https:"||(!String(url).startsWith("https:")&&u.origin!==location.origin))return null;const a=el("a",text,cls);a.href=u.href;a.target="_blank";a.rel="noopener noreferrer";parent.append(a);return a}catch(e){return null}
 }
+function historyInfo(message,query=""){
+ const parent=$("history-info");if(!parent)return;
+ parent.replaceChildren(document.createTextNode(message+" "));
+ const link=el("a",query?"Search this query on the official arXiv website ↗":"Browse the official arXiv website ↗");
+ link.id="history-official-link";link.href=Arxiv?.officialSearchUrl(query)||"https://arxiv.org/search/advanced";
+ link.target="_blank";link.rel="noopener noreferrer";parent.append(link);
+}
 function pageInfo(){return {q:$("q").value.trim(),from:$("date-from").value,to:$("date-to").value,sort:$("order").value}}
 function switchView(on){
  active=on;view.hidden=!on;feed.hidden=on;back.hidden=!on;btn.textContent=on?"Update full-history results":"Search all arXiv history";
@@ -105,8 +112,8 @@ function pager(){
 async function search(n=1,fromUrl=false){
  const p=pageInfo();
  const direct=Arxiv?.parse(p.q);
- if(p.from&&p.to&&p.from>p.to){$("history-info").textContent="Start date must be before or equal to end date.";switchView(true);return}
- if(p.q.length>0&&p.q.length<3&& !/^\d{4}\.\d{4,5}(?:v\d+)?$/.test(p.q)){$("history-info").textContent="Enter at least 3 letters, or use the date fields alone.";switchView(true);return}
+ if(p.from&&p.to&&p.from>p.to){historyInfo("Start date must be before or equal to end date.",p.q);switchView(true);return}
+ if(p.q.length>0&&p.q.length<3&& !/^\d{4}\.\d{4,5}(?:v\d+)?$/.test(p.q)){historyInfo("Enter at least 3 letters, or use the date fields alone.",p.q);switchView(true);return}
  // Empty keyword search lists the latest OpenAlex-indexed arXiv-hosted works.
  if(controller)controller.abort();
  controller=new AbortController();loading=true;page=n;switchView(true);
@@ -114,8 +121,7 @@ async function search(n=1,fromUrl=false){
  if(direct){const directBox=el("div",undefined,"rl-source-notice");directBox.textContent="Exact arXiv ID supplied. The official record is available independently of ResearchLens indexing: ";addLink(directBox,"Open arXiv:"+direct.requested+" ↗",Arxiv.abs(direct.requested),"rl-paper-action primary");root.append(directBox)}
  $("history-count").textContent="Searching…";
  $("history-pagination").replaceChildren();
- $("history-info").textContent="External arXiv-hosted search via OpenAlex. Search and version links go to original arXiv; publication dates are not necessarily arXiv v1 submission dates.";
- const official=$("history-official-link");if(official){official.href=Arxiv.officialSearchUrl(p.q);official.textContent=p.q?"Search this query directly on arXiv ↗":"Browse arXiv on the official website ↗"}
+ historyInfo("Historical arXiv-hosted search via OpenAlex. Publication dates may differ from original arXiv submission dates. This index is not exhaustive.",p.q);
  const filters=["locations.source.id:"+ARXIV_SOURCE];
  if(p.from)filters.push("from_publication_date:"+p.from);
  if(p.to)filters.push("to_publication_date:"+p.to);
