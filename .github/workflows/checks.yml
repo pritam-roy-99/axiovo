@@ -26,6 +26,8 @@ jobs:
           node tests/field-taxonomy.test.js
       - name: Test personalized research interest controls
         run: node tests/interests.test.js
+      - name: Scholarly field relevance regression tests
+        run: node tests/scholar-search.test.js
       - name: Build homepage video preview
         run: |
           python -m pip install --disable-pip-version-check Pillow
