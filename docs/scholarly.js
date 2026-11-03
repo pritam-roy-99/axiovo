@@ -190,7 +190,7 @@ async function search(){
   items=selected.map(x=>({...x.work,__source:x.source})).filter(w=>Boolean(arxivURL(w)));
   total=sourceTotal;
   const aiAdded=selected.filter(x=>x.source==="semantic").length;
-  let summary=items.length+" field-relevant papers shown from "+scope+" (batch "+page+")."+fieldsRequested;
+  let summary=(dates.changed?"Future or reversed dates were cleared; searching available papers through "+dates.until+". ":"")+items.length+" field-relevant papers shown from "+scope+" (batch "+page+")."+fieldsRequested;
   if(triedAI)summary+=" AI semantic fallback "+(semanticError?"unavailable ("+semanticError+")":aiAdded+" additional candidates passed subject screening")+".";
   if(mainError)summary+=" Standard search issue: "+mainError+".";
   if(!items.length)summary+=" No adequately supported matches. Try a narrower query or a different topic.";
