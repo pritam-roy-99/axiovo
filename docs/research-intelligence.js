@@ -21,7 +21,7 @@ function persistProjects(){write(PROJECTS,projects)}
 function persistSettings(){write(META,settings)}
 function link(parent,url,label){if(!/^https:\/\//.test(url||""))return;const a=texts(parent,"a",label);a.href=url;a.target="_blank";a.rel="noopener noreferrer"}
 function projectName(p){return p.title+(p.status==="completed"?" (completed)":"")}
-function allInterests(){const p=read("researchlens-field-explorer-v1",{});const topics=read("researchlens-followed-topics",[]);return [...new Set([...settings.interests, ...(Array.isArray(topics)?topics:[]),p.topic,p.subtopic].filter(x=>typeof x==="string"&&x.trim()))].slice(0,15)}
+function allInterests(){const p=read("researchlens-field-explorer-v1",{});const topics=read("researchlens-followed-topics",[]);const API=window.ResearchLensInterests;const specialized=API?.get(read(API.KEY,{}),p.field||"quantum",p.topic||"")||[];return [...new Set([...settings.interests,...specialized,...(Array.isArray(topics)?topics:[]),p.topic,p.subtopic].filter(x=>typeof x==="string"&&x.trim()))].slice(0,20)}
 function drawSettings(){
  const p=read("researchlens-field-explorer-v1",{});
  $("research-interest").value=settings.interests.join(", ");
