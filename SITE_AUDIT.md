@@ -3,7 +3,7 @@
 **Audit date:** 2026-11-03  
 **Scope:** GitHub repository `main` as of the start of the audit, plus the changes in this pull request.
 
-**Verification boundary:** This is a source-code and GitHub Actions audit, **not** a successful hands-on browser test of the public deployment. Direct page navigation to the GitHub Pages domain was unavailable in the available web checker, and the execution container had no working external DNS/browser runtime. Do not interpret this document as proof that mobile layouts, external APIs, or third-party login work in production.
+**Verification boundary:** This audit combines repository source inspection, Python/Node regression tests and an automated Chromium walkthrough of locally served pages. The Chromium tests cover a 390px mobile view and a 1366px desktop view using **mocked external API responses**, not live OpenAlex or Supabase. Direct navigation to the public GitHub Pages domain was unavailable through the web checker in this session. Do not interpret passing local tests as proof that external APIs, third-party login or the public production deployment work end-to-end.
 
 ## Executive diagnosis
 
@@ -63,4 +63,4 @@ This PR fixes verified contradictions; it **does not** claim to solve source-com
 14. Test menu/keyboard focus, screen reader labels and mobile scroll behavior.
 15. Verify GitHub Issues discussions and optional hosted accounts only when actually configured.
 
-**Release criterion:** Automated code checks are necessary, but must not be described as a complete browser acceptance test. GitHub Pages deployment success confirms publication of assets, not correctness of external APIs or all user journeys.
+**Release criterion:** The local Chromium walkthrough and code tests must both pass. They establish page-level behavior with simulated network data, not full production acceptance. A subsequent real-world test must use live OpenAlex, arXiv, GitHub, Android devices, and any configured account service. GitHub Pages deployment success confirms asset publication, not external API correctness.
