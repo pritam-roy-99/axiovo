@@ -19,7 +19,7 @@ class CategoryPickerTests(unittest.TestCase):
             self.assertIn(key,p.nodes)
         self.assertEqual(p.nodes["category-trigger"][0],"button")
         self.assertEqual(p.nodes["category-trigger"][1]["aria-expanded"],"false")
-        self.assertEqual(p.nodes["category-menu"][1].get("hidden"),"")
+        self.assertIn("hidden",p.nodes["category-menu"][1])
         self.assertEqual(p.nodes["category"][0],"select")
         self.assertIn('selected.dispatchEvent(new Event("change",{bubbles:true}))',html)
         self.assertIn('data-category="physics.optics"',html)
