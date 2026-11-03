@@ -35,6 +35,13 @@ jobs:
           echo '### arXiv synchronization failed' >> "$GITHUB_STEP_SUMMARY"
           echo 'The previous feed is preserved. Check the refresh step logs and retry.' >> "$GITHUB_STEP_SUMMARY"
           echo '::warning::Could not refresh arXiv data. Existing records are preserved.'
+      - name: Optional citation metadata enrichment
+        if: steps.refresh.outcome == 'success'
+        continue-on-error: true
+        env:
+          OPENALEX_API_KEY: ${{ secrets.OPENALEX_API_KEY }}
+          OPENALEX_BATCH_SIZE: '10'
+        run: python -m scripts.enrich
       - name: Commit refreshed feed
         if: steps.refresh.outcome == 'success'
         run: |
