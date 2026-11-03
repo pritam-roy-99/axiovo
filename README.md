@@ -84,6 +84,16 @@ Paper cards now have one **Analyze / Ask AI** link to the unified Research Assis
 
 **Scope:** Research subtopics are curated search suggestions, not a disciplinary ontology or a validated paper classifier. The local arXiv snapshot is incomplete, and OpenAlex results depend on source indexing and API availability. Saved reading lists and preferences stay on the current device unless explicitly exported or backed up through an independently configured account service.
 
+## Researcher-centered Discover usability
+
+- **Workspace first, Discover second** in the primary navigation.
+- **One AI action per paper:** the feed and scholarly search use **Research Assistant**, which opens the same unified paper analysis and Q&A tool. When an arXiv ID can be extracted from OpenAlex's source URL, it is passed to the assistant; otherwise the paper title becomes the search query.
+- **Bookmark-style reading list button** with an icon and distinct Saved/Save paper states on both sources, with keyboard and accessibility labels.
+- **Explore your main field:** Discover uses the researcher's selected discipline from the browser-local profile and shows field-specific topics when the broader scholarly source is selected. The local arXiv feed still covers only its original categories and is explicitly distinguished from wider cross-disciplinary search.
+- **Field-specific subtopics and followed interests:** follow curated specialized areas or add a personal interest under a particular field and research topic. Followed subtopics are listed first; the current Workspace and personalized recommendation logic reuse those choices. These are browser-local preferences, not server-side researcher accounts or a scientific taxonomy classifier.
+
+The preferences live in `localStorage` under `researchlens-field-explorer-v1` and `researchlens-interests-by-field-v1`. To transfer them across devices, use browser data migration or a future authenticated sync feature. A local preference does not expand the underlying arXiv metadata coverage.
+
 ## Current features (deployed GitHub Pages prototype)
 
 - Responsive scientific-paper website with title, abstract, author, and arXiv identifier search.

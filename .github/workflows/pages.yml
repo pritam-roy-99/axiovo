@@ -36,6 +36,8 @@ jobs:
         run: |
           node tests/assistant-core.test.js
           node tests/field-taxonomy.test.js
+      - name: Test field-interest preferences
+        run: node tests/interests.test.js
       - name: Refresh research metadata
         id: refresh
         continue-on-error: true

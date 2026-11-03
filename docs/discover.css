@@ -92,3 +92,24 @@
 .rl-field-choice:hover,.rl-scholar .rl-field-choice:hover,.rl-field-choice[aria-pressed=true],.rl-scholar .rl-field-choice[aria-pressed=true]{background:var(--rl-soft,#eaf2f8)!important;color:var(--rl-blue,#136ea3)!important}
 .rl-field-choice[aria-pressed=true]::after{content:" ✓";float:right}
 @media(max-width:580px){.rl-field-choice-list{min-width:0;max-height:45vh}.rl-field-details>summary{min-height:45px}}
+
+
+/* Compact, accessible reading-list control on both literature sources. */
+.rl-save-button,.rl-scholar .rl-save-button{
+  display:inline-flex!important;align-items:center;justify-content:center;gap:8px;
+  border:1px solid #b7d4e4!important;border-radius:999px!important;
+  background:var(--rl-panel,#fff)!important;color:var(--rl-blue,#136ea3)!important;
+  min-height:42px;padding:9px 15px!important;font-size:12px!important;font-weight:750!important;
+  box-shadow:0 1px 3px #163d5412;transition:background .15s,color .15s,border-color .15s,transform .15s;
+}
+.rl-save-button:hover,.rl-scholar .rl-save-button:hover{background:var(--rl-soft,#eaf2f8)!important;border-color:#65b4d5!important;transform:translateY(-1px)}
+.rl-save-button.is-saved,.rl-scholar .rl-save-button.is-saved{background:#156b83!important;color:#fff!important;border-color:#156b83!important}
+.rl-save-button svg,.rl-scholar .rl-save-button svg{flex-shrink:0;width:16px;height:16px}
+.rl-save-button:focus-visible,.rl-scholar .rl-save-button:focus-visible{outline:3px solid #56b7e6;outline-offset:2px}
+.rl-scholar .rl-interest-help{font-size:11px;line-height:1.55;color:var(--rl-muted,#607a91);margin:4px 0 10px}
+.rl-scholar .rl-interest-chip{display:inline-flex;align-items:stretch;border:1px solid var(--rl-border,#dbe6ee);border-radius:999px;overflow:hidden;background:var(--rl-panel,#fff);margin:3px}
+.rl-scholar .rl-interest-chip .topic{border:0!important;margin:0!important;border-radius:0!important;padding:8px 12px!important}
+.rl-scholar .rl-interest-follow{border:0!important;border-left:1px solid var(--rl-border,#dbe6ee)!important;border-radius:0!important;padding:7px 11px!important;background:transparent!important;color:var(--rl-muted,#607a91)!important;font-size:16px!important}
+.rl-scholar .rl-interest-follow.is-followed{color:#b17d20!important;background:#fff4d7!important}
+.rl-scholar .rl-interest-follow:focus-visible{outline:3px solid #63b6df;outline-offset:-3px}
+@media(prefers-reduced-motion:reduce){.rl-save-button,.rl-scholar .rl-save-button{transition:none!important}}

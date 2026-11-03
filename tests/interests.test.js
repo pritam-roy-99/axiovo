@@ -1,0 +1,16 @@
+"use strict";
+const assert=require("node:assert/strict");
+const Interests=require("../docs/interests.js");
+let data={};
+data=Interests.toggle(data,"quantum","Quantum steering","Network steering");
+assert.deepEqual(Interests.get(data,"quantum","Quantum steering"),["Network steering"]);
+data=Interests.toggle(data,"computer","Cybersecurity","Post-quantum cryptography");
+assert.deepEqual(Interests.get(data,"computer","Cybersecurity"),["Post-quantum cryptography"]);
+assert.deepEqual(Interests.get(data,"quantum","Quantum steering"),["Network steering"]);
+assert.deepEqual(Interests.get(data,"quantum","Contextuality"),[]);
+assert.equal(Interests.order(["Measurement incompatibility","Network steering"],["Network steering"])[0],"Network steering");
+data=Interests.toggle(data,"quantum","Quantum steering","network steering");
+assert.deepEqual(Interests.get(data,"quantum","Quantum steering"),[]);
+assert.equal(Interests.clean("  quantum   information  "),"quantum information");
+assert.equal(Interests.clean("x".repeat(150)).length,100);
+console.log("Field-specific research interest tests passed");

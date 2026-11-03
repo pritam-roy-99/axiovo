@@ -24,6 +24,8 @@ jobs:
         run: |
           node tests/assistant-core.test.js
           node tests/field-taxonomy.test.js
+      - name: Test personalized research interest controls
+        run: node tests/interests.test.js
       - name: Build homepage video preview
         run: |
           python -m pip install --disable-pip-version-check Pillow
