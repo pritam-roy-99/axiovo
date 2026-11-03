@@ -33,6 +33,17 @@ The [research workspace](https://pritam-roy-99.github.io/researchlens/workspace.
 
 **Limitations:** Ranking is deterministic lexical matching rather than an evaluated embedding or AI recommendation service. It does not automatically search the whole arXiv archive, assess importance or prove novelty, and cannot notify users of new papers on its own. Research interests, questions and attached paper IDs stay in local browser storage. The [integrated roadmap](ROADMAP.md) describes future ingestion, PDF, citation and secure account milestones.
 
+## Integrated Research Tools (four stage foundations)
+
+Open [Research Tools](https://pritam-roy-99.github.io/researchlens/lab.html) from the shared navigation after deployment. The page combines:
+
+- **Stage 2, discovery:** bounded recent metadata mirror from arXiv OAI-PMH plus live OpenAlex searches directly on ResearchLens. This is *not* a complete local historical arXiv index or embedding search.
+- **Stage 3, reading:** PDF.js browser-local rendering of user-selected PDF files, page notes, export; side-by-side source-metadata comparison of two locally indexed arXiv papers and user-authored source-checked comparison notes.
+- **Stage 4, accounts:** optional GitHub OAuth / Supabase RLS-protected private reading and project backup/restore, reusing existing optional public paper discussions and researcher profiles. **Inactive until an owner configures Supabase**, moderation and abuse protections.
+- **Stage 5, connections:** live OpenAlex citation neighborhoods with source links, plus on-visit keyword watch against locally indexed papers. No background, email or push notifications.
+
+The OAI workflow can run daily and stores at most 4,000 recently modified metadata records. For requirements, operational limits, privacy and setup, see [RESEARCH_TOOLS_SETUP.md](RESEARCH_TOOLS_SETUP.md). These are functional foundations, not claims of complete full-corpus semantic retrieval, reliable PDF theorem comparison, production community moderation, or automated scientific alerts.
+
 ## Current features (deployed GitHub Pages prototype)
 
 - Responsive scientific-paper website with title, abstract, author, and arXiv identifier search.
