@@ -62,6 +62,17 @@ jobs:
             git rebase -X theirs origin/main
             git push origin HEAD:main
           fi
+      - name: Build self-hosted homepage explainer
+        run: |
+          python -m pip install --disable-pip-version-check Pillow
+          if ! command -v ffmpeg >/dev/null 2>&1; then
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq ffmpeg
+          fi
+          python scripts/build_intro_video.py
+          test -s docs/assets/researchlens-tour.mp4
+          test -s docs/assets/researchlens-tour-poster.jpg
+          test -s docs/assets/researchlens-tour.vtt
       - name: Render first-paint snapshot with actual index counts
         run: python -m scripts.build_snapshot
       - name: Build Atom topic subscriptions
