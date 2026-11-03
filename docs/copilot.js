@@ -47,7 +47,7 @@ function retrieved(question,draft){
  return index.map(p=>({...p,score:score(q,p)})).filter(p=>p.score>0).sort((a,b)=>b.score-a.score).slice(0,9)
  .map(p=>({id:p.id,title:p.title,abstract:p.abstract,authors:p.authors,date:p.published||p.updated,url:arxivUrl(p.id),provider:"arXiv indexed metadata",score:p.score}));
 }
-function directId(question){const x=question.trim().replace(/^arxiv:/i,"").split(/\s+/)[0];return arxivID.test(x)?x.replace(/v\d+$/,""):null}
+function directId(question){const match=String(question||"").match(/(?:arxiv:\s*)?(\d{4}\.\d{4,5}(?:v\d+)?|[a-z-]+(?:\.[a-z]{2})?\/\d{7}(?:v\d+)?)/i);return match?match[1].replace(/v\d+$/,""):null}
 function sourceDigest(){return sources.map((s,i)=>({reference:"["+(i+1)+"]",provider:s.provider,title:s.title,date:s.date,authors:s.authors,url:s.url,abstract:s.abstract.slice(0,1300)}))}
 function evidenceText(query){
  const lines=[modeNames[mode]+" · Preliminary evidence retrieval", "Query: "+query,"Index snapshot: "+indexVersion,"Retrieved: "+sources.length+" candidates.",""];
@@ -130,6 +130,7 @@ async function submit(withOpenAlex=false){
   let found=retrieved(query,draft);
   const id=directId(question);
   if(id&&!found.some(x=>x.id===id)){const paper=index.find(p=>p.id===id);if(paper)found.unshift({id,title:paper.title,abstract:paper.abstract,authors:paper.authors,date:paper.published||paper.updated,url:arxivUrl(id),provider:"arXiv indexed record",score:100});else found.unshift({id,title:"arXiv:"+id,abstract:"This ID is not in the local index. Follow the official link for metadata and PDF.",authors:[],date:"",url:arxivUrl(id),provider:"arXiv identifier lookup",score:0})}
+  if(id)found.sort((a,b)=>Number(b.id===id)-Number(a.id===id));
   addSources(found,false);
   rstatus(found.length+" local references retrieved from "+index.length+" indexed papers. Snapshot: "+indexVersion);
   if(withOpenAlex){
