@@ -1,12 +1,32 @@
 // ResearchLens AI Lab. All generative inference is opt-in and runs locally via WebGPU.
 // Evidence report is deterministic and must never be represented as a scientific verdict.
 const $ = id => document.getElementById(id);
-let papers=[],current=null,evidence=null,engine=null,loading=false,indexGeneratedAt="unknown",reportGeneratedAt="";
+let papers=[],current=null,evidence=null,engine=null,loading=false,indexGeneratedAt="unknown",reportGeneratedAt="",docFreq=new Map(),avgLength=1;
 const STOP = new Set(("about above after again against along also among and are because been before being between both could does each either from have into its itself more most must near neither other over same should since some than that their them then there these they this those through under upon using very were what when where which while with within would quantum study studies results result method approach analysis paper proposed investigate framework based provide using").split(" "));
 function words(t){return (String(t||"").toLowerCase().match(/[a-z][a-z0-9-]{3,}/g)||[]).filter(x=>!STOP.has(x))}
 function rankedKeywords(p){const title=words(p.title||""),abstract=words(p.abstract||"");let map=new Map();for(const x of abstract)map.set(x,(map.get(x)||0)+1);for(const x of title)map.set(x,(map.get(x)||0)+4);return [...map.entries()].sort((a,b)=>b[1]-a[1]).slice(0,12).map(x=>x[0])}
-function cosine(a,b){const A=new Map(),B=new Map();for(const t of words((a.title||"")+" "+(a.abstract||"")))A.set(t,(A.get(t)||0)+1);for(const t of words((b.title||"")+" "+(b.abstract||"")))B.set(t,(B.get(t)||0)+1);if(!A.size||!B.size)return 0;let dot=0,a2=0,b2=0;for(const [k,n] of A){a2+=n*n;dot+=n*(B.get(k)||0)}for(const n of B.values())b2+=n*n;return dot/Math.sqrt(a2*b2)}
-function prior(p){const pTime=Date.parse(p.published||p.updated||"");return papers.filter(x=>x.id!==p.id).map(x=>({paper:x,score:cosine(p,x),earlier:Date.parse(x.published||x.updated||"")<pTime})).filter(x=>x.score>0).sort((a,b)=>b.score-a.score).slice(0,12)}
+function countWords(text,weight=1){const m=new Map();for(const t of words(text))m.set(t,(m.get(t)||0)+weight);return m}
+function prepareIndex(){
+ docFreq=new Map();let total=0;
+ for(const p of papers){const terms=new Set(words((p.title||"")+" "+(p.abstract||"")));total+=terms.size;for(const t of terms)docFreq.set(t,(docFreq.get(t)||0)+1)}
+ avgLength=Math.max(1,total/Math.max(1,papers.length));
+}
+function lexicalScore(a,b){
+ const query=countWords(a.abstract||"");for(const [t,n] of countWords(a.title||"",3))query.set(t,(query.get(t)||0)+n);
+ const tf=countWords(b.abstract||"");for(const [t,n] of countWords(b.title||"",3))tf.set(t,(tf.get(t)||0)+n);
+ const n=papers.length||1,docLen=words(b.abstract||"").length+3*words(b.title||"").length;
+ let score=0;
+ for(const [term,queryWeight] of query){
+  if(!tf.has(term))continue;
+  const freq=tf.get(term),df=docFreq.get(term)||1,idf=Math.log(1+(n-df+0.5)/(df+0.5));
+  const saturation=freq*2.2/(freq+1.2*(0.25+0.75*docLen/(avgLength*1.5)));
+  score+=idf*saturation*Math.min(3,queryWeight);
+ }
+ const cats=new Set(a.categories||[]);
+ if((b.categories||[]).some(c=>cats.has(c)))score+=0.5;
+ return score;
+}
+function prior(p){const pTime=Date.parse(p.published||p.updated||"");return papers.filter(x=>x.id!==p.id).map(x=>({paper:x,score:lexicalScore(p,x),earlier:Date.parse(x.published||x.updated||"")<pTime})).filter(x=>x.score>0).sort((a,b)=>b.score-a.score).slice(0,12)}
 function node(tag,text,cls){const e=document.createElement(tag);e.textContent=text;if(cls)e.className=cls;return e}
 function link(p){const a=node("a",p.title);a.href="https://arxiv.org/abs/"+encodeURIComponent(p.id);a.target="_blank";a.rel="noopener noreferrer";return a}
 function selectOptions(items){const select=$("paper");select.replaceChildren();for(const p of items){const o=document.createElement("option");o.value=p.id;o.textContent=p.title+" · "+p.id;select.append(o)}if(select.options.length){if(current&&items.some(x=>x.id===current.id))select.value=current.id;else current=items[0]}else current=null;updateSelected()}
@@ -18,7 +38,7 @@ const chips=node("div","","row");for(const k of keywords.slice(0,9))chips.append
 root.append(node("h3","Candidate related literature"));
 const old=matches.filter(x=>x.earlier),newer=matches.filter(x=>!x.earlier);
 line(root,"Retrieved candidates",matches.length+" indexed abstracts; "+old.length+" with earlier publication dates and "+newer.length+" later/same/unknown dates. This is not exhaustive prior-art search.");
-for(const x of matches.slice(0,8)){const block=node("div","","evidence");const badge=node("span",x.earlier?"Earlier publication date":"Not confirmed earlier","score");block.append(badge,node("span","  Lexical relevance "+x.score.toFixed(3),"small"));const h=node("h4","");h.append(link(x.paper));block.append(h);const intersection=rankedKeywords(current).filter(t=>new Set(words(x.paper.title+" "+x.paper.abstract)).has(t));block.append(node("p","Shared concepts: "+(intersection.slice(0,7).join(", ")||"weak lexical match")));root.append(block)}
+for(const x of matches.slice(0,8)){const block=node("div","","evidence");const badge=node("span",x.earlier?"Earlier publication date":"Not confirmed earlier","score");block.append(badge,node("span","  BM25-style lexical rank "+x.score.toFixed(3),"small"));const h=node("h4","");h.append(link(x.paper));block.append(h);const intersection=rankedKeywords(current).filter(t=>new Set(words(x.paper.title+" "+x.paper.abstract)).has(t));block.append(node("p","Shared concepts: "+(intersection.slice(0,7).join(", ")||"weak lexical match")));root.append(block)}
 const checks=node("div","","warning");checks.textContent="Suggested verification checklist: Compare theorem statements and assumptions, identify the exact claimed improvement, inspect the oldest relevant proofs, check whether the result is a special case, and verify numerical results independently. No novelty or correctness conclusion is produced.";root.append(checks);
 $("report").classList.remove("hidden");$("download").disabled=false;$("ai-result").replaceChildren();$("ai-status").textContent=engine?"Model ready. Select a question and generate a source-bounded answer.":"Evidence report ready. You can optionally load a model to generate explanations.";
 }
@@ -46,7 +66,7 @@ catch(err){$("ai-result").textContent="Generation failed: "+String(err.message||
 }
 $("search").addEventListener("input",()=>{const q=$("search").value.toLowerCase().trim();selectOptions(papers.filter(p=>[p.title,p.id,(p.authors||[]).join(" "),p.abstract].join(" ").toLowerCase().includes(q)).slice(0,120))});
 $("paper").addEventListener("change",()=>{evidence=null;$("download").disabled=true;$("report").classList.add("hidden");updateSelected()});
-$("analyze").addEventListener("click",makeEvidence);$("download").addEventListener("click",()=>{if(!evidence)return;const text="ResearchLens Preliminary Literature Evidence\n"+evidence.title+"\n"+evidence.id+"\nGenerated: "+evidence.reportGeneratedAt+"\nIndex snapshot: "+evidence.indexGeneratedAt+"\nSearch query: "+evidence.query+"\nLocal algorithm: abstract/title token cosine overlap (not novelty evidence)\n\nKeywords: "+evidence.keywords.join(", ")+"\n\nCandidate literature (not novelty findings):\n"+evidence.near.map(x=>(x.earlier?"Earlier date: ":"Not established earlier: ")+x.paper.title+" https://arxiv.org/abs/"+x.paper.id+" relevance="+x.score.toFixed(3)).join("\n")+"\n\nExternal OpenAlex results (if searched; not validated prior-art matches):\n"+(evidence.external||[]).map(x=>(x.year||"Year unknown")+" | "+x.title+" | "+x.id).join("\n")+"\n\nNOT a scientific novelty or correctness verdict.";const url=URL.createObjectURL(new Blob([text],{type:"text/plain"}));const a=document.createElement("a");a.href=url;a.download="researchlens-evidence-"+evidence.id+".txt";a.click();URL.revokeObjectURL(url)});
+$("analyze").addEventListener("click",makeEvidence);$("download").addEventListener("click",()=>{if(!evidence)return;const text="ResearchLens Preliminary Literature Evidence\n"+evidence.title+"\n"+evidence.id+"\nGenerated: "+evidence.reportGeneratedAt+"\nIndex snapshot: "+evidence.indexGeneratedAt+"\nSearch query: "+evidence.query+"\nLocal algorithm: abstract/title token cosine overlap (not novelty evidence)\n\nKeywords: "+evidence.keywords.join(", ")+"\n\nCandidate literature (not novelty findings):\n"+evidence.near.map(x=>(x.earlier?"Earlier date: ":"Not established earlier: ")+x.paper.title+" https://arxiv.org/abs/"+x.paper.id+" lexicalRank="+x.score.toFixed(3)).join("\n")+"\n\nExternal OpenAlex results (if searched; not validated prior-art matches):\n"+(evidence.external||[]).map(x=>(x.year||"Year unknown")+" | "+x.title+" | "+x.id).join("\n")+"\n\nNOT a scientific novelty or correctness verdict.";const url=URL.createObjectURL(new Blob([text],{type:"text/plain"}));const a=document.createElement("a");a.href=url;a.download="researchlens-evidence-"+evidence.id+".txt";a.click();URL.revokeObjectURL(url)});
 $("draft-analyze").addEventListener("click",()=>{
  const title=$("draft-title").value.trim(), abstract=$("draft-abstract").value.trim();
  if(title.length<8||abstract.length<80){alert("Please provide a meaningful title and an abstract of at least 80 characters.");return}
@@ -87,4 +107,4 @@ async function searchOpenAlex(){
 }
 $("openalex-search").addEventListener("click",searchOpenAlex);
 $("load").addEventListener("click",loadModel);$("ask").addEventListener("click",ask);
-fetch("data/feed.json",{cache:"no-cache"}).then(r=>{if(!r.ok)throw Error("Feed not available");return r.json()}).then(d=>{papers=(d.papers||[]).filter(p=>p&&p.id&&p.title);indexGeneratedAt=d.generated_at||"unknown";$("count").textContent=papers.length+" indexed papers";const urlID=new URLSearchParams(location.search).get("id");const match=urlID?papers.find(p=>p.id===urlID):null;if(match)current=match;selectOptions(papers.slice(0,120));if(match){const opt=document.createElement("option");opt.value=match.id;opt.textContent=match.title+" · "+match.id;$("paper").prepend(opt);$("paper").value=match.id;updateSelected()}}).catch(e=>{$("count").textContent="Feed unavailable";$("selected").textContent=String(e.message||e)});
+fetch("data/feed.json",{cache:"no-cache"}).then(r=>{if(!r.ok)throw Error("Feed not available");return r.json()}).then(d=>{papers=(d.papers||[]).filter(p=>p&&p.id&&p.title);prepareIndex();indexGeneratedAt=d.generated_at||"unknown";$("count").textContent=papers.length+" indexed papers";const urlID=new URLSearchParams(location.search).get("id");const match=urlID?papers.find(p=>p.id===urlID):null;if(match)current=match;selectOptions(papers.slice(0,120));if(match){const opt=document.createElement("option");opt.value=match.id;opt.textContent=match.title+" · "+match.id;$("paper").prepend(opt);$("paper").value=match.id;updateSelected()}}).catch(e=>{$("count").textContent="Feed unavailable";$("selected").textContent=String(e.message||e)});
