@@ -173,6 +173,93 @@ function exportChat(){
  const blob=new Blob([lines.join("\n")],{type:"text/plain;charset=utf-8"});
  const url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="researchlens-copilot-"+new Date().toISOString().slice(0,10)+".txt";a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
+/* Unified paper investigation, formerly spread across AI Lab and Copilot. */
+let selectedPaperId="";
+function pickerOptions(query=""){
+ const q=String(query||"").trim().toLowerCase(),root=$("paper-picker"),other=$("comparison-paper");
+ const choices=index.filter(p=>!q||[p.id,p.title,(p.authors||[]).join(" ")].join(" ").toLowerCase().includes(q))
+  .slice(0,120);
+ function fill(node,previous){
+  node.replaceChildren();
+  const initial=document.createElement("option");initial.value="";initial.textContent="Select a paper…";node.append(initial);
+  for(const p of choices){const option=document.createElement("option");option.value=p.id;
+   option.textContent=p.title.slice(0,90)+" · "+p.id;node.append(option)}
+  if(choices.some(p=>p.id===previous))node.value=previous;
+ }
+ const oldA=root.value||selectedPaperId,oldB=other.value;fill(root,oldA);fill(other,oldB);
+ if(!root.value&&choices.some(p=>p.id===selectedPaperId))root.value=selectedPaperId;
+ $("paper-status").textContent=index.length+" indexed arXiv metadata records available. Select a paper to investigate.";
+}
+function chosenPaper(selectId="paper-picker"){
+ const selected=$(selectId).value;return index.find(p=>p.id===selected)||null
+}
+function assessPaper(){
+ const p=chosenPaper();if(!p){$("paper-status").textContent="Select an indexed paper first.";return}
+ selectedPaperId=p.id;updateMode("claims");
+ $("question").value="Analyze the research question, stated contributions, assumptions and limitations of arXiv:"+p.id+
+ ". Find related earlier literature and list which claims require a full-paper check.";
+ $("paper-status").textContent="Selected "+p.id+". Source: arXiv. Analysis uses indexed abstracts, not full mathematical proofs.";
+ submit(false)
+}
+function comparePapers(){
+ const a=chosenPaper("paper-picker"),b=chosenPaper("comparison-paper");
+ if(!a||!b){$("paper-status").textContent="Select two indexed papers for comparison.";return}
+ if(a.id===b.id){$("paper-status").textContent="Choose two different arXiv papers.";return}
+ if(!Core){$("paper-status").textContent="Comparison component unavailable.";return}
+ const result=Core.compare(a,b);
+ updateMode("compare");
+ addSources([{id:a.id,title:a.title,abstract:a.abstract,authors:a.authors,
+   date:a.published||a.date,url:arxivUrl(a.id),provider:"arXiv indexed metadata"},
+  {id:b.id,title:b.title,abstract:b.abstract,authors:b.authors,
+   date:b.published||b.date,url:arxivUrl(b.id),provider:"arXiv indexed metadata"}],false);
+ const lines=["Structured source-metadata comparison",
+  "Paper A [1]: "+a.title+" ("+a.id+")",
+  "Paper B [2]: "+b.title+" ("+b.id+")",
+  "Chronology: "+result.chronology,
+  "Shared indexed terms: "+(result.overlap.join(", ")||"No reliable keyword overlap"),
+  "",
+  "Paper A abstract: "+(a.abstract||"Unavailable"),
+  "",
+  "Paper B abstract: "+(b.abstract||"Unavailable"),"",
+  "Technical verification checklist:",
+  "1. Compare exact definitions and boundary conditions.",
+  "2. Compare stated claims against theorems and complete proofs.",
+  "3. Examine independent numerical or experimental evidence.",
+  "4. Check original submission versions and priority dates.",
+  "",
+  result.limitations];
+ record("assistant",lines.join("\n"),sources);
+ $("paper-status").textContent="Comparison prepared for "+a.id+" and "+b.id+". Examine complete papers before drawing conclusions.";
+}
+function downloadEvidence(){
+ const data=Core?Core.evidenceReport(lastQuery||$("question").value,sources,modeNames[mode]):evidenceText($("question").value);
+ const blob=new Blob([data],{type:"text/plain;charset=utf-8"}),url=URL.createObjectURL(blob);
+ const a=document.createElement("a");a.href=url;a.download="researchlens-evidence-"+new Date().toISOString().slice(0,10)+".txt";
+ document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000)
+}
+async function loadOai(){
+ try{
+  const response=await fetch("./data/oai-recent.json",{cache:"no-store"});
+  if(!response.ok)return;
+  const data=await response.json();
+  let added=0;const known=new Set(index.map(p=>p.id));
+  for(const p of (data.papers||[])){
+   const id=Core?.arxivId(p.id)||"";
+   if(!id||known.has(id)||!p.title)continue;
+   index.push({...p,id,published:p.created||p.oai_datestamp||"",provider:"arXiv OAI-PMH metadata",date:p.created||""});
+   known.add(id);added++;
+  }
+  if(added){pickerOptions($("paper-search").value);rstatus("Loaded "+index.length+" unique indexed arXiv records, including "+added+" OAI metadata entries. Complete historical coverage is not claimed.")}
+ }catch(err){/* OAI is optional; the original Atom index remains functional */}
+}
+$("paper-search").addEventListener("input",()=>pickerOptions($("paper-search").value));
+$("paper-picker").addEventListener("change",()=>{selectedPaperId=$("paper-picker").value;const p=chosenPaper();if(p)$("paper-status").textContent="Selected "+p.id+": "+p.title});
+$("analyze-paper").onclick=assessPaper;
+$("compare-papers").onclick=()=>{$("paper-compare-fields").hidden=!$("paper-compare-fields").hidden};
+$("run-paper-compare").onclick=comparePapers;
+$("download-evidence").onclick=downloadEvidence;
+$("search-current").onclick=globalSearch;
+
 document.querySelectorAll(".mode").forEach(b=>b.onclick=()=>updateMode(b.dataset.mode));
 $("engine").onchange=engineChange;$("test-ollama").onclick=checkOllama;$("load-browser").onclick=loadBrowserModel;
 $("ask").onclick=()=>submit(false);$("search-openalex").onclick=globalSearch;
@@ -183,8 +270,8 @@ $("clear-sources").onclick=()=>{sources=[];renderSources();rstatus("Source list 
 $("clear-draft").onclick=()=>{$("draft").value=""};
 $("question").onkeydown=evt=>{if(evt.key==="Enter"&&!evt.shiftKey){evt.preventDefault();submit(false)}};
 fetch("data/feed.json",{cache:"no-cache"}).then(r=>{if(!r.ok)throw Error("feed unavailable");return r.json()}).then(d=>{
- index=(d.papers||[]).filter(p=>p.id&&p.title);indexVersion=d.generated_at||"unknown";rstatus(index.length+" local indexed arXiv records ready. External OpenAlex search available.");const params=new URLSearchParams(location.search);
- const id=params.get("id");if(id&&arxivID.test(id))$("question").value="Compare this paper with earlier literature: arXiv:"+id;
+ index=(d.papers||[]).filter(p=>p.id&&p.title);indexVersion=d.generated_at||"unknown";rstatus(index.length+" local indexed arXiv records ready. External OpenAlex search available.");pickerOptions();loadOai();const params=new URLSearchParams(location.search);
+ const id=params.get("id");if(id&&arxivID.test(id)){$("question").value="Compare this paper with earlier literature: arXiv:"+id;selectedPaperId=id;pickerOptions();}
  else if(params.get("q"))$("question").value=params.get("q").slice(0,500);
 }).catch(()=>rstatus("Local feed unavailable. You can still search OpenAlex or inspect the original arXiv website."));
 engineChange();
