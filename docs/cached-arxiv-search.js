@@ -15,7 +15,7 @@
   "bell nonlocality":/\b(chsh|bell|nonlocal|inequalit)\w*/i,
   "quantum steering":/\b(steering|assemblages?|epr steering|one.sided device.independent)\b/i,
   "quantum key distribution":/\b(qkd|quantum key distribution|secret key rate|quantum cryptograph)\b/i,
-  "quantum computing":/\b(quantum comput\w*|quantum circuits?|quantum algorithm\w*|qubits?)\b/i,
+  "quantum computing":/\b(quantum comput\w*|quantum circuits?|quantum algorithm\w*)\b/i,
   "contextuality":/\b(contextuality|noncontextuality|kochen.specker)\b/i
  };
  function categoryFit(p,field){
