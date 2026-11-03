@@ -35,8 +35,8 @@ class ArxivSyncTests(unittest.TestCase):
         def fake_urlopen(req,timeout=45):
             requests.append(urllib.parse.parse_qs(urllib.parse.urlsplit(req.full_url).query)["sortBy"][0])
             return FakeResponse()
-        with patch.dict("os.environ", {"ARXIV_CATEGORIES":"quant-ph","ARXIV_MAX_RESULTS":"10"}), \\
-             patch("scripts.sync.urllib.request.urlopen",side_effect=fake_urlopen), \\
+        with patch.dict("os.environ", {"ARXIV_CATEGORIES":"quant-ph","ARXIV_MAX_RESULTS":"10"}), \
+             patch("scripts.sync.urllib.request.urlopen",side_effect=fake_urlopen), \
              patch("scripts.sync.time.sleep"):
             papers=fetch_recent()
         self.assertEqual(requests,["submittedDate","lastUpdatedDate"])
