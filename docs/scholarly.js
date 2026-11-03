@@ -86,6 +86,13 @@ async function search(){
  if(!q){busy=false;setStatus("Enter a topic, subtopic, paper title or research question.");return}
  if(from&&to&&from>to){busy=false;setStatus("Start date must be before end date.");return}
  if(!SearchCore){busy=false;setStatus("Search tools unavailable. Reload ResearchLens.");return}
+ if(Arxiv?.parse(q)){
+  if(requestController)requestController.abort();requestController=null;
+  busy=false;items=[];total=0;
+  directArxivPaper(q);
+  setStatus("Direct version-specific arXiv link. This result does not depend on the ResearchLens feed or OpenAlex indexing.");
+  return;
+ }
  const today=new Date().toISOString().slice(0,10),effectiveEnd=to&&to<today?to:today;
  if(from&&from>effectiveEnd){busy=false;items=[];total=0;render();setStatus("Start date is in the future. Choose an earlier date.");return}
  const plan=SearchCore.plan(state,q,{page,from,to,sort:$("sort").value,today});
@@ -144,6 +151,36 @@ async function search(){
  }finally{
   if(requestController===ctl){busy=false;requestController=null;render()}
  }
+}
+function directArxivPaper(raw){
+ const request=Arxiv?.parse(raw);if(!request)return false;
+ const root=$("results");root.replaceChildren();
+ const card=node("article",undefined,"paper");
+ card.append(node("span","Authoritative arXiv source · exact identifier","pill"));
+ card.append(node("h3","arXiv:"+request.requested));
+ card.append(node("p",request.explicit?
+  "Requested v"+request.version+". arXiv confirms whether that revision exists. Metadata and full version history are available on the original paper page.":
+  "Open the latest available arXiv revision. The original record lists previous versions.","muted"));
+ const buttons=node("div",undefined,"rl-paper-actionbar");
+ link(buttons,"Read on arXiv",Arxiv.abs(request.requested));
+ link(buttons,"PDF",Arxiv.pdf(request.requested));
+ link(buttons,"Research Assistant","./copilot.html?id="+encodeURIComponent(request.requested));
+ const save=node("button","☆ Save paper","rl-paper-action");
+ save.type="button";save.onclick=()=>{
+  const key="researchlens-reading-list";let values=[];
+  try{values=JSON.parse(localStorage.getItem(key)||"[]")}catch{}
+  if(!Array.isArray(values))values=[];
+  const present=values.includes(request.requested);
+  values=present?values.filter(x=>x!==request.requested):[...values,request.requested];
+  try{localStorage.setItem(key,JSON.stringify(values));save.textContent=present?"☆ Save paper":"✓ Saved";
+   save.setAttribute("aria-pressed",String(!present));
+   window.dispatchEvent(new Event("researchlens-library-change"))}
+  catch{save.textContent="Browser storage unavailable"}
+ };
+ buttons.append(save);card.append(buttons);root.append(card);
+ $("pagination").textContent="Direct arXiv paper · "+request.requested;
+ $("prev").disabled=true;$("next").disabled=true;
+ return true;
 }
 function renderControls(){$("prev").disabled=true;$("next").disabled=true}
 function init(){
