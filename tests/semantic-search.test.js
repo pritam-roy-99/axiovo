@@ -9,7 +9,8 @@ assert.equal(sem.params.get("per_page"),"50");
 assert.ok(sem.params.has("search.semantic"));
 assert.equal(sem.params.has("search"),false);
 assert.equal(sem.params.has("sort"),false);
-assert.ok(sem.params.get("filter").includes("primary_topic.field.id:31|17|26"));
+assert.ok(!sem.params.get("filter").includes("primary_topic.field.id:"));
+assert.ok(sem.params.get("filter").includes("to_publication_date:2026-11-03"));
 assert.ok(sem.description.toLowerCase().includes("preparation contextuality"));
 function work(id,title,field="31",extra={}){
  return {id:"https://openalex.org/"+id,display_name:title,publication_date:"2026-08-21",
