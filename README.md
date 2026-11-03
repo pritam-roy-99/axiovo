@@ -50,6 +50,19 @@ The homepage now includes a 48-second narrated, illustrated walkthrough explaini
 
 The source is `scripts/build_intro_video.py`. GitHub Actions generates `docs/assets/researchlens-tour.mp4`, the poster and captions during deployment, then caches the assets so routine hourly metadata updates don't re-encode the video. The build uses Pillow, FFmpeg and espeak-ng. No commercial video API credentials are needed. Media is served directly from GitHub Pages.
 
+## Unified Research Assistant
+
+ResearchLens now combines the former AI Lab and Research Copilot into **one** interface: [Research Assistant](https://pritam-roy-99.github.io/researchlens/copilot.html).
+
+- Begin with a scientific question, arXiv ID or locally indexed paper; choose discovery, comparison, technical explanation, reviewer checks, speculative directions or claim-and-assumption analysis.
+- The paper picker and two-paper comparison replace the AI Lab's separate metadata analysis workflow. Comparisons show linked source abstracts, original-submission chronology when recorded, shared technical terms and a human verification checklist.
+- The assistant ranks papers with a BM25-style metadata relevance function and searches the local arXiv Atom snapshot plus bounded OAI-PMH mirror. Optional live OpenAlex metadata retrieval is available directly in the assistant.
+- A public research question may use OpenAlex when the wider-retrieval setting is enabled. An unpublished draft is **not automatically** sent to OpenAlex; the user may initiate wider search explicitly.
+- No account or inference API is needed for deterministic evidence reports, comparison and source links. Optional Ollama Qwen3.5 on the user's own computer and experimental WebGPU Qwen2.5 on the user's device remain available. Citation numbers outside the retrieved source list are flagged.
+- Export structured source evidence separately from the conversation transcript. Original `ai.html` deep links redirect to the unified Assistant, preserving query and arXiv ID parameters.
+
+**Limitations:** Local ranking and comparison operate on bibliographic metadata and abstracts, not full mathematical proofs. This is not a validated semantic or full-text literature review, theorem correctness assessment, novelty certification, or hosted large-model API. The optional local inference engines require compatible hardware/setup. Browser-side OpenAlex lookups may be rate limited. The complete arXiv archive is not included.
+
 ## Current features (deployed GitHub Pages prototype)
 
 - Responsive scientific-paper website with title, abstract, author, and arXiv identifier search.
