@@ -1,0 +1,22 @@
+name: Validate proposed ResearchLens changes
+on:
+  pull_request:
+  push:
+    branches:
+      - 'feature/**'
+permissions:
+  contents: read
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Python regression tests
+        run: python -m unittest discover -s tests -v
+      - name: JavaScript and page validation
+        run: python -m scripts.validate_site
+      - name: Research relevance tests
+        run: node tests/relevance.test.js
