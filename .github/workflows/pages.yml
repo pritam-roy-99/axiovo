@@ -32,6 +32,8 @@ jobs:
         run: python -m scripts.validate_site
       - name: Test research relevance ranking
         run: node tests/relevance.test.js
+      - name: Unified research assistant regression tests
+        run: node tests/assistant-core.test.js
       - name: Refresh research metadata
         id: refresh
         continue-on-error: true
