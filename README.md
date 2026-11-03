@@ -22,6 +22,14 @@
 
 An optional localhost-only Qwen/Ollama HTTP service is included in `api/server.py`, but the public static website does not call it. The original ZIP contains a more extensive FastAPI/SQLite development implementation that has not been fully imported.
 
+## Search historical arXiv-linked papers inside ResearchLens
+
+The homepage **Search historical arXiv papers here** button no longer redirects to arXiv. It opens an in-page search result pane with paper cards, date-range filtering, pagination, OpenAlex/DOI links and links to original arXiv records when the API exposes them. Press Enter in the main search field for the same in-site search.
+
+This on-page history feature queries OpenAlex for works with an arXiv-hosted copy, using OpenAlex source S4306400194. It **does not guarantee complete arXiv coverage**, and OpenAlex publication dates **may differ from arXiv original submission dates**. The existing local index remains available via **Return to local feed**. Search URLs encode the query and dates, so they can be shared.
+
+The local feed is still a small arXiv metadata snapshot. Neither OpenAlex results nor their citation data are automatically added to ResearchLens's permanent local database.
+
 ## ResearchLens Research Copilot
 
 **[Launch Copilot](https://pritam-roy-99.github.io/researchlens/copilot.html)** or open it from any research paper. The copilot has five task modes: literature discovery, contribution comparison, explaining results, reviewer checks, and research directions.
