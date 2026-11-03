@@ -173,3 +173,10 @@
  .rl-focus-addrow{flex-wrap:wrap}
  .rl-focus-addrow button{flex:1}
 }
+
+
+/* Always-available source link for OpenAlex API outages. */
+.rl-official-source{font-size:12px;font-weight:750;color:var(--rl-blue,#136ea3);white-space:nowrap;
+ text-decoration:underline;text-underline-offset:3px;padding:5px 0}
+.rl-official-source:focus-visible{outline:3px solid #59b6e8;outline-offset:3px}
+@media(max-width:760px){#scholar-result-heading+.muted{flex-basis:100%}.rl-official-source{white-space:normal}}
