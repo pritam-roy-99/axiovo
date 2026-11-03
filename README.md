@@ -2,7 +2,7 @@
 
 **ResearchLens is a free, open-source research-discovery prototype with preliminary prior-literature exploration.** It is independent from arXiv and SciRate.
 
-## Current features
+## Current features (deployed GitHub Pages prototype)
 
 - Responsive scientific-paper website with title, abstract, author, and arXiv identifier search.
 - arXiv category filters and 15 cross-cutting quantum subcategories (Bell tests, QKD, contextuality, steering, sensing, networks, optics, hardware, and more).
@@ -21,6 +21,18 @@
 **No public AI novelty verdicts are generated.** The similarity feature only surfaces possible literature connections from a limited local index. It cannot establish mathematical equivalence, novelty, technical correctness, or misconduct. The repository is not a manuscript-submission service yet. The public GitHub Pages website does not run Python or Ollama.
 
 An optional localhost-only Qwen/Ollama HTTP service is included in `api/server.py`, but the public static website does not call it. The original ZIP contains a more extensive FastAPI/SQLite development implementation that has not been fully imported.
+
+## Research workflow and first-load experience
+
+- A pre-rendered static 30-paper snapshot appears at first paint with verified index count and synchronization timestamp. JavaScript progressively upgrades it to a searchable, paginated feed.
+- Homepage displays local coverage (five arXiv categories plus curated historical IDs) and the oldest/newest source v1 publication dates. This is not complete arXiv coverage.
+- **Global scholarly search:** [OpenAlex live search](https://pritam-roy-99.github.io/researchlens/search.html) queries the external OpenAlex corpus, which is much larger than ResearchLens's local GitHub Pages snapshot. It is not copied into our database.
+- **Quantum topic subscriptions:** [all-research Atom feed](https://pritam-roy-99.github.io/researchlens/feeds/all.xml) and [example contextuality Atom feed](https://pritam-roy-99.github.io/researchlens/feeds/contextuality.xml).
+- **Triage:** j/k navigate, s save, r mark as read, h hide, Enter open selected arXiv record. Bookmarks, read/hidden lists and followed topics are browser-local.
+- Export bookmarks as BibTeX, RIS, or JSON; import JSON to restore a reading list and preferences. Paper cards offer arXiv ID and BibTeX copy plus a shareable search URL.
+- Mathematical notation in feed cards uses external MathJax for TeX rendering, with plain text fallback when the CDN is unavailable.
+- The local AI Lab evidence index uses a *title-weighted BM25-style lexical baseline* plus category overlap; larger external OpenAlex searches are optional and explicitly distinguishable. No embedding-based search or validated theorem comparison is implemented yet.
+- [Methodology and coverage](https://pritam-roy-99.github.io/researchlens/methodology.html) documents known errors, refresh cadence, missing benchmark data, and contribution/reporting paths.
 
 ## AI Lab (new, public, experimental)
 
@@ -53,7 +65,7 @@ Optional OpenAlex metadata: register for an API key according to OpenAlex's curr
 
 The automatic provider refresh is independent of model inference. GitHub Pages cannot run Ollama; AI requires a separate protected backend or running the local API.
 
-For optional local open-weight AI, install [Ollama](https://ollama.com), run `ollama pull qwen3.5:4b`, then launch `python -m api.server`. The local API provides `POST http://127.0.0.1:8765/analyze` with JSON `{"paper_id":"<arxiv ID>"}`. It requires a populated `docs/data/feed.json` and returns claimed contributions, comparison questions, and candidate prior-paper references. All are **unverified preliminary guidance, not scientific verdicts**.
+For optional local open-weight AI, install [Ollama](https://ollama.com), run `ollama pull qwen3.5:4b`, then launch `python -m api.server`. The local developer API provides `POST http://127.0.0.1:8765/analyze` with JSON `{"paper_id":"<arxiv ID>"}`. It requires a populated `docs/data/feed.json` and returns claimed contributions, comparison questions, and candidate prior-paper references. All are **unverified preliminary guidance, not scientific verdicts**.
 
 Serve the site with:
 
