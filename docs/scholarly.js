@@ -3,22 +3,15 @@
 "use strict";
 /* Field Explorer: public scholarly search and browser-local reading collections. */
 const $=id=>document.getElementById("scholar-"+id);
-const FIELDS={
- quantum:{name:"Quantum information & physics",summary:"Theory, protocols, quantum foundations, photonics, devices and experimental platforms.",topics:["Quantum key distribution","Bell nonlocality","Quantum steering","Contextuality","Quantum networks","Quantum sensing","Quantum error correction","Quantum computing","Optomechanics","Entanglement theory"],queries:["device independent quantum cryptography","measurement incompatibility steering","quantum networks Bell inequalities"],workflow:["Verify operational assumptions and device trust models.","Compare noise models and experimental feasibility.","Inspect mathematical proofs and alternative security bounds."]},
- mathematics:{name:"Mathematics",summary:"Pure and applied mathematics, including analysis, algebra, topology and optimization.",topics:["Algebraic geometry","Number theory","Topology","Functional analysis","Probability theory","Combinatorics","Optimization","Mathematical physics","Differential geometry"],queries:["semidefinite programming convergence","operator algebras quantum information","combinatorial optimization"],workflow:["Identify precise definitions and hypotheses.","Trace theorem dependencies and counterexamples.","Check proof details against original sources."]},
- astrophysics:{name:"Astronomy & astrophysics",summary:"Cosmology, gravitational waves, galaxies, compact objects and observational astronomy.",topics:["Cosmology","Gravitational waves","Black holes","Exoplanets","Galactic dynamics","High-energy astrophysics","Radio astronomy","Numerical relativity","Dark matter"],queries:["gravitational wave population inference","dark matter cosmological constraints","exoplanet atmosphere spectroscopy"],workflow:["Check instruments, sky surveys and selection functions.","Compare parameter inference, uncertainty and systematics.","Distinguish observational evidence from simulations."]},
- computer:{name:"Computer science & AI",summary:"Algorithms, machine learning, formal methods, systems and human-centered computing.",topics:["Machine learning","Large language models","Algorithms","Formal verification","Computer vision","Distributed systems","Cybersecurity","Information theory","Human computer interaction"],queries:["retrieval augmented generation evaluation","formal verification neural networks","efficient transformer inference"],workflow:["Read evaluation datasets and baselines.","Check ablations, compute requirements and leakage.","Look for reproducible source code and artifacts."]},
- biology:{name:"Biology & bioinformatics",summary:"Molecular, cellular and computational life science.",topics:["Genomics","Proteomics","Computational biology","Evolution","Neuroscience","Molecular biology","Systems biology","Structural biology","Ecology"],queries:["single cell RNA sequencing integration","protein structure prediction validation","evolutionary genomics"],workflow:["Check organisms, sample sizes and experimental design.","Inspect statistical uncertainty and replication.","Check accessions and data availability statements."]},
- medicine:{name:"Medicine & public health",summary:"Clinical research, epidemiology, diagnostics and population health.",topics:["Clinical trials","Epidemiology","Oncology","Cardiology","Neuroscience","Immunology","Diagnostics","Global health","Public health"],queries:["randomized clinical trial meta analysis","diagnostic accuracy external validation","population cohort study"],workflow:["Identify study design, endpoints and preregistration.","Compare effect size, uncertainty and confounding.","Assess clinical applicability and evidence quality."]},
- chemistry:{name:"Chemistry & materials",summary:"Chemical synthesis, condensed matter, materials discovery and characterization.",topics:["Materials science","Catalysis","Organic chemistry","Electrochemistry","Battery materials","Spectroscopy","Nanomaterials","Computational chemistry","Polymers"],queries:["solid state battery electrolyte stability","photocatalysis reaction mechanism","density functional theory materials"],workflow:["Check synthesis and characterization protocols.","Compare structural evidence and uncertainty.","Look for stability, scale-up and independent replication."]},
- engineering:{name:"Engineering & robotics",summary:"Controls, electrical engineering, energy systems and robotics.",topics:["Robotics","Control theory","Signal processing","Renewable energy","Microelectronics","Wireless communications","Mechanical engineering","Optimization","Sensors"],queries:["model predictive control robotics","autonomous navigation uncertainty","power electronics renewable integration"],workflow:["Identify operating ranges and system constraints.","Check experimental benchmarks and failure cases.","Compare deployment cost, reliability and performance."]},
- social:{name:"Social sciences & economics",summary:"Economics, psychology, political science, education and social research.",topics:["Econometrics","Behavioral science","Education","Development economics","Political science","Sociology","Public policy","Psychology","Causal inference"],queries:["difference in differences causal inference","policy evaluation randomized experiment","education intervention meta analysis"],workflow:["Check causal identification and measurement validity.","Inspect sampling, uncertainty and generalizability.","Distinguish observational results from causal claims."]}
-};
+const {FIELDS,fieldTopics,fieldKey}=window.ResearchLensFields;
+
 const KEY="researchlens-field-explorer-v1", SAVED="researchlens-field-saved-v1";
 function read(key,fallback){try{const d=JSON.parse(localStorage.getItem(key)||"null");return d??fallback}catch{return fallback}}
 function store(key,value){try{localStorage.setItem(key,JSON.stringify(value))}catch{}}
-let state=read(KEY,{field:"quantum",topic:"Quantum key distribution",query:"",sort:"relevance",from:"",to:""});
-if(!FIELDS[state.field])state.field="quantum";
+let state=read(KEY,{field:"quantum",topic:"Quantum key distribution",subtopic:"",query:"",sort:"relevance",from:"",to:""});
+state.field=fieldKey(state.field);
+if(!FIELDS[state.field].topics.includes(state.topic)){state.topic=FIELDS[state.field].topics[0];state.subtopic=""}
+if(state.subtopic&&!state.customSubtopic&&!fieldTopics(state.field,state.topic).includes(state.subtopic))state.subtopic="";
 let saved=read(SAVED,[]);if(!Array.isArray(saved))saved=[];
 let page=1,total=0,busy=false,items=[],showingSaved=false,requestController=null;
 function node(tag,text,className){const el=document.createElement(tag);if(text!==undefined)el.textContent=text;if(className)el.className=className;return el}
@@ -29,9 +22,20 @@ function bib(w){const author=(w.authorships||[]).map(a=>a.author?.display_name).
 function download(name,contents,type){const b=new Blob([contents],{type});const url=URL.createObjectURL(b);const a=document.createElement("a");a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000)}
 function setStatus(s){$("status").textContent=s}
 function persist(){state.field=$("field").value;state.query=$("query").value;state.sort=$("sort").value;state.from=$("from").value;state.to=$("to").value;store(KEY,state)}
-function topicSelect(t){state.topic=t;state.query=t;$("query").value=t;persist();drawTopics();page=1;search()}
+function topicSelect(t){state.topic=t;state.subtopic="";state.customSubtopic=false;state.query=t;$("query").value=t;persist();drawTopics();drawSubtopics();page=1;search()}
+function subtopicSelect(t){state.subtopic=t;state.customSubtopic=!fieldTopics(state.field,state.topic).includes(t);state.query=t;$("query").value=t;persist();drawSubtopics();page=1;search()}
+function drawSubtopics(){
+ const holder=$("subtopic-list");holder.replaceChildren();
+ const items=fieldTopics(state.field,state.topic);
+ $("subtopic-label").textContent="Interests within "+state.topic;
+ for(const t of items){
+  const b=node("button",t,"topic"+(t===state.subtopic?" active":""));b.type="button";
+  b.setAttribute("aria-pressed",String(t===state.subtopic));b.onclick=()=>subtopicSelect(t);holder.append(b)
+ }
+ const custom=$("custom-subtopic");custom.placeholder="Your own "+state.topic.toLowerCase()+" research interest";
+}
 function drawTopics(){const holder=$("topic-list");holder.replaceChildren();for(const t of FIELDS[state.field].topics){const b=node("button",t,"topic"+(t===state.topic?" active":""));b.type="button";b.setAttribute("aria-pressed",String(t===state.topic));b.onclick=()=>topicSelect(t);holder.append(b)}}
-function drawField(){const f=FIELDS[state.field];$("field").value=state.field;$("field-summary").textContent=f.summary;drawTopics();const holder=$("suggestions");holder.replaceChildren();for(const q of f.queries){const b=node("button",q,"template");b.type="button";b.onclick=()=>topicSelect(q);holder.append(b)}const w=$("workflow");w.replaceChildren();const ol=document.createElement("ol");for(const step of f.workflow){ol.append(node("li",step))}ol.style.paddingLeft="20px";w.append(ol)}
+function drawField(){const f=FIELDS[state.field];$("field").value=state.field;$("field-label").textContent=f.name;for(const b of $("field-choices").querySelectorAll("button"))b.setAttribute("aria-pressed",String(b.dataset.field===state.field));$("field-summary").textContent=f.summary;$("field-heading").textContent="Explore "+f.name.toLowerCase();drawTopics();drawSubtopics();const holder=$("suggestions");holder.replaceChildren();for(const q of f.queries){const b=node("button",q,"template");b.type="button";b.onclick=()=>{state.subtopic="";state.query=q;$("query").value=q;persist();drawSubtopics();page=1;search()};holder.append(b)}const w=$("workflow");w.replaceChildren();const ol=document.createElement("ol");for(const step of f.workflow){ol.append(node("li",step))}ol.style.paddingLeft="20px";w.append(ol)}
 function drawSaved(){store(SAVED,saved);$("saved-count").textContent=saved.length;const root=$("saved-list");root.replaceChildren();if(!saved.length){root.append(node("p","No saved papers yet.","muted"));return}for(const w of saved.slice().reverse().slice(0,12)){const a=node("a",w.display_name||"Untitled");a.href=w.id||w.doi||"#";a.target="_blank";a.rel="noopener noreferrer";root.append(a)}}
 function renderPaper(w){const art=node("article",undefined,"paper");const header=node("div",undefined,"row");header.append(node("span",String(w.publication_year||"Year unknown"),"pill"));header.append(node("span",(w.cited_by_count??0)+" citations","pill"));const access=w.open_access?.is_oa;if(access)header.append(node("span","Open access","pill"));art.append(header);
 const h=node("h3",w.display_name||w.title||"Untitled research");art.append(h);
@@ -39,9 +43,9 @@ const authors=(w.authorships||[]).slice(0,6).map(x=>x.author?.display_name).filt
 const venue=w.primary_location?.source?.display_name;if(venue)art.append(node("p",venue,"authors"));
 if(w.abstract_inverted_index){const entries=[];for(const [term,positions] of Object.entries(w.abstract_inverted_index)){for(const pos of positions)if(pos<140)entries[pos]=term}if(entries.length)art.append(node("p",entries.filter(Boolean).join(" ").slice(0,820)+(entries.length>140?"…":""),"summary"))}
 const row=node("div",undefined,"row actions");link(row,"OpenAlex",w.id);link(row,"DOI",w.doi);link(row,"PDF / OA",w.best_oa_location?.pdf_url||w.best_oa_location?.landing_page_url);link(row,"arXiv",arxivURL(w));
-const isSaved=saved.some(p=>recordID(p)===recordID(w));const b=node("button",isSaved?"✓ Saved":"☆ Save");b.type="button";b.setAttribute("aria-pressed",String(isSaved));b.onclick=()=>{if(saved.some(p=>recordID(p)===recordID(w)))saved=saved.filter(p=>recordID(p)!==recordID(w));else saved.push(w);drawSaved();render()};row.append(b);
+const isSaved=saved.some(p=>recordID(p)===recordID(w));const b=node("button",isSaved?"✓ In reading list":"Save to reading list","rl-save-button"+(isSaved?" is-saved":""));b.type="button";b.setAttribute("aria-pressed",String(isSaved));b.setAttribute("aria-label",(isSaved?"Remove from reading list: ":"Save to reading list: ")+(w.display_name||w.title||"Paper"));b.onclick=()=>{if(saved.some(p=>recordID(p)===recordID(w)))saved=saved.filter(p=>recordID(p)!==recordID(w));else saved.push(w);drawSaved();window.dispatchEvent(new Event("researchlens-library-change"));render()};row.append(b);
 const cite=node("button","Copy BibTeX");cite.type="button";cite.onclick=async()=>{try{await navigator.clipboard.writeText(bib(w));cite.textContent="Copied"}catch{download("researchlens-citation.bib",bib(w),"text/plain")}};row.append(cite);
-const cop=node("a","Analyze with Copilot");cop.href="./copilot.html?"+new URLSearchParams({q:w.display_name||w.title||""});row.append(cop);art.append(row);return art}
+const cop=node("a","✦ Analyze / Ask AI");cop.href="./copilot.html?"+new URLSearchParams({q:w.display_name||w.title||""});row.append(cop);art.append(row);return art}
 function render(){const root=$("results");root.replaceChildren();const display=showingSaved?saved.slice().reverse():items;$("result-heading").textContent=showingSaved?"Your saved papers":"Literature results";if(!display.length){root.append(node("div",showingSaved?"No papers saved yet. Save papers from your search results.":"No matching records to display.","empty"))}else for(const w of display)root.append(renderPaper(w));
 $("pagination").textContent=showingSaved?saved.length+" locally saved":("Page "+page+" · "+total.toLocaleString()+" records");$("prev").disabled=showingSaved||busy||page===1;$("next").disabled=showingSaved||busy||page*20>=Math.min(total,10000)}
 async function search(){if(busy&&requestController)requestController.abort();busy=true;showingSaved=false;persist();const q=$("query").value.trim();const from=$("from").value,to=$("to").value;if(!q&&!from&&!to){busy=false;setStatus("Enter a topic or a publication date.");return}if(from&&to&&from>to){busy=false;setStatus("Start date must be before end date.");return}setStatus("Searching live scholarly literature…");$("results").replaceChildren(node("div","Retrieving research records…","empty"));renderControls();
@@ -52,10 +56,28 @@ try{const res=await fetch("https://api.openalex.org/works?"+p.toString(),{signal
 catch(err){if(err.name==="AbortError")return;items=[];total=0;setStatus("Search unavailable: "+err.message+". Retry or use the global search.");}
 finally{if(requestController===ctl){busy=false;requestController=null;render()}}}
 function renderControls(){$("prev").disabled=true;$("next").disabled=true}
-function init(){const opts=$("field");for(const [id,f] of Object.entries(FIELDS)){const o=node("option",f.name);o.value=id;opts.append(o)}
-$("field").value=state.field;$("query").value=state.query||state.topic||"";$("sort").value=state.sort||"relevance";$("from").value=state.from||"";$("to").value=state.to||"";drawField();drawSaved();
-$("field").onchange=()=>{state.field=$("field").value;state.topic=FIELDS[state.field].topics[0];state.query=state.topic;$("query").value=state.query;persist();drawField();page=1;search()};
-$("use-custom").onclick=()=>{const t=$("custom").value.trim();if(t.length<3){setStatus("Enter at least three characters for a custom topic.");return}topicSelect(t)};
+function init(){
+const latest=read(KEY,{});
+if(latest.field&&FIELDS[latest.field]&&latest.field!==state.field){
+ state.field=latest.field;state.topic=FIELDS[state.field].topics[0];state.subtopic="";state.query=state.topic
+}
+const opts=$("field"), choices=$("field-choices");
+for(const [id,f] of Object.entries(FIELDS)){
+ const button=node("button",f.name,"rl-field-choice");button.type="button";button.dataset.field=id;
+ button.onclick=()=>{opts.value=id;$("field-details").open=false;opts.dispatchEvent(new Event("change",{bubbles:true}))};
+ choices.append(button)
+}
+$("field").value=state.field;$("query").value=state.query||state.topic||"";
+document.addEventListener("pointerdown",e=>{if(!$("field-details").contains(e.target))$("field-details").open=false});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&$("field-details").open){$("field-details").open=false;$("field-trigger").focus()}});$("sort").value=state.sort||"relevance";$("from").value=state.from||"";$("to").value=state.to||"";drawField();drawSaved();
+$("field").onchange=()=>{state.field=$("field").value;state.topic=FIELDS[state.field].topics[0];state.subtopic="";state.customSubtopic=false;state.query=state.topic;$("query").value=state.query;persist();drawField();window.dispatchEvent(new CustomEvent("researchlens:field-changed",{detail:{field:state.field,topic:state.topic}}));page=1;search()};
+$("use-custom").onclick=()=>{const t=$("custom").value.trim();if(t.length<3){setStatus("Enter at least three characters for a custom topic.");return}state.subtopic=t;state.customSubtopic=true;state.query=t;$("query").value=t;persist();drawSubtopics();page=1;search()};
+$("use-subtopic").onclick=()=>{const t=$("custom-subtopic").value.trim();if(t.length<3){setStatus("Enter at least three characters for a subtopic.");return}subtopicSelect(t)};
+window.addEventListener("researchlens:choose-field",e=>{
+ const field=fieldKey(e.detail?.field);if(state.field===field)return;
+ state.field=field;state.topic=FIELDS[field].topics[0];state.subtopic="";state.query=state.topic;
+ $("query").value=state.query;persist();drawField();page=1;search()
+});
 $("search-form").onsubmit=e=>{e.preventDefault();page=1;search()};
 $("sort").onchange=()=>{page=1;search()};
 $("latest").onclick=()=>{$("sort").value="publication_date:desc";$("from").value="";$("to").value="";page=1;search()};
@@ -64,7 +86,7 @@ $("show-saved").onclick=()=>{showingSaved=true;setStatus("This collection is sto
 $("prev").onclick=()=>{if(page>1){page--;search()}};$("next").onclick=()=>{if(page*20<Math.min(total,10000)){page++;search()}};
 $("export-bib").onclick=()=>{if(!saved.length){setStatus("Save a paper before exporting citations.");return}download("researchlens-reading-list.bib",saved.map(bib).join("\n"),"text/plain;charset=utf-8")};
 $("export-json").onclick=()=>download("researchlens-field-reading-list.json",JSON.stringify(saved,null,2),"application/json");
-const u=new URLSearchParams(location.search);if(u.get("field")&&FIELDS[u.get("field")]){state.field=u.get("field");$("field").value=state.field;drawField()}if(u.get("q")){$("query").value=u.get("q").slice(0,250);state.query=$("query").value}persist();if($("query").value.trim())search();
+const u=new URLSearchParams(location.search);if(u.get("field")&&FIELDS[u.get("field")]){state.field=u.get("field");if(!FIELDS[state.field].topics.includes(state.topic)){state.topic=FIELDS[state.field].topics[0];state.subtopic=""}$("field").value=state.field;drawField()}if(u.get("q")){$("query").value=u.get("q").slice(0,250);state.query=$("query").value}persist();if($("query").value.trim())search();
 }
 window.addEventListener("researchlens:scholarly-open",init,{once:true});
 })();

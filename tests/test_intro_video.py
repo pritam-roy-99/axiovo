@@ -31,7 +31,8 @@ class IntroVideoTests(unittest.TestCase):
         self.assertTrue(any(x.get("src")=="./assets/researchlens-tour.mp4" for x in parser.sources))
         self.assertTrue(any(x.get("kind")=="captions" and x.get("srclang")=="en" for x in parser.tracks))
         self.assertIn("Read video transcript",html)
-        self.assertIn("Open my workspace",html)
+        self.assertIn("Discover research",html)
+        self.assertIn("My workspace",html)
 
     def test_video_builder_python_syntax(self):
         script=ROOT/"scripts/build_intro_video.py"

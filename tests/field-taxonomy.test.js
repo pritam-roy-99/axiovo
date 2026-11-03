@@ -1,0 +1,19 @@
+/* Run node tests/field-taxonomy.test.js */
+"use strict";
+const assert=require("node:assert/strict");
+const {FIELDS,SUBTOPICS,fieldTopics,fieldKey}=require("../docs/research-fields.js");
+assert.equal(Object.keys(FIELDS).length,9);
+for(const [field,spec] of Object.entries(FIELDS)){
+ assert.ok(spec.name && spec.topics.length>=8,"field has credible research areas: "+field);
+ for(const topic of spec.topics){
+  const subs=fieldTopics(field,topic);
+  assert.ok(subs.length>=2,"missing field-specific interests: "+field+" / "+topic);
+  assert.ok(new Set(subs).size===subs.length,"duplicate subtopic in "+topic);
+  assert.ok(subs.every(x=>typeof x==="string"&&x.length>5));
+ }
+}
+assert.deepEqual(fieldTopics("quantum","Quantum steering"),["Multipartite steering","Network steering","Measurement incompatibility"]);
+assert.deepEqual(fieldTopics("medicine","Clinical trials"),["Randomized controlled trials","Adaptive trials","Clinical trial meta-analysis"]);
+assert.equal(fieldKey("biology"),"biology");
+assert.equal(fieldKey("not-a-field"),"quantum");
+console.log("Field taxonomy: "+Object.keys(FIELDS).length+" disciplines, "+Object.values(SUBTOPICS).reduce((n,x)=>n+Object.values(x).reduce((a,y)=>a+y.length,0),0)+" curated subtopics; tests passed.");

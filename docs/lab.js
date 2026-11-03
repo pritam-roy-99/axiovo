@@ -229,7 +229,7 @@ function checkAlerts(){
  const prefs=read("researchlens-research-interest-settings-v1",{});
  const field=read("researchlens-field-explorer-v1",{});
  const projects=read("researchlens-research-projects-v1",[]);
- const terms=[...(Array.isArray(prefs.interests)?prefs.interests:[]),field.topic,...(Array.isArray(projects)?projects.map(p=>p.keywords):[])].filter(Boolean)
+ const terms=[...(Array.isArray(prefs.interests)?prefs.interests:[]),field.topic,field.subtopic,...(Array.isArray(projects)?projects.map(p=>p.keywords):[])].filter(Boolean)
   .flatMap(x=>String(x).toLowerCase().split(/[,;]/)).map(x=>x.trim()).filter(x=>x.length>4).slice(0,40);
  const seen=read(SEEN,{});
  const matches=documents.filter(p=>keywordMatch(p,terms)).filter(p=>!seen[p.id])

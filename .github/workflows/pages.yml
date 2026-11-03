@@ -33,7 +33,9 @@ jobs:
       - name: Test research relevance ranking
         run: node tests/relevance.test.js
       - name: Unified research assistant regression tests
-        run: node tests/assistant-core.test.js
+        run: |
+          node tests/assistant-core.test.js
+          node tests/field-taxonomy.test.js
       - name: Refresh research metadata
         id: refresh
         continue-on-error: true
