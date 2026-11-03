@@ -27,6 +27,15 @@ function init(){
  window.addEventListener("popstate",()=>show(new URLSearchParams(location.search).get("view")==="scholarly"?"scholarly":"arxiv",false));
  const params=new URLSearchParams(location.search);
  let primary="quantum";try{primary=JSON.parse(localStorage.getItem("researchlens-field-explorer-v1")||"{}").field||"quantum"}catch{}
+ function updateFieldLabel(){
+  let field="quantum";try{field=JSON.parse(localStorage.getItem("researchlens-field-explorer-v1")||"{}").field||"quantum"}catch{}
+  const config=window.ResearchLensFields;
+  const name=config?.FIELDS?.[field]?.name||"your field";
+  if(b.firstChild?.nodeType===Node.TEXT_NODE)b.firstChild.textContent="Explore "+name+" ";
+ }
+ window.addEventListener("researchlens:field-changed",updateFieldLabel);
+ window.addEventListener("researchlens:choose-field",updateFieldLabel);
+ updateFieldLabel();
  const requested=params.get("view");
  show(requested==="scholarly"||(!requested&&primary!=="quantum")?"scholarly":"arxiv",false);
 }
