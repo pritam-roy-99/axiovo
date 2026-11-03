@@ -126,9 +126,9 @@ def harvest(from_date: str, max_pages: int = 6) -> tuple[list[dict], bool]:
 def main() -> None:
     now = dt.datetime.now(dt.timezone.utc)
     # The mirror intentionally uses a recent lookback, not a claimed full archive.
-    days = max(1, min(30, int(os.getenv("OAI_LOOKBACK_DAYS", "7"))))
+    days = max(1, min(30, int(os.getenv("OAI_LOOKBACK_DAYS", "2"))))
     from_date = (now - dt.timedelta(days=days)).date().isoformat()
-    pages = max(1, min(20, int(os.getenv("OAI_MAX_PAGES", "6"))))
+    pages = max(1, min(20, int(os.getenv("OAI_MAX_PAGES", "20"))))
     existing = {}
     try:
         existing = json.loads(TARGET.read_text(encoding="utf-8"))
