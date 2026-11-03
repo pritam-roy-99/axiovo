@@ -70,7 +70,7 @@ def merge(existing, incoming, limit=3000):
             index[item["id"]] = item
     for item in index.values():
         item["topics"] = assign_topics(item)
-    return sorted(index.values(), key=lambda p: p.get("updated") or p.get("published") or "", reverse=True)[:limit]
+    return sorted(index.values(), key=lambda p: (p.get("published") or "", p.get("updated") or ""), reverse=True)[:limit]
 
 def fetch_recent():
     """Ingest separate subject feeds, including adjacent interdisciplinary work.
@@ -81,18 +81,24 @@ def fetch_recent():
     page_size = min(200, max(1, int(os.environ.get("ARXIV_MAX_RESULTS", "150"))))
     results = []
     failures = []
-    for i, category in enumerate(categories):
-        category = category.strip()
-        if not re.fullmatch(r"[A-Za-z0-9.\-]+", category):
-            continue
+    # Read both streams. "lastUpdatedDate" alone can crowd newly announced
+    # v1 papers out of the limited query window when older papers are revised.
+    streams = ("submittedDate", "lastUpdatedDate")
+    valid_categories = [c.strip() for c in categories
+                        if re.fullmatch(r"[A-Za-z0-9.-]+", c.strip())]
+    calls = [(category, stream) for category in valid_categories
+             for stream in streams]
+    for i, (category, stream) in enumerate(calls):
         args = urllib.parse.urlencode({
             "search_query": "cat:" + category, "start": 0,
             "max_results": page_size,
-            "sortBy": "lastUpdatedDate", "sortOrder": "descending"
+            "sortBy": stream, "sortOrder": "descending"
         })
         req = urllib.request.Request(
             "https://export.arxiv.org/api/query?" + args,
-            headers={"User-Agent": os.environ.get("ARXIV_USER_AGENT", "ResearchLens-MVP/0.2 (https://github.com/pritam-roy-99/researchlens; research metadata discovery)")}
+            headers={"User-Agent": os.environ.get(
+                "ARXIV_USER_AGENT",
+                "ResearchLens/0.4 (https://github.com/pritam-roy-99/researchlens; scholarly metadata discovery)")}
         )
         for attempt in range(2):
             try:
@@ -103,15 +109,16 @@ def fetch_recent():
                     break
             except (OSError, ET.ParseError, ValueError) as exc:
                 if attempt == 1:
-                    failures.append(category + ": " + str(exc)[:120])
+                    failures.append(category + " " + stream + ": " + str(exc)[:120])
                 else:
                     time.sleep(5)
-        if i < len(categories)-1:
+        # Respect the arXiv API's request spacing across all query types.
+        if i < len(calls) - 1:
             time.sleep(3.2)
     if failures:
-        print("WARNING: Some arXiv categories failed:", "; ".join(failures))
+        print("WARNING: Some arXiv queries failed:", "; ".join(failures))
     if not results:
-        raise RuntimeError("All arXiv feeds unavailable, preserving previous data")
+        raise RuntimeError("All arXiv queries unavailable, preserving previous data")
     return results
 
 
@@ -182,7 +189,8 @@ def main():
     papers = merge(papers, pinned_records, limit=3500)
     payload = {
         "generated_at": dt.datetime.now(dt.timezone.utc).isoformat(),
-        "source": "arXiv Atom API",
+        "source": "arXiv Atom API (submittedDate + lastUpdatedDate)",
+        "refresh_methods": ["submittedDate", "lastUpdatedDate"],
         "paper_count": len(papers), "pinned_ids": pinned, "topic_catalog": topic_catalog(), "papers": papers
     }
     TARGET.parent.mkdir(parents=True, exist_ok=True)
