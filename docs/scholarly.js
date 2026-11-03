@@ -57,13 +57,19 @@ catch(err){if(err.name==="AbortError")return;items=[];total=0;setStatus("Search 
 finally{if(requestController===ctl){busy=false;requestController=null;render()}}}
 function renderControls(){$("prev").disabled=true;$("next").disabled=true}
 function init(){
+const latest=read(KEY,{});
+if(latest.field&&FIELDS[latest.field]&&latest.field!==state.field){
+ state.field=latest.field;state.topic=FIELDS[state.field].topics[0];state.subtopic="";state.query=state.topic
+}
 const opts=$("field"), choices=$("field-choices");
 for(const [id,f] of Object.entries(FIELDS)){
  const button=node("button",f.name,"rl-field-choice");button.type="button";button.dataset.field=id;
  button.onclick=()=>{opts.value=id;$("field-details").open=false;opts.dispatchEvent(new Event("change",{bubbles:true}))};
  choices.append(button)
 }
-$("field").value=state.field;$("query").value=state.query||state.topic||"";$("sort").value=state.sort||"relevance";$("from").value=state.from||"";$("to").value=state.to||"";drawField();drawSaved();
+$("field").value=state.field;$("query").value=state.query||state.topic||"";
+document.addEventListener("pointerdown",e=>{if(!$("field-details").contains(e.target))$("field-details").open=false});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&$("field-details").open){$("field-details").open=false;$("field-trigger").focus()}});$("sort").value=state.sort||"relevance";$("from").value=state.from||"";$("to").value=state.to||"";drawField();drawSaved();
 $("field").onchange=()=>{state.field=$("field").value;state.topic=FIELDS[state.field].topics[0];state.subtopic="";state.query=state.topic;$("query").value=state.query;persist();drawField();window.dispatchEvent(new CustomEvent("researchlens:field-changed",{detail:{field:state.field,topic:state.topic}}));page=1;search()};
 $("use-custom").onclick=()=>{const t=$("custom").value.trim();if(t.length<3){setStatus("Enter at least three characters for a custom topic.");return}state.subtopic=t;state.query=t;$("query").value=t;persist();drawSubtopics();page=1;search()};
 $("use-subtopic").onclick=()=>{const t=$("custom-subtopic").value.trim();if(t.length<3){setStatus("Enter at least three characters for a subtopic.");return}subtopicSelect(t)};
