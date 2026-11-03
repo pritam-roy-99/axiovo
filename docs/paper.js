@@ -21,7 +21,7 @@ external(links,"PDF ↗","https://arxiv.org/pdf/"+id);
 external(links,"Read & annotate","./lab.html?arxiv="+encodeURIComponent(id)+"#reader");
 if(p.doi)external(links,"DOI ↗","https://doi.org/"+p.doi.replace(/^https?:\/\/doi.org\//,""));
 external(links,"SciRate ↗","https://scirate.com/arxiv/"+id);
-external(links,"Similar literature ↗","./search.html?q="+encodeURIComponent(p.title)"btn");
+external(links,"Similar literature ↗","./search.html?q="+encodeURIComponent(p.title),"btn");
 external(links,"Research Assistant ↗","./copilot.html?id="+encodeURIComponent(id),"btn primary");
 const e=document.createElement("button");e.className="btn";e.textContent="Copy BibTeX";e.onclick=()=>navigator.clipboard?.writeText(bibEntry(p));links.append(e);
 const fields=$("fields");fields.replaceChildren();
