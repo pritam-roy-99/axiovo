@@ -56,7 +56,12 @@ try{
    localStorage.setItem(key,JSON.stringify(data.payload.keys[key]))}
   status("Backup restored to this browser. Reload My Workspace to see the changes.")
  };
- db.auth.onAuthStateChange((_event,session)=>{\n  user=session?.user||null;\n  $("lab-cloud-login").hidden=!!user;$("lab-cloud-logout").hidden=!user;\n  $("lab-cloud-push").disabled=!user;$("lab-cloud-pull").disabled=!user;\n  status(user?"Signed in. Private cloud backups are available.":"Signed out. Local research data remains in this browser.");\n });
+ db.auth.onAuthStateChange((_event,session)=>{
+  user=session?.user||null;
+  $("lab-cloud-login").hidden=!!user;$("lab-cloud-logout").hidden=!user;
+  $("lab-cloud-push").disabled=!user;$("lab-cloud-pull").disabled=!user;
+  status(user?"Signed in. Private cloud backups are available.":"Signed out. Local research data remains in this browser.");
+ });
  await auth()
 }catch(err){status("Account service unavailable: "+String(err.message||err).slice(0,170))}
 })();
