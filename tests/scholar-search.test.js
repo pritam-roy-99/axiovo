@@ -28,4 +28,16 @@ const free=S.plan({...contextual,query:"Bell correlations"},"Bell correlations",
 assert.equal(free.browse,false);
 assert.equal(S.fieldId("https://openalex.org/fields/31"),"31");
 assert.equal(S.fieldId("bad"),"");
+// Topic specificity: "quantum" alone must not qualify for steering or QKD.
+const steering=S.plan({field:"quantum",topic:"Quantum steering",subtopic:""},"Quantum steering",{today:"2026-11-03"});
+const genericQuantum={...quantum,id:"https://openalex.org/W6",display_name:"Quantum computation and error correction"};
+const steeringPaper={...quantum,id:"https://openalex.org/W7",display_name:"Quantum steering and incompatibility measurements"};
+assert.equal(S.match(genericQuantum,steering),false);
+assert.equal(S.match(steeringPaper,steering),true);
+const qkd=S.plan({field:"quantum",topic:"Quantum key distribution",subtopic:""},"Quantum key distribution",{today:"2026-11-03"});
+assert.equal(S.match(steeringPaper,qkd),false);
+assert.equal(S.match({...quantum,id:"https://openalex.org/W8",display_name:"Finite key distribution in quantum networks"},qkd),true);
+const prepQuantum=S.plan({field:"quantum",topic:"Contextuality",subtopic:"Preparation contextuality"},"Preparation contextuality",{today:"2026-11-03"});
+assert.equal(S.match(quantum,prepQuantum),false);
+assert.equal(S.match({...quantum,id:"https://openalex.org/W9",display_name:"Preparation contextuality for quantum states"},prepQuantum),true);
 console.log("Field-restricted scholarly search tests passed.");
