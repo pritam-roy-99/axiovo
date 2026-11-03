@@ -126,7 +126,8 @@ function compare(e){
  const x=documents.find(p=>p.id===a),y=documents.find(p=>p.id===b);
  if(!x||!y){status("lab-compare-status","One or both papers are absent from the bounded local index. Try archive search or use source links to inspect the full papers.");return}
  comparePaper(x,"Paper A");comparePaper(y,"Paper B");
- loadComparisonNotes();\n status("lab-compare-status","Side-by-side original metadata comparison. Mathematical assumptions and conclusions must be checked in the PDFs.")
+ loadComparisonNotes();
+ status("lab-compare-status","Side-by-side original metadata comparison. Mathematical assumptions and conclusions must be checked in the PDFs.")
 }
 const COMPARES="researchlens-comparisons-v1";
 function comparisonKey(){
@@ -244,7 +245,8 @@ function markSeen(){
 }
 function init(){
  $("lab-search-form").onsubmit=searchLiterature;
- $("lab-compare-form").onsubmit=compare;\n $("lab-compare-save").onclick=saveComparison;$("lab-compare-export").onclick=exportComparison;
+ $("lab-compare-form").onsubmit=compare;
+ $("lab-compare-save").onclick=saveComparison;$("lab-compare-export").onclick=exportComparison;
  $("lab-citation-form").onsubmit=citation;
  $("lab-local-pdf").onchange=e=>loadPdf(e.target.files?.[0]);
  $("lab-prev-page").onclick=async()=>{if(pdf&&pdfPage>1){pdfPage--;await drawPage()}};
