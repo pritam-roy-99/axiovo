@@ -34,6 +34,12 @@ class DiscoveryUXTests(unittest.TestCase):
                      "scholar-subtopic-list","scholar-custom-subtopic","scholar-use-subtopic",
                      "scholar-field-heading"):
             self.assertEqual(len(doc.ids.get(item,[])),1,item)
+        self.assertEqual(doc.ids["scholar-field"][0][0],"input")
+        self.assertEqual(doc.ids["scholar-field"][0][1].get("type"),"hidden")
+        self.assertEqual(doc.ids["arxiv-main-field"][0][0],"input")
+        self.assertEqual(doc.ids["arxiv-main-field"][0][1].get("type"),"hidden")
+        self.assertIn("arxiv-field-choices",doc.ids)
+        self.assertIn("scholar-field-choices",doc.ids)
         self.assertIn("research-fields.js",html)
         self.assertIn("researchlens:choose-field",html)
         self.assertIn("researchlens:field-changed",html)
