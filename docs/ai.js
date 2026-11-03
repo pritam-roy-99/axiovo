@@ -31,17 +31,17 @@ if(!navigator.gpu){$("model-state").textContent="WebGPU unavailable";$("ai-statu
 loading=true;$("load").disabled=true;$("model-state").textContent="Preparing WebGPU runtime";
 try{
 const webllm=await import("https://esm.sh/@mlc-ai/web-llm@0.2.86");
-const id="Qwen2.5-0.5B-Instruct-q4f16_1-MLC";
+const id=$("model-choice").value;
 if(!webllm.prebuiltAppConfig.model_list.some(m=>m.model_id===id))throw Error("Selected model is not in this WebLLM release");
 engine=await webllm.CreateMLCEngine(id,{initProgressCallback:report=>{$("model-state").textContent=report.text||"Loading";if(Number.isFinite(report.progress))$("progress").style.width=(report.progress*100).toFixed(0)+"%";}});
-$("progress").style.width="100%";$("load").textContent="Model loaded";$("model-state").textContent="Qwen2.5 0.5B on-device";$("ask").disabled=false;$("ai-status").textContent="On-device inference is ready. Answers are experimental and must be checked against sources.";
+$("progress").style.width="100%";$("load").textContent="Model loaded";$("model-state").textContent=id+" ready on-device";$("model-choice").disabled=true;$("ask").disabled=false;$("ai-status").textContent="On-device inference is ready. Answers are experimental and must be checked against sources.";
 }catch(err){engine=null;$("model-state").textContent="Model failed to load";$("ai-status").textContent="Could not initialize WebGPU inference: "+String(err.message||err).slice(0,240)+". Try a WebGPU browser with available graphics memory.";$("load").disabled=false;}finally{loading=false;}
 }
 async function ask(){
 if(!engine||!current||loading)return;
 loading=true;$("ask").disabled=true;$("ai-result").textContent="Generating answer locally…";$("ai-status").textContent="On-device model is analyzing the supplied abstracts.";
 try{const response=await engine.chat.completions.create({messages:[{role:"system",content:"You are a cautious scientific paper assistant. Prioritize source-grounded uncertainty and cite supplied arXiv IDs."},{role:"user",content:promptFor(current,prior(current),$("mode").value,$("question").value.slice(0,700))}],temperature:0.2,max_tokens:650});
-$("ai-result").textContent=response.choices?.[0]?.message?.content||"No text generated.";$("ai-status").textContent="Generated using Qwen2.5 0.5B, locally in your browser. This is not peer review or verified novelty assessment.";}
+$("ai-result").textContent=response.choices?.[0]?.message?.content||"No text generated.";$("ai-status").textContent="Generated locally using "+$("model-choice").value+". This is not peer review or verified novelty assessment.";}
 catch(err){$("ai-result").textContent="Generation failed: "+String(err.message||err).slice(0,240);$("ai-status").textContent="Try reloading or a shorter question.";}finally{loading=false;$("ask").disabled=false}
 }
 $("search").addEventListener("input",()=>{const q=$("search").value.toLowerCase().trim();selectOptions(papers.filter(p=>[p.title,p.id,(p.authors||[]).join(" "),p.abstract].join(" ").toLowerCase().includes(q)).slice(0,120))});
