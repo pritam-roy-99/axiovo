@@ -101,7 +101,7 @@ function renderRecommendations(){
   save.onclick=()=>{
     const current=read(OLD_SAVED,[]);const ids=Array.isArray(current)?current:[];
     const id=R.normalizeId(pp.id);if(!ids.includes(id))ids.push(id);
-    if(write(OLD_SAVED,ids)){message($("research-rec-status"),"Saved arXiv:"+id+" to your reading list.");renderRecommendations()}
+    if(write(OLD_SAVED,ids)){window.dispatchEvent(new CustomEvent("researchlens-library-change"));message($("research-rec-status"),"Saved arXiv:"+id+" to your reading list.");renderRecommendations()}
     else message($("research-rec-status"),"Could not save. Local browser storage may be disabled.")
   };
   if(projects.length){
