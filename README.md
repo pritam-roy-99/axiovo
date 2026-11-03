@@ -61,6 +61,19 @@ Both modes are in the same homepage instead of separate destination pages, and m
 
 The two modes **do not claim the same source coverage or date semantics**: arXiv's local rolling index is incomplete and uses original submission dates, whereas OpenAlex can find a wider body of publications using indexed publication dates. This is a unified interface, not an assertion that OpenAlex and arXiv contain the same records.
 
+## Unified Research Assistant
+
+ResearchLens combines the former AI Lab and Research Copilot into **one** interface: [Research Assistant](https://pritam-roy-99.github.io/researchlens/copilot.html).
+
+- Start from a scientific question, arXiv ID or indexed paper; choose literature discovery, contributions, technical explanation, reviewer checks, speculative directions, or claim-and-assumption analysis.
+- Paper selection and comparison integrate AI Lab's separate metadata analysis. A source-linked comparison shows indexed abstracts, original-submission chronology, shared concepts and a checklist for human verification.
+- BM25-style metadata ranking combines the local arXiv Atom snapshot and bounded OAI-PMH mirror. Live OpenAlex bibliographic search can be added directly to the source context.
+- The wider-retrieval setting explicitly distinguishes remote and local searches. An unpublished draft is **not automatically** submitted to OpenAlex; external searches remain user-initiated when a draft is present.
+- Deterministic source evidence and conversation exports work without any local language model. Optional Ollama Qwen on the researcher's computer and experimental browser WebGPU Qwen remain available, and model citations to nonexistent source numbers are flagged.
+- The old `ai.html` route redirects to the unified assistant, retaining arXiv paper IDs and question parameters.
+
+**Limits:** This is metadata/abstract-based research assistance, not complete full-text semantic retrieval, theorem verification, proof equivalence, automated novelty certification or a hosted AI API. OpenAlex availability is external, and local AI modes need device-specific setup.
+
 ## Current features (deployed GitHub Pages prototype)
 
 - Responsive scientific-paper website with title, abstract, author, and arXiv identifier search.
