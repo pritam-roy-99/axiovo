@@ -22,6 +22,7 @@ let saved=read(SAVED,[]);if(!Array.isArray(saved))saved=[];
 let page=1,total=0,busy=false,items=[],showingSaved=false,requestController=null;
 function node(tag,text,className){const el=document.createElement(tag);if(text!==undefined)el.textContent=text;if(className)el.className=className;return el}
 function link(parent,label,url){
+ if(typeof url!=="string"||!url.trim())return null;
  try{
   const target=new URL(url,location.href);
   if(target.protocol!=="https:"||(!String(url||"").startsWith("https://")&&target.origin!==location.origin))return null;
