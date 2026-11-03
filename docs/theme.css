@@ -1,0 +1,20 @@
+:root[data-theme="dark"]{color-scheme:dark;background:#0b1421;color:#e4eef8}
+:root[data-theme="dark"] body{background:#0b1421;color:#e4eef8}
+:root[data-theme="dark"] main{color:#e4eef8}
+:root[data-theme="dark"] .panel,:root[data-theme="dark"] .paper,:root[data-theme="dark"] .searchbox,:root[data-theme="dark"] .empty,:root[data-theme="dark"] .topic-btn,:root[data-theme="dark"] dialog,:root[data-theme="dark"] section.panel{background:#132337;color:#e6eef8;border-color:#34506b}
+:root[data-theme="dark"] .paper h2,:root[data-theme="dark"] .panel h2,:root[data-theme="dark"] .panel h3,:root[data-theme="dark"] h3,:root[data-theme="dark"] h4,:root[data-theme="dark"] b{color:#eaf2fa}
+:root[data-theme="dark"] .paper p,:root[data-theme="dark"] .panel p,:root[data-theme="dark"] .muted,:root[data-theme="dark"] .hint,:root[data-theme="dark"] .small,:root[data-theme="dark"] .status,:root[data-theme="dark"] .meta{color:#a9c1d9}
+:root[data-theme="dark"] input,:root[data-theme="dark"] select,:root[data-theme="dark"] textarea,:root[data-theme="dark"] .btn:not(.primary):not(.ai-nav),:root[data-theme="dark"] button.alt{color:#e4eef8;background:#20334a;border-color:#425c73}
+:root[data-theme="dark"] .coverage,:root[data-theme="dark"] .topic-label,:root[data-theme="dark"] .tag,:root[data-theme="dark"] .score{color:#c7e4f9;background:#203b52;border-color:#365773}
+:root[data-theme="dark"] .warning{color:#f6ddad;background:#423721;border-color:#765d31}
+:root[data-theme="dark"] .topic-btn.active{color:#fff;background:#176b9c}
+:root[data-theme="dark"] .paper.read{opacity:.58}
+:root[data-theme="dark"] .evidence,:root[data-theme="dark"] .stat{border-color:#35516b}
+:root[data-theme="dark"] .hero{background:linear-gradient(115deg,#061424,#114069)}
+:root[data-theme="dark"] .ai-nav,:root[data-theme="dark"] .primary{color:white}
+:root[data-theme="dark"] a{color:#86cefb}
+:root[data-theme="dark"] header a,:root[data-theme="dark"] .primary{color:#fff}
+:root[data-theme="dark"] .success{background:#163c33;color:#bcf1d8}
+.theme-toggle{border:1px solid #6a97b2;background:#183e60;color:#f3f9ff;border-radius:9px;padding:9px 12px;cursor:pointer;font-size:13px;font-weight:650}
+.theme-toggle:focus-visible{outline:3px solid #ffca65;outline-offset:3px}
+@media(max-width:550px){.theme-toggle{padding:6px 8px}}
