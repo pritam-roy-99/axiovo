@@ -117,6 +117,43 @@ const base="http://127.0.0.1:8765";
   assert.equal(await dpage.locator("#scholar-results article").count(),1);
   await discover.close();
 
+  // OpenAlex 429 must not leave Discover empty or trigger repeated semantic calls.
+  const limited=await browser.newContext({viewport:{width:1100,height:800}});
+  const rateRequests=[];
+  await limited.route("https://api.openalex.org/**",route=>{
+   rateRequests.push(route.request().url());
+   return route.fulfill({status:429,contentType:"application/json",
+    body:JSON.stringify({error:"rate_limit_exceeded"})})
+  });
+  await limited.route("**/data/feed.json",route=>route.fulfill({status:200,contentType:"application/json",
+   body:JSON.stringify({papers:[
+    {id:"2610.00333",title:"Bell nonlocality with entangled qubits",
+      abstract:"Experimental tests of the CHSH Bell inequality under quantum noise.",
+      authors:["A. Researcher"],published:"2026-10-03",categories:["quant-ph"],primary_category:"quant-ph"},
+    {id:"2501.00444",title:"Quantum computing with optical circuits",abstract:"Quantum circuits and error correction.",
+      authors:["B. Researcher"],published:"2025-01-04",categories:["quant-ph"],primary_category:"quant-ph"}
+   ]})
+  }));
+  await limited.route("https://cdn.jsdelivr.net/**",route=>route.fulfill({status:200,contentType:"application/javascript",body:""}));
+  const limitedPage=await limited.newPage();
+  limitedPage.on("pageerror",err=>errors.push(limitedPage.url()+": "+err.message));
+  await limitedPage.goto(base+"/?view=scholarly#discover",{waitUntil:"domcontentloaded"});
+  await limitedPage.locator("#scholar-query").fill("Bell nonlocality");
+  await limitedPage.locator("#scholar-from").fill("2026-11-01");
+  await limitedPage.locator("#scholar-to").fill("2026-11-03");
+  await limitedPage.locator("#scholar-search-form button[type=submit]").click();
+  await limitedPage.locator("#scholar-results article").first().waitFor({timeout:18000});
+  assert((await limitedPage.locator("#scholar-status").innerText()).includes("rate-limited"));
+  assert((await limitedPage.locator("#scholar-status").innerText()).includes("other dates"));
+  assert((await limitedPage.locator("#scholar-results").innerText()).includes("Bell nonlocality with entangled qubits"));
+  assert((await limitedPage.locator("#scholar-results").innerText()).includes("Cached arXiv"));
+  assert.equal(rateRequests.length,1,"429 should not trigger semantic retry");
+  assert((await limitedPage.locator("#scholar-official-search").getAttribute("href")).includes("Bell+nonlocality"));
+  await limitedPage.locator("#scholar-search-form button[type=submit]").click();
+  await limitedPage.locator("#scholar-results article").first().waitFor({timeout:10000});
+  assert.equal(rateRequests.length,1,"Cooldown should avoid repeated calls during the same session");
+  await limited.close();
+
   // Check the core desktop layout separately from the mobile touch session.
   const desktop=await browser.newContext({viewport:{width:1366,height:820}});
   await desktop.route("https://api.openalex.org/**",route=>route.fulfill({

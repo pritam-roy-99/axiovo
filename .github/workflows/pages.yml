@@ -46,6 +46,8 @@ jobs:
         run: node tests/arxiv-versions.test.js
       - name: Validate shared Discover focus
         run: node tests/focus-bar.test.js
+      - name: Test rate-limited arXiv fallback
+        run: node tests/cached-arxiv-search.test.js
       - name: Refresh research metadata
         id: refresh
         continue-on-error: true

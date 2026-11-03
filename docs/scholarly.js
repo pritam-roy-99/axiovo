@@ -7,6 +7,30 @@ const {FIELDS,fieldTopics,fieldKey}=window.ResearchLensFields;
 const SearchCore=window.ResearchLensSearch;
 const SemanticCore=window.ResearchLensSemanticSearch;
 const Arxiv=window.ResearchLensArxiv;
+const CachedArxiv=window.ResearchLensCachedArxiv;
+const OPENALEX_COOLDOWN="researchlens-openalex-429-until";
+let cachedFeedPromise=null;
+function cooldownUntil(){try{return Number(sessionStorage.getItem(OPENALEX_COOLDOWN)||0)}catch{return 0}}
+function setCooldown(){try{sessionStorage.setItem(OPENALEX_COOLDOWN,String(Date.now()+60*60*1000))}catch{}}
+async function offlineArxivFallback(plan,{reason="",from="",to="",sort="",today=""}={}){
+ if(!CachedArxiv)return {items:[],message:"Local index search module unavailable.",outsideDates:false};
+ try{
+  if(!cachedFeedPromise)cachedFeedPromise=fetch("./data/feed.json",{cache:"force-cache"})
+   .then(res=>{if(!res.ok)throw Error("Local index unavailable (HTTP "+res.status+")");return res.json()})
+   .catch(err=>{cachedFeedPromise=null;throw err});
+  const feed=await cachedFeedPromise;
+  const found=CachedArxiv.find(feed,{field:plan.field,query:plan.query,from,to,sort,today,limit:20});
+  let message="OpenAlex is rate-limited. Showing "+found.items.length+
+   " matching papers from ResearchLens's cached arXiv index ("+found.indexed+" indexed papers).";
+  if(found.outsideDates)message+=" No cached matches fall within the chosen date range; these results are from other dates.";
+  if(!found.items.length)message+=" No matching papers in the limited cache. This does not mean arXiv has no matching research.";
+  message+=" This is a partial local snapshot, not an exhaustive historical arXiv search.";
+  return {items:found.items,message,outsideDates:found.outsideDates};
+ }catch(error){
+  return {items:[],message:"OpenAlex unavailable, and local arXiv index could not be loaded ("+String(error.message||error)+"). Use the official arXiv website.",outsideDates:false};
+ }
+}
+
 
 const KEY="researchlens-field-explorer-v1", SAVED="researchlens-field-saved-v1";
 const interestsAPI=window.ResearchLensInterests;
@@ -91,11 +115,11 @@ function followedCount(topic){return interestsAPI?.get(read(interestsAPI.KEY,{})
 function drawTopics(){const holder=$("topic-list");holder.replaceChildren();const topics=FIELDS[state.field].topics.slice().sort((a,b)=>followedCount(b)-followedCount(a));for(const t of topics){const b=node("button",t,"topic"+(t===state.topic?" active":""));b.type="button";b.setAttribute("aria-pressed",String(t===state.topic));b.onclick=()=>topicSelect(t);holder.append(b)}}
 function drawField(){const f=FIELDS[state.field];$("field").value=state.field;$("field-label").textContent=f.name;for(const b of $("field-choices").querySelectorAll("button"))b.setAttribute("aria-pressed",String(b.dataset.field===state.field));$("field-summary").textContent=f.summary;$("field-heading").textContent="Explore "+f.name.toLowerCase();drawTopics();drawSubtopics();const holder=$("suggestions");holder.replaceChildren();for(const q of f.queries){const b=node("button",q,"template");b.type="button";b.onclick=()=>{state.subtopic="";state.query=q;$("query").value=q;persist();drawSubtopics();page=1;search()};holder.append(b)}const w=$("workflow");w.replaceChildren();const ol=document.createElement("ol");for(const step of f.workflow){ol.append(node("li",step))}ol.style.paddingLeft="20px";w.append(ol)}
 function drawSaved(){store(SAVED,saved);$("saved-count").textContent=saved.length;const root=$("saved-list");root.replaceChildren();if(!saved.length){root.append(node("p","No saved papers yet.","muted"));return}for(const w of saved.slice().reverse().slice(0,12)){const a=node("a",w.display_name||"Untitled");a.href=w.id||w.doi||"#";a.target="_blank";a.rel="noopener noreferrer";root.append(a)}}
-function renderPaper(w){const art=node("article",undefined,"paper");const header=node("div",undefined,"row");header.append(node("span",String(w.publication_year||"Year unknown"),"pill"));header.append(node("span",(w.cited_by_count??0)+" citations","pill"));const access=w.open_access?.is_oa;if(access)header.append(node("span","Open access","pill"));if(w.__source==="semantic")header.append(node("span","AI semantic match · verify topic","pill rl-semantic-badge"));art.append(header);
+function renderPaper(w){const art=node("article",undefined,"paper");const header=node("div",undefined,"row");header.append(node("span",String(w.publication_year||"Year unknown"),"pill"));if(w.cited_by_count!==null&&w.cited_by_count!==undefined)header.append(node("span",w.cited_by_count+" citations","pill"));if(w.__source==="local-arxiv")header.append(node("span","Cached arXiv · offline fallback","pill"));const access=w.open_access?.is_oa;if(access)header.append(node("span","Open access","pill"));if(w.__source==="semantic")header.append(node("span","AI semantic match · verify topic","pill rl-semantic-badge"));art.append(header);
 const h=node("h3",w.display_name||w.title||"Untitled research");art.append(h);
 const authors=(w.authorships||[]).slice(0,6).map(x=>x.author?.display_name).filter(Boolean);art.append(node("p",authors.join(", ")+(w.authorships?.length>6?" et al.":""),"authors"));
 const venue=w.primary_location?.source?.display_name;if(venue)art.append(node("p",venue,"authors"));
-if(w.abstract_inverted_index){const entries=[];for(const [term,positions] of Object.entries(w.abstract_inverted_index)){for(const pos of positions)if(pos<140)entries[pos]=term}if(entries.length)art.append(node("p",entries.filter(Boolean).join(" ").slice(0,820)+(entries.length>140?"…":""),"summary"))}
+if(w.__abstract)art.append(node("p",w.__abstract.slice(0,820)+(w.__abstract.length>820?"…":""),"summary"));if(w.abstract_inverted_index){const entries=[];for(const [term,positions] of Object.entries(w.abstract_inverted_index)){for(const pos of positions)if(pos<140)entries[pos]=term}if(entries.length)art.append(node("p",entries.filter(Boolean).join(" ").slice(0,820)+(entries.length>140?"…":""),"summary"))}
 const row=node("div",undefined,"row actions rl-paper-actionbar");const original=Arxiv?.candidates(w)[0];if(original){link(row,"Read on arXiv",Arxiv.abs(original.base));link(row,"PDF",Arxiv.pdf(original.base));}else{link(row,"OpenAlex",w.id)}
 const isSaved=saved.some(p=>recordID(p)===recordID(w));const b=node("button",isSaved?"Saved":"Save paper","rl-save-button"+(isSaved?" is-saved":""));b.type="button";b.setAttribute("aria-pressed",String(isSaved));b.setAttribute("aria-label",(isSaved?"Remove from reading list: ":"Save to reading list: ")+(w.display_name||w.title||"Paper"));b.onclick=()=>{const wasSaved=saved.some(p=>recordID(p)===recordID(w));if(wasSaved)saved=saved.filter(p=>recordID(p)!==recordID(w));else saved.push(w);mirrorArxivBookmark(w,!wasSaved);drawSaved();window.dispatchEvent(new Event("researchlens-library-change"));render()};const icon=document.createElementNS("http://www.w3.org/2000/svg","svg");icon.setAttribute("viewBox","0 0 24 24");icon.setAttribute("width","16");icon.setAttribute("height","16");icon.setAttribute("fill",isSaved?"currentColor":"none");icon.setAttribute("stroke","currentColor");icon.setAttribute("stroke-width","1.8");icon.setAttribute("aria-hidden","true");const mark=document.createElementNS("http://www.w3.org/2000/svg","path");mark.setAttribute("d","M6 4.5A1.5 1.5 0 0 1 7.5 3h9A1.5 1.5 0 0 1 18 4.5V21l-6-4-6 4z");icon.append(mark);b.prepend(icon);row.append(b);
 const cite=node("button","Copy BibTeX");cite.type="button";cite.onclick=async()=>{try{await navigator.clipboard.writeText(bib(w));cite.textContent="Copied"}catch{download("researchlens-citation.bib",bib(w),"text/plain")}};row.append(cite);
@@ -127,60 +151,65 @@ $("pagination").textContent=showingSaved?saved.length+" locally saved":("Search 
 async function search(){
  if(requestController)requestController.abort();
  busy=true;showingSaved=false;persist();
- const q=$("query").value.trim(),from=$("from").value,to=$("to").value;
- if(!q){busy=false;setStatus("Enter a topic, subtopic, paper title or research question.");return}
+ const q=$("query").value.trim();
+ const official=$("official-search");if(official&&Arxiv)official.href=Arxiv.officialSearchUrl(q);
+ if(!q){busy=false;setStatus("Enter a research topic, paper title or arXiv identifier.");return}
  const dates=normalizeSearchDates();
- if(dates.changed){
-  setStatus("Future or reversed dates were cleared; searching existing research through "+dates.until+".")
- }
-
  if(!SearchCore){busy=false;setStatus("Search tools unavailable. Reload ResearchLens.");return}
  if(Arxiv?.parse(q)){
   if(requestController)requestController.abort();requestController=null;
-  busy=false;items=[];total=0;
-  directArxivPaper(q);
-  setStatus("Direct version-specific arXiv link. This result does not depend on the ResearchLens feed or OpenAlex indexing.");
-  return;
+  busy=false;items=[];total=0;directArxivPaper(q);
+  setStatus("Direct source link. Exact arXiv versions do not need OpenAlex or the local feed.");return;
  }
  const today=new Date().toISOString().slice(0,10);
- const plan=SearchCore.plan(state,q,{page,from:$("from").value,to:$("to").value,sort:$("sort").value,today});
+ const from=$("from").value,to=$("to").value,sort=$("sort").value;
+ const plan=SearchCore.plan(state,q,{page,from,to,sort,today});
  const ctl=new AbortController();requestController=ctl;
  const scope=FIELDS[plan.field].name;
- const fieldsRequested=plan.context?" · Quantum contextuality disambiguation enabled.":"";
  const fallbackEnabled=$("semantic-fallback")?.checked&&Boolean(SemanticCore)&&page===1;
- setStatus("Searching "+scope+" with title, abstract and field screening…");
- $("results").replaceChildren(node("div","Finding verified field-specific research records…","empty"));
+ setStatus("Searching arXiv-hosted literature for "+scope+"…");
+ $("results").replaceChildren(node("div","Checking paper records and scientific relevance…","empty"));
  renderControls();
  const service="https://api.openalex.org/works?";
  let lexical=[],semantic=[],mainError="",semanticError="",sourceTotal=0,triedAI=false;
+ let rateLimited=cooldownUntil()>Date.now();
  const fetchResults=async params=>{
-  const res=await fetch(service+params.toString(),{signal:ctl.signal,headers:{Accept:"application/json"}});
-  if(!res.ok)throw new Error("OpenAlex HTTP "+res.status);
-  return res.json()
+  const response=await fetch(service+params.toString(),{signal:ctl.signal,headers:{Accept:"application/json"}});
+  if(response.status===429){
+   setCooldown();
+   const err=new Error("OpenAlex HTTP 429 (quota or request limit)");
+   err.rateLimited=true;throw err;
+  }
+  if(!response.ok)throw new Error("OpenAlex HTTP "+response.status);
+  return response.json()
  };
  try{
-  try{
-   const data=await fetchResults(plan.params);
-   if(ctl.signal.aborted||requestController!==ctl)return;
-   sourceTotal=Number(data.meta?.count)||0;
-   lexical=SearchCore.select(data.results||[],plan);
-  }catch(err){
-   if(ctl.signal.aborted||requestController!==ctl)return;
-   mainError=String(err.message||err).slice(0,140);
-  }
-  if(fallbackEnabled&&lexical.length<6){
-   triedAI=true;
-   setStatus("Only "+lexical.length+" matching keyword records. Checking OpenAlex AI semantic matches for "+scope+"…");
+  if(!rateLimited){
    try{
-    // OpenAlex specifies a maximum of one semantic query per second.
+    const data=await fetchResults(plan.params);
+    if(ctl.signal.aborted||requestController!==ctl)return;
+    sourceTotal=Number(data.meta?.count)||0;
+    lexical=SearchCore.select(data.results||[],plan);
+   }catch(err){
+    if(ctl.signal.aborted||requestController!==ctl)return;
+    if(err.rateLimited)rateLimited=true;
+    mainError=String(err.message||err).slice(0,140);
+   }
+  }
+  // A quota failure is not an empty scientific result. Do not make a second
+  // OpenAlex request for semantic fallback while a 429 cooldown is active.
+  if(!rateLimited&&fallbackEnabled&&lexical.length<6){
+   triedAI=true;
+   setStatus("Checking semantically related papers with OpenAlex…");
+   try{
     await new Promise(resolve=>setTimeout(resolve,1100));
     if(ctl.signal.aborted||requestController!==ctl)return;
-    const semanticPlan=SemanticCore.plan(plan,state);
-    const data=await fetchResults(semanticPlan.params);
+    const data=await fetchResults(SemanticCore.plan(plan,state).params);
     if(ctl.signal.aborted||requestController!==ctl)return;
     semantic=(data.results||[]).filter(w=>Boolean(arxivURL(w))&&SemanticCore.screen(w,plan,state,SearchCore));
    }catch(err){
     if(ctl.signal.aborted||requestController!==ctl)return;
+    if(err.rateLimited)rateLimited=true;
     semanticError=String(err.message||err).slice(0,140);
    }
   }
@@ -189,13 +218,33 @@ async function search(){
    lexical.slice(0,20).map(work=>({work,source:"keyword"}));
   items=selected.map(x=>({...x.work,__source:x.source})).filter(w=>Boolean(arxivURL(w)));
   total=sourceTotal;
+  let localNote="";
+  if(!items.length&&(rateLimited||mainError)){
+   const offline=await offlineArxivFallback(plan,{reason:mainError,from,to,sort,today});
+   if(ctl.signal.aborted||requestController!==ctl)return;
+   if(offline.items.length){items=offline.items;total=0}
+   localNote=offline.message;
+  }else if(rateLimited){
+   localNote="OpenAlex semantic search reached its rate limit. Showing "+items.length+
+    " successfully retrieved standard-search papers. Semantic requests are paused for this browser session.";
+  }
+  if(ctl.signal.aborted||requestController!==ctl)return;
   const aiAdded=selected.filter(x=>x.source==="semantic").length;
-  let summary=(dates.changed?"Future or reversed dates were cleared; searching available papers through "+dates.until+". ":"")+items.length+" field-relevant papers shown from "+scope+" (batch "+page+")."+fieldsRequested;
-  if(triedAI)summary+=" AI semantic fallback "+(semanticError?"unavailable ("+semanticError+")":aiAdded+" additional candidates passed subject screening")+".";
-  if(mainError)summary+=" Standard search issue: "+mainError+".";
-  if(!items.length)summary+=" No adequately supported matches. Try a narrower query or a different topic.";
-  summary+=" Search is not exhaustive; verify titles and original sources.";
+  let summary=(dates.changed?"Invalid future dates were cleared. ":"");
+  if(localNote){
+   summary+=localNote;
+  }else{
+   summary+=items.length+" field-relevant arXiv-hosted papers shown for "+scope+" (batch "+page+").";
+   if(triedAI)summary+=" Semantic matches added: "+aiAdded+".";
+   if(semanticError)summary+=" Semantic search unavailable: "+semanticError+".";
+   if(mainError)summary+=" Standard search problem: "+mainError+".";
+   if(!items.length)summary+=" No relevant records on this search batch. Try another query.";
+   summary+=" Indexing and scientific classification are not exhaustive.";
+  }
   setStatus(summary);
+ }catch(err){
+  if(ctl.signal.aborted||requestController!==ctl)return;
+  setStatus("Search interrupted: "+String(err.message||err)+". Try again or use arXiv directly.");
  }finally{
   if(requestController===ctl){busy=false;requestController=null;render()}
  }
