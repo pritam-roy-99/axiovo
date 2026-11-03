@@ -5,6 +5,7 @@
 const $=id=>document.getElementById("scholar-"+id);
 const {FIELDS,fieldTopics,fieldKey}=window.ResearchLensFields;
 const SearchCore=window.ResearchLensSearch;
+const SemanticCore=window.ResearchLensSemanticSearch;
 
 const KEY="researchlens-field-explorer-v1", SAVED="researchlens-field-saved-v1";
 const interestsAPI=window.ResearchLensInterests;
@@ -56,7 +57,7 @@ function followedCount(topic){return interestsAPI?.get(read(interestsAPI.KEY,{})
 function drawTopics(){const holder=$("topic-list");holder.replaceChildren();const topics=FIELDS[state.field].topics.slice().sort((a,b)=>followedCount(b)-followedCount(a));for(const t of topics){const b=node("button",t,"topic"+(t===state.topic?" active":""));b.type="button";b.setAttribute("aria-pressed",String(t===state.topic));b.onclick=()=>topicSelect(t);holder.append(b)}}
 function drawField(){const f=FIELDS[state.field];$("field").value=state.field;$("field-label").textContent=f.name;for(const b of $("field-choices").querySelectorAll("button"))b.setAttribute("aria-pressed",String(b.dataset.field===state.field));$("field-summary").textContent=f.summary;$("field-heading").textContent="Explore "+f.name.toLowerCase();drawTopics();drawSubtopics();const holder=$("suggestions");holder.replaceChildren();for(const q of f.queries){const b=node("button",q,"template");b.type="button";b.onclick=()=>{state.subtopic="";state.query=q;$("query").value=q;persist();drawSubtopics();page=1;search()};holder.append(b)}const w=$("workflow");w.replaceChildren();const ol=document.createElement("ol");for(const step of f.workflow){ol.append(node("li",step))}ol.style.paddingLeft="20px";w.append(ol)}
 function drawSaved(){store(SAVED,saved);$("saved-count").textContent=saved.length;const root=$("saved-list");root.replaceChildren();if(!saved.length){root.append(node("p","No saved papers yet.","muted"));return}for(const w of saved.slice().reverse().slice(0,12)){const a=node("a",w.display_name||"Untitled");a.href=w.id||w.doi||"#";a.target="_blank";a.rel="noopener noreferrer";root.append(a)}}
-function renderPaper(w){const art=node("article",undefined,"paper");const header=node("div",undefined,"row");header.append(node("span",String(w.publication_year||"Year unknown"),"pill"));header.append(node("span",(w.cited_by_count??0)+" citations","pill"));const access=w.open_access?.is_oa;if(access)header.append(node("span","Open access","pill"));art.append(header);
+function renderPaper(w){const art=node("article",undefined,"paper");const header=node("div",undefined,"row");header.append(node("span",String(w.publication_year||"Year unknown"),"pill"));header.append(node("span",(w.cited_by_count??0)+" citations","pill"));const access=w.open_access?.is_oa;if(access)header.append(node("span","Open access","pill"));if(w.__source==="semantic")header.append(node("span","AI semantic match · verify topic","pill rl-semantic-badge"));art.append(header);
 const h=node("h3",w.display_name||w.title||"Untitled research");art.append(h);
 const authors=(w.authorships||[]).slice(0,6).map(x=>x.author?.display_name).filter(Boolean);art.append(node("p",authors.join(", ")+(w.authorships?.length>6?" et al.":""),"authors"));
 const venue=w.primary_location?.source?.display_name;if(venue)art.append(node("p",venue,"authors"));
@@ -68,41 +69,67 @@ const cop=node("a","✦ Research Assistant");const arxiv=arxivURL(w);const match
 function render(){const root=$("results");root.replaceChildren();const display=showingSaved?saved.slice().reverse():items;$("result-heading").textContent=showingSaved?"Your saved papers":"Literature results";if(!display.length){root.append(node("div",showingSaved?"No papers saved yet. Save papers from your search results.":"No matching records to display.","empty"))}else for(const w of display)root.append(renderPaper(w));
 $("pagination").textContent=showingSaved?saved.length+" locally saved":("Search batch "+page+" · "+items.length+" relevant papers shown");$("prev").disabled=showingSaved||busy||page===1;$("next").disabled=showingSaved||busy||page*100>=Math.min(total,10000)}
 async function search(){
- if(busy&&requestController)requestController.abort();
+ if(requestController)requestController.abort();
  busy=true;showingSaved=false;persist();
  const q=$("query").value.trim(),from=$("from").value,to=$("to").value;
- if(!q){busy=false;setStatus("Enter a research topic, subtopic or specific paper query.");return}
+ if(!q){busy=false;setStatus("Enter a topic, subtopic, paper title or research question.");return}
  if(from&&to&&from>to){busy=false;setStatus("Start date must be before end date.");return}
- if(!SearchCore){busy=false;setStatus("Field-aware search unavailable. Please refresh ResearchLens.");return}
- const today=new Date().toISOString().slice(0,10);
- const effectiveEnd=to&&to<today?to:today;
- if(from&&from>effectiveEnd){
-  busy=false;items=[];total=0;render();
-  setStatus("The start date is after today's date. Choose an earlier date.");return
- }
+ if(!SearchCore){busy=false;setStatus("Search tools unavailable. Reload ResearchLens.");return}
+ const today=new Date().toISOString().slice(0,10),effectiveEnd=to&&to<today?to:today;
+ if(from&&from>effectiveEnd){busy=false;items=[];total=0;render();setStatus("Start date is in the future. Choose an earlier date.");return}
  const plan=SearchCore.plan(state,q,{page,from,to,sort:$("sort").value,today});
- setStatus("Searching "+FIELDS[plan.field].name+" with field and topic relevance checks…");
- $("results").replaceChildren(node("div","Checking field-specific research records…","empty"));
- renderControls();
  const ctl=new AbortController();requestController=ctl;
+ const scope=FIELDS[plan.field].name;
+ const fieldsRequested=plan.context?" · Quantum contextuality disambiguation enabled.":"";
+ const fallbackEnabled=$("semantic-fallback")?.checked&&Boolean(SemanticCore)&&page===1;
+ setStatus("Searching "+scope+" with title, abstract and field screening…");
+ $("results").replaceChildren(node("div","Finding verified field-specific research records…","empty"));
+ renderControls();
+ const service="https://api.openalex.org/works?";
+ let lexical=[],semantic=[],mainError="",semanticError="",sourceTotal=0,triedAI=false;
+ const fetchResults=async params=>{
+  const res=await fetch(service+params.toString(),{signal:ctl.signal,headers:{Accept:"application/json"}});
+  if(!res.ok)throw new Error("OpenAlex HTTP "+res.status);
+  return res.json()
+ };
  try{
-  const url="https://api.openalex.org/works?"+plan.params.toString();
-  const res=await fetch(url,{signal:ctl.signal,headers:{Accept:"application/json"}});
-  if(!res.ok)throw new Error("OpenAlex returned HTTP "+res.status);
-  const data=await res.json();
-  const candidates=Array.isArray(data.results)?data.results:[];
-  items=SearchCore.select(candidates,plan).slice(0,20);
-  // Count only validated results actually on this batch, not OpenAlex's broad
-  // total which includes other meanings of the keyword.
-  total=Number(data.meta?.count)||0;
-  const coverage=items.length+" relevant papers from "+candidates.length+" OpenAlex candidates on batch "+page;
-  setStatus(coverage+(plan.context?" · Quantum contextuality disambiguation applied.":".")+
-   (items.length<20?" Try a more specific subtopic if needed.":"")+
-   " Field classification and title/abstract matching are approximate; source dates are publication metadata.");
- }catch(err){
-  if(err.name==="AbortError")return;
-  items=[];total=0;
-  setStatus("Field-filtered search unavailable: "+err.message+". Retry or change your query.");
+  try{
+   const data=await fetchResults(plan.params);
+   if(ctl.signal.aborted||requestController!==ctl)return;
+   sourceTotal=Number(data.meta?.count)||0;
+   lexical=SearchCore.select(data.results||[],plan);
+  }catch(err){
+   if(ctl.signal.aborted||requestController!==ctl)return;
+   mainError=String(err.message||err).slice(0,140);
+  }
+  if(fallbackEnabled&&lexical.length<6){
+   triedAI=true;
+   setStatus("Only "+lexical.length+" matching keyword records. Checking OpenAlex AI semantic matches for "+scope+"…");
+   try{
+    // OpenAlex specifies a maximum of one semantic query per second.
+    await new Promise(resolve=>setTimeout(resolve,1100));
+    if(ctl.signal.aborted||requestController!==ctl)return;
+    const semanticPlan=SemanticCore.plan(plan,state);
+    const data=await fetchResults(semanticPlan.params);
+    if(ctl.signal.aborted||requestController!==ctl)return;
+    semantic=(data.results||[]).filter(w=>SemanticCore.screen(w,plan,state,SearchCore));
+   }catch(err){
+    if(ctl.signal.aborted||requestController!==ctl)return;
+    semanticError=String(err.message||err).slice(0,140);
+   }
+  }
+  if(ctl.signal.aborted||requestController!==ctl)return;
+  const selected=triedAI?SemanticCore.combine(lexical,semantic,plan,state,SearchCore,20):
+   lexical.slice(0,20).map(work=>({work,source:"keyword"}));
+  items=selected.map(x=>({...x.work,__source:x.source}));
+  total=sourceTotal;
+  const aiAdded=selected.filter(x=>x.source==="semantic").length;
+  let summary=items.length+" field-relevant papers shown from "+scope+" (batch "+page+")."+fieldsRequested;
+  if(triedAI)summary+=" AI semantic fallback "+(semanticError?"unavailable ("+semanticError+")":aiAdded+" additional candidates passed subject screening")+".";
+  if(mainError)summary+=" Standard search issue: "+mainError+".";
+  if(!items.length)summary+=" No adequately supported matches. Try a narrower query or a different topic.";
+  summary+=" Search is not exhaustive; verify titles and original sources.";
+  setStatus(summary);
  }finally{
   if(requestController===ctl){busy=false;requestController=null;render()}
  }

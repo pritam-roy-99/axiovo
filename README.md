@@ -106,6 +106,17 @@ ResearchLens Discover no longer treats a bare broad keyword as a complete field-
 
 **Important:** Field classification in OpenAlex is approximate, and stronger filtering trades recall for precision. It may omit interdisciplinary papers or records with incomplete topic metadata. This is not exhaustive research retrieval; for complete prior-art work, cross-check additional source databases and original papers. OpenAlex's live API and indexing limits still apply.
 
+## AI-assisted field-specific literature discovery
+
+Discover now uses a staged retrieval strategy rather than relying solely on exact keywords.
+
+1. Search OpenAlex bibliographic metadata with the user's selected discipline and publication-date filters, then screen title/abstract/topic evidence.
+2. When fewer than six matching records survive and **Use AI semantic search when keyword results are weak** is enabled, automatically try OpenAlex's embedding-based `search.semantic` endpoint. It can retrieve conceptually related literature without identical wording.
+3. Recheck the semantic candidates against discipline classification, source date and specific domain anchors. E.g. Preparation contextuality must concern quantum contextuality *and* preparation, not contextual urbanism or clinical medicine.
+4. Deduplicate candidates, retain verified lexical results ahead of fallback matches and label each new AI semantic candidate visibly. The fallback can be turned off by the user.
+
+The semantic query and field preferences are transmitted to OpenAlex; a local AI model is not installed and no unpublished manuscript is uploaded. Semantic search is subject to OpenAlex availability, usage budgets, and rate limits. Only 50 records per semantic request are possible, and the fallback is attempted on the first search batch. This is a **relevance aid**, not an exhaustive review, a novelty assessment, or a guarantee that all papers are correctly classified. An OpenAlex field restriction and topical anchors can still omit relevant cross-disciplinary results. ResearchLens falls back to standard bibliographic results if the semantic service fails.
+
 ## Current features (deployed GitHub Pages prototype)
 
 - Responsive scientific-paper website with title, abstract, author, and arXiv identifier search.

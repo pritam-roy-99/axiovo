@@ -97,5 +97,5 @@
   return true;
  }
  function select(results,p){return (Array.isArray(results)?results:[]).filter(w=>match(w,p));}
- return {FIELDS,fieldId,norm,terms,abstractText,plan,match,select};
+ return {FIELDS,fieldId,norm,terms,abstractText,textFor,plan,match,select};
 });
