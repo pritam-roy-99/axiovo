@@ -1,0 +1,34 @@
+name: Harvest arXiv OAI metadata
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '21 4 * * *'
+permissions:
+  contents: write
+concurrency:
+  group: researchlens-oai-mirror
+  cancel-in-progress: false
+jobs:
+  harvest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Test OAI parser
+        run: python -m unittest discover -s tests -v
+      - name: Harvest recent OAI records
+        run: python -m scripts.oai_harvest
+      - name: Commit mirror when changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/data/oai-recent.json
+          if ! git diff --cached --quiet; then
+            git commit -m "data: update bounded OAI mirror [skip ci]"
+            git fetch origin main
+            git rebase -X theirs origin/main
+            git push origin HEAD:main
+          fi
