@@ -12,7 +12,7 @@ function link(p){const a=node("a",p.title);a.href="https://arxiv.org/abs/"+encod
 function selectOptions(items){const select=$("paper");select.replaceChildren();for(const p of items){const o=document.createElement("option");o.value=p.id;o.textContent=p.title+" · "+p.id;select.append(o)}if(select.options.length){if(current&&items.some(x=>x.id===current.id))select.value=current.id;else current=items[0]}else current=null;updateSelected()}
 function updateSelected(){current=papers.find(p=>p.id===$("paper").value)||null;$("selected").textContent=current?((current.authors||[]).slice(0,5).join(", ")+" · "+(current.published||"").slice(0,10)+" · "+current.id):"No matching papers";$("analyze").disabled=!current;$("download").disabled=!evidence;$("ai-result").replaceChildren()}
 function line(container,label,value){const p=node("p",label+": "+value,"muted");container.append(p)}
-function makeEvidence(){if(!current)return;const matches=prior(current),keywords=rankedKeywords(current);reportGeneratedAt=new Date().toISOString();evidence={id:current.id,title:current.title,published:current.published,keywords,near:matches,indexGeneratedAt,reportGeneratedAt,query:current.title};const root=$("report-body");root.replaceChildren();
+function makeEvidence(){if(!current)return;const matches=prior(current),keywords=rankedKeywords(current);reportGeneratedAt=new Date().toISOString();evidence={id:current.id,title:current.title,published:current.published,keywords,near:matches,indexGeneratedAt,reportGeneratedAt,query:current.title};const root=$("report-body");root.replaceChildren();$("openalex-search").disabled=false;$("openalex-results").replaceChildren();$("openalex-status").textContent="Optional external literature search is available.";
 root.append(node("h3","Paper and key concepts"));line(root,"Analysis UTC",reportGeneratedAt);line(root,"Index snapshot UTC",indexGeneratedAt);line(root,"Search query",current.title);line(root,"Paper",current.title);line(root,"Published",current.published||"unknown");line(root,"Primary category",current.primary_category||"unknown");
 const chips=node("div","","row");for(const k of keywords.slice(0,9))chips.append(node("span",k,"tag"));root.append(chips);
 root.append(node("h3","Candidate related literature"));
@@ -46,7 +46,7 @@ catch(err){$("ai-result").textContent="Generation failed: "+String(err.message||
 }
 $("search").addEventListener("input",()=>{const q=$("search").value.toLowerCase().trim();selectOptions(papers.filter(p=>[p.title,p.id,(p.authors||[]).join(" "),p.abstract].join(" ").toLowerCase().includes(q)).slice(0,120))});
 $("paper").addEventListener("change",()=>{evidence=null;$("download").disabled=true;$("report").classList.add("hidden");updateSelected()});
-$("analyze").addEventListener("click",makeEvidence);$("download").addEventListener("click",()=>{if(!evidence)return;const text="ResearchLens Preliminary Literature Evidence\n"+evidence.title+"\n"+evidence.id+"\nGenerated: "+evidence.reportGeneratedAt+"\nIndex snapshot: "+evidence.indexGeneratedAt+"\nSearch query: "+evidence.query+"\nLocal algorithm: abstract/title token cosine overlap (not novelty evidence)\n\nKeywords: "+evidence.keywords.join(", ")+"\n\nCandidate literature (not novelty findings):\n"+evidence.near.map(x=>(x.earlier?"Earlier date: ":"Not established earlier: ")+x.paper.title+" https://arxiv.org/abs/"+x.paper.id+" relevance="+x.score.toFixed(3)).join("\n")+"\n\nNOT a scientific novelty or correctness verdict.";const url=URL.createObjectURL(new Blob([text],{type:"text/plain"}));const a=document.createElement("a");a.href=url;a.download="researchlens-evidence-"+evidence.id+".txt";a.click();URL.revokeObjectURL(url)});
+$("analyze").addEventListener("click",makeEvidence);$("download").addEventListener("click",()=>{if(!evidence)return;const text="ResearchLens Preliminary Literature Evidence\n"+evidence.title+"\n"+evidence.id+"\nGenerated: "+evidence.reportGeneratedAt+"\nIndex snapshot: "+evidence.indexGeneratedAt+"\nSearch query: "+evidence.query+"\nLocal algorithm: abstract/title token cosine overlap (not novelty evidence)\n\nKeywords: "+evidence.keywords.join(", ")+"\n\nCandidate literature (not novelty findings):\n"+evidence.near.map(x=>(x.earlier?"Earlier date: ":"Not established earlier: ")+x.paper.title+" https://arxiv.org/abs/"+x.paper.id+" relevance="+x.score.toFixed(3)).join("\n")+"\n\nExternal OpenAlex results (if searched; not validated prior-art matches):\n"+(evidence.external||[]).map(x=>(x.year||"Year unknown")+" | "+x.title+" | "+x.id).join("\n")+"\n\nNOT a scientific novelty or correctness verdict.";const url=URL.createObjectURL(new Blob([text],{type:"text/plain"}));const a=document.createElement("a");a.href=url;a.download="researchlens-evidence-"+evidence.id+".txt";a.click();URL.revokeObjectURL(url)});
 $("draft-analyze").addEventListener("click",()=>{
  const title=$("draft-title").value.trim(), abstract=$("draft-abstract").value.trim();
  if(title.length<8||abstract.length<80){alert("Please provide a meaningful title and an abstract of at least 80 characters.");return}
@@ -56,5 +56,35 @@ $("draft-analyze").addEventListener("click",()=>{
  $("selected").textContent="Private draft · text remains in browser memory and is not sent to ResearchLens servers.";
  document.getElementById("report").scrollIntoView({behavior:"smooth",block:"start"});
 });
+
+async function searchOpenAlex(){
+ if(!current||!evidence)return;
+ const button=$("openalex-search"),root=$("openalex-results");
+ button.disabled=true;root.replaceChildren();$("openalex-status").textContent="Searching external OpenAlex corpus…";
+ const term=(current.title||"").slice(0,220);
+ const qs=new URLSearchParams({search:term,per_page:"12",select:"id,display_name,title,publication_year,cited_by_count,doi"});
+ try{
+  const response=await fetch("https://api.openalex.org/works?"+qs.toString(),{headers:{Accept:"application/json"}});
+  if(!response.ok)throw Error("OpenAlex HTTP "+response.status);
+  const data=await response.json();const found=(data.results||[]).filter(x=>x.id&&x.display_name);
+  evidence.external=found.map(x=>({id:x.id,title:x.display_name,year:x.publication_year,citations:x.cited_by_count}));
+  const targetYear=Number((current.published||"").slice(0,4));
+  root.append(node("p",String(data.meta?.count||0)+" title/phrase search hits in OpenAlex; displaying "+found.length+". A publication year is not proof of priority.","muted"));
+  for(const w of found){
+    const d=node("div","","evidence"),h=node("h4","");
+    const a=node("a",w.display_name);a.href=w.id;a.target="_blank";a.rel="noopener noreferrer";h.append(a);d.append(h);
+    const date=(Number(w.publication_year)&&targetYear)?w.publication_year<targetYear?"Earlier year":w.publication_year>targetYear?"Later year":"Same year, ordering unresolved":"Date ordering uncertain";
+    d.append(node("p",date+" · "+(w.publication_year||"year unknown")+" · "+(w.cited_by_count??0)+" OpenAlex citations · External metadata, not independently validated","muted"));
+    if(w.doi&&/^https:\/\//.test(w.doi)){const doi=node("a","DOI ↗");doi.href=w.doi;doi.target="_blank";doi.rel="noopener noreferrer";d.append(doi)}
+    root.append(d);
+  }
+  $("openalex-status").textContent="Live external results loaded. Compare full papers and claims manually.";
+ }catch(err){
+  $("openalex-status").textContent="OpenAlex is unavailable or rate-limited: "+String(err.message||err).slice(0,140);
+  const a=node("a","Search this title on OpenAlex directly ↗");
+  a.href="https://openalex.org/works?search="+encodeURIComponent(term);a.target="_blank";a.rel="noopener noreferrer";root.append(a);
+ }finally{button.disabled=false}
+}
+$("openalex-search").addEventListener("click",searchOpenAlex);
 $("load").addEventListener("click",loadModel);$("ask").addEventListener("click",ask);
 fetch("data/feed.json",{cache:"no-cache"}).then(r=>{if(!r.ok)throw Error("Feed not available");return r.json()}).then(d=>{papers=(d.papers||[]).filter(p=>p&&p.id&&p.title);indexGeneratedAt=d.generated_at||"unknown";$("count").textContent=papers.length+" indexed papers";const urlID=new URLSearchParams(location.search).get("id");const match=urlID?papers.find(p=>p.id===urlID):null;if(match)current=match;selectOptions(papers.slice(0,120));if(match){const opt=document.createElement("option");opt.value=match.id;opt.textContent=match.title+" · "+match.id;$("paper").prepend(opt);$("paper").value=match.id;updateSelected()}}).catch(e=>{$("count").textContent="Feed unavailable";$("selected").textContent=String(e.message||e)});
