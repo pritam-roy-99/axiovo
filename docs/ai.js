@@ -47,5 +47,14 @@ catch(err){$("ai-result").textContent="Generation failed: "+String(err.message||
 $("search").addEventListener("input",()=>{const q=$("search").value.toLowerCase().trim();selectOptions(papers.filter(p=>[p.title,p.id,(p.authors||[]).join(" "),p.abstract].join(" ").toLowerCase().includes(q)).slice(0,120))});
 $("paper").addEventListener("change",()=>{evidence=null;$("download").disabled=true;$("report").classList.add("hidden");updateSelected()});
 $("analyze").addEventListener("click",makeEvidence);$("download").addEventListener("click",()=>{if(!evidence)return;const text="ResearchLens Preliminary Literature Evidence\n"+evidence.title+"\n"+evidence.id+"\n\nKeywords: "+evidence.keywords.join(", ")+"\n\nCandidate literature (not novelty findings):\n"+evidence.near.map(x=>(x.earlier?"Earlier date: ":"Not established earlier: ")+x.paper.title+" https://arxiv.org/abs/"+x.paper.id+" relevance="+x.score.toFixed(3)).join("\n")+"\n\nNOT a scientific novelty or correctness verdict.";const url=URL.createObjectURL(new Blob([text],{type:"text/plain"}));const a=document.createElement("a");a.href=url;a.download="researchlens-evidence-"+evidence.id+".txt";a.click();URL.revokeObjectURL(url)});
+$("draft-analyze").addEventListener("click",()=>{
+ const title=$("draft-title").value.trim(), abstract=$("draft-abstract").value.trim();
+ if(title.length<8||abstract.length<80){alert("Please provide a meaningful title and an abstract of at least 80 characters.");return}
+ const draft={id:"private-draft",title,abstract,authors:["Local private draft"],categories:[],primary_category:"private",published:"",updated:"",topics:[]};
+ papers=papers.filter(p=>p.id!=="private-draft");papers.unshift(draft);current=draft;
+ $("search").value="";selectOptions(papers.slice(0,120));$("paper").value=draft.id;updateSelected();makeEvidence();
+ $("selected").textContent="Private draft · text remains in browser memory and is not sent to ResearchLens servers.";
+ document.getElementById("report").scrollIntoView({behavior:"smooth",block:"start"});
+});
 $("load").addEventListener("click",loadModel);$("ask").addEventListener("click",ask);
 fetch("data/feed.json",{cache:"no-cache"}).then(r=>{if(!r.ok)throw Error("Feed not available");return r.json()}).then(d=>{papers=(d.papers||[]).filter(p=>p&&p.id&&p.title);$("count").textContent=papers.length+" indexed papers";const urlID=new URLSearchParams(location.search).get("id");const match=urlID?papers.find(p=>p.id===urlID):null;if(match)current=match;selectOptions(papers.slice(0,120));if(match){const opt=document.createElement("option");opt.value=match.id;opt.textContent=match.title+" · "+match.id;$("paper").prepend(opt);$("paper").value=match.id;updateSelected()}}).catch(e=>{$("count").textContent="Feed unavailable";$("selected").textContent=String(e.message||e)});
