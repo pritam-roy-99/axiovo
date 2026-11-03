@@ -32,16 +32,35 @@ let saved=[];try{saved=JSON.parse(localStorage.getItem("researchlens-reading-lis
 const b=$("save");function saveLabel(){b.textContent=saved.includes(id)?"★ Saved":"☆ Save to reading list"}saveLabel();b.onclick=()=>{saved=saved.includes(id)?saved.filter(x=>x!==id):[...saved,id];localStorage.setItem("researchlens-reading-list",JSON.stringify(saved));saveLabel()};
 $("share").onclick=()=>navigator.clipboard?.writeText(location.href);
 }
+async function renderGithubComments(number){
+ const root=$("github-comments");if(!root)return;root.replaceChildren();
+ try{
+  const url="https://api.github.com/repos/"+repoName+"/issues/"+number+"/comments?per_page=50";
+  const response=await fetch(url,{headers:{Accept:"application/vnd.github+json"}});
+  if(!response.ok)throw Error("GitHub API "+response.status);
+  const comments=await response.json();
+  const heading=document.createElement("h3");heading.textContent="Recent public comments ("+comments.length+" shown)";root.append(heading);
+  if(!comments.length){line(root,"Discussion","No comments yet. Open the GitHub thread to contribute.");return}
+  for(const comment of comments){
+   const item=document.createElement("div");item.className="related";
+   const author=document.createElement("a");author.href=comment.user?.html_url||"https://github.com";author.target="_blank";author.rel="noopener noreferrer";author.textContent="@"+(comment.user?.login||"GitHub user");item.append(author);
+   const when=document.createElement("span");when.className="muted";when.textContent=" · "+(comment.created_at||"").slice(0,10);item.append(when);
+   const body=document.createElement("p");body.className="abstract";body.style.fontSize="13px";body.textContent=(comment.body||"").slice(0,1800);item.append(body);
+   external(item,"View or reply on GitHub ↗",comment.html_url,"");
+   root.append(item);
+  }
+ }catch(err){line(root,"Comments","Could not retrieve GitHub comments; open the thread to read or contribute.")}
+}
 async function findDiscussion(){
 $("new-thread").href=issueCreate;$("browse-threads").href=issueSearch;
 $("report-error").href="https://github.com/"+repoName+"/issues/new?"+new URLSearchParams({title:"Metadata issue for "+issueTerm,body:"https://arxiv.org/abs/"+id+"\n\nDescribe the correction needed:"});
-if(curatedIssue[id]){$("discussion-status").textContent="Dedicated paper discussion is available. Add a comment or 👍 reaction on GitHub.";const a=$("existing-thread");a.href="https://github.com/"+repoName+"/issues/"+curatedIssue[id];a.hidden=false;$("new-thread").hidden=true;try{const r=await fetch("https://api.github.com/repos/"+repoName+"/issues/"+curatedIssue[id]);if(r.ok){const d=await r.json();$("discussion-status").textContent="Dedicated discussion: "+(d.comments||0)+" public comments · "+(d.reactions?.["+1"]||0)+" 👍 reactions (GitHub)."}}catch(err){}return}
+if(curatedIssue[id]){$("discussion-status").textContent="Dedicated paper discussion is available. Add a comment or 👍 reaction on GitHub.";const a=$("existing-thread");a.href="https://github.com/"+repoName+"/issues/"+curatedIssue[id];a.hidden=false;$("new-thread").hidden=true;renderGithubComments(curatedIssue[id]);try{const r=await fetch("https://api.github.com/repos/"+repoName+"/issues/"+curatedIssue[id]);if(r.ok){const d=await r.json();$("discussion-status").textContent="Dedicated discussion: "+(d.comments||0)+" public comments · "+(d.reactions?.["+1"]||0)+" 👍 reactions (GitHub)."}}catch(err){}return}
 try{
  const url="https://api.github.com/search/issues?"+new URLSearchParams({q:"repo:"+repoName+" is:issue in:title "+issueTerm,per_page:"20"});
  const response=await fetch(url,{headers:{Accept:"application/vnd.github+json"}});
  if(!response.ok)throw Error("GitHub API "+response.status);
  const data=await response.json();const found=(data.items||[]).find(x=>x.title?.includes(issueTerm)&&x.title?.includes("Paper discussion:"));
- if(found){$("discussion-status").textContent="Public discussion is available. Comment or add a 👍 reaction on GitHub.";const a=$("existing-thread");a.href=found.html_url;a.hidden=false;$("new-thread").hidden=true}
+ if(found){$("discussion-status").textContent="Public discussion is available. Comment or add a 👍 reaction on GitHub.";const a=$("existing-thread");a.href=found.html_url;a.hidden=false;$("new-thread").hidden=true;renderGithubComments(found.number)}
  else $("discussion-status").textContent="No dedicated discussion issue exists yet. Be the first to start one.";
 }catch(err){$("discussion-status").textContent="GitHub discussion lookup unavailable. Use Browse discussions to find an existing thread before opening a new one."}
 }
