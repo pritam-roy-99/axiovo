@@ -41,7 +41,7 @@
    fieldDetails.open=false;render();emit("field")
   }
   function chooseTopic(topic){
-   if(current.topic===topic&&current.subtopic==="")return;
+   if(current.topic===topic&&current.subtopic===""){emit("topic");return}
    current={...current,topic,subtopic:""};render();emit("topic")
   }
   function chooseSubtopic(subtopic){
