@@ -4,7 +4,10 @@ on:
     branches: [main]
   workflow_dispatch:
   schedule:
-    # Hourly checks; extra post-announcement polls improve freshness.\n    # GitHub scheduled workflows run on a best-effort basis and may be delayed.\n    - cron: '17 * * * *'\n    - cron: '47 0,1,2,3,4,5 * * 1-5'
+    # Hourly checks; extra post-announcement polls improve freshness.
+    # GitHub scheduled workflows run on a best-effort basis and may be delayed.
+    - cron: '17 * * * *'
+    - cron: '47 0,1,2,3,4,5 * * 1-5'
 permissions:
   contents: write
   pages: write
