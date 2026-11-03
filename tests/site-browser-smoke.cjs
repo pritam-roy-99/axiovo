@@ -66,6 +66,23 @@ const base="http://127.0.0.1:8765";
   await page.goto(base+"/ai.html?id=2608.13942v2",{waitUntil:"domcontentloaded"});
   await page.waitForURL(url=>url.pathname==="/copilot.html"&&url.searchParams.get("id")==="2608.13942v2");
 
+  // Check the core desktop layout separately from the mobile touch session.
+  const desktop=await browser.newContext({viewport:{width:1366,height:820}});
+  await desktop.route("https://api.openalex.org/**",route=>route.fulfill({
+   status:200,contentType:"application/json",body:JSON.stringify({meta:{count:0},results:[]})
+  }));
+  await desktop.route("https://cdn.jsdelivr.net/**",route=>route.fulfill({status:200,contentType:"application/javascript",body:""}));
+  const screen=await desktop.newPage();
+  screen.on("pageerror",err=>errors.push(screen.url()+": "+err.message));
+  for(const url of ["/","/workspace.html","/copilot.html","/lab.html"]){
+   await screen.goto(base+url,{waitUntil:"domcontentloaded"});
+   await screen.locator("main").first().waitFor();
+   const metrics=await screen.evaluate(()=>({viewport:document.documentElement.clientWidth,
+    document:document.documentElement.scrollWidth}));
+   assert(metrics.document<=metrics.viewport+3,url+" horizontal page overflow: "+JSON.stringify(metrics));
+  }
+  await desktop.close();
+
   assert.deepEqual(errors,[],"Unexpected JavaScript exceptions");
   console.log("Browser smoke passed: responsive focus, source search, saved arXiv vN, 7 routes and redirects.");
  }finally{
