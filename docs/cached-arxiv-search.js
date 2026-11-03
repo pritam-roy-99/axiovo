@@ -12,10 +12,10 @@
  const words=str=>[...new Set((String(str||"").toLowerCase().match(TOKEN)||[]).filter(w=>w.length>2&&!STOP.has(w)))];
  const PHYSICS=/\b(quantum|qubit|qudit|bell|chsh|entangl|nonlocal|steer|povm|measurement|contextual|hilbert|photon|quantiz|cryptograph|qkd)\w*/i;
  const TOPICS={
-  "bell nonlocality":/\b(chsh|bell.{0,25}(inequalit|nonlocal|test|correlat|theorem)|nonlocalit|nonlocal correlations?)\b/i,
+  "bell nonlocality":/\b(chsh|bell|nonlocal|inequalit)\w*/i,
   "quantum steering":/\b(steering|assemblages?|epr steering|one.sided device.independent)\b/i,
   "quantum key distribution":/\b(qkd|quantum key distribution|secret key rate|quantum cryptograph)\b/i,
-  "quantum computing":/\b(quantum comput|quantum circuits?|quantum algorithm|qubits?)\b/i,
+  "quantum computing":/\b(quantum comput\w*|quantum circuits?|quantum algorithm\w*|qubits?)\b/i,
   "contextuality":/\b(contextuality|noncontextuality|kochen.specker)\b/i
  };
  function categoryFit(p,field){
