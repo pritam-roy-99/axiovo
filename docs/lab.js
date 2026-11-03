@@ -126,8 +126,45 @@ function compare(e){
  const x=documents.find(p=>p.id===a),y=documents.find(p=>p.id===b);
  if(!x||!y){status("lab-compare-status","One or both papers are absent from the bounded local index. Try archive search or use source links to inspect the full papers.");return}
  comparePaper(x,"Paper A");comparePaper(y,"Paper B");
- status("lab-compare-status","Side-by-side original metadata comparison. Mathematical assumptions and conclusions must be checked in the PDFs.")
+ loadComparisonNotes();\n status("lab-compare-status","Side-by-side original metadata comparison. Mathematical assumptions and conclusions must be checked in the PDFs.")
 }
+const COMPARES="researchlens-comparisons-v1";
+function comparisonKey(){
+ const a=id($("lab-paper-a").value),b=id($("lab-paper-b").value);
+ return a&&b&&a!==b?[a,b].sort().join("::"):"";
+}
+function saveComparison(){
+ const key=comparisonKey();
+ if(!key){status("lab-compare-note-status","Enter two distinct arXiv identifiers first.");return}
+ const values=read(COMPARES,{});
+ values[key]={ids:[id($("lab-paper-a").value),id($("lab-paper-b").value)],
+  notes:[$("lab-compare-a-note").value.slice(0,5000),$("lab-compare-b-note").value.slice(0,5000)],
+  updated_at:new Date().toISOString()};
+ status("lab-compare-note-status",write(COMPARES,values)?"Researcher notes saved locally.":"Unable to save comparison notes.");
+}
+function loadComparisonNotes(){
+ const key=comparisonKey(),value=read(COMPARES,{})[key];
+ $("lab-compare-a-note").value=value?.notes?.[0]||"";
+ $("lab-compare-b-note").value=value?.notes?.[1]||"";
+}
+function exportComparison(){
+ const a=id($("lab-paper-a").value),b=id($("lab-paper-b").value);
+ if(!a||!b||a===b){status("lab-compare-note-status","Enter two distinct arXiv identifiers first.");return}
+ const lines=[
+ "# Source-checked literature comparison",
+ "", "Prepared on: "+new Date().toISOString(),
+ "", "## Paper A", "https://arxiv.org/abs/"+a, "",
+ $("lab-compare-a-note").value||"No researcher evidence notes entered.",
+ "", "## Paper B", "https://arxiv.org/abs/"+b, "",
+ $("lab-compare-b-note").value||"No researcher evidence notes entered.",
+ "", "These entries are user-authored. ResearchLens has not verified mathematical correctness."
+ ];
+ const blob=new Blob([lines.join("\n")],{type:"text/markdown;charset=utf-8"});
+ const url=URL.createObjectURL(blob),anchor=document.createElement("a");
+ anchor.href=url;anchor.download="researchlens-paper-comparison.md";
+ document.body.append(anchor);anchor.click();anchor.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+
 function openAlexId(value){
  const s=String(value||"").trim();
  const w=s.match(/(?:https:\/\/openalex.org\/)?(W\d+)$/i);if(w)return{kind:"id",value:w[1]};
@@ -207,7 +244,7 @@ function markSeen(){
 }
 function init(){
  $("lab-search-form").onsubmit=searchLiterature;
- $("lab-compare-form").onsubmit=compare;
+ $("lab-compare-form").onsubmit=compare;\n $("lab-compare-save").onclick=saveComparison;$("lab-compare-export").onclick=exportComparison;
  $("lab-citation-form").onsubmit=citation;
  $("lab-local-pdf").onchange=e=>loadPdf(e.target.files?.[0]);
  $("lab-prev-page").onclick=async()=>{if(pdf&&pdfPage>1){pdfPage--;await drawPage()}};
