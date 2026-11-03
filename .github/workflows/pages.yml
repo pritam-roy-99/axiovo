@@ -17,6 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -24,17 +25,24 @@ jobs:
           python-version: '3.12'
       - name: Test metadata processing
         run: python -m unittest discover -s tests -v
-      - name: Refresh papers from arXiv (scheduled/manual runs)
-        if: github.event_name != 'push'
-        run: python scripts/sync.py || echo "arXiv unavailable; retaining existing feed"
-      - name: Commit refreshed metadata
-        if: github.event_name != 'push'
+      - name: Refresh research metadata
+        id: refresh
+        continue-on-error: true
+        run: python scripts/sync.py
+      - name: Report synchronization outcome
+        if: steps.refresh.outcome == 'failure'
+        run: |
+          echo '### arXiv synchronization failed' >> "$GITHUB_STEP_SUMMARY"
+          echo 'The previous feed is preserved. Check the refresh step logs and retry.' >> "$GITHUB_STEP_SUMMARY"
+          echo '::warning::Could not refresh arXiv data. Existing records are preserved.'
+      - name: Commit refreshed feed
+        if: steps.refresh.outcome == 'success'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add docs/data/feed.json
           if ! git diff --cached --quiet; then
-            git commit -m "data: refresh arXiv feed"
+            git commit -m "data: refresh arXiv index [skip ci]"
             git push origin HEAD:main
           fi
       - uses: actions/configure-pages@v5
