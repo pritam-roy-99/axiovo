@@ -24,7 +24,7 @@ Open **[Explore by field](https://pritam-roy-99.github.io/researchlens/fields.ht
 - Page through the indexed feed and find related papers in a subject-focused shortlist.
 - Browser-local reading-list bookmarks with BibTeX export.
 - Candidate related papers based on lexical overlap of indexed titles and abstracts.
-- Scheduled synchronization of arXiv Atom API metadata, with version-aware deduplication, up to 3,000 retained records and incremental updates.
+- Scheduled synchronization of arXiv Atom API metadata using both newest submissions and latest revisions, with version-aware deduplication, up to 3,500 retained records and incremental updates.
 - Direct links to title-based Semantic Scholar search from each paper.
 - Optional OpenAlex citation metadata enrichment for exact normalized title and plausible year matches (requires an API key).
 - GitHub Actions tests and GitHub Pages deployment; no paid server required.
@@ -101,13 +101,13 @@ The local Ollama API (`api/server.py`) is a separate experimental developer mode
 3. Open **Actions → Refresh arXiv and deploy ResearchLens → Run workflow** to fetch real papers and deploy.
 4. Once deployment succeeds, visit https://pritam-roy-99.github.io/researchlens/.
 
-The scheduled refresh runs at 00:37, 06:37, 12:37, and 18:37 UTC, on a best-effort basis. Upstream arXiv releases and GitHub scheduling can delay updates. If the API is unavailable, the previous snapshot is retained.
+The scheduled refresh checks hourly at minute 17 UTC, with supplementary post-announcement checks at minute 47 during 00:00–05:59 UTC Monday–Friday, on a best-effort basis. Upstream arXiv releases and GitHub scheduling can delay updates. If the API is unavailable, the previous snapshot is retained.
 
 ## Develop locally
 
 Requires Python 3.11 or newer.
 
-Run `python -m unittest discover -s tests -v` to test. Run `python scripts/sync.py` to refresh (internet required). The default ingest searches `quant-ph, cs.IT, hep-th, physics.optics, cond-mat.mes-hall` with rate-limited requests.
+Run `python -m unittest discover -s tests -v` to test. Run `python scripts/sync.py` to refresh (internet required). The importer separately queries newly submitted papers and recently revised papers, so revision traffic cannot displace new submissions from the fetched window. The default ingest searches `quant-ph, cs.IT, hep-th, physics.optics, cond-mat.mes-hall` with rate-limited requests.
 
 Optional OpenAlex metadata: register for an API key according to OpenAlex's current developer terms and add it as a GitHub Actions repository secret named `OPENALEX_API_KEY`. The workflow will then gradually enrich matching paper records, without making unsupported novelty claims. You can also run `python -m scripts.enrich` locally with that environment variable set.
 
