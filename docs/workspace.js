@@ -64,6 +64,7 @@ function init(){
  renderLibrary();
  fetch("./data/feed.json",{cache:"no-store"}).then(r=>{if(!r.ok)throw Error("HTTP "+r.status);return r.json()}).then(data=>{storedFeed=Array.isArray(data.papers)?data.papers:[];$("feed-status").textContent=storedFeed.length+" indexed arXiv records · feed refreshed "+(data.generated_at?new Date(data.generated_at).toLocaleString():"date unavailable");showRecent();renderLibrary()}).catch(()=>{$("feed-status").textContent="Recent feed is temporarily unavailable. Saved papers are still accessible.";text($("recent-list"),"div","Please try the arXiv feed from the navigation.","rl-empty")});
  window.addEventListener("storage",()=>{fillFocus();renderLibrary()});
+ window.addEventListener("researchlens-library-change",renderLibrary);
 }
 init();
 })();
