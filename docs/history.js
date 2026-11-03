@@ -65,7 +65,7 @@ function paperCard(w){
  const version=document.createElement("input");version.type="number";version.min="1";version.step="1";version.max="9999";version.placeholder="Latest";
  version.setAttribute("aria-label","arXiv version number for "+(w.display_name||w.title));
  const versions=Arxiv.candidates(w);
- const known=versions.find(v=>v.version);if(known)version.value=String(known.version);
+ // The most recent version is unversioned; an indexed vN may be stale.
  const jump=el("a","Open selected version ↗");jump.href=Arxiv.abs(linked.base);
  jump.target="_blank";jump.rel="noopener noreferrer";
  version.addEventListener("input",()=>{
@@ -120,7 +120,7 @@ async function search(n=1,fromUrl=false){
  if(p.to)filters.push("to_publication_date:"+p.to);
  const qs=new URLSearchParams({filter:filters.join(","),page:String(page),per_page:String(PAGE_SIZE),select:"id,display_name,title,publication_date,authorships,doi,locations,primary_location,best_oa_location"});
  if(p.q){
-  const id=p.q.replace(/^arxiv:\s*/i,"").replace(/v\d+$/,"");
+  const id=(Arxiv?.parse(p.q)?.base)||p.q.replace(/^arxiv:\s*/i,"");
   if(Arxiv?.parse(id)){
    // Search title/abstract by ID may not match. A URL-aware fallback is shown
    // if OpenAlex cannot locate the requested preprint.
