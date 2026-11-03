@@ -15,13 +15,13 @@ class Elements(HTMLParser):
             self.ids.setdefault(values["id"],[]).append((tag,values))
 
 class DiscoveryUXTests(unittest.TestCase):
-    def test_discover_before_workspace(self):
+    def test_workspace_before_discover(self):
         nav=(ROOT/"navigation.js").read_text(encoding="utf8")
-        self.assertLess(nav.index('["./#discover","Discover"]'),nav.index('["./workspace.html","Workspace"]'))
+        self.assertLess(nav.index('["./workspace.html","Workspace"]'),nav.index('["./#discover","Discover"]'))
 
     def test_one_ai_entry_on_paper_cards(self):
         html=(ROOT/"index.html").read_text(encoding="utf8")
-        self.assertIn('ai.textContent="✦ Analyze / Ask AI"',html)
+        self.assertIn('ai.textContent="✦ Research Assistant"',html)
         self.assertNotIn('ai.href="./ai.html?id="',html)
         self.assertNotIn('cop.textContent="✦ Ask Copilot"',html)
         self.assertIn("rl-save-button",html)
