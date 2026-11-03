@@ -22,6 +22,18 @@
 
 An optional localhost-only Qwen/Ollama HTTP service is included in `api/server.py`, but the public static website does not call it. The original ZIP contains a more extensive FastAPI/SQLite development implementation that has not been fully imported.
 
+## ResearchLens Research Copilot
+
+**[Launch Copilot](https://pritam-roy-99.github.io/researchlens/copilot.html)** or open it from any research paper. The copilot has five task modes: literature discovery, contribution comparison, explaining results, reviewer checks, and research directions.
+
+The **evidence-only** mode works on the static site immediately and retrieves clickable paper references from the local arXiv snapshot. Use **Search wider literature** to query external OpenAlex. The optional **local Ollama** mode connects to an open-weight Qwen3.5 9B or 27B model running on the visitor's own computer. A much smaller Qwen2.5 WebGPU option is also provided for experimentation. GitHub Pages hosts no GPUs and provides **no shared inference server**.
+
+Conversation history is held in tab memory and may be exported with source links. Research drafts are not posted to a ResearchLens backend. If the user selects Ollama, prompts and retrieved evidence are sent to the configured localhost Ollama process. WebGPU mode requires downloading model assets from third-party model hosts.
+
+Scientific explanations, model comparisons, and citations are generated from **limited, unverified evidence**. Do not interpret them as formal theorem equivalence or novelty checks.
+
+[Model and browser setup instructions](COPILOT_SETUP.md)
+
 ## New SciRate-style discovery and community workflow
 
 - **Date browsing:** The research feed filters by a date range of first arXiv submission, for records present in its local snapshot. Global OpenAlex search also supports inclusive publication-date ranges.
