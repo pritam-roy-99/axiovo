@@ -22,9 +22,10 @@ const base="http://127.0.0.1:8765";
  try{
   await page.goto(base+"/",{waitUntil:"domcontentloaded"});
   await page.locator("#rl-focus-bar").waitFor();
-  assert(await page.locator("#rl-focus-fields").isVisible());
+  assert(await page.locator("#rl-focus-field-title").isVisible());
   assert(!(await page.locator("#arxiv-legacy-focus").isVisible()));
   await page.locator("#rl-focus-field-details > summary").click();
+  assert(await page.locator("#rl-focus-fields").isVisible());
   await page.locator("#rl-focus-fields button").filter({hasText:"Medicine & public health"}).click();
   assert((await page.locator("#rl-focus-trail").innerText()).includes("Medicine"));
   const trial=page.locator("#rl-focus-areas button").filter({hasText:"Clinical trials"});
