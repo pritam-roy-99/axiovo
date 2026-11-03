@@ -85,7 +85,7 @@ def fetch_recent():
     # v1 papers out of the limited query window when older papers are revised.
     streams = ("submittedDate", "lastUpdatedDate")
     valid_categories = [c.strip() for c in categories
-                        if re.fullmatch(r"[A-Za-z0-9.\\-]+", c.strip())]
+                        if re.fullmatch(r"[A-Za-z0-9.-]+", c.strip())]
     calls = [(category, stream) for category in valid_categories
              for stream in streams]
     for i, (category, stream) in enumerate(calls):
