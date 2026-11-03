@@ -77,6 +77,12 @@
  function plan(base,state,opts={}){
   const p=new URLSearchParams(base.params);
   p.delete("search");p.delete("sort");p.delete("search.title_abstract_keywords");
+  // Primary-field filtering on the semantic endpoint would hide valid
+  // interdisciplinary papers whose secondary topic belongs to the chosen field.
+  // Retrieve semantically similar candidates, then enforce ALL eligible fields
+  // using primary + secondary classification in screen().
+  const filters=(p.get("filter")||"").split(",").filter(x=>!x.startsWith("primary_topic.field.id:"));
+  if(filters.length)p.set("filter",filters.join(","));else p.delete("filter");
   p.set("search.semantic",semanticDescription(state,base.query));
   p.set("per_page","50");p.set("page","1");
   return {params:p,description:semanticDescription(state,base.query),profile:profile(state,base.query)};
