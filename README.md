@@ -15,7 +15,7 @@
 
 **No public AI novelty verdicts are generated.** The similarity feature only surfaces possible literature connections from a limited local index. It cannot establish mathematical equivalence, novelty, technical correctness, or misconduct. The repository is not a manuscript-submission service yet. The public GitHub Pages website does not run Python or Ollama.
 
-The separate downloadable full MVP package from the original ChatGPT project includes an optional local Python backend and Ollama integration. Those additional components are **not yet imported to this GitHub repository**.
+An optional localhost-only Qwen/Ollama HTTP service is included in `api/server.py`, but the public static website does not call it. The original ZIP contains a more extensive FastAPI/SQLite development implementation that has not been fully imported.
 
 ## Publish on GitHub Pages
 
@@ -32,6 +32,8 @@ Requires Python 3.11 or newer.
 
 Run `python -m unittest discover -s tests -v` to test. Run `python scripts/sync.py` to refresh (internet required).
 
+For optional local open-weight AI, install [Ollama](https://ollama.com), run `ollama pull qwen3.5:4b`, then launch `python -m api.server`. The local API provides `POST http://127.0.0.1:8765/analyze` with JSON `{"paper_id":"<arxiv ID>"}`. It requires a populated `docs/data/feed.json` and provides questions, **not scientific verdicts**.
+
 Serve the site with:
 
 ```bash
@@ -46,6 +48,7 @@ Then open http://localhost:8000.
 - `docs/data/feed.json`: Versioned metadata snapshot.
 - `scripts/sync.py`: arXiv importer and deduplication.
 - `tests/test_sync.py`: Parser and versioning tests.
+- `api/server.py`: Optional localhost-only Ollama analysis API.
 - `.github/workflows/pages.yml`: Scheduled refresh and Pages deployment.
 
 ## Roadmap
