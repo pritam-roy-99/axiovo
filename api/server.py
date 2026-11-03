@@ -19,7 +19,7 @@ FEED = ROOT / "docs" / "data" / "feed.json"
 def words(text):
     return set(re.findall(r"[a-z]{4,}", (text or "").lower()))
 
-def related(target, papers, top=5):
+def related(target, papers, top=6):
     a = words(target.get("title","") + " " + target.get("abstract",""))
     matches=[]
     for paper in papers:
@@ -30,7 +30,7 @@ def related(target, papers, top=5):
             if score>0: matches.append((score,paper))
     matches.sort(key=lambda x:x[0],reverse=True)
     return [{"id":p["id"],"title":p["title"],"score":round(s,4),
-             "url":"https://arxiv.org/abs/"+p["id"]} for s,p in matches[:top]]
+             "url":"https://arxiv.org/abs/"+p["id"],"abstract":p.get("abstract","")[:950]} for s,p in matches[:top]]
 
 def load_papers():
     return json.loads(FEED.read_text(encoding="utf-8")).get("papers",[])
@@ -43,15 +43,24 @@ def analyze(paper_id):
     matches=related(target,papers)
     result={"paper_id":paper_id,"status":"preliminary",
         "disclaimer":"No novelty or correctness verdict. This is abstract-level research guidance only.",
-        "related":matches,"model_used":None,"questions":[]}
+        "related":[{k:v for k,v in m.items() if k!="abstract"} for m in matches],
+        "model_used":None,"questions":[],"claims":[],"comparison_notes":[]}
     prompt=(
-        "You are a cautious scientific literature assistant. Given a paper abstract and a list "
-        "of candidate related paper titles, return JSON with a key 'questions' containing "
-        "at most 5 concrete scientific verification questions. Never claim novelty or invalidity. "
-        "The related titles alone cannot establish a mathematical result.\n"
-        "Paper title: "+target.get("title","")+"\nAbstract: "+target.get("abstract","")[:5500]+
-        "\nCandidate related papers: "+json.dumps(matches,ensure_ascii=False)+"\n"
+        "You are an academically cautious scientific research assistant. The provided corpus "
+        "is an incomplete set of abstracts, not the complete prior literature. "
+        "Identify what the manuscript CLAIMS is new, list explicit technical assumptions, "
+        "and give comparison questions grounded in the candidate paper abstracts. "
+        "Do not conclude that any claim is proven novel, non-novel, correct, or incorrect. "
+        "Do not fabricate citations or theorem statements. Quote candidate arXiv IDs exactly "
+        "as listed. If evidence is insufficient, say so. "
+        "Return only JSON with arrays: 'claims' (short manuscript claims), "
+        "'questions' (questions for a researcher to check), and 'comparison_notes' "
+        "(objects with 'paper_id', 'question', 'uncertainty'). At most 5 elements per array.\n"
+        "Target title: "+target.get("title","")+"\nTarget abstract: "+target.get("abstract","")[:5500]+
+        "\nPotential prior literature (title and abstract; similarity is not novelty): "+
+        json.dumps(matches,ensure_ascii=False)+"\n"
     )
+
     model=os.getenv("OLLAMA_MODEL","qwen3.5:4b")
     base=os.getenv("OLLAMA_URL","http://127.0.0.1:11434").rstrip("/")
     if base not in ("http://127.0.0.1:11434","http://localhost:11434"):
@@ -65,8 +74,16 @@ def analyze(paper_id):
         with urllib.request.urlopen(req,timeout=90) as resp:
             output=json.load(resp)
         parsed=json.loads(output.get("response","{}"))
-        if isinstance(parsed,dict) and isinstance(parsed.get("questions"),list):
-            result["questions"]=[str(q)[:450] for q in parsed["questions"] if isinstance(q,str)][:5]
+        if isinstance(parsed,dict):
+            result["questions"]=[q[:450] for q in parsed.get("questions",[]) if isinstance(q,str)][:5] if isinstance(parsed.get("questions"),list) else []
+            result["claims"]=[c[:450] for c in parsed.get("claims",[]) if isinstance(c,str)][:5] if isinstance(parsed.get("claims"),list) else []
+            valid_ids={p["id"] for p in matches}
+            notes=parsed.get("comparison_notes",[])
+            if isinstance(notes,list):
+                result["comparison_notes"]=[{"paper_id":n["paper_id"],
+                    "question":str(n.get("question",""))[:450],
+                    "uncertainty":str(n.get("uncertainty","Not independently verified"))[:200]}
+                    for n in notes if isinstance(n,dict) and n.get("paper_id") in valid_ids][:5]
             result["model_used"]=model
     except (OSError,ValueError,KeyError,urllib.error.URLError):
         result["note"]="Ollama unavailable; lexical prior-paper suggestions remain available"
