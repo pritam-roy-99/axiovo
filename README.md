@@ -22,6 +22,19 @@
 
 An optional localhost-only Qwen/Ollama HTTP service is included in `api/server.py`, but the public static website does not call it. The original ZIP contains a more extensive FastAPI/SQLite development implementation that has not been fully imported.
 
+## New SciRate-style discovery and community workflow
+
+- **Date browsing:** The research feed filters by a date range of first arXiv submission, for records present in its local snapshot. Global OpenAlex search also supports inclusive publication-date ranges.
+- **Historical arXiv:** Use the official [full arXiv advanced search](https://arxiv.org/search/advanced) or [OpenAlex global search](https://pritam-roy-99.github.io/researchlens/search.html). ResearchLens does not locally mirror every paper in arXiv; historical links go to their authoritative records.
+- **Recommendations:** A transparent, device-local "Recommended for me" feed based on topics the researcher follows and papers they save. No server-side personalization data collection.
+- **Paper profiles:** Each record has a shareable \`paper.html?id=<arXiv ID>\` page, PDF / arXiv / SciRate / DOI link-outs (where available), related articles, and author search links.
+- **Real shared discussions and endorsements:** Paper discussion pages look up a GitHub Issue associated with the arXiv ID. Visitors with GitHub accounts can add comments and 👍 reactions to the issue, visible to other researchers. A first discussion thread is seeded for arXiv:2608.13942 at [GitHub issue #1](https://github.com/pritam-roy-99/researchlens/issues/1). This is GitHub-hosted, **not native in-site social functionality**.
+- **Researcher workspace:** A local profile editor stores name, affiliation, research interests, bio, and optional ORCID/GitHub links in the visitor's own browser. These are self-entered and not publicly verified; visitors can export/import their local profile. Public ResearchGate-like accounts, verified profiles, social follower graphs, and messaging **still need a secure authentication/database service**.
+- **Day/night mode:** Accessible light/dark theme toggle on site pages, stored locally and shared across visits.
+- **Quality controls:** GitHub Actions validates Python tests and browser JavaScript syntax before Pages deploy.
+
+No author-provided profile or manuscript is implicitly endorsed by ResearchLens. Community reactions are not measures of scientific correctness or novelty.
+
 ## Research workflow and first-load experience
 
 - A pre-rendered static 30-paper snapshot appears at first paint with verified index count and synchronization timestamp. JavaScript progressively upgrades it to a searchable, paginated feed.
