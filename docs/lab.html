@@ -43,7 +43,15 @@
 <label for="lab-paper-a">First arXiv ID</label><input id="lab-paper-a" maxlength="40" placeholder="2608.13942" required>
 <label for="lab-paper-b">Second arXiv ID</label><input id="lab-paper-b" maxlength="40" placeholder="2609.36080" required>
 <button class="rl-button primary" type="submit">Compare evidence</button></form>
-<p class="rl-subtext" id="lab-compare-status" role="status"></p><div class="lab-compare-grid" id="lab-compare-results"></div></section>
+<p class="rl-subtext" id="lab-compare-status" role="status"></p><div class="lab-compare-grid" id="lab-compare-results"></div>
+<details class="rl-preferences"><summary>Structured researcher comparison notes</summary>
+<p class="rl-subtext">Write only what you have verified in the source PDFs. Cite exact pages, equations or sections. Entries are not AI-derived.</p>
+<div class="lab-compare-grid">
+<div><label for="lab-compare-a-note">Paper A: assumptions, results and evidence</label><textarea id="lab-compare-a-note" rows="5" maxlength="5000" placeholder="Assumptions, main claim, exact page or equation"></textarea></div>
+<div><label for="lab-compare-b-note">Paper B: assumptions, results and evidence</label><textarea id="lab-compare-b-note" rows="5" maxlength="5000" placeholder="Assumptions, main claim, exact page or equation"></textarea></div>
+</div><div class="rl-paper-actions"><button id="lab-compare-save" type="button">Save comparison notes</button>
+<button id="lab-compare-export" type="button">Export Markdown comparison</button></div>
+<p class="rl-subtext" id="lab-compare-note-status" role="status"></p></details></section>
 <section class="rl-section lab-block" id="citations">
 <span class="rl-eyebrow">STAGE 5 / CONNECTIONS</span><h2>Explore a citation neighborhood</h2>
 <p class="rl-subtext">Enter a DOI or OpenAlex work ID. Relationships are retrieved directly from OpenAlex. This is a limited citation neighborhood, not a complete citation network.</p>
