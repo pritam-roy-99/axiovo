@@ -66,6 +66,57 @@ const base="http://127.0.0.1:8765";
   await page.goto(base+"/ai.html?id=2608.13942v2",{waitUntil:"domcontentloaded"});
   await page.waitForURL(url=>url.pathname==="/copilot.html"&&url.searchParams.get("id")==="2608.13942v2");
 
+  // Discover must recover from stale future dates and retrieve live arXiv results.
+  const discover=await browser.newContext({viewport:{width:1100,height:820}});
+  const openalexQueries=[];
+  const matchingWork={
+   id:"https://openalex.org/W2608",display_name:"Quantum computing with error corrected qubits",
+   publication_year:2026,publication_date:"2026-10-01",cited_by_count:3,
+   authorships:[{author:{display_name:"A. Researcher"}}],
+   primary_topic:{display_name:"Quantum computing",field:{id:"https://openalex.org/fields/31"}},
+   topics:[{display_name:"Quantum Information",field:{id:"https://openalex.org/fields/31"}}],
+   locations:[{landing_page_url:"https://arxiv.org/abs/2610.00001"}],
+   abstract_inverted_index:{Quantum:[0],computing:[1],qubits:[2]},
+   primary_location:{source:{display_name:"arXiv"},landing_page_url:"https://arxiv.org/abs/2610.00001"}
+  };
+  const wrongWork={
+   id:"https://openalex.org/Wmed",display_name:"Quantum approaches in clinical workplace learning",
+   publication_date:"2026-10-01",primary_topic:{display_name:"Clinical Medicine",field:{id:"https://openalex.org/fields/27"}},
+   locations:[{landing_page_url:"https://arxiv.org/abs/2610.00002"}]
+  };
+  await discover.route("https://api.openalex.org/**",route=>{
+   const url=new URL(route.request().url());
+   openalexQueries.push(url);
+   return route.fulfill({status:200,contentType:"application/json",
+     body:JSON.stringify({meta:{count:2},results:[matchingWork,wrongWork]})})
+  });
+  await discover.route("https://cdn.jsdelivr.net/**",route=>route.fulfill({status:200,contentType:"application/javascript",body:""}));
+  const dpage=await discover.newPage();
+  dpage.on("pageerror",err=>errors.push(dpage.url()+": "+err.message));
+  await dpage.goto(base+"/",{waitUntil:"domcontentloaded"});
+  await dpage.evaluate(()=>localStorage.setItem("researchlens-field-explorer-v1",JSON.stringify({
+   field:"quantum",topic:"Quantum computing",subtopic:"",query:"Quantum computing",
+   from:"2099-11-27",to:"2099-11-30",sort:"publication_date:desc"
+  })));
+  await dpage.goto(base+"/?view=scholarly#discover",{waitUntil:"domcontentloaded"});
+  await dpage.locator("#scholar-results article").first().waitFor({timeout:15000});
+  assert.equal(await dpage.locator("#scholar-from").inputValue(),"");
+  assert.equal(await dpage.locator("#scholar-to").inputValue(),"");
+  assert.equal(await dpage.locator("#scholar-results article").count(),1);
+  assert((await dpage.locator("#scholar-results").innerText()).includes("Quantum computing with error corrected qubits"));
+  assert(!openalexQueries.some(u=>(u.searchParams.get("filter")||"").includes("2099")));
+  assert(openalexQueries.some(u=>u.searchParams.get("search")==="Quantum computing"));
+  assert(openalexQueries.some(u=>(u.searchParams.get("filter")||"").includes("locations.source.id:S4306400194")));
+  assert(openalexQueries.every(u=>!(u.searchParams.get("filter")||"").includes("primary_topic.field.id:")));
+  await dpage.locator("#scholar-from").fill("2099-11-27");
+  await dpage.locator("#scholar-to").fill("2099-11-30");
+  await dpage.locator("#scholar-search-form button[type=submit]").click();
+  await dpage.locator("#scholar-results article").first().waitFor({timeout:15000});
+  assert.equal(await dpage.locator("#scholar-from").inputValue(),"");
+  assert.equal(await dpage.locator("#scholar-to").inputValue(),"");
+  assert.equal(await dpage.locator("#scholar-results article").count(),1);
+  await discover.close();
+
   // Check the core desktop layout separately from the mobile touch session.
   const desktop=await browser.newContext({viewport:{width:1366,height:820}});
   await desktop.route("https://api.openalex.org/**",route=>route.fulfill({
