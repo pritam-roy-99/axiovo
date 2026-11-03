@@ -35,7 +35,7 @@
  }
  function isTopicBrowse(state,q){
   const typed=norm(q);
-  return typed===norm(state.subtopic)||typed===norm(state.topic)||typed===norm(state.query)&&Boolean(state.subtopic||state.topic)&&!state.customQuery;
+  return typed===norm(state.subtopic)||typed===norm(state.topic);
  }
  function plan(state,query,opts={}){
   const field=FIELDS[state.field]?state.field:"quantum",raw=String(query||"").trim();
