@@ -16,7 +16,7 @@
  const PHYSICS=/\b(quantum|qubit|qudit|bell(?:['’]s)?|kochen[\s-]*specker|noncontextual(?:ity)?|contextuality|hidden[\s-]*variables?|povm|hilbert|entangl(?:e|ed|ement)|wavefunction|stabilizer|measurement incompatibility|ontological models?|prepare[\s-]*and[\s-]*measure|quantum[\s-]*information)\b/i;
  const CONTEXT=/\b(contextuality|noncontextual(?:ity)?|kochen[\s-]*specker|contextual correlations?|contextual[\s-]*fraction)\b/i;
  const STRONG_QUANTUM=/\b(quantum|qubit|qudit|bell(?:['’]s)?|kochen[\s-]*specker|povm|hilbert|hidden[\s-]*variables?|ontological models?|prepare[\s-]*and[\s-]*measure|measurement incompatibility|stabilizer)\b/i;
- const STOP=new Set("about across around based both from into with using paper study results research analysis approaches methods theory theoretical latest recent studies dynamics their some more upon what when where how than among".split(" "));
+ const STOP=new Set("about across around based both from into with using paper study results research analysis approaches methods theoretical latest recent studies dynamics their some more upon what when where how than among".split(" "));
  function fieldId(raw){
   const m=String(raw||"").match(/(?:\/fields\/)?(\d+)$/);return m?m[1]:"";
  }
