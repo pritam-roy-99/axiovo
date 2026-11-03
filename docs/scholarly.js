@@ -74,7 +74,19 @@ if(original){
  version.setAttribute("aria-label","Select arXiv version for "+(w.display_name||"paper"));
  const selected=node("a","Open latest on arXiv ↗");selected.href=Arxiv.abs(original.base);selected.target="_blank";selected.rel="noopener noreferrer";
  version.oninput=()=>{const n=Number(version.value),good=version.value===""||Number.isInteger(n)&&n>=1&&n<=9999;selected.href=good?Arxiv.abs(original.base+(version.value?"v"+version.value:"")):Arxiv.abs(original.base);selected.textContent=version.value?"Open v"+version.value+" on arXiv ↗":"Open latest on arXiv ↗"};
- versions.append(version,selected);art.append(versions);
+ const saveExact=node("button","Save selected revision","rl-paper-action");
+ saveExact.type="button";saveExact.setAttribute("aria-label","Save selected arXiv revision of "+(w.display_name||"paper"));
+ saveExact.onclick=()=>{
+   const n=Number(version.value),valid=version.value===""||Number.isInteger(n)&&n>=1&&n<=9999;
+   if(!valid){saveExact.textContent="Enter a valid revision";return}
+   const chosen=original.base+(version.value?"v"+version.value:"");
+   let list=[];try{list=JSON.parse(localStorage.getItem("researchlens-reading-list")||"[]")}catch{}
+   if(!Array.isArray(list))list=[];
+   if(!list.includes(chosen))list.push(chosen);
+   try{localStorage.setItem("researchlens-reading-list",JSON.stringify(list));saveExact.textContent="✓ Saved "+(version.value?"v"+version.value:"latest");window.dispatchEvent(new Event("researchlens-library-change"))}
+   catch{saveExact.textContent="Browser storage unavailable"}
+ };
+ versions.append(version,selected,saveExact);art.append(versions);
 }
 art.append(row);return art}
 function render(){const root=$("results");root.replaceChildren();const display=showingSaved?saved.slice().reverse():items;$("result-heading").textContent=showingSaved?"Your saved papers":"Literature results";if(!display.length){root.append(node("div",showingSaved?"No papers saved yet. Save papers from your search results.":"No matching records to display.","empty"))}else for(const w of display)root.append(renderPaper(w));
