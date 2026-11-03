@@ -11,7 +11,7 @@ function store(key,value){try{localStorage.setItem(key,JSON.stringify(value))}ca
 let state=read(KEY,{field:"quantum",topic:"Quantum key distribution",subtopic:"",query:"",sort:"relevance",from:"",to:""});
 state.field=fieldKey(state.field);
 if(!FIELDS[state.field].topics.includes(state.topic)){state.topic=FIELDS[state.field].topics[0];state.subtopic=""}
-if(state.subtopic&&!fieldTopics(state.field,state.topic).includes(state.subtopic))state.subtopic="";
+if(state.subtopic&&!state.customSubtopic&&!fieldTopics(state.field,state.topic).includes(state.subtopic))state.subtopic="";
 let saved=read(SAVED,[]);if(!Array.isArray(saved))saved=[];
 let page=1,total=0,busy=false,items=[],showingSaved=false,requestController=null;
 function node(tag,text,className){const el=document.createElement(tag);if(text!==undefined)el.textContent=text;if(className)el.className=className;return el}
@@ -22,8 +22,8 @@ function bib(w){const author=(w.authorships||[]).map(a=>a.author?.display_name).
 function download(name,contents,type){const b=new Blob([contents],{type});const url=URL.createObjectURL(b);const a=document.createElement("a");a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000)}
 function setStatus(s){$("status").textContent=s}
 function persist(){state.field=$("field").value;state.query=$("query").value;state.sort=$("sort").value;state.from=$("from").value;state.to=$("to").value;store(KEY,state)}
-function topicSelect(t){state.topic=t;state.subtopic="";state.query=t;$("query").value=t;persist();drawTopics();drawSubtopics();page=1;search()}
-function subtopicSelect(t){state.subtopic=t;state.query=t;$("query").value=t;persist();drawSubtopics();page=1;search()}
+function topicSelect(t){state.topic=t;state.subtopic="";state.customSubtopic=false;state.query=t;$("query").value=t;persist();drawTopics();drawSubtopics();page=1;search()}
+function subtopicSelect(t){state.subtopic=t;state.customSubtopic=!fieldTopics(state.field,state.topic).includes(t);state.query=t;$("query").value=t;persist();drawSubtopics();page=1;search()}
 function drawSubtopics(){
  const holder=$("subtopic-list");holder.replaceChildren();
  const items=fieldTopics(state.field,state.topic);
@@ -70,8 +70,8 @@ for(const [id,f] of Object.entries(FIELDS)){
 $("field").value=state.field;$("query").value=state.query||state.topic||"";
 document.addEventListener("pointerdown",e=>{if(!$("field-details").contains(e.target))$("field-details").open=false});
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&$("field-details").open){$("field-details").open=false;$("field-trigger").focus()}});$("sort").value=state.sort||"relevance";$("from").value=state.from||"";$("to").value=state.to||"";drawField();drawSaved();
-$("field").onchange=()=>{state.field=$("field").value;state.topic=FIELDS[state.field].topics[0];state.subtopic="";state.query=state.topic;$("query").value=state.query;persist();drawField();window.dispatchEvent(new CustomEvent("researchlens:field-changed",{detail:{field:state.field,topic:state.topic}}));page=1;search()};
-$("use-custom").onclick=()=>{const t=$("custom").value.trim();if(t.length<3){setStatus("Enter at least three characters for a custom topic.");return}state.subtopic=t;state.query=t;$("query").value=t;persist();drawSubtopics();page=1;search()};
+$("field").onchange=()=>{state.field=$("field").value;state.topic=FIELDS[state.field].topics[0];state.subtopic="";state.customSubtopic=false;state.query=state.topic;$("query").value=state.query;persist();drawField();window.dispatchEvent(new CustomEvent("researchlens:field-changed",{detail:{field:state.field,topic:state.topic}}));page=1;search()};
+$("use-custom").onclick=()=>{const t=$("custom").value.trim();if(t.length<3){setStatus("Enter at least three characters for a custom topic.");return}state.subtopic=t;state.customSubtopic=true;state.query=t;$("query").value=t;persist();drawSubtopics();page=1;search()};
 $("use-subtopic").onclick=()=>{const t=$("custom-subtopic").value.trim();if(t.length<3){setStatus("Enter at least three characters for a subtopic.");return}subtopicSelect(t)};
 window.addEventListener("researchlens:choose-field",e=>{
  const field=fieldKey(e.detail?.field);if(state.field===field)return;
