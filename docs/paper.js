@@ -3,7 +3,7 @@ const $=id=>document.getElementById(id);
 const id=new URLSearchParams(location.search).get("id")||"";
 const valid=/^(?:\d{4}\.\d{4,5}|[a-z-]+(?:\.[a-z]{2})?\/\d{7})$/i.test(id);
 const issueTerm="arXiv:"+id;
-const repoName="pritam-roy-99/researchlens";
+const repoName="pritam-roy-99/researchlens";const curatedIssue={"2608.13942":1};
 const issueSearch="https://github.com/"+repoName+"/issues?q="+encodeURIComponent("is:issue "+issueTerm);
 const issueCreate="https://github.com/"+repoName+"/issues/new?"+new URLSearchParams({title:"Paper discussion: "+issueTerm,body:"### Paper\nhttps://arxiv.org/abs/"+id+"\n\n### Discussion\nPlease add technical comments, references, verification questions or follow-up results below. Reactions are not endorsements of scientific correctness.\n"});
 function line(parent,label,value){const p=document.createElement("p");p.className="muted";p.textContent=label+": "+value;parent.append(p)}
@@ -35,6 +35,7 @@ $("share").onclick=()=>navigator.clipboard?.writeText(location.href);
 async function findDiscussion(){
 $("new-thread").href=issueCreate;$("browse-threads").href=issueSearch;
 $("report-error").href="https://github.com/"+repoName+"/issues/new?"+new URLSearchParams({title:"Metadata issue for "+issueTerm,body:"https://arxiv.org/abs/"+id+"\n\nDescribe the correction needed:"});
+if(curatedIssue[id]){$("discussion-status").textContent="Dedicated paper discussion is available. Add a comment or 👍 reaction on GitHub.";const a=$("existing-thread");a.href="https://github.com/"+repoName+"/issues/"+curatedIssue[id];a.hidden=false;$("new-thread").hidden=true;try{const r=await fetch("https://api.github.com/repos/"+repoName+"/issues/"+curatedIssue[id]);if(r.ok){const d=await r.json();$("discussion-status").textContent="Dedicated discussion: "+(d.comments||0)+" public comments · "+(d.reactions?.["+1"]||0)+" 👍 reactions (GitHub)."}}catch(err){}return}
 try{
  const url="https://api.github.com/search/issues?"+new URLSearchParams({q:"repo:"+repoName+" is:issue in:title "+issueTerm,per_page:"20"});
  const response=await fetch(url,{headers:{Accept:"application/vnd.github+json"}});
