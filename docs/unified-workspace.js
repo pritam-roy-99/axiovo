@@ -116,9 +116,6 @@
   window.addEventListener("hashchange",show);
   window.addEventListener("popstate",show);
   window.addEventListener("axiovo:discover-search",event=>navigateToDiscover(event.detail?.query));
-  window.addEventListener("researchlens-library-change",()=>{
-    if (loaded) window.dispatchEvent(new Event("researchlens:workspace-activated"));
-  });
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded",show);
   else show();
 })();
