@@ -38,7 +38,7 @@ const followedInterests=()=>interestsAPI?.get(read(interestsAPI.KEY,{}),state.fi
 function toggleInterest(value){if(!interestsAPI)return;const next=interestsAPI.toggle(read(interestsAPI.KEY,{}),state.field,state.topic,value);store(interestsAPI.KEY,next);drawTopics();drawSubtopics();window.dispatchEvent(new Event("researchlens:interests-changed"))}
 function read(key,fallback){try{const d=JSON.parse(localStorage.getItem(key)||"null");return d??fallback}catch{return fallback}}
 function store(key,value){try{localStorage.setItem(key,JSON.stringify(value))}catch{}}
-let state=read(KEY,{field:"quantum",topic:"Quantum key distribution",subtopic:"",query:"",sort:"relevance",from:"",to:""});
+let state=read(KEY,{field:"general",topic:"Explore all research",subtopic:"",query:"",sort:"relevance",from:"",to:""});
 state.field=fieldKey(state.field);
 if(!FIELDS[state.field].topics.includes(state.topic)){state.topic=FIELDS[state.field].topics[0];state.subtopic=""}
 if(state.subtopic&&!state.customSubtopic&&!fieldTopics(state.field,state.topic).includes(state.subtopic))state.subtopic="";
@@ -297,7 +297,7 @@ for(const [id,f] of Object.entries(FIELDS)){
  button.onclick=()=>{opts.value=id;$("field-details").open=false;opts.dispatchEvent(new Event("change",{bubbles:true}))};
  choices.append(button)
 }
-$("field").value=state.field;$("query").value=state.query||state.topic||"";
+$("field").value=state.field;$("query").value=state.query||(state.field==="general"?"":state.topic)||"";
 document.addEventListener("pointerdown",e=>{if(!$("field-details").contains(e.target))$("field-details").open=false});
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&$("field-details").open){$("field-details").open=false;$("field-trigger").focus()}});$("sort").value=state.sort||"relevance";$("from").value=state.from||"";$("to").value=state.to||"";const dateRestore=normalizeSearchDates();drawField();drawSaved();if(dateRestore.changed)setStatus("Saved future publication dates were cleared. Research is available through "+dateRestore.until+".");
 $("field").onchange=()=>{state.field=$("field").value;state.topic=FIELDS[state.field].topics[0];state.subtopic="";state.customSubtopic=false;state.query=state.topic;$("query").value=state.query;persist();drawField();window.dispatchEvent(new CustomEvent("researchlens:field-changed",{detail:{field:state.field,topic:state.topic}}));page=1;search()};
