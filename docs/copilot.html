@@ -1,5 +1,5 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Research Assistant | ResearchLens</title><meta name="description" content="Unified ResearchLens research assistant: paper selection, evidence analysis, literature comparison, reviewer checks and optional open-weight AI.">
+<title>Research Assistant | Litveyra</title><meta name="description" content="Unified Litveyra research assistant: paper selection, evidence analysis, literature comparison, reviewer checks and optional open-weight AI.">
 <link rel="stylesheet" href="./theme.css"><script defer src="./theme.js"></script><link rel="stylesheet" href="./workspace.css"><script defer src="./navigation.js"></script><script defer src="./arxiv-versions.js"></script><script defer src="./assistant-core.js"></script>
 <style>
 :root{font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;color:#18324b;background:#f2f7fa}*{box-sizing:border-box}body{margin:0}a{color:#096da1;text-decoration:none}a:hover{text-decoration:underline}
@@ -33,7 +33,7 @@ hr{border:0;border-top:1px solid #e0e9f0;margin:16px 0}.info{border-left:3px sol
 :root[data-theme=dark] .rl-selected-paper{background:#173248;color:#d4eef9;border-color:#346987}
 @media(max-width:690px){.columns{grid-template-columns:minmax(0,1fr)}.panel{padding:14px}main{padding:11px}.intro{padding:5px}}
 </style><link rel="manifest" href="./manifest.webmanifest"><meta name="theme-color" content="#0b2239"><link rel="icon" type="image/svg+xml" href="./icons/researchlens.svg"><script defer src="./pwa.js"></script></head><body>
-<header><b><span class="mark">R</span> ResearchLens Assistant</b><a href="./">Paper feed</a><a href="./workspace.html">My workspace</a><a href="./lab.html">Research tools</a></header>
+<header><b><span class="mark">L</span> Litveyra Assistant</b><a href="./">Paper feed</a><a href="./workspace.html">My workspace</a><a href="./lab.html">Research tools</a></header>
 <main><section class="intro"><h1>Your scientific research assistant</h1><p>One place to discover prior literature, analyze a paper, compare contributions, organize source-linked evidence, and ask an optional local AI model. All scientific conclusions require source verification.</p></section>
 <div class="columns"><aside class="panel">
 <h2>Choose your task</h2>
@@ -61,7 +61,7 @@ hr{border:0;border-top:1px solid #e0e9f0;margin:16px 0}.info{border-left:3px sol
 </aside>
 <section class="panel">
 <div class="row" style="justify-content:space-between"><h2>Research Assistant conversation</h2><span id="mode-indicator" class="pill">Literature discovery</span></div>
-<div id="conversation" aria-live="polite"><div class="message assistant"><h4>ResearchLens Research Assistant</h4>Ask a quantum-information question, paste an arXiv ID, or describe a claim you are investigating. I'll retrieve candidate literature and show verifiable source links. Select a local model to enable multi-turn AI answers.</div></div>
+<div id="conversation" aria-live="polite"><div class="message assistant"><h4>Litveyra Research Assistant</h4>Ask a quantum-information question, paste an arXiv ID, or describe a claim you are investigating. I'll retrieve candidate literature and show verifiable source links. Select a local model to enable multi-turn AI answers.</div></div>
 <div class="compose"><label for="question">Research question</label><textarea id="question" maxlength="3500" placeholder="Example: What earlier work studies device-independent quantum steering in networks?"></textarea>
 <details style="margin:8px 0"><summary class="muted" style="cursor:pointer">Optional: include your own title, abstract, or technical claim</summary><label for="draft">Unpublished text (processed locally in this browser, or sent only to your selected local model)</label><textarea id="draft" maxlength="7500" placeholder="Paste a manuscript abstract or a precise theorem statement for preliminary comparison"></textarea></details>
 <label for="retrieval-scope">Evidence search scope</label><select id="retrieval-scope"><option value="all">Indexed arXiv + live OpenAlex (for public questions)</option><option value="local">Indexed arXiv only (private)</option></select><p class="tiny">For unpublished drafts, automatic external search is disabled. Use the wider-literature button only when you want to send a query to OpenAlex.</p>
