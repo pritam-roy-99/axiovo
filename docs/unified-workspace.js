@@ -11,6 +11,7 @@
   if (!discover || !workspace || !firstTab || !secondTab) return;
   let loading = null;
   let loaded = false;
+  let failed = false;
   let transition = 0;
 
   function script(url) {
@@ -24,7 +25,7 @@
   }
 
   async function loadWorkspace() {
-    if (loaded) return;
+    if (loaded || failed) return;
     if (loading) return loading;
     loading = (async () => {
       const response = await fetch("./workspace.html", {cache:"no-store"});
@@ -40,6 +41,7 @@
     })();
     try { await loading; }
     catch (error) {
+      failed = true;
       const message = document.createElement("p");
       message.setAttribute("role","alert");
       message.textContent = error.message + ". Your saved data has not been changed.";
