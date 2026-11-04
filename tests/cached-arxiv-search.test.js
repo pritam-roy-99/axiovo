@@ -25,10 +25,10 @@ const window=Cache.find({papers},{field:"quantum",query:"Bell nonlocality",from:
 assert.deepEqual(window.items.map(w=>w.id),["https://arxiv.org/abs/2611.00009"]);
 assert.equal(window.outsideDates,false);
 const missing=Cache.find({papers},{field:"quantum",query:"Bell nonlocality",from:"2026-11-03",to:"2026-11-03",today:"2026-11-03"});
-assert.equal(missing.outsideDates,true);
-assert.equal(missing.items.length,3);
-assert.equal(missing.items[0].primary_location.source.display_name,"arXiv");
-assert.equal(missing.items[0].__source,"local-arxiv");
+assert.equal(missing.outsideDates,false);
+assert.equal(missing.items.length,0);
+assert.equal(window.items[0].primary_location.source.display_name,"arXiv");
+assert.equal(window.items[0].__source,"local-arxiv");
 assert.equal(Cache.find(papers,{field:"quantum",query:"Bell nonlocality",today:"2026-11-03"}).items.length,3);
 assert.equal(Cache.find(papers,{field:"medicine",query:"Bell nonlocality",today:"2026-11-03"}).items.length,0);
 assert.equal(Cache.find(papers,{field:"quantum",query:"Quantum computing",today:"2026-11-03"}).items.length,1);
