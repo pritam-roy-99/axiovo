@@ -52,6 +52,13 @@
    ...a,__similarity:Math.max(rankName(a.display_name,query),...(a.display_name_alternatives||[]).slice(0,15).map(x=>rankName(x,query)))
   })).sort((a,b)=>b.__similarity-a.__similarity||Number(b.works_count||0)-Number(a.works_count||0)).slice(0,20)
  }
+ function arxivFromCache(work,feed){
+  const title=clean(work?.display_name||work?.title);
+  if(title.length<12)return null;
+  const names=(work?.authorships||[]).map(a=>clean(a.author?.display_name)).filter(Boolean);
+  return (Array.isArray(feed)?feed:[]).find(p=>clean(p.title)===title&&
+    (p.authors||[]).some(a=>names.includes(clean(a))))||null;
+ }
  function init(){
   const form=document.getElementById("axiovo-author-form"),input=document.getElementById("axiovo-author-query");
   const candidates=document.getElementById("axiovo-author-candidates"),papers=document.getElementById("axiovo-author-papers");
@@ -90,23 +97,49 @@
   }
   async function showWorks(author){
    const ctl=abort(),id=canonicalId(author.id);if(!id)return;
-   papers.replaceChildren();status.textContent="Searching arXiv-hosted works by "+author.display_name+" ("+id+")…";
+   papers.replaceChildren();status.textContent="Searching research by "+author.display_name+" ("+id+")…";
+   let feed=[],works=[],problem="";
+   try{
+    const response=await fetch("./data/feed.json",{signal:ctl.signal,cache:"no-store"});
+    if(response.ok){const snapshot=await response.json();feed=Array.isArray(snapshot.papers)?snapshot.papers:[];}
+   }catch(error){if(ctl.signal.aborted)return}
    try{
     const response=await fetch("https://api.openalex.org/works?"+worksParams(id),{signal:ctl.signal});
     if(!response.ok)throw Error("OpenAlex HTTP "+response.status);
-    const data=await response.json();if(ctl.signal.aborted)return;
-    const results=(data.results||[]).filter(w=>arxiv?.candidates(w)?.length);
-    if(!results.length){status.textContent="No arXiv-hosted works found for this OpenAlex author ID. The external index is incomplete.";return}
-    status.textContent=results.length+" arXiv-hosted papers associated with OpenAlex author "+id+". Names and author identities can contain indexing errors.";
-    for(const p of results){
-     const record=arxiv.candidates(p)[0];
+    const data=await response.json();works=Array.isArray(data.results)?data.results:[];
+   }catch(error){if(ctl.signal.aborted)return;problem=String(error.message||error)}
+   if(ctl.signal.aborted)return;
+   const verified=[],seen=new Set();
+   for(const work of works){
+    const record=arxiv?.candidates(work)?.[0],cached=record?null:arxivFromCache(work,feed);
+    const idFound=record?.base||cached?.id;if(!idFound||seen.has(idFound))continue;
+    seen.add(idFound);
+    verified.push({work,id:idFound,source:record?"arXiv location indexed":"arXiv preprint matched by title and coauthor"});
+   }
+   for(const row of verified){
+    const box=element("article",undefined,"axiovo-author-paper");
+    anchor(box,row.work.display_name||"Untitled work","https://arxiv.org/abs/"+encodeURIComponent(row.id));
+    box.append(element("small",(row.work.publication_date||"Date unknown")+
+      " · OpenAlex publication date · "+row.source));
+    papers.append(box);
+   }
+   const possible=feed.filter(p=>!seen.has(p.id)&&
+    (p.authors||[]).some(name=>rankName(name,author.display_name)>=78))
+    .sort((a,b)=>String(b.published||"").localeCompare(String(a.published||""))).slice(0,30);
+   if(possible.length){
+    papers.append(element("h3","Additional cached arXiv matches (author identity not verified)"));
+    for(const record of possible){
      const box=element("article",undefined,"axiovo-author-paper");
-     anchor(box,p.display_name||"Untitled work",arxiv.abs(record.base));
-     const authors=(p.authorships||[]).map(x=>x.author?.display_name).filter(Boolean);
-     box.append(element("small",(p.publication_date||"Date unavailable")+" · OpenAlex indexed publication date (not verified arXiv v1) · "+authors.slice(0,8).join(", ")));
+     anchor(box,record.title||"Untitled work","https://arxiv.org/abs/"+encodeURIComponent(record.id));
+     box.append(element("small",String(record.published||"").slice(0,10)+
+       " · arXiv first submitted · matching name; could be another researcher"));
      papers.append(box);
     }
-   }catch(e){if(!ctl.signal.aborted){status.textContent="Could not load works for the selected author identity. Please try again.";}}
+   }
+   status.textContent=verified.length+" arXiv-linked works associated with OpenAlex author "+id+
+    (possible.length?"; "+possible.length+" additional name-only matches.":"")+
+    (problem?" OpenAlex unavailable: "+problem+".":"")+
+    (!verified.length&&!possible.length?" No matches in these sources; this does not mean the author has no arXiv papers.":"");
   }
   form.addEventListener("submit",async e=>{
    e.preventDefault();const query=input.value.trim();if(query.length<2){status.textContent="Enter at least two characters of an author's name.";return}
