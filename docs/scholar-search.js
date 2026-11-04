@@ -44,7 +44,7 @@
   const context=field==="quantum"&&
     [raw,state.topic,state.subtopic].some(x=>CONTEXT.test(x||""))&&browse;
   const search=context?"quantum "+(raw||"contextuality"):raw;
-  const filters=["locations.source.id:S4306400194"]; // Screen returned works against primary and secondary fields, not a restrictive primary-only API gate.
+  const filters=[]; // Do not exclude legitimate arXiv-linked works because provider source tagging is missing.
   const maxDate=String(opts.today||new Date().toISOString().slice(0,10));
   const from=String(opts.from||"");
   const to=String(opts.to||"");
