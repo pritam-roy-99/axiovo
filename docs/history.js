@@ -92,6 +92,7 @@ function paperCard(w){
  const save=el("button",isSaved?"✓ Saved":"☆ Save paper","rl-paper-action"+(isSaved?" saved":""));
  save.type="button";save.setAttribute("aria-pressed",String(isSaved));save.setAttribute("aria-label","Save arXiv paper to reading list");
  save.addEventListener("click",()=>saveVersion(save,selected()));row.append(save);
+ window.AxiovoAuthorFollow?.mount(row,authors);
  action(row,"Discussion","./paper.html?id="+encodeURIComponent(linked.base));
  action(row,"OpenAlex record",w.id);
  const copy=el("button","Copy BibTeX","rl-paper-action");
