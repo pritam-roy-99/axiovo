@@ -8,11 +8,10 @@
   logo.append(mark,document.createTextNode(" Axiovo"));
   const nav=document.createElement("nav");nav.className="rl-nav";nav.setAttribute("aria-label","Main navigation");
   const links=[["./#discover","Discover"],["./#workspace","Library"],["./copilot.html","Research AI"],
-   ["https://github.com/pritam-roy-99/researchlens/issues","Community"]];
+   ["./community.html","Community"]];
   const file=location.pathname.split("/").pop()||"index.html";
   for(const [href,label] of links){
    const a=document.createElement("a");a.href=href;a.textContent=label;
-   if(label==="Community"){a.target="_blank";a.rel="noopener noreferrer";a.title="Discussions currently use GitHub Issues";}
    const target=href.startsWith("./#")?"index.html":href.slice(2);
    if(file===target&&(!href.includes("#")||location.hash===href.slice(2)))a.setAttribute("aria-current","page");
    nav.append(a);
