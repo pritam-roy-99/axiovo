@@ -20,7 +20,7 @@ async function offlineArxivFallback(plan,{reason="",from="",to="",sort="",today=
    .catch(err=>{cachedFeedPromise=null;throw err});
   const feed=await cachedFeedPromise;
   const found=CachedArxiv.find(feed,{field:plan.field,query:plan.query,from,to,sort,today,limit:20});
-  let message="OpenAlex is rate-limited. Showing "+found.items.length+
+  let message=(reason?"OpenAlex unavailable or incomplete. ":"OpenAlex returned no eligible matches. ")+ "Showing "+found.items.length+
    " matching papers from Axiovo's cached arXiv index ("+found.indexed+" indexed papers).";
   if(found.outsideDates)message+=" No cached matches fall within the chosen date range; these results are from other dates.";
   if(!found.items.length)message+=" No matching papers in the limited cache. This does not mean arXiv has no matching research.";
@@ -223,8 +223,8 @@ async function search(){
   items=selected.map(x=>({...x.work,__source:x.source})).filter(w=>Boolean(arxivURL(w)));
   total=sourceTotal;
   let localNote="";
-  if(!items.length&&(rateLimited||mainError)){
-   const offline=await offlineArxivFallback(plan,{reason:mainError,from,to,sort,today});
+  if(!items.length){
+   const offline=await offlineArxivFallback(plan,{reason:mainError|| (rateLimited?"OpenAlex rate limit":""),from,to,sort:effectiveSort,today});
    if(ctl.signal.aborted||requestController!==ctl)return;
    if(offline.items.length){items=offline.items;total=0}
    localNote=offline.message;
