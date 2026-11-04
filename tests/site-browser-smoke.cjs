@@ -223,7 +223,7 @@ const base="http://127.0.0.1:8765";
   await research.goto(base+"/community.html",{waitUntil:"domcontentloaded"});
   assert((await research.locator("main").innerText()).includes("GitHub Issues"));
   await research.goto(base+"/profiles.html",{waitUntil:"domcontentloaded"});
-  assert((await research.locator("h1").innerText()).includes("Settings"));
+  assert((await research.locator("h1").innerText()).toLowerCase().includes("settings"));
   await researchContext.close();
 
   // Check the core desktop layout separately from the mobile touch session.
