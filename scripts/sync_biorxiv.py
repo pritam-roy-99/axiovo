@@ -12,7 +12,7 @@ import re
 import urllib.request
 
 TARGET = Path(__file__).resolve().parents[1] / "docs" / "data" / "biorxiv.json"
-ENDPOINT = "https://api.biorxiv.org/details/biorxiv/14d/0/json"
+ENDPOINT = "https://api.biorxiv.org/details/biorxiv/100/0/json"
 
 def normalize(item: dict) -> dict | None:
     doi = str(item.get("doi") or "").strip()
@@ -66,7 +66,7 @@ def main() -> None:
     except (OSError, ValueError):
         pass
     request = urllib.request.Request(ENDPOINT, headers={
-        "User-Agent": "Axiovo/0.6 (+https://github.com/pritam-roy-99/researchlens; noncommercial metadata reader)",
+        "User-Agent": "Axiovo/0.6 (+https://github.com/pritam-roy-99/axiovo; noncommercial metadata reader)",
         "Accept": "application/json",
     })
     try:

@@ -42,8 +42,7 @@ function init(){
  function updateFieldLabel(){
   let field="general";try{field=JSON.parse(localStorage.getItem("researchlens-field-explorer-v1")||"{}").field||"general"}catch{}
   const config=window.ResearchLensFields;
-  const name=config?.FIELDS?.[field]?.name||"your field";
-  if(b.firstChild?.nodeType===Node.TEXT_NODE)b.firstChild.textContent="Explore "+name+" ";
+  if(b.firstChild?.nodeType===Node.TEXT_NODE)b.firstChild.textContent="Explore research ";
  }
  window.addEventListener("researchlens:field-changed",updateFieldLabel);
  window.addEventListener("researchlens:choose-field",updateFieldLabel);
