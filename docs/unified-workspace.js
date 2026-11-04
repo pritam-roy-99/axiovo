@@ -99,18 +99,17 @@
     url.hash = "discover";
     // Push a history entry instead of reloading and losing current form state.
     window.history.pushState({view:"discover",q},"",url.pathname+url.search+url.hash);
+    const form = document.getElementById("scholar-search-form");
+    const alreadyInitialized = typeof form?.onsubmit === "function";
     const scholar = document.getElementById("rl-source-scholarly");
     scholar?.click();
     show();
     if (!q) return;
     const input = document.getElementById("scholar-query");
     if (input) input.value = q.slice(0,250);
-    // Scholarly search is lazy-initialized when the source selector is clicked.
-    // Allow the existing initialization callback to bind submit handlers.
-    queueMicrotask(() => {
-      const form = document.getElementById("scholar-search-form");
-      if (form?.onsubmit) form.requestSubmit();
-    });
+    // On first entry scholarly.js performs the URL-derived search itself.
+    // Later entries submit the new query exactly once, avoiding duplicate APIs.
+    if (alreadyInitialized) form.requestSubmit();
   }
 
   window.addEventListener("hashchange",show);
