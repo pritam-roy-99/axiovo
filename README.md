@@ -1,5 +1,14 @@
 # ResearchLens
 
+## Install or run locally (no build step)
+
+- **Android / desktop:** Open [ResearchLens](https://pritam-roy-99.github.io/researchlens/) in Chrome or Edge and use **Install app** or **Add to Home screen** when the browser offers it.
+- **Run on your computer:** Download or clone this GitHub repository, then run `python3 run.py` (Windows: `py run.py`). The app opens in your browser on a local address. Stop with Ctrl+C.
+- **Offline:** Previously visited app pages and scripts can work offline. Live scholarly search, remote PDFs, external discussions, and model downloads still need internet. Data saved in your browser is not automatically synced.
+
+See [LOCAL_APP.md](LOCAL_APP.md) for complete installation, update, and privacy instructions.
+
+
 **ResearchLens is a free, open-source research-discovery prototype with preliminary prior-literature exploration.** It is independent from arXiv and SciRate.
 
 ## Field Explorer (proposed ResearchLens 2.0 workspace)
