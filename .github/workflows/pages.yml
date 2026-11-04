@@ -50,7 +50,15 @@ jobs:
       - name: Test rate-limited arXiv fallback
         run: node tests/cached-arxiv-search.test.js
       - name: Refresh free bioRxiv metadata
+        id: biorxiv
+        continue-on-error: true
         run: python scripts/sync_biorxiv.py
+      - name: Report failed bioRxiv synchronization
+        if: steps.biorxiv.outcome == 'failure'
+        run: |
+          echo '### bioRxiv metadata synchronization failed' >> "$GITHUB_STEP_SUMMARY"
+          echo 'No live bioRxiv results were available. Cached records are preserved, if any.' >> "$GITHUB_STEP_SUMMARY"
+          echo '::warning::bioRxiv synchronization unsuccessful; review diagnostics in logs.'
       - name: Refresh research metadata
         id: refresh
         continue-on-error: true
