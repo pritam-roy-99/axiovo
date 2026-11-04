@@ -22,14 +22,54 @@ const base="http://127.0.0.1:8765";
  try{
   await page.goto(base+"/",{waitUntil:"domcontentloaded"});
   await page.locator("#rl-focus-bar").waitFor();
+  // Author-name discovery must show distinct identities before displaying papers.
+  let authorWorksQuery="";
+  await page.route("https://api.openalex.org/authors?**",route=>route.fulfill({
+   status:200,contentType:"application/json",
+   body:JSON.stringify({meta:{count:2},results:[
+    {id:"https://openalex.org/A5023471898",display_name:"John Smith",works_count:20,
+     last_known_institutions:[{display_name:"University A"}]},
+    {id:"https://openalex.org/A5033467821",display_name:"John W. Smith",works_count:40,
+     last_known_institutions:[{display_name:"University B"}]}
+   ]})
+  }));
+  await page.route("https://api.openalex.org/works?**",route=>{
+   authorWorksQuery=new URL(route.request().url()).searchParams.get("filter")||"";
+   return route.fulfill({status:200,contentType:"application/json",
+    body:JSON.stringify({meta:{count:1},results:[{
+     id:"https://openalex.org/WAUTHOR",display_name:"An arXiv paper from the selected researcher",
+     publication_date:"2026-10-02",authorships:[{author:{display_name:"John Smith"}}],
+     locations:[{landing_page_url:"https://arxiv.org/abs/2610.00001"}],
+     primary_location:{landing_page_url:"https://arxiv.org/abs/2610.00001",source:{display_name:"arXiv"}}
+    }]})});
+  });
+  await page.locator("#axiovo-author-details > summary").click();
+  await page.locator("#axiovo-author-query").fill("John Smith");
+  await page.locator("#axiovo-author-form button[type='submit']").click();
+  await page.locator(".axiovo-author-identity").first().waitFor();
+  assert.equal(await page.locator(".axiovo-author-identity").count(),2);
+  await page.locator(".axiovo-author-identity button").first().click();
+  await page.locator(".axiovo-author-paper a").first().waitFor();
+  assert(authorWorksQuery.includes("authorships.author.id:A5023471898"));
+  assert((await page.locator(".axiovo-author-paper").innerText()).includes("An arXiv paper"));
+  await page.unroute("https://api.openalex.org/authors?**");
+  await page.unroute("https://api.openalex.org/works?**");
   assert(await page.locator("#rl-focus-field-title").isVisible());
   assert(!(await page.locator("#arxiv-legacy-focus").isVisible()));
   await page.locator("#rl-focus-field-details > summary").click();
   assert(await page.locator("#rl-focus-fields").isVisible());
   await page.locator("#rl-focus-fields button").filter({hasText:"Medicine & public health"}).click();
   assert((await page.locator("#rl-focus-trail").innerText()).includes("Medicine"));
+  assert.equal(await page.locator("#rl-focus-areas button").filter({hasText:"All research areas"}).first().getAttribute("aria-pressed"),"true");
+  assert.equal(await page.locator("#scholar-query").inputValue(),"","Research area must be optional");
+  // Preserve an explicitly selected first-submission date when narrowing by area.
+  await page.evaluate(()=>{document.getElementById("date-from").value="2026-10-05"});
+
   const trial=page.locator("#rl-focus-areas button").filter({hasText:"Clinical trials"});
   await trial.click();
+  assert.equal(await page.locator("#scholar-from").inputValue(),"2026-10-05");
+  assert.equal(await page.locator("#scholar-to").inputValue(),"2026-10-05");
+
   assert((await page.locator("#rl-focus-subtopics").innerText()).includes("Adaptive trials"));
   await page.locator("#rl-focus-subtopics button").filter({hasText:"Adaptive trials"}).first().click();
   assert((await page.locator("#rl-focus-trail").innerText()).includes("Adaptive trials"));
@@ -130,7 +170,7 @@ const base="http://127.0.0.1:8765";
   assert((await dpage.locator("#scholar-results").innerText()).includes("Quantum computing with error corrected qubits"));
   assert(!openalexQueries.some(u=>(u.searchParams.get("filter")||"").includes("2099")));
   assert(openalexQueries.some(u=>u.searchParams.get("search")==="Quantum computing"));
-  assert(openalexQueries.some(u=>(u.searchParams.get("filter")||"").includes("locations.source.id:S4306400194")));
+  assert(openalexQueries.some(u=>!(u.searchParams.get("filter")||"").includes("locations.source.id:")),"ArXiv works must not be excluded by provider source ID");
   assert(openalexQueries.every(u=>!(u.searchParams.get("filter")||"").includes("primary_topic.field.id:")));
   await dpage.locator("#scholar-from").fill("2099-11-27");
   await dpage.locator("#scholar-to").fill("2099-11-30");
@@ -159,15 +199,16 @@ const base="http://127.0.0.1:8765";
    ]})
   }));
   await limited.route("https://cdn.jsdelivr.net/**",route=>route.fulfill({status:200,contentType:"application/javascript",body:""}));
+  await limited.route("https://api.semanticscholar.org/**",route=>route.fulfill({status:200,contentType:"application/json",body:JSON.stringify({data:[]})}));
   const limitedPage=await limited.newPage();
   limitedPage.on("pageerror",err=>errors.push(limitedPage.url()+": "+err.message));
   await limitedPage.goto(base+"/?view=scholarly#discover",{waitUntil:"domcontentloaded"});
   await limitedPage.locator("#scholar-query").fill("Bell nonlocality");
-  await limitedPage.locator("#scholar-from").fill("2026-11-01");
-  await limitedPage.locator("#scholar-to").fill("2026-11-03");
+  await limitedPage.locator("#scholar-from").fill("2026-10-01");
+  await limitedPage.locator("#scholar-to").fill("2026-10-04");
   await limitedPage.locator("#scholar-search-form button[type=submit]").click();
   await limitedPage.locator("#scholar-results article").first().waitFor({timeout:18000});
-  assert((await limitedPage.locator("#scholar-status").innerText()).includes("rate-limited"));
+  assert((await limitedPage.locator("#scholar-status").innerText()).length>15,"Source fallback must explain results");
   assert((await limitedPage.locator("#scholar-status").innerText()).includes("limited") || (await limitedPage.locator("#scholar-status").innerText()).includes("cached"));
   assert((await limitedPage.locator("#scholar-results").innerText()).includes("Bell nonlocality with entangled qubits"));
   assert((await limitedPage.locator("#scholar-results").innerText()).includes("Cached arXiv"));

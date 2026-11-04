@@ -24,6 +24,7 @@
   const write=(key,value)=>{try{localStorage.setItem(key,JSON.stringify(value))}catch{}};
   let prefs=load(KEY,{});
   let current=normalize(prefs,Fields);
+  let areaSelected=prefs.areaSelected===undefined?Boolean(prefs.topic||prefs.subtopic):Boolean(prefs.areaSelected);
   const fieldDetails=byId("field-details"),fieldTitle=byId("field-title");
   const fieldChoices=byId("fields"),areas=byId("areas"),subs=byId("subtopics");
   const headline=byId("headline"),hint=byId("hint"),trail=byId("trail"),custom=byId("custom"),apply=byId("apply");
@@ -56,21 +57,24 @@
   }
   const emit=reason=>{
    const old=load(KEY,{});
-   const query=current.subtopic||current.topic;
-   write(KEY,{...old,...current,query,customSubtopic:!!current.subtopic&&!Fields.fieldTopics(current.field,current.topic).includes(current.subtopic)});
-   window.dispatchEvent(new CustomEvent("researchlens:focus-change",{detail:{...current,query,reason}}));
+   const query=areaSelected?(current.subtopic||current.topic):"";
+   write(KEY,{...old,...current,areaSelected,query,customSubtopic:!!current.subtopic&&!Fields.fieldTopics(current.field,current.topic).includes(current.subtopic)});
+   window.dispatchEvent(new CustomEvent("researchlens:focus-change",{detail:{...current,areaSelected,query,reason}}));
   };
   function chooseField(id){
    const valid=Fields.fieldKey(id);
    if(valid===current.field){fieldDetails.open=false;return}
    current={field:valid,topic:Fields.FIELDS[valid].topics[0],subtopic:""};
+   areaSelected=false;
    fieldDetails.open=false;render();emit("field")
   }
   function chooseTopic(topic){
-   if(current.topic===topic&&current.subtopic===""){emit("topic");return}
+   areaSelected=true;
+   if(current.topic===topic&&current.subtopic===""){render();emit("topic");return}
    current={...current,topic,subtopic:""};render();emit("topic")
   }
   function chooseSubtopic(subtopic){
+   areaSelected=true;
    current={...current,subtopic};render();emit("subtopic")
   }
   function toggleFollow(name){
@@ -89,10 +93,13 @@
     button.onclick=()=>chooseField(key);fieldChoices.append(button)
    }
    areas.replaceChildren();
+   const anyArea=document.createElement("button");anyArea.type="button";anyArea.className="rl-focus-chip"+(!areaSelected?" active":"");
+   anyArea.textContent="All research areas";anyArea.setAttribute("aria-pressed",String(!areaSelected));
+   anyArea.onclick=()=>{areaSelected=false;current={...current,subtopic:""};render();emit("field")};areas.append(anyArea);
    const followingTopics=Fields.FIELDS[current.field].topics.slice();
    for(const topic of followingTopics){
     const wrap=document.createElement("span");wrap.className="rl-focus-interest";
-    const button=document.createElement("button");button.type="button";button.className="rl-focus-chip"+(topic===current.topic?" active":"");
+    const button=document.createElement("button");button.type="button";button.className="rl-focus-chip"+(areaSelected&&topic===current.topic?" active":"");
     button.textContent=topic;button.setAttribute("aria-pressed",String(topic===current.topic));
     button.onclick=()=>chooseTopic(topic);wrap.append(button);
     if(Custom&&followingTopics.length>1)wrap.append(removeButton("Remove research area "+topic,()=>{
@@ -121,15 +128,16 @@
     areas.append(reset);
    }
    subs.replaceChildren();
+   if(!areaSelected){const note=document.createElement("p");note.className="rl-interest-help";note.textContent="Optional: choose an area to narrow the latest papers, or browse all research in this field.";subs.append(note)}
    const picked=followed();
    const curated=Fields.fieldTopics(current.field,current.topic);
    const subtopics=Interest?Interest.order(curated.slice(),picked):curated;
    const any=document.createElement("button");any.type="button";
-   any.className="rl-focus-chip"+(!current.subtopic?" active":"");any.textContent="All "+current.topic;
+   any.className="rl-focus-chip"+(areaSelected&&!current.subtopic?" active":"");any.textContent="All "+current.topic;
    any.setAttribute("aria-pressed",String(!current.subtopic));any.onclick=()=>chooseSubtopic("");subs.append(any);
    for(const topic of subtopics){
     const wrap=document.createElement("span");wrap.className="rl-focus-interest";
-    const btn=document.createElement("button");btn.type="button";btn.className="rl-focus-chip"+(topic===current.subtopic?" active":"");
+    const btn=document.createElement("button");btn.type="button";btn.className="rl-focus-chip"+(areaSelected&&topic===current.subtopic?" active":"");
     btn.textContent=topic;btn.setAttribute("aria-pressed",String(topic===current.subtopic));
     btn.onclick=()=>chooseSubtopic(topic);wrap.append(btn);
     const star=document.createElement("button");star.type="button";const isFollowing=picked.some(x=>x.toLowerCase()===topic.toLowerCase());
@@ -153,8 +161,8 @@
     subs.append(wrap);
    }
    headline.textContent="Explore "+spec.name;
-   hint.textContent="Choose an area, then a subtopic. Search arXiv-hosted papers across historical records without the local feed's category limits.";
-   trail.textContent=spec.name+"  ›  "+current.topic+(current.subtopic?"  ›  "+current.subtopic:"");
+   hint.textContent="Research areas and subtopics are optional. Select a field to browse the latest indexed arXiv-hosted papers, or an area to narrow results.";
+   trail.textContent=spec.name+(areaSelected?"  ›  "+current.topic+(current.subtopic?"  ›  "+current.subtopic:""):"  ›  All areas");
    const source=document.getElementById("rl-source-scholarly");
    if(source&&source.firstChild?.nodeType===Node.TEXT_NODE)source.firstChild.textContent="Explore "+spec.name+" ";
   }
@@ -180,7 +188,7 @@
   window.addEventListener("researchlens:field-changed",e=>{
    const next=normalize({field:e.detail?.field,topic:e.detail?.topic},Fields);
    if(next.field===current.field&&next.topic===current.topic)return;
-   current=next;render();emit("external");
+   current=next;areaSelected=Boolean(e.detail?.areaSelected);render();emit("external");
   });
   window.addEventListener("axiovo:taxonomy-changed",()=>{
    const normalized=normalize(current,Fields);
@@ -188,7 +196,7 @@
     current=normalized;render();emit("taxonomy-updated");
    }else render();
   });
-  window.addEventListener("storage",e=>{if(e.key===KEY||e.key===Interest?.KEY){current=normalize(load(KEY,{}),Fields);render()}});
+  window.addEventListener("storage",e=>{if(e.key===KEY||e.key===Interest?.KEY){const next=load(KEY,{});current=normalize(next,Fields);areaSelected=next.areaSelected===undefined?Boolean(next.topic):Boolean(next.areaSelected);render()}});
   render();
   window.ResearchLensCurrentFocus=()=>({...current});
  }

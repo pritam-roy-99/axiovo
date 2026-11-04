@@ -1,0 +1,14 @@
+"use strict";
+const assert=require("node:assert/strict");
+const X=require("../docs/multisource-search.js");
+const paper={title:"Secure One-Sided Device-Independent Quantum Key Distribution Under Collective Attacks with Enhanced Robustness",publicationDate:"2026-01-31",year:2026,externalIds:{ArXiv:"2507.18744",DOI:"10.1007/s11128-026-05073-9"},authors:[{name:"Pritam Roy"},{name:"A. S. Majumdar"}]};
+assert.equal(X.arxivId(paper),"2507.18744");
+const work=X.normalize(paper);
+assert.equal(work.id,"https://arxiv.org/abs/2507.18744");
+assert.deepEqual(work.authorships.map(x=>x.author.display_name),["Pritam Roy","A. S. Majumdar"]);
+assert.equal(work.publication_date,"2026-01-31");
+assert.equal(X.normalize({...paper,externalIds:{DOI:"10.1007/s11128-026-05073-9"}}),null);
+assert.equal(X.normalize({...paper,externalIds:{ArXiv:"javascript:evil"}}),null);
+assert.equal(X.arxivId({...paper,externalIds:{ArXiv:"2411.16822v2"}}),"2411.16822");
+assert.equal(X.queryParams("QKD").get("query"),"QKD");
+console.log("Independent arXiv-ID literature source checks passed");

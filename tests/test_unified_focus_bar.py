@@ -33,7 +33,7 @@ class UnifiedFocusTests(unittest.TestCase):
   self.assertIn("researchlens:focus-change",source)
   explorer=(ROOT/"scholarly.js").read_text(encoding="utf8")
   self.assertIn('window.addEventListener("researchlens:focus-change"',explorer)
-  self.assertIn('state.query=newSubtopic||newTopic;',explorer)
+  self.assertIn('state.query=state.areaSelected?(newSubtopic||newTopic):"";',explorer)
   discover=(ROOT/"discover.js").read_text(encoding="utf8")
   self.assertIn('show("scholarly")',discover)
  def test_legacy_sections_invisible(self):

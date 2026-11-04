@@ -15,7 +15,7 @@ const future={...quantum,id:"https://openalex.org/W5",publication_date:"2027-08-
 const plan=S.plan(contextual,"Contextuality",{today:"2026-11-03"});
 assert.equal(plan.context,true);
 assert.equal(plan.search,"quantum Contextuality");
-assert.ok(plan.params.get("filter").includes("locations.source.id:S4306400194"));
+assert.ok(!plan.params.get("filter").includes("locations.source.id:"),"Do not exclude arXiv papers with missing provider tags");
 assert.ok(!plan.params.get("filter").includes("primary_topic.field.id:"));
 assert.ok(plan.params.get("filter").includes("to_publication_date:2026-11-03"));
 assert.deepEqual(S.select([medical,social,wrong,quantum,future],plan).map(w=>w.id),[quantum.id]);
@@ -55,4 +55,15 @@ assert.equal(S.match({...quantum,id:"https://openalex.org/WY",display_name:"Quan
 const hepPlan=S.plan({field:"highenergy",topic:"Scattering amplitudes",subtopic:""},"Scattering amplitudes",{today:"2026-11-03"});
 assert.equal(S.match({...quantum,id:"https://openalex.org/WHEP",display_name:"Scattering amplitudes in gauge theory"},hepPlan),true);
 assert.equal(S.match({...medical,id:"https://openalex.org/WHEPM",display_name:"Scattering amplitudes in gauge theory"},hepPlan),false);
+
+const broad=S.plan({field:"quantum",topic:"Quantum steering",subtopic:"",areaSelected:false},"",{today:"2026-11-05",sort:"publication_date:desc"});
+assert.equal(broad.search,"","A researcher must browse their field without selecting an area");
+assert.equal(broad.params.get("search"),null);
+assert.equal(broad.params.get("sort"),"publication_date:desc");
+assert.equal(S.match(quantum,broad),true);
+assert.equal(S.match(medical,broad),false);
+const dated=S.plan({field:"quantum",topic:"Quantum steering",subtopic:""},"Quantum steering",
+ {today:"2026-11-05",from:"2026-10-07",to:"2026-10-07",sort:"publication_date:desc"});
+assert(dated.params.get("filter").includes("from_publication_date:2026-10-07"));
+assert(dated.params.get("filter").includes("to_publication_date:2026-10-07"));
 console.log("Field-restricted scholarly search tests passed.");
