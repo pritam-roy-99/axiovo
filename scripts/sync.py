@@ -62,7 +62,7 @@ def parse_atom(data):
         })
     return papers
 
-def merge(existing, incoming, limit=3000):
+def merge(existing, incoming, limit=5000):
     index = {p["id"]: p for p in existing if p.get("id") and p.get("title")}
     for item in incoming:
         old = index.get(item["id"])
@@ -77,7 +77,7 @@ def fetch_recent():
 
     Poll at a deliberately modest pace and preserve existing metadata on failures.
     """
-    categories = os.environ.get("ARXIV_CATEGORIES", "quant-ph,cs.IT,hep-th,physics.optics,cond-mat.mes-hall").split(",")
+    categories = os.environ.get("ARXIV_CATEGORIES", "quant-ph,cs.AI,stat.ML,math.PR,astro-ph.CO,cond-mat.stat-mech,cond-mat.str-el,hep-ph,hep-th,q-bio.MN,physics.bio-ph,econ.GN").split(",")
     page_size = min(200, max(1, int(os.environ.get("ARXIV_MAX_RESULTS", "150"))))
     results = []
     failures = []
