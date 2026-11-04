@@ -4,7 +4,7 @@ const requested=window.ResearchLensArxiv?.parse(new URLSearchParams(location.sea
 const id=requested?.requested||"";const baseId=requested?.base||"";
 const valid=Boolean(requested);
 const issueTerm="arXiv:"+baseId;
-const repoName="pritam-roy-99/researchlens";const curatedIssue={"2608.13942":1};
+const repoName="pritam-roy-99/axiovo";const curatedIssue={"2608.13942":1};
 const issueSearch="https://github.com/"+repoName+"/issues?q="+encodeURIComponent("is:issue "+issueTerm);
 const issueCreate="https://github.com/"+repoName+"/issues/new?"+new URLSearchParams({title:"Paper discussion: "+issueTerm,body:"### Paper\nhttps://arxiv.org/abs/"+id+"\n\n### Discussion\nPlease add technical comments, references, verification questions or follow-up results below. Reactions are not endorsements of scientific correctness.\n"});
 function line(parent,label,value){const p=document.createElement("p");p.className="muted";p.textContent=label+": "+value;parent.append(p)}
@@ -27,6 +27,7 @@ external(links,"Research Assistant ↗","./copilot.html?id="+encodeURIComponent(
 const e=document.createElement("button");e.className="btn";e.textContent="Copy BibTeX";e.onclick=()=>navigator.clipboard?.writeText(bibEntry(p));links.append(e);
 const fields=$("fields");fields.replaceChildren();
 line(fields,"arXiv ID",baseId);if(requested?.explicit)line(fields,"Requested revision","v"+requested.version+" (verify on arXiv)");line(fields,"First submitted",p.published||"unknown");line(fields,"Last version update",p.updated||"unknown");line(fields,"arXiv categories",(p.categories||[]).join(", "));line(fields,"Inferred topics",(p.topics||[]).join(", ")||"uncategorized");
+window.AxiovoAuthorFollow?.mount(links,p.authors||[]);
 const authors=$("author-links");authors.replaceChildren();
 for(const name of (p.authors||[]).slice(0,12)){const div=document.createElement("div");div.className="related";const query="https://arxiv.org/search/?"+new URLSearchParams({query:name,searchtype:"author"});external(div,name+" ↗",query,"");authors.append(div)}
 const related=all.filter(x=>x.id!==baseId).map(x=>({paper:x,score:overlap(p.title+" "+p.abstract,x.title+" "+x.abstract)})).filter(x=>x.score>0).sort((a,b)=>b.score-a.score).slice(0,6);
