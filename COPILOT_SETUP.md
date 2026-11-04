@@ -63,3 +63,7 @@ The Copilot includes source metadata in the generation prompt and requests numbe
 5. Deploy a secured opt-in inference gateway if hosted AI is needed for visitors without local hardware.
 
 All functionality described as local or optional remains local or optional until corresponding infrastructure is deployed.
+
+## Which free AI should I use?
+
+For a typical laptop, Qwen3.5 4B or 9B via Ollama is a practical starting point. On a machine with substantially more memory and GPU capacity, try the 27B or 35B variants for more demanding research synthesis. Axiovo detects the models actually installed; there is no automatic proof verifier. Check citations and mathematical details against the original paper. The browser-only option uses smaller experimental models and is not comparable to large desktop models. Consensus is a separate provider with its own API allowances and is not included with Ollama.

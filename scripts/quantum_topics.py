@@ -1,4 +1,4 @@
-"""Transparent, keyword-based multi-label quantum research topic classifier.
+"""Transparent, keyword-based multi-label interdisciplinary research topic classifier.
 
 Labels are exploratory discovery aids, not verified scientific classifications.
 """
@@ -6,6 +6,18 @@ from __future__ import annotations
 import re
 
 TOPICS = {
+    "stat-mech": {"label": "Statistical mechanics", "patterns": [r"\b(?:statistical mechanics|critical phenomena|renormalization group|spin glass|stochastic thermodynamics)\b"]},
+    "cond-mat": {"label": "Condensed matter", "patterns": [r"\b(?:superconductiv\w*|hubbard model|strongly correlated|moire material|condensed matter)\b"]},
+    "high-energy": {"label": "High-energy physics", "patterns": [r"\b(?:lattice qcd|collider physics|higgs boson|particle physics|standard model)\b"]},
+    "astrophysics": {"label": "Astrophysics and cosmology", "patterns": [r"\b(?:astrophysic\w*|galax\w*|cosmolog\w*|gravitational wave)\b"]},
+    "biology": {"label": "Molecular biology", "patterns": [r"\b(?:cell biolog\w*|gene regulation|protein folding|biochemical pathway)\b"]},
+    "genomics": {"label": "Genomics and genetics", "patterns": [r"\b(?:genom\w*|transcriptom\w*|crispr|dna sequencing)\b"]},
+    "computer-ai": {"label": "Computer science and AI", "patterns": [r"\b(?:machine learning|artificial intelligence|deep learning|neural network)\b"]},
+    "mathematics": {"label": "Mathematics and statistics", "patterns": [r"\b(?:algebraic geometry|number theory|probability theory|mathematical statistics)\b"]},
+    "chemistry": {"label": "Chemistry", "patterns": [r"\b(?:chemical synthesis|organic chemistry|catalysis|electrochemistry)\b"]},
+    "environment": {"label": "Earth and climate", "patterns": [r"\b(?:climate change|oceanography|atmospheric dynamics|geophysics)\b"]},
+    "medicine": {"label": "Medicine and health", "patterns": [r"\b(?:clinical trial|public health|epidemiology|medical imaging)\b"]},
+    "social": {"label": "Social sciences", "patterns": [r"\b(?:social network analysis|economic policy|political science|behavioral economics)\b"]},
     "quantum-communication": {
         "label": "Quantum communication & QKD",
         "patterns": [

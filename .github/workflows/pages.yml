@@ -52,6 +52,8 @@ jobs:
         id: refresh
         continue-on-error: false
         run: python scripts/sync.py
+      - name: Refresh free bioRxiv metadata
+        run: python scripts/sync_biorxiv.py
       - name: Report synchronization outcome
         if: steps.refresh.outcome == 'failure'
         run: |
@@ -73,7 +75,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docs/data/feed.json
+          git add docs/data/feed.json docs/data/biorxiv.json
           if ! git diff --cached --quiet; then
             git commit -m "data: refresh arXiv index [skip ci]"
             git fetch origin main

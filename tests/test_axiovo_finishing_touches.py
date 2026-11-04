@@ -5,9 +5,10 @@ ROOT=Path(__file__).resolve().parents[1]/"docs"
 class FinishingTouchesTests(unittest.TestCase):
  def test_internal_community_and_truthful_status(self):
   nav=(ROOT/"navigation.js").read_text()
-  self.assertIn('["./community.html","Community"]',nav)
+  self.assertNotIn('["./community.html","Community"]',nav)
   page=(ROOT/"community.html").read_text()
   self.assertIn("GitHub Issues",page)
+  self.assertIn('href="./community.html"',(ROOT/"profiles.html").read_text())
   self.assertIn("Native cross-user commenting",page)
   self.assertIn("not automatically published",page)
  def test_saved_paper_attaches_to_research_question(self):
@@ -28,7 +29,7 @@ class FinishingTouchesTests(unittest.TestCase):
   self.assertIn('tour.open=false',onboard)
  def test_offline_app_caches_community(self):
   worker=(ROOT/"sw.js").read_text()
-  self.assertIn("axiovo-shell-v7",worker)
+  self.assertIn("axiovo-shell-v8",worker)
   self.assertIn("community.html",worker)
 if __name__=="__main__":
  unittest.main()

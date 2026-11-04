@@ -198,3 +198,30 @@
  .rl-focus-restore{width:100%;justify-content:center}
  .rl-focus-subrow,.rl-focus-area,.rl-focus-submain,.rl-focus-chiplist{min-width:0;max-width:100%}
 }
+
+/* Three discovery sources and actual arXiv cross-listing, no preferred discipline. */
+.rl-discover-options{display:flex!important;flex-wrap:wrap;gap:9px}
+.rl-discover-options>.rl-source-button{flex:1 1 190px;min-width:0;white-space:normal}
+.axiovo-crosslist-toggle{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:650;min-height:44px;padding:6px}
+.axiovo-crosslist-toggle input{width:18px;height:18px;flex:0 0 18px}
+.axiovo-crosslist-tag{display:inline-block;background:#e7edf9;color:#284a82;border:1px solid #b9cae8;
+  border-radius:7px;font-size:10px;margin:0 4px 4px 0;padding:3px 7px;max-width:100%;overflow-wrap:anywhere}
+.axiovo-biorxiv{max-width:1190px;margin:auto;min-width:0}
+.axiovo-biorxiv[hidden]{display:none!important}
+.axiovo-biorxiv-intro{margin:10px 0 17px;padding:17px;border:1px solid var(--rl-border,#d5e3ee);border-radius:14px;background:var(--rl-panel,#fff)}
+.axiovo-biorxiv-intro h2{margin:6px 0;font-size:22px}.axiovo-biorxiv-intro p{font-size:13px;line-height:1.65}
+.axiovo-biorxiv-controls{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:12px;margin:12px 0}
+.axiovo-biorxiv-controls label{display:grid;gap:6px;font-size:12px;font-weight:700}
+.axiovo-biorxiv-controls input,.axiovo-biorxiv-controls select{width:100%;min-width:0;border:1px solid var(--rl-border,#bfd2e1);background:var(--rl-panel,#fff);color:var(--rl-text,#203e54);border-radius:9px;padding:10px;min-height:44px}
+.axiovo-biorxiv-results{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;min-width:0}
+.axiovo-biorxiv-paper{border:1px solid var(--rl-border,#d3e4ec);border-radius:13px;padding:15px;min-width:0;background:var(--rl-panel,#fff);overflow-wrap:anywhere}
+.axiovo-biorxiv-paper h3{margin:9px 0;font-size:16px;line-height:1.35}
+.axiovo-biorxiv-paper p{font-size:12px;line-height:1.6}
+.axiovo-biorxiv-paper small{font-size:11px;color:var(--rl-muted,#5d7890)}
+.axiovo-biorxiv-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.axiovo-biorxiv-actions a,.axiovo-biorxiv-actions button{display:inline-flex;align-items:center;min-height:42px;padding:9px 11px;border-radius:9px;background:var(--axiovo-accent,#126f9c);border:1px solid var(--axiovo-accent,#126f9c);color:white;font-size:12px;font-weight:650;text-decoration:none;cursor:pointer}
+.axiovo-biorxiv-paper textarea{display:block;width:100%;min-width:0;min-height:60px;resize:vertical;padding:10px;border:1px solid var(--rl-border,#bfd2e1);border-radius:9px}
+.axiovo-provider-line{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:10px 0 15px}
+.axiovo-provider-line button{font-size:12px;background:var(--rl-panel,#fff);color:var(--rl-text,#18364e);padding:10px;border:1px solid var(--rl-border,#b4cfe0);border-radius:9px;cursor:pointer}
+.axiovo-provider-line small{font-size:11px;color:var(--rl-muted,#587088)}
+@media(max-width:700px){.axiovo-biorxiv-controls,.axiovo-biorxiv-results{grid-template-columns:minmax(0,1fr)}.rl-discover-options>.rl-source-button{flex-basis:100%}}

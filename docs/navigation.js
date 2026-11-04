@@ -7,8 +7,7 @@
   const mark=document.createElement("span");mark.className="rl-logo-mark";mark.textContent="A";
   logo.append(mark,document.createTextNode(" Axiovo"));
   const nav=document.createElement("nav");nav.className="rl-nav";nav.setAttribute("aria-label","Main navigation");
-  const links=[["./#discover","Discover"],["./#workspace","Library"],["./copilot.html","Research AI"],
-   ["./community.html","Community"]];
+  const links=[["./#discover","Discover"],["./#workspace","Library"],["./copilot.html","Research AI"]];
   const file=location.pathname.split("/").pop()||"index.html";
   for(const [href,label] of links){
    const a=document.createElement("a");a.href=href;a.textContent=label;

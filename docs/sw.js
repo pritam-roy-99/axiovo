@@ -1,6 +1,6 @@
 /* ResearchLens offline shell. Do not cache remote APIs, PDFs or the live feed. */
 "use strict";
-const CACHE = "axiovo-shell-v7";
+const CACHE = "axiovo-shell-v8";
 const SHELL = [
   "./", "./index.html", "./workspace.html", "./copilot.html",
   "./lab.html", "./paper.html", "./profiles.html", "./community.html", "./methodology.html",
@@ -12,7 +12,7 @@ const SHELL = [
   "./assistant-core.js", "./copilot.js", "./lab.js", "./workspace.js",
   "./paper.js", "./profiles.js", "./profiles-social.js", "./social.js",
   "./social-config.js", "./cloud-sync.js", "./relevance.js",
-  "./research-intelligence.js", "./unified-workspace.js", "./onboarding.js", "./data/feed.json", "./manifest.webmanifest", "./icons/researchlens.svg"
+  "./research-intelligence.js", "./unified-workspace.js", "./onboarding.js", "./biorxiv.js", "./research-providers.js", "./appearance-picker.js", "./data/biorxiv.json", "./data/feed.json", "./manifest.webmanifest", "./icons/researchlens.svg"
 ];
 self.addEventListener("install", (event) => {
   event.waitUntil(

@@ -51,7 +51,7 @@ class DiscoveryUXTests(unittest.TestCase):
         self.assertIn('state.subtopic=""',js)
         self.assertIn('window.addEventListener("researchlens:scholarly-open",init,{once:true})',js)
         switch=(ROOT/"discover.js").read_text(encoding="utf8")
-        self.assertIn('primary!=="quantum"',switch)
+        self.assertIn('primary!=="general"',switch)
 
 if __name__=="__main__":
     unittest.main()

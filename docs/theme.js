@@ -1,20 +1,43 @@
-/* Shared day/night appearance; stored only on this device. */
+/* Local appearance settings shared across Axiovo, without accounts or trackers. */
 (function(){
- const key="researchlens-theme";let theme="light";
- try{theme=localStorage.getItem(key)||"light"}catch(err){}
- if(theme!=="dark")theme="light";
+ "use strict";
+ const KEY="researchlens-theme",PALETTE_KEY="axiovo-palette-v1";
+ const allowed=["ocean","forest","violet","rose","amber"];
+ let theme="light",palette="ocean";
+ try{theme=localStorage.getItem(KEY)==="dark"?"dark":"light";
+     palette=localStorage.getItem(PALETTE_KEY)||"ocean"}catch{}
+ if(!allowed.includes(palette))palette="ocean";
  document.documentElement.dataset.theme=theme;
- function set(t){
-  theme=t;document.documentElement.dataset.theme=t;
-  try{localStorage.setItem(key,t)}catch(err){}
+ document.documentElement.dataset.accent=palette;
+ function applyTheme(value){
+  theme=value==="dark"?"dark":"light";
+  document.documentElement.dataset.theme=theme;
+  try{localStorage.setItem(KEY,theme)}catch{}
   const b=document.querySelector(".theme-toggle");
-  if(b){b.textContent=t==="dark"?"☀ Day":"☾ Night";b.setAttribute("aria-label","Switch to "+(t==="dark"?"light":"dark")+" mode")}
+  if(b){b.textContent=theme==="dark"?"☀ Day":"☾ Night";
+   b.setAttribute("aria-label","Switch to "+(theme==="dark"?"light":"dark")+" mode")}
  }
+ function applyPalette(value){
+  if(!allowed.includes(value))return false;
+  palette=value;document.documentElement.dataset.accent=value;
+  try{localStorage.setItem(PALETTE_KEY,value)}catch{}
+  for(const select of document.querySelectorAll("[data-axiovo-palette]"))select.value=value;
+  return true;
+ }
+ window.AxiovoAppearance={palettes:allowed.slice(),setPalette:applyPalette,getPalette:()=>palette,
+  setTheme:applyTheme,getTheme:()=>theme};
  function install(){
-  const h=document.querySelector("header");if(!h)return;
-  const b=document.createElement("button");b.type="button";b.className="theme-toggle";
-  b.onclick=()=>set(theme==="light"?"dark":"light");
-  h.append(b);set(theme);
+  const header=document.querySelector("header");
+  if(header&&!header.querySelector(".theme-toggle")){
+   const b=document.createElement("button");b.type="button";b.className="theme-toggle";
+   b.onclick=()=>applyTheme(theme==="light"?"dark":"light");header.append(b);
+  }
+  applyTheme(theme);applyPalette(palette);
  }
- if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",install);else install();
+ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",install);
+ else install();
+ window.addEventListener("storage",e=>{
+  if(e.key===PALETTE_KEY)applyPalette(e.newValue||"ocean");
+  if(e.key===KEY)applyTheme(e.newValue||"light");
+ });
 })();

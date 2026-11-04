@@ -2,7 +2,7 @@
 "use strict";
 const assert=require("node:assert/strict");
 const {FIELDS,SUBTOPICS,fieldTopics,fieldKey}=require("../docs/research-fields.js");
-assert.equal(Object.keys(FIELDS).length,12);
+assert.equal(Object.keys(FIELDS).length,13);
 for(const [field,spec] of Object.entries(FIELDS)){
  assert.ok(spec.name && spec.topics.length>=8,"field has credible research areas: "+field);
  for(const topic of spec.topics){
@@ -14,6 +14,7 @@ for(const [field,spec] of Object.entries(FIELDS)){
 }
 assert.deepEqual(fieldTopics("quantum","Quantum steering"),["Multipartite steering","Network steering","Measurement incompatibility"]);
 assert.deepEqual(fieldTopics("medicine","Clinical trials"),["Randomized controlled trials","Adaptive trials","Clinical trial meta-analysis"]);
+assert.equal(fieldKey("general"),"general");
 assert.equal(fieldKey("biology"),"biology");
 assert.equal(fieldKey("statmech"),"statmech");
 assert.equal(fieldKey("condmat"),"condmat");
@@ -25,5 +26,5 @@ for(const id of ["statmech","condmat","highenergy"]){
 }
 assert.ok(fieldTopics("statmech","Nonequilibrium statistical mechanics").includes("Fluctuation-dissipation violations"));
 assert.ok(fieldTopics("condmat","Topological phases of matter").includes("Topological order and anyons"));
-assert.equal(fieldKey("not-a-field"),"quantum");
+assert.equal(fieldKey("not-a-field"),"general");
 console.log("Field taxonomy: "+Object.keys(FIELDS).length+" disciplines, "+Object.values(SUBTOPICS).reduce((n,x)=>n+Object.values(x).reduce((a,y)=>a+y.length,0),0)+" curated subtopics; tests passed.");

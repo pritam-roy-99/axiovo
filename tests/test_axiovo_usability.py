@@ -17,7 +17,7 @@ class UsabilityTests(unittest.TestCase):
         self.assertIn('["./#discover","Discover"]',nav)
         self.assertIn('["./#workspace","Library"]',nav)
         self.assertIn('["./copilot.html","Research AI"]',nav)
-        self.assertIn('["./community.html","Community"]',nav)
+        self.assertNotIn('["./community.html","Community"]',nav)
         self.assertNotIn('["./profiles.html","Profile"]',nav)
         self.assertIn('settings.href="./profiles.html"',nav)
     def test_app_footer_credits_are_accurate(self):
@@ -42,7 +42,7 @@ class UsabilityTests(unittest.TestCase):
         js=(DOCS/"onboarding.js").read_text()
         self.assertIn('axiovo-onboarding-dismissed-v1',js)
         css=(DOCS/"theme.css").read_text()
-        self.assertIn('grid-template-columns:repeat(4,minmax(0,1fr))',css)
+        self.assertIn('grid-template-columns:repeat(3,minmax(0,1fr))',css)
         self.assertIn('env(safe-area-inset-bottom',css)
         self.assertIn('max-width:700px',css)
 if __name__=="__main__":
