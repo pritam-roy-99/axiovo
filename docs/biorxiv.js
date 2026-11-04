@@ -63,7 +63,7 @@
   const status=document.getElementById("axiovo-biorxiv-status");
   if(status)status.textContent=feed.length?
    selected.length+" of "+feed.length+" cached recent bioRxiv preprints · last sync "+lastUpdated:
-   "No bioRxiv metadata has been synchronized yet. Use the official bioRxiv search below.";
+   "No bioRxiv records are available in the current feed. Use the official bioRxiv search below.";
   if(!selected.length)container.append(text("p","No matching cached preprints. This does not mean bioRxiv has no matching work."));
   selected.slice(0,100).forEach(p=>container.append(paperCard(p)));
   const official=document.getElementById("axiovo-biorxiv-official");
@@ -77,6 +77,20 @@
    const data=await resp.json();
    feed=(Array.isArray(data.papers)?data.papers:[]).map(normalize).filter(Boolean);
    lastUpdated=String(data.generated_at||"not yet synchronized").slice(0,19);
+   if(!feed.length){
+    const status=document.getElementById("axiovo-biorxiv-status");
+    if(status)status.textContent="The cached bioRxiv feed is empty. Checking live official metadata…";
+    try{
+     const live=await fetch("https://api.biorxiv.org/details/biorxiv/100/0/json",{signal:AbortSignal.timeout(12000)});
+     if(!live.ok)throw Error("HTTP "+live.status);
+     const latest=await live.json();
+     const entries=Array.isArray(latest.collection)?latest.collection:[];
+     feed=entries.map(p=>normalize({...p,authors:typeof p.authors==="string"?p.authors.split(";").map(x=>x.trim()):p.authors})).filter(Boolean);
+     if(feed.length)lastUpdated="live bioRxiv API";
+    }catch(error){
+     if(status)status.textContent="The cached bioRxiv feed has not been populated, and live retrieval is unavailable. Use the official bioRxiv search below.";
+    }
+   }
    const cats=[...new Set(feed.map(x=>x.category).filter(Boolean))].sort();
    const filter=document.getElementById("axiovo-biorxiv-category");
    for(const c of cats){const opt=text("option",c);opt.value=c;filter?.append(opt)}
