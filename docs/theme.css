@@ -87,12 +87,18 @@ body{min-width:0;max-width:100%}
 @media(min-width:701px){.axiovo-video-details summary{display:none}}
 @media(max-width:700px){.axiovo-video-details:not([open]){border:1px solid #456985;border-radius:9px;padding:7px}.axiovo-video-details:not([open]) summary{padding:10px}}
 
-/* Five accessible research-friendly accent palettes, available in light and dark. */
+/* Eleven accessible research-friendly accent palettes, available in light and dark. */
 :root{--axiovo-accent:#126f9c;--axiovo-accent-soft:#e0f1fb;--axiovo-accent-rgb:18,111,156;--axiovo-hero:#0a2b49;--axiovo-hero-2:#195b82}
 :root[data-accent="forest"]{--axiovo-accent:#24775e;--axiovo-accent-soft:#e0f4e9;--axiovo-accent-rgb:36,119,94;--axiovo-hero:#102f2b;--axiovo-hero-2:#26715e}
 :root[data-accent="violet"]{--axiovo-accent:#7256b9;--axiovo-accent-soft:#eee8fc;--axiovo-accent-rgb:114,86,185;--axiovo-hero:#252047;--axiovo-hero-2:#5a478f}
 :root[data-accent="rose"]{--axiovo-accent:#a54f7d;--axiovo-accent-soft:#fae8f0;--axiovo-accent-rgb:165,79,125;--axiovo-hero:#421c37;--axiovo-hero-2:#844262}
 :root[data-accent="amber"]{--axiovo-accent:#8f5e16;--axiovo-accent-soft:#fff1d4;--axiovo-accent-rgb:143,94,22;--axiovo-hero:#382a18;--axiovo-hero-2:#84602b}
+:root[data-accent="slate"]{--axiovo-accent:#4b647d;--axiovo-accent-soft:#e8eef4;--axiovo-accent-rgb:75,100,125;--axiovo-hero:#1b2a3b;--axiovo-hero-2:#465f76}
+:root[data-accent="teal"]{--axiovo-accent:#007f82;--axiovo-accent-soft:#e2f4f2;--axiovo-accent-rgb:0,127,130;--axiovo-hero:#083436;--axiovo-hero-2:#08777a}
+:root[data-accent="indigo"]{--axiovo-accent:#5357a6;--axiovo-accent-soft:#ebedfc;--axiovo-accent-rgb:83,87,166;--axiovo-hero:#1c2550;--axiovo-hero-2:#4b5493}
+:root[data-accent="coral"]{--axiovo-accent:#bd604f;--axiovo-accent-soft:#fcece7;--axiovo-accent-rgb:189,96,79;--axiovo-hero:#452821;--axiovo-hero-2:#a85c49}
+:root[data-accent="mint"]{--axiovo-accent:#367e70;--axiovo-accent-soft:#e3f5ef;--axiovo-accent-rgb:54,126,112;--axiovo-hero:#163a33;--axiovo-hero-2:#398572}
+:root[data-accent="plum"]{--axiovo-accent:#86528e;--axiovo-accent-soft:#f4e8f4;--axiovo-accent-rgb:134,82,142;--axiovo-hero:#35213a;--axiovo-hero-2:#77497f}
 :root[data-accent] .hero{background:linear-gradient(120deg,var(--axiovo-hero),var(--axiovo-hero-2))!important}
 :root[data-accent] .rl-global-header,:root[data-accent] header{background:var(--axiovo-hero)!important}
 :root[data-accent] .rl-global-header .rl-nav a[aria-current="page"],:root[data-accent] .rl-unified-switch a[aria-current="page"],
