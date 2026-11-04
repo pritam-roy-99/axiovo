@@ -1,5 +1,18 @@
 # ResearchLens
 
+## What makes this project different
+
+**ResearchLens is an open-source, local-first research discovery and reading workspace**, rather than a pay-per-paper AI PDF analysis service. Its intended workflow is **discover → verify the original source → save → annotate → revisit and discuss**.
+
+- **Open and inspectable:** the code is public; arXiv metadata and OpenAlex provenance are explicitly identified.
+- **Use without a hosted account:** browser-local reading, PDF notes and personal research interests; export options are available in the workspace.
+- **Install or run locally:** use the installable web app or run `python3 run.py` with no extra packages.
+- **Source-linked rather than verdict-driven:** original arXiv records and revision-aware links are emphasized. AI output, citation counts and lexical rankings must not be treated as correctness or novelty certification.
+
+**Important limits:** historical search is not a complete arXiv mirror. Hosted social accounts and model inference require separate setup, and local storage is device/browser-specific. Paper analysis and comparison are not unique to this project. We do not claim scientifically validated novelty or correctness from automated reports.
+
+**Naming:** Other unrelated projects and websites use “Research Lens” or “ResearchLens”. This repository is independent of them. A distinctive product name and a trademark/domain check should be considered before an app-store launch.
+
 ## Install or run locally (no build step)
 
 - **Android / desktop:** Open [ResearchLens](https://pritam-roy-99.github.io/researchlens/) in Chrome or Edge and use **Install app** or **Add to Home screen** when the browser offers it.
