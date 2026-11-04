@@ -170,7 +170,7 @@ const base="http://127.0.0.1:8765";
   assert((await dpage.locator("#scholar-results").innerText()).includes("Quantum computing with error corrected qubits"));
   assert(!openalexQueries.some(u=>(u.searchParams.get("filter")||"").includes("2099")));
   assert(openalexQueries.some(u=>u.searchParams.get("search")==="Quantum computing"));
-  assert(openalexQueries.some(u=>(u.searchParams.get("filter")||"").includes("locations.source.id:S4306400194")));
+  assert(openalexQueries.some(u=>!(u.searchParams.get("filter")||"").includes("locations.source.id:")),"ArXiv works must not be excluded by provider source ID");
   assert(openalexQueries.every(u=>!(u.searchParams.get("filter")||"").includes("primary_topic.field.id:")));
   await dpage.locator("#scholar-from").fill("2099-11-27");
   await dpage.locator("#scholar-to").fill("2099-11-30");
