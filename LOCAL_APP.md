@@ -12,7 +12,7 @@ Docker, a database, or an account to use the basic reading workspace.
 3. Launch ResearchLens from your home screen or applications list.
 
 Installation availability depends on the browser and platform. The interface
-and previously visited assets can work offline, but **live arXiv/OpenAlex searches,
+and cached app assets, including the last downloaded arXiv snapshot, can work offline, but **live arXiv/OpenAlex searches,
 GitHub discussions, AI model downloads, and remote PDFs need a network**.
 A browser-local reading list is saved in browser storage, so it does not
 automatically synchronize with other browsers/devices.
