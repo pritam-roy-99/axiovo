@@ -22,6 +22,7 @@
   const categories=[p.primary_category,...(p.categories||[])].filter(Boolean).join(" ");
   const raw=String(p.title||"")+" "+String(p.abstract||"");
   if(field==="quantum")return /\bquant-ph\b/.test(categories)||PHYSICS.test(raw);
+  if(field==="highenergy")return /\b(hep-th|hep-ph|hep-ex|hep-lat|gr-qc)\b/i.test(categories)||/\b(particle physics|quantum field theory|lattice qcd|standard model|collider physics|supersymmetry|scattering amplitudes|higgs boson|neutrino oscillations|ads\/cft)\b/i.test(raw);
   if(field==="statmech")return /\bcond-mat\.stat-mech\b/.test(categories)||/\b(critical phenomena|renormalization group|stochastic thermodynamics|nonequilibrium statistical|spin glasses|statistical mechanics|phase transitions)\b/i.test(raw);
   if(field==="condmat")return /\bcond-mat(?:\.[a-z-]+)?\b/.test(categories)||/\b(condensed matter|superconductivity|Hubbard model|quantum spin liquid|topological insulator|moiré material)\b/i.test(raw);
   if(field==="computer")return /\bcs\.|\bstat\./i.test(categories);
