@@ -28,7 +28,7 @@ class UnifiedFocusTests(unittest.TestCase):
   self.assertIn("ResearchLensInterests",source)
   self.assertIn("Custom.addArea",source)
   self.assertIn("Custom.removeArea",source)
-  self.assertIn("Custom.addInterest",source)
+  self.assertIn("Custom?.addInterest",source)
   self.assertIn("Custom.removeInterest",source)
   self.assertIn("researchlens:focus-change",source)
   explorer=(ROOT/"scholarly.js").read_text(encoding="utf8")
