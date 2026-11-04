@@ -12,6 +12,35 @@ Axiovo includes 12 top-level disciplines, including a dedicated **High-energy ph
 
 The optional Research Assistant provides evidence-led source retrieval, literature comparison, deep technical reviews and assumption-checking workflows. For model-generated answers, connect a locally running [Ollama](https://ollama.com/) instance, detect installed models and choose an analysis depth. Hosted GPU inference and mathematically verified results are not included in the free static GitHub Pages deployment.
 
+## Multi-disciplinary discovery and optional evidence providers
+
+- **Neutral first launch:** All research disciplines are available, without special ranking weight for quantum physics. Your previously selected discipline remains saved on this device.
+- **arXiv cross-listing:** Recent-paper cards display secondary arXiv categories alongside the primary category. Use *Cross-listed only* to filter papers that appear in more than one category. This is based on source metadata, not AI-inferred classifications.
+- **bioRxiv:** A new Discover tab searches a cached snapshot of recent life-science preprints from the official public bioRxiv API. Save DOI-identified bioRxiv preprints in Library with private notes. Historical coverage remains available on bioRxiv's official site.
+- **Visual palettes:** Settings offers Ocean, Forest, Violet, Rose and Amber, each with day and night modes. The palette is stored locally.
+- **Community:** It is intentionally a secondary link in Settings rather than a main navigation destination.
+- **Consensus:** An optional Consensus-powered search is available *inside the locally run app* when `CONSENSUS_API_KEY` is set. The token stays on the local Python server, never in browser JavaScript or GitHub Pages. On hosted Pages, open Consensus's official search separately. Free API accounts currently have a limited monthly quota; please consult provider terms.
+- **Free AI:** Evidence-only retrieval works without model downloads. Researchers can enable a local Ollama Qwen3.5 model or an experimental small browser-based model. Axiovo does not supply free GPU inference or certify proofs automatically.
+
+### Use Consensus locally
+
+Register for a Consensus API key at [Consensus](https://consensus.app/), then start Axiovo on your own computer:
+
+```bash
+# macOS / Linux
+export CONSENSUS_API_KEY="your-own-api-key"
+python3 run.py
+```
+
+For Windows PowerShell:
+
+```powershell
+$env:CONSENSUS_API_KEY="your-own-api-key"
+py run.py
+```
+
+Use Discover → **Search with Consensus (local API)**. The local HTTP server binds only to `127.0.0.1` and forwards a query to Consensus `/v1/search` with the key from its environment. Never commit your key into this repository or paste it into the website.
+
 ## What makes this project different
 
 **Axiovo is an open-source, local-first research discovery and reading workspace**, rather than a pay-per-paper AI PDF analysis service. Its intended workflow is **discover → verify the original source → save → annotate → revisit and discuss**.
