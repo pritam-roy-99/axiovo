@@ -41,4 +41,15 @@ assert.equal(S.match({...quantum,id:"https://openalex.org/W8",display_name:"Fini
 const prepQuantum=S.plan({field:"quantum",topic:"Contextuality",subtopic:"Preparation contextuality"},"Preparation contextuality",{today:"2026-11-03"});
 assert.equal(S.match(quantum,prepQuantum),false);
 assert.equal(S.match({...quantum,id:"https://openalex.org/W9",display_name:"Preparation contextuality for quantum states"},prepQuantum),true);
+const statPlan=S.plan({field:"statmech",topic:"Nonequilibrium statistical mechanics",subtopic:""},
+ "Nonequilibrium statistical mechanics",{today:"2026-11-03"});
+const statPaper={...quantum,id:"https://openalex.org/WS",display_name:"Nonequilibrium statistical mechanics and entropy production"};
+const unrelatedPaper={...medical,id:"https://openalex.org/WX",display_name:"Nonequilibrium healthcare management"};
+assert.equal(S.match(statPaper,statPlan),true);
+assert.equal(S.match(unrelatedPaper,statPlan),false);
+const condPlan=S.plan({field:"condmat",topic:"Topological phases of matter",subtopic:""},
+ "Topological phases of matter",{today:"2026-11-03"});
+const condPaper={...quantum,id:"https://openalex.org/WC",display_name:"Topological phases of quantum matter"};
+assert.equal(S.match(condPaper,condPlan),true);
+assert.equal(S.match({...quantum,id:"https://openalex.org/WY",display_name:"Quantum computing with qubits"},condPlan),false);
 console.log("Field-restricted scholarly search tests passed.");

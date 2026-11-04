@@ -8,6 +8,8 @@ assert.equal(C.normalize({...p,field:"computer"},F).topic,F.FIELDS.computer.topi
 assert.equal(C.normalize({field:"medicine",topic:"Clinical trials",subtopic:"Adaptive trials"},F).subtopic,"Adaptive trials");
 assert.equal(C.normalize({field:"medicine",topic:"Clinical trials",subtopic:"Network steering"},F).subtopic,"");
 assert.equal(C.normalize({field:"biology",topic:"Nonexistent"},F).topic,F.FIELDS.biology.topics[0]);
+assert.deepEqual(C.normalize({field:"statmech",topic:"Nonequilibrium statistical mechanics",subtopic:"Fluctuation-dissipation violations"},F),{field:"statmech",topic:"Nonequilibrium statistical mechanics",subtopic:"Fluctuation-dissipation violations"});
+assert.deepEqual(C.normalize({field:"condmat",topic:"Topological phases of matter",subtopic:"Topological order and anyons"},F),{field:"condmat",topic:"Topological phases of matter",subtopic:"Topological order and anyons"});
 assert.equal(C.normalize({field:"not-a-field",topic:"Cybersecurity"},F).field,"quantum");
 assert.equal(C.normalize({field:"mathematics",topic:F.FIELDS.mathematics.topics[0],subtopic:"Custom area",customSubtopic:true},F).subtopic,"Custom area");
 for(const [id,field] of Object.entries(F.FIELDS)){
