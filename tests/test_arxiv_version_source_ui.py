@@ -23,7 +23,7 @@ class SourceFirstTests(unittest.TestCase):
   self.assertIn("Search all arXiv",home)
  def test_historical_search_not_limited_to_snapshot(self):
   js=(ROOT/"history.js").read_text(encoding="utf8")
-  self.assertIn('locations.source.id:',js)
+  self.assertIn('const filters=[];',js)
   self.assertIn('Arxiv?.parse(p.q)',js)
   self.assertIn('Arxiv.abs(direct.requested)',js)
   self.assertIn('arxiv-live-search',js)
