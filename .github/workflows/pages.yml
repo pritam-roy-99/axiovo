@@ -41,6 +41,7 @@ jobs:
           node tests/assistant-core.test.js
           node tests/field-taxonomy.test.js
           node tests/author-follow.test.js
+          node tests/author-search.test.js
       - name: Test field-interest preferences
         run: node tests/interests.test.js
       - name: Validate discipline-specific search
