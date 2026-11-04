@@ -110,3 +110,11 @@ body{min-width:0;max-width:100%}
 :root[data-theme="dark"][data-accent]{--axiovo-accent-soft:#243448}
 :root[data-theme="dark"][data-accent] .axiovo-color-option{background:#20334a;color:#e9f2fd}
 @media(max-width:700px){:root[data-accent] .rl-global-header .rl-nav{background:var(--axiovo-hero)!important}}
+
+/* Accessible first-party Android install affordance. */
+.axiovo-install-action{font:inherit;cursor:pointer;border-radius:10px;padding:11px 17px;margin:6px 4px;border:1px solid #69d9f0;background:#143f59;color:#fff;min-height:44px;font-weight:700}
+.axiovo-install-action:focus-visible{outline:3px solid #66d6ec;outline-offset:3px}
+.axiovo-install-guide{max-width:min(420px,calc(100vw - 32px));border-radius:16px;padding:24px;border:1px solid #a2c4d4;background:var(--rl-panel,#fff);color:var(--rl-text,#19324d);line-height:1.5}
+.axiovo-install-guide::backdrop{background:#0515259c}
+.axiovo-install-guide h2{font-size:21px;margin:0 0 12px}
+@media(max-width:550px){.axiovo-install-action{width:auto;max-width:100%}}
