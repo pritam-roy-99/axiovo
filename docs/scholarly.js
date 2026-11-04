@@ -61,7 +61,7 @@ function mirrorArxivBookmark(work,add){
  const key="researchlens-reading-list";
  let ids=[];try{ids=JSON.parse(localStorage.getItem(key)||"[]")}catch{}
  if(!Array.isArray(ids))ids=[];
- const id=selected.base;
+ const id=selected.requested;
  const next=add?[...new Set([...ids,id])]:ids.filter(x=>x!==id);
  try{localStorage.setItem(key,JSON.stringify(next))}catch{}
 }

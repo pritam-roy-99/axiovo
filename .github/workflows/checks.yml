@@ -16,6 +16,8 @@ jobs:
           python-version: '3.12'
       - name: Python regression tests
         run: python -m unittest discover -s tests -v
+      - name: Verify internal navigation and assets
+        run: python scripts/audit_internal_links.py
       - name: JavaScript and page validation
         run: python -m scripts.validate_site
       - name: Research relevance tests
