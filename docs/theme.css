@@ -86,3 +86,27 @@ body{min-width:0;max-width:100%}
 .axiovo-video-details summary{cursor:pointer;font-size:13px;color:#d6edfa;padding:8px 5px;font-weight:700}
 @media(min-width:701px){.axiovo-video-details summary{display:none}}
 @media(max-width:700px){.axiovo-video-details:not([open]){border:1px solid #456985;border-radius:9px;padding:7px}.axiovo-video-details:not([open]) summary{padding:10px}}
+
+/* Five accessible research-friendly accent palettes, available in light and dark. */
+:root{--axiovo-accent:#126f9c;--axiovo-accent-soft:#e0f1fb;--axiovo-accent-rgb:18,111,156;--axiovo-hero:#0a2b49;--axiovo-hero-2:#195b82}
+:root[data-accent="forest"]{--axiovo-accent:#24775e;--axiovo-accent-soft:#e0f4e9;--axiovo-accent-rgb:36,119,94;--axiovo-hero:#102f2b;--axiovo-hero-2:#26715e}
+:root[data-accent="violet"]{--axiovo-accent:#7256b9;--axiovo-accent-soft:#eee8fc;--axiovo-accent-rgb:114,86,185;--axiovo-hero:#252047;--axiovo-hero-2:#5a478f}
+:root[data-accent="rose"]{--axiovo-accent:#a54f7d;--axiovo-accent-soft:#fae8f0;--axiovo-accent-rgb:165,79,125;--axiovo-hero:#421c37;--axiovo-hero-2:#844262}
+:root[data-accent="amber"]{--axiovo-accent:#8f5e16;--axiovo-accent-soft:#fff1d4;--axiovo-accent-rgb:143,94,22;--axiovo-hero:#382a18;--axiovo-hero-2:#84602b}
+:root[data-accent] .hero{background:linear-gradient(120deg,var(--axiovo-hero),var(--axiovo-hero-2))!important}
+:root[data-accent] .rl-global-header,:root[data-accent] header{background:var(--axiovo-hero)!important}
+:root[data-accent] .rl-global-header .rl-nav a[aria-current="page"],:root[data-accent] .rl-unified-switch a[aria-current="page"],
+:root[data-accent] .rl-source-button[aria-pressed="true"]{background:var(--axiovo-accent)!important;color:#fff!important;border-color:var(--axiovo-accent)!important}
+:root[data-accent] a:not(.rl-logo):not(.rl-nav a):not(.rl-paper-action):not(.primary):not(.axiovo-credit a){accent-color:var(--axiovo-accent)}
+:root[data-accent] .btn.primary,:root[data-accent] button.primary,:root[data-accent] .rl-button.primary,
+:root[data-accent] .rl-home-start{background:var(--axiovo-accent)!important;border-color:var(--axiovo-accent)!important;color:#fff!important}
+:root[data-accent] .rl-focus-chip.active,:root[data-accent] .topic-btn.active{background:var(--axiovo-accent)!important;border-color:var(--axiovo-accent)!important;color:white!important}
+:root[data-accent] .rl-focus-current{border-color:rgba(var(--axiovo-accent-rgb),.45)}
+:root[data-accent] button:focus-visible,:root[data-accent] input:focus-visible,:root[data-accent] select:focus-visible,:root[data-accent] a:focus-visible{outline-color:var(--axiovo-accent)!important}
+:root[data-accent] .axiovo-palette-preview{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}
+.axiovo-color-option{border:2px solid transparent!important;border-radius:14px;padding:7px 11px;display:inline-flex;align-items:center;gap:7px;cursor:pointer;min-height:44px;background:var(--rl-panel,#fff);color:var(--rl-text,#17324b)}
+.axiovo-color-option[aria-pressed="true"]{border-color:var(--axiovo-accent)!important;box-shadow:0 0 0 2px rgba(var(--axiovo-accent-rgb),.15)}
+.axiovo-color-swatch{display:inline-block;border-radius:99px;height:20px;width:20px;border:1px solid #94a4b4}
+:root[data-theme="dark"][data-accent]{--axiovo-accent-soft:#243448}
+:root[data-theme="dark"][data-accent] .axiovo-color-option{background:#20334a;color:#e9f2fd}
+@media(max-width:700px){:root[data-accent] .rl-global-header .rl-nav{background:var(--axiovo-hero)!important}}
