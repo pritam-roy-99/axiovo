@@ -48,7 +48,13 @@
    return {score:35+(special[1].test(title)?20:0),terms:special[0]};
   }
   const tokens=words(query).slice(0,12);
-  if(!tokens.length)return null;
+  if(!tokens.length)return {score:1,terms:"all field papers"};
+  const byline=(Array.isArray(p.authors)?p.authors:[]).join(" ");
+  const normalizedName=value=>String(value||"").toLowerCase().replace(/[^a-z0-9]+/g," ").trim();
+  const authorNeedle=normalizedName(query);
+  if(authorNeedle.length>2&&(p.authors||[]).some(name=>{
+   const candidate=normalizedName(name);return candidate===authorNeedle||candidate.includes(authorNeedle)||authorNeedle.includes(candidate)
+  }))return {score:45,terms:"author name"};
   const hits=tokens.filter(w=>title.includes(w)||body.includes(w));
   const required=tokens.length<=2?1:Math.max(2,Math.ceil(tokens.length*0.6));
   if(hits.length<required)return null;
@@ -80,8 +86,9 @@
   }
   const sorter=(a,b)=>opts.sort==="publication_date:desc"?b.date.localeCompare(a.date)||b.score-a.score:b.score-a.score||b.date.localeCompare(a.date);
   const inRange=scored.filter(x=>x.inRange).sort(sorter);
-  const expanded=!inRange.length&&Boolean(from||to);
-  const chosen=(expanded?scored.sort(sorter):inRange).slice(0,Math.min(30,Math.max(1,opts.limit||20)));
+  // Never silently ignore explicitly chosen dates. A zero-result window is real for this cached subset.
+  const expanded=false;
+  const chosen=inRange.slice(0,Math.min(30,Math.max(1,opts.limit||20)));
   return {items:chosen.map(x=>toWork(x.p)),matches:scored.length,inDateRange:inRange.length,
    outsideDates:expanded&&chosen.length>0,indexed:all.length};
  }
