@@ -94,6 +94,12 @@
     const url = new URL(anchor.href);
     if (url.origin !== location.origin || url.pathname !== location.pathname ||
         !["#discover", "#workspace", "#library"].includes(url.hash)) return;
+    if (url.hash === "#discover" && url.searchParams.get("view") === "scholarly" &&
+        [...url.searchParams.keys()].length === 1) {
+      event.preventDefault();
+      document.getElementById("rl-source-scholarly")?.click();
+      return;
+    }
     if (url.search && url.search !== location.search) return;
     event.preventDefault();
     const next = new URL(location.href);
