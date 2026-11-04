@@ -42,8 +42,8 @@
  function worksParams(id){
   const author=canonicalId(id);if(!author)throw Error("Invalid author identifier");
   return new URLSearchParams({
-   filter:"authorships.author.id:"+author+",locations.source.id:"+SOURCE,
-   sort:"publication_date:desc",per_page:"50",
+   filter:"authorships.author.id:"+author,
+   sort:"publication_date:desc",per_page:"200",
    select:"id,display_name,publication_date,publication_year,authorships,locations,primary_location,doi"
   })
  }
