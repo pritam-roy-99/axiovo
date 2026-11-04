@@ -112,6 +112,27 @@
     if (alreadyInitialized) form.requestSubmit();
   }
 
+  // Internal links such as ./#workspace must retain the chosen scholarly
+  // source, query and date filters. Full navigation would drop ?view and ?q.
+  document.addEventListener("click",event=>{
+    const link=event.target.closest?.("a[href]");
+    if (!link || event.defaultPrevented || event.button !== 0 ||
+        event.ctrlKey || event.metaKey || event.shiftKey || event.altKey ||
+        (link.target && link.target !== "_self")) return;
+    const target=new URL(link.href);
+    if (target.origin !== location.origin || target.pathname !== location.pathname ||
+        !["#discover","#workspace","#library"].includes(target.hash)) return;
+    // Only intercept hash-only links. Explicit query links have intentional
+    // search parameters and may need a full page initialization.
+    if (target.search) return;
+    event.preventDefault();
+    const next=new URL(location.href);
+    next.hash=target.hash;
+    if(next.href !== location.href) history.pushState({view:target.hash.slice(1)},"",next.href);
+    show();
+  });
+  // Source changes use history.replaceState, which emits no hashchange event.
+  window.addEventListener("researchlens:discover-navigation",show);
   window.addEventListener("hashchange",show);
   window.addEventListener("popstate",show);
   window.addEventListener("axiovo:discover-search",event=>navigateToDiscover(event.detail?.query));
