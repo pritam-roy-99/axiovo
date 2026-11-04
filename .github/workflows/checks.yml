@@ -28,6 +28,8 @@ jobs:
           node tests/field-taxonomy.test.js
       - name: Test personalized research interest controls
         run: node tests/interests.test.js
+      - name: User-editable research field hierarchy tests
+        run: node tests/custom-taxonomy.test.js
       - name: Scholarly field relevance regression tests
         run: node tests/scholar-search.test.js
       - name: AI semantic search precision tests
