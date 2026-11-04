@@ -218,6 +218,12 @@ const base="http://127.0.0.1:8765";
   assert.equal(new URL(wf.url()).searchParams.get("view"),"scholarly");
   assert.equal(await wf.locator("#library-list .rl-paper").count(),1);
   assert.equal(await wf.locator("#library-list textarea").first().inputValue(),"Check the nonlocality assumptions");
+  await wf.locator("#research-query").fill("quantum steering");
+  await wf.locator("#quick-search button[type=submit]").click();
+  await wf.locator("#scholarly-discovery").waitFor({state:"visible",timeout:12000});
+  assert.equal(await wf.locator("#scholar-query").inputValue(),"quantum steering");
+  assert.equal(new URL(wf.url()).searchParams.get("q"),"quantum steering");
+  assert.equal(new URL(wf.url()).searchParams.get("view"),"scholarly");
   await workflow.close();
 
   assert.deepEqual(errors,[],"Unexpected JavaScript exceptions");
