@@ -44,6 +44,31 @@ const base="http://127.0.0.1:8765";
   await page.locator("#discover-shell").waitFor({state:"visible",timeout:12000});
   await page.locator("#workflow-workspace").click();
   await page.locator("#workspace-panel").waitFor({state:"visible",timeout:12000});
+  // A saved arXiv revision must appear on the same-page Workspace and retain
+  // its reading note after switching views, without an additional navigation.
+  await page.evaluate(()=>{
+    localStorage.setItem("researchlens-reading-list",JSON.stringify(["2608.13942v2"]));
+    window.dispatchEvent(new Event("researchlens-library-change"));
+  });
+  await page.locator("#library-list article").first().waitFor({timeout:12000});
+  const savedHref=await page.locator("#library-list article a").first().getAttribute("href");
+  assert(savedHref.includes("2608.13942v2"),"Saved arXiv revision was lost in Workspace");
+  await page.locator('#library-list textarea[aria-label^="Private note"]').first().fill("Read proof of Theorem 2");
+  await page.locator('#library-list textarea[aria-label^="Private note"]').first().blur();
+  await page.locator("#workflow-discover").click();
+  await page.locator("#discover-shell").waitFor({state:"visible"});
+  await page.locator("#workflow-workspace").click();
+  await page.locator("#workspace-panel").waitFor({state:"visible"});
+  assert.equal(await page.locator('#library-list textarea[aria-label^="Private note"]').first().inputValue(),"Read proof of Theorem 2");
+  // Workspace search switches to the visible Discover search without a reload.
+  await page.evaluate(()=>{window.__axiovoSamePage=true});
+  await page.locator("#research-query").fill("contextuality and steering");
+  await page.locator('#quick-search button[type="submit"]').click();
+  await page.locator("#scholarly-discovery").waitFor({state:"visible",timeout:12000});
+  assert.equal(await page.locator("#scholar-query").inputValue(),"contextuality and steering");
+  assert(await page.evaluate(()=>window.__axiovoSamePage),"Quick search should not reload the page");
+  await page.locator("#workflow-workspace").click();
+  await page.locator("#workspace-panel").waitFor({state:"visible"});
 
   await page.goto(base+"/copilot.html",{waitUntil:"domcontentloaded"});
   await page.locator("#paper-picker").waitFor();
