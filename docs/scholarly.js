@@ -38,7 +38,8 @@ const followedInterests=()=>interestsAPI?.get(read(interestsAPI.KEY,{}),state.fi
 function toggleInterest(value){if(!interestsAPI)return;const next=interestsAPI.toggle(read(interestsAPI.KEY,{}),state.field,state.topic,value);store(interestsAPI.KEY,next);drawTopics();drawSubtopics();window.dispatchEvent(new Event("researchlens:interests-changed"))}
 function read(key,fallback){try{const d=JSON.parse(localStorage.getItem(key)||"null");return d??fallback}catch{return fallback}}
 function store(key,value){try{localStorage.setItem(key,JSON.stringify(value))}catch{}}
-let state=read(KEY,{field:"general",topic:"Explore all research",subtopic:"",query:"",sort:"relevance",from:"",to:""});
+let state=read(KEY,{field:"general",topic:"Explore all research",subtopic:"",query:"",sort:"publication_date:desc",from:"",to:"",areaSelected:false});
+state.areaSelected=state.areaSelected===undefined?Boolean(state.query):Boolean(state.areaSelected);
 state.field=fieldKey(state.field);
 if(!FIELDS[state.field].topics.includes(state.topic)){state.topic=FIELDS[state.field].topics[0];state.subtopic=""}
 if(state.subtopic&&!state.customSubtopic&&!fieldTopics(state.field,state.topic).includes(state.subtopic))state.subtopic="";
@@ -85,8 +86,8 @@ function normalizeSearchDates(){
  return {changed:reasons.length>0,until:now,reasons}
 }
 
-function topicSelect(t){state.topic=t;state.subtopic="";state.customSubtopic=false;state.query=t;$("query").value=t;persist();drawTopics();drawSubtopics();page=1;search()}
-function subtopicSelect(t){state.subtopic=t;state.customSubtopic=!fieldTopics(state.field,state.topic).includes(t);state.query=t;$("query").value=t;persist();drawSubtopics();page=1;search()}
+function topicSelect(t){state.topic=t;state.subtopic="";state.customSubtopic=false;state.areaSelected=true;state.query=t;$("query").value=t;persist();drawTopics();drawSubtopics();page=1;search()}
+function subtopicSelect(t){state.subtopic=t;state.areaSelected=true;state.customSubtopic=!fieldTopics(state.field,state.topic).includes(t);state.query=t;$("query").value=t;persist();drawSubtopics();page=1;search()}
 function drawSubtopics(){
  const holder=$("subtopic-list");holder.replaceChildren();
  const followed=followedInterests();
@@ -155,7 +156,7 @@ async function search(){
  busy=true;showingSaved=false;persist();
  const q=$("query").value.trim();
  const official=$("official-search");if(official&&Arxiv)official.href=Arxiv.officialSearchUrl(q);
- if(!q){busy=false;setStatus("Enter a research topic, paper title or arXiv identifier.");return}
+ // Empty query browses the selected field without requiring an area or subtopic.
  const dates=normalizeSearchDates();
  if(!SearchCore){busy=false;setStatus("Search tools unavailable. Reload Axiovo.");return}
  if(Arxiv?.parse(q)){
@@ -165,7 +166,8 @@ async function search(){
  }
  const today=new Date().toISOString().slice(0,10);
  const from=$("from").value,to=$("to").value,sort=$("sort").value;
- const plan=SearchCore.plan(state,q,{page,from,to,sort,today});
+  const effectiveSort=sort==="relevance"&&(!q||state.areaSelected)?"publication_date:desc":sort;
+ const plan=SearchCore.plan(state,q,{page,from,to,sort:effectiveSort,today});
  const ctl=new AbortController();requestController=ctl;
  const scope=FIELDS[plan.field].name;
  const fallbackEnabled=$("semantic-fallback")?.checked&&Boolean(SemanticCore)&&page===1;
@@ -291,7 +293,8 @@ if(latest.field&&FIELDS[latest.field]){
  state.subtopic=String(latest.subtopic||"");
  if(state.subtopic&&!fieldTopics(state.field,state.topic).includes(state.subtopic)&&!latest.customSubtopic)state.subtopic="";
  state.customSubtopic=Boolean(latest.customSubtopic);
- state.query=state.subtopic||state.topic;
+ state.areaSelected=latest.areaSelected===undefined?Boolean(latest.query):Boolean(latest.areaSelected);
+  state.query=state.areaSelected?(state.subtopic||state.topic):"";
 }
 const opts=$("field"), choices=$("field-choices");
 for(const [id,f] of Object.entries(FIELDS)){
@@ -299,10 +302,10 @@ for(const [id,f] of Object.entries(FIELDS)){
  button.onclick=()=>{opts.value=id;$("field-details").open=false;opts.dispatchEvent(new Event("change",{bubbles:true}))};
  choices.append(button)
 }
-$("field").value=state.field;$("query").value=state.query||(state.field==="general"?"":state.topic)||"";
+$("field").value=state.field;$("query").value=state.query||"";
 document.addEventListener("pointerdown",e=>{if(!$("field-details").contains(e.target))$("field-details").open=false});
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&$("field-details").open){$("field-details").open=false;$("field-trigger").focus()}});$("sort").value=state.sort||"relevance";$("from").value=state.from||"";$("to").value=state.to||"";const dateRestore=normalizeSearchDates();drawField();drawSaved();if(dateRestore.changed)setStatus("Saved future publication dates were cleared. Research is available through "+dateRestore.until+".");
-$("field").onchange=()=>{state.field=$("field").value;state.topic=FIELDS[state.field].topics[0];state.subtopic="";state.customSubtopic=false;state.query=state.topic;$("query").value=state.query;persist();drawField();window.dispatchEvent(new CustomEvent("researchlens:field-changed",{detail:{field:state.field,topic:state.topic}}));page=1;search()};
+$("field").onchange=()=>{state.field=$("field").value;state.topic=FIELDS[state.field].topics[0];state.subtopic="";state.customSubtopic=false;state.areaSelected=false;state.query="";$("query").value=state.query;persist();drawField();window.dispatchEvent(new CustomEvent("researchlens:field-changed",{detail:{field:state.field,topic:state.topic}}));page=1;search()};
 $("use-custom").onclick=()=>{const t=$("custom").value.trim();if(t.length<3){setStatus("Enter at least three characters for a custom topic.");return}state.subtopic=t;state.customSubtopic=true;state.query=t;$("query").value=t;persist();drawSubtopics();page=1;search()};
 $("use-subtopic").onclick=()=>{
  const t=$("custom-subtopic").value.trim();
@@ -330,7 +333,8 @@ window.addEventListener("researchlens:focus-change",e=>{
  const newField=fieldKey(focus.field);
  const newTopic=FIELDS[newField].topics.includes(focus.topic)?focus.topic:FIELDS[newField].topics[0];
  const newSubtopic=String(focus.subtopic||"").trim();
- if(state.field===newField&&state.topic===newTopic&&state.subtopic===newSubtopic)return;
+ const incomingSelected=focus.areaSelected!==false;
+  if(state.field===newField&&state.topic===newTopic&&state.subtopic===newSubtopic&&state.areaSelected===incomingSelected)return;
  state.field=newField;state.topic=newTopic;state.subtopic=newSubtopic;
  state.customSubtopic=!!newSubtopic&&!fieldTopics(newField,newTopic).includes(newSubtopic);
  state.query=newSubtopic||newTopic;
@@ -339,7 +343,7 @@ window.addEventListener("researchlens:focus-change",e=>{
 });
 window.addEventListener("researchlens:choose-field",e=>{
  const field=fieldKey(e.detail?.field);if(state.field===field)return;
- state.field=field;state.topic=FIELDS[field].topics[0];state.subtopic="";state.query=state.topic;
+ state.field=field;state.topic=FIELDS[field].topics[0];state.subtopic="";state.areaSelected=false;state.query="";
  $("query").value=state.query;persist();drawField();page=1;search()
 });
 $("search-form").onsubmit=e=>{e.preventDefault();page=1;search()};
@@ -350,7 +354,7 @@ $("show-saved").onclick=()=>{showingSaved=true;setStatus("This collection is sto
 $("prev").onclick=()=>{if(page>1){page--;search()}};$("next").onclick=()=>{if(page*100<Math.min(total,10000)){page++;search()}};
 $("export-bib").onclick=()=>{if(!saved.length){setStatus("Save a paper before exporting citations.");return}download("researchlens-reading-list.bib",saved.map(bib).join("\n"),"text/plain;charset=utf-8")};
 $("export-json").onclick=()=>download("researchlens-field-reading-list.json",JSON.stringify(saved,null,2),"application/json");
-const u=new URLSearchParams(location.search);if(u.get("field")&&FIELDS[u.get("field")]){state.field=u.get("field");if(!FIELDS[state.field].topics.includes(state.topic)){state.topic=FIELDS[state.field].topics[0];state.subtopic=""}$("field").value=state.field;drawField()}if(u.get("q")){$("query").value=u.get("q").slice(0,250);state.query=$("query").value}if(u.get("from"))$("from").value=u.get("from").slice(0,10);if(u.get("to"))$("to").value=u.get("to").slice(0,10);if(["relevance","publication_date:desc","cited_by_count:desc"].includes(u.get("sort")))$("sort").value=u.get("sort");const dateLink=normalizeSearchDates();persist();if(dateLink.changed)setStatus("The requested future date range was removed; searching available papers.");if($("query").value.trim())search();
+const u=new URLSearchParams(location.search);if(u.get("field")&&FIELDS[u.get("field")]){state.field=u.get("field");if(!FIELDS[state.field].topics.includes(state.topic)){state.topic=FIELDS[state.field].topics[0];state.subtopic=""}$("field").value=state.field;drawField()}if(u.get("q")){$("query").value=u.get("q").slice(0,250);state.query=$("query").value}if(u.get("from"))$("from").value=u.get("from").slice(0,10);if(u.get("to"))$("to").value=u.get("to").slice(0,10);if(["relevance","publication_date:desc","cited_by_count:desc"].includes(u.get("sort")))$("sort").value=u.get("sort");const dateLink=normalizeSearchDates();persist();if(dateLink.changed)setStatus("The requested future date range was removed; searching available papers.");if($("query").value.trim()||state.field!=="general")search();
 }
 window.addEventListener("researchlens:scholarly-open",init,{once:true});
 })();
