@@ -26,5 +26,5 @@ for(const id of ["statmech","condmat","highenergy"]){
 }
 assert.ok(fieldTopics("statmech","Nonequilibrium statistical mechanics").includes("Fluctuation-dissipation violations"));
 assert.ok(fieldTopics("condmat","Topological phases of matter").includes("Topological order and anyons"));
-assert.equal(fieldKey("not-a-field"),"quantum");
+assert.equal(fieldKey("not-a-field"),"general");
 console.log("Field taxonomy: "+Object.keys(FIELDS).length+" disciplines, "+Object.values(SUBTOPICS).reduce((n,x)=>n+Object.values(x).reduce((a,y)=>a+y.length,0),0)+" curated subtopics; tests passed.");
