@@ -51,7 +51,7 @@ dialog{border:0;border-radius:13px;box-shadow:0 20px 90px #061e3977;width:min(74
 <span class="rl-home-kicker">OPEN-SOURCE RESEARCH DISCOVERY &amp; WORKSPACE</span>
 <h1 id="rl-home-title">From scientific foundations to new discoveries.</h1>
 <p><strong>Axiovo</strong> combines <em>axiom</em>, a foundation for reasoning, and <em>novo</em>, new. Discover original papers, follow research topics, build a reading library, and examine source-linked evidence in one place.</p>
-<p class="rl-home-hero-actions"><a class="rl-home-start" href="./#discover">Find papers</a><a class="rl-home-explore" href="./#workspace">My research workspace</a></p>
+<p class="rl-home-hero-actions"><a class="rl-home-start" href="./#discover">Find papers</a><a class="rl-home-explore" href="./#workspace">My research library</a></p>
 <p class="rl-home-explainer-meta">Free and open source · Installable on your device · No account needed for local reading and notes</p>
 </section>
 <figure class="rl-home-demo">
@@ -69,7 +69,7 @@ Your browser cannot play this video. Read the transcript below to explore the fe
 <main><section class="axiovo-onboarding" id="axiovo-onboarding" hidden aria-label="Getting started with Axiovo">
 <div><strong>Start with your research question</strong><p>Choose a research field, discover original papers, save useful references, and organize your work in Library. No account required.</p></div>
 <div class="axiovo-onboarding-actions"><button type="button" id="axiovo-pick-field">Choose my field</button><a href="./#workspace">Create a research question</a><button type="button" id="axiovo-dismiss" aria-label="Dismiss getting started tips">Dismiss</button></div></section>
-<div class="rl-unified-switch" role="group" aria-label="Research workflow"><a id="workflow-discover" href="./#discover" aria-current="page">Discover papers</a><a id="workflow-workspace" href="./#workspace">My workspace &amp; library</a></div><div id="discover-shell"><section class="rl-discover-switch" id="discover" aria-label="Literature discovery modes">
+<div class="rl-unified-switch" role="group" aria-label="Research workflow"><a id="workflow-discover" href="./#discover" aria-current="page">Discover papers</a><a id="workflow-workspace" href="./#workspace">My Library &amp; questions</a></div><div id="discover-shell"><section class="rl-discover-switch" id="discover" aria-label="Literature discovery modes">
 <div><span class="rl-discover-eyebrow">ONE RESEARCH DISCOVERY SPACE</span><h2>Discover literature</h2><p>Switch between newly indexed arXiv papers and wider scholarly search without leaving Axiovo.</p></div>
 <div class="rl-discover-options" role="group" aria-label="Choose literature source">
 <button type="button" id="rl-source-arxiv" class="rl-source-button" aria-pressed="true">Latest arXiv <small>New papers, dates, followed topics</small></button>
@@ -112,9 +112,9 @@ Your browser cannot play this video. Read the transcript below to explore the fe
 <div class="row pager"><button id="scholar-prev" disabled>Previous</button><span class="muted" id="scholar-pagination">Page 1</span><button id="scholar-next" disabled>Next</button></div></section>
 <aside class="panel tools-panel"><h2>Your researcher toolkit</h2><p class="muted" id="scholar-field-summary"></p>
 <h3>Suggested workflow</h3><div id="scholar-workflow" class="muted"></div>
-<h3>Saved-paper preview <span class="pill" id="scholar-saved-count">0</span></h3><p class="muted">Your full reading list, notes, progress and research questions are in the workspace on this same page.</p><a class="template" href="./#workspace">Open My workspace <small>Saved papers, private notes, projects and exports</small></a><details><summary>Quick saved-paper links and exports</summary><div id="scholar-saved-list"></div><div class="row" style="margin-top:10px"><button id="scholar-export-bib">Export BibTeX</button><button id="scholar-export-json">Export JSON</button></div></details>
+<h3>Saved-paper preview <span class="pill" id="scholar-saved-count">0</span></h3><p class="muted">Your full reading library, notes and research questions are on the Library tab.</p><a class="template" href="./#workspace">Open Library <small>Saved papers, private notes, research questions and exports</small></a><details><summary>Quick saved-paper links and exports</summary><div id="scholar-saved-list"></div><div class="row" style="margin-top:10px"><button id="scholar-export-bib">Export BibTeX</button><button id="scholar-export-json">Export JSON</button></div></details>
 <h3>Research assistant</h3><a class="template" href="./copilot.html">Research Assistant <small>Literature comparison, evidence and research questions</small></a>
-<a class="template" href="./profiles.html">Research profile <small>Keep your interests and affiliation</small></a>
+<a class="template" href="./profiles.html">Research settings <small>Optional identity and local data</small></a>
 <div class="notion" style="margin-top:12px"><strong>Evidence over scores.</strong> Citation counts and AI-generated comparisons are not measures of truth, novelty, or correctness.</div></aside>
 </div></section></div><span id="workspace" aria-hidden="true"></span><section id="workspace-panel" class="rl-workspace" hidden aria-label="My research workspace"><p role="status">Loading your research library…</p></section></main>
 <dialog id="detail"><button class="btn" id="close" style="float:right">Close ✕</button><div id="content"></div></dialog>
