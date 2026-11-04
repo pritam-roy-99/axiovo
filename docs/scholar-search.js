@@ -8,6 +8,7 @@
  // OpenAlex field identifiers are stable; IDs are from the public fields hierarchy.
  // Cross-listed research receives multiple eligible fields.
  const FIELDS={
+  general:[],
   quantum:["31","17","26"], statmech:["31"], condmat:["31","25"], highenergy:["31"], mathematics:["26"], astrophysics:["31","19"],
   computer:["17"], biology:["11","13","28"], medicine:["27","28","13","29"],
   chemistry:["16","25","15"], engineering:["22","15","17","21"],
@@ -38,7 +39,7 @@
   return typed===norm(state.subtopic)||typed===norm(state.topic);
  }
  function plan(state,query,opts={}){
-  const field=FIELDS[state.field]?state.field:"quantum",raw=String(query||"").trim();
+  const field=FIELDS[state.field]?state.field:"general",raw=String(query||"").trim();
   const browse=isTopicBrowse(state,raw);
   const context=field==="quantum"&&
     [raw,state.topic,state.subtopic].some(x=>CONTEXT.test(x||""))&&browse;
@@ -62,7 +63,7 @@
   if(!work||!work.id||!(work.display_name||work.title))return false;
   const classifications=[work.primary_topic,...(work.topics||[])].map(t=>fieldId(t?.field?.id)).filter(Boolean);
   // Interdisciplinary works may be classified primarily outside their relevant subfield.
-  if(!classifications.some(id=>p.allowed.includes(id)))return false;
+  if(p.field!=="general"&&!classifications.some(id=>p.allowed.includes(id)))return false;
   if(work.publication_date&&String(work.publication_date)>p.maxDate)return false;
   const {title,abs,labels,combined}=textFor(work);
   const src=norm(title+" "+abs);
