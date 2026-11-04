@@ -199,6 +199,7 @@ const base="http://127.0.0.1:8765";
    ]})
   }));
   await limited.route("https://cdn.jsdelivr.net/**",route=>route.fulfill({status:200,contentType:"application/javascript",body:""}));
+  await limited.route("https://api.semanticscholar.org/**",route=>route.fulfill({status:200,contentType:"application/json",body:JSON.stringify({data:[]})}));
   const limitedPage=await limited.newPage();
   limitedPage.on("pageerror",err=>errors.push(limitedPage.url()+": "+err.message));
   await limitedPage.goto(base+"/?view=scholarly#discover",{waitUntil:"domcontentloaded"});
