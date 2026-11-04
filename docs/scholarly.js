@@ -349,6 +349,17 @@ window.addEventListener("researchlens:choose-field",e=>{
  state.field=field;state.topic=FIELDS[field].topics[0];state.subtopic="";state.areaSelected=false;state.query="";
  $("query").value=state.query;persist();drawField();page=1;search()
 });
+$("search-author").onclick=()=>{
+ const query=$("query").value.trim();
+ const details=document.getElementById("axiovo-author-details");
+ const finder=document.getElementById("axiovo-author-query");
+ if(!details||!finder)return;
+ details.open=true;
+ if(query)finder.value=query;
+ details.scrollIntoView({behavior:"smooth",block:"start"});
+ if(finder.value.trim().length>=2)document.getElementById("axiovo-author-form")?.requestSubmit();
+ else finder.focus();
+};
 $("search-form").onsubmit=e=>{e.preventDefault();page=1;search()};
 $("sort").onchange=()=>{page=1;search()};
 $("latest").onclick=()=>{$("sort").value="publication_date:desc";$("from").value="";$("to").value="";page=1;search()};
