@@ -4,7 +4,7 @@
  function init(){
   const root=document.getElementById("axiovo-palette-options"),appearance=window.AxiovoAppearance;
   if(!root||!appearance)return;
-  const opts=[["ocean","Ocean","#126f9c"],["forest","Forest","#24775e"],["violet","Violet","#7256b9"],["rose","Rose","#a54f7d"],["amber","Amber","#8f5e16"]];
+  const opts=[["ocean","Ocean","#126f9c"],["forest","Forest","#24775e"],["violet","Violet","#7256b9"],["rose","Rose","#a54f7d"],["amber","Amber","#8f5e16"],["slate","Slate","#4b647d"],["teal","Teal","#007f82"],["indigo","Indigo","#5357a6"],["coral","Coral","#bd604f"],["mint","Mint","#367e70"],["plum","Plum","#86528e"]];
   function render(){
    root.replaceChildren();
    for(const [value,label,color] of opts){
