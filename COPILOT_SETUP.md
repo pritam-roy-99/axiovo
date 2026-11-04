@@ -1,4 +1,4 @@
-# ResearchLens Research Copilot
+# Litveyra Research Copilot
 
 Live interface: https://pritam-roy-99.github.io/researchlens/copilot.html
 
@@ -6,12 +6,12 @@ Live interface: https://pritam-roy-99.github.io/researchlens/copilot.html
 
 - Ask questions in one of five modes: literature search, contribution comparison, technical explanation, reviewer checklist, research directions.
 - Candidate retrieval from the current arXiv metadata snapshot; each source has a numbered, clickable link.
-- Additional external OpenAlex searches for broader discovery. These source records do not become permanent ResearchLens database entries.
+- Additional external OpenAlex searches for broader discovery. These source records do not become permanent Litveyra database entries.
 - In evidence-only mode, you get an immediate deterministic source list without inference or GPU hardware.
 - In local Ollama mode, you may use Qwen3.5 9B, 27B or 4B, running on a computer you control.
 - An optional small Qwen2.5 WebGPU model runs directly in your browser after a substantial download.
 - Conversation history stays in the current browser tab, not in an account or central store. Export it to a text file with source URLs.
-- Enter an arXiv ID or open Copilot directly from a paper card. Draft abstracts or technical claims are optional and never sent to ResearchLens servers.
+- Enter an arXiv ID or open Copilot directly from a paper card. Draft abstracts or technical claims are optional and never sent to Litveyra servers.
 
 ## Preferred open-weight model
 
