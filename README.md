@@ -12,6 +12,20 @@ Axiovo includes 12 top-level disciplines, including a dedicated **High-energy ph
 
 The optional Research Assistant provides evidence-led source retrieval, literature comparison, deep technical reviews and assumption-checking workflows. For model-generated answers, connect a locally running [Ollama](https://ollama.com/) instance, detect installed models and choose an analysis depth. Hosted GPU inference and mathematically verified results are not included in the free static GitHub Pages deployment.
 
+## Axiovo usability release
+
+The app is organized around four researcher tasks: **Discover**, **Library**, **Research AI**, and **Community**. The old Profile entry is now under **Settings**. Existing optional researcher information remains available at `profiles.html`; the underlying saved browser keys remain unchanged.
+
+**Question-first workflow:** Create a research question in Library, save papers in Discover, link a saved arXiv paper to a question, add a reading note or status, and use related-paper recommendations. The Library is a unified page with Discover; the old standalone workspace URL remains available as a compatibility fallback.
+
+**Mobile usability:** The four primary destinations appear in a bottom bar on small displays. Axiovo includes first-run guidance and responsive controls for narrow phones. The home-page video and its transcript remain available.
+
+**Community:** The public fallback is [GitHub Issues](https://github.com/pritam-roy-99/researchlens/issues). In-site cross-user comments, endorsements, researcher follows and hosted accounts require a configured secure backend, and must not be treated as active by default.
+
+**Attribution:** Footer states “Developed with ChatGPT by OpenAI ❤️ · Independent open-source project”. OpenAI does not operate or endorse this independent website.
+
+**Known limitations:** The existing arXiv snapshot is not an exhaustive archive; source-linked AI reports do not certify proof correctness or novelty. Local data is saved per browser and is not automatically synchronized across devices. Future full-text/equation-aware analysis and verified citation graphs need separate indexing and evaluation.
+
 ## What makes this project different
 
 **Axiovo is an open-source, local-first research discovery and reading workspace**, rather than a pay-per-paper AI PDF analysis service. Its intended workflow is **discover → verify the original source → save → annotate → revisit and discuss**.
