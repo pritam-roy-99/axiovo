@@ -52,7 +52,9 @@
     if (navDiscover) navDiscover.setAttribute("aria-current", showWorkspace ? "false" : "page");
     if (navWorkspace) navWorkspace.setAttribute("aria-current", showWorkspace ? "page" : "false");
     if (showWorkspace) await mountWorkspace();
-    window.scrollTo(0,0);
+    if (showWorkspace) window.scrollTo(0,0);
+    else if (location.hash === "#discover") document.getElementById("discover")?.scrollIntoView({block:"start"});
+    else window.scrollTo(0,0);
     if (showWorkspace) window.dispatchEvent(new Event("researchlens:workspace-activated"));
   }
   window.addEventListener("hashchange", render);
