@@ -1,4 +1,4 @@
-"""Build Atom feeds for all papers and quantum topics for free GitHub Pages.
+"""Build Atom feeds for all indexed papers and all classified research topics.
 
 The feed records arXiv titles, links and abstracts; it is not a publisher of
 those papers. The generated files are built in GitHub Actions.
@@ -11,7 +11,7 @@ import json, re
 ROOT=Path(__file__).resolve().parents[1]
 SOURCE=ROOT/"docs"/"data"/"feed.json"
 OUTPUT=ROOT/"docs"/"feeds"
-BASE="https://pritam-roy-99.github.io/researchlens/"
+BASE="https://pritam-roy-99.github.io/axiovo/"
 ATOM="http://www.w3.org/2005/Atom"
 
 def tag(name):
@@ -41,14 +41,14 @@ def main():
     doc=json.loads(SOURCE.read_text(encoding="utf-8"))
     papers=doc.get("papers",[])
     stamp=doc.get("generated_at") or datetime.now(timezone.utc).isoformat()
-    make_feed(papers,"ResearchLens: Indexed research", "all",stamp)
+    make_feed(papers,"Axiovo: Indexed research", "all",stamp)
     count=0
     for topic in doc.get("topic_catalog",[]):
         slug=topic.get("id","")
         if not re.fullmatch(r"[a-z0-9-]+",slug):continue
         matches=[p for p in papers if slug in p.get("topics",[])]
-        make_feed(matches,"ResearchLens: "+topic["label"],slug,stamp)
+        make_feed(matches,"Axiovo: "+topic["label"],slug,stamp)
         count+=1
-    print(f"Built Atom feeds: all research + {count} quantum topics")
+    print(f"Built Atom feeds: all research + {count} research topics")
 
 if __name__=="__main__":main()

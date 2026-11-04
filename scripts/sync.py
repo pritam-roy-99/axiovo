@@ -77,7 +77,7 @@ def fetch_recent():
 
     Poll at a deliberately modest pace and preserve existing metadata on failures.
     """
-    categories = os.environ.get("ARXIV_CATEGORIES", "quant-ph,cs.AI,stat.ML,math.PR,astro-ph.CO,cond-mat.stat-mech,cond-mat.str-el,hep-ph,hep-th,q-bio.MN,physics.bio-ph,econ.GN").split(",")
+    categories = os.environ.get("ARXIV_CATEGORIES", "quant-ph,cs.AI,cs.LG,cs.CR,cs.IT,stat.ML,stat.AP,math.PR,math.AG,astro-ph.CO,astro-ph.HE,cond-mat.stat-mech,cond-mat.str-el,cond-mat.supr-con,cond-mat.mtrl-sci,hep-ph,hep-th,gr-qc,q-bio.MN,q-bio.QM,physics.bio-ph,physics.optics,econ.GN,eess.SP").split(",")
     page_size = min(200, max(1, int(os.environ.get("ARXIV_MAX_RESULTS", "150"))))
     results = []
     failures = []
@@ -98,7 +98,7 @@ def fetch_recent():
             "https://export.arxiv.org/api/query?" + args,
             headers={"User-Agent": os.environ.get(
                 "ARXIV_USER_AGENT",
-                "ResearchLens/0.4 (https://github.com/pritam-roy-99/researchlens; scholarly metadata discovery)")}
+                "Axiovo/0.5 (https://github.com/pritam-roy-99/axiovo; scholarly metadata discovery)")}
         )
         for attempt in range(2):
             try:
@@ -190,6 +190,7 @@ def main():
     payload = {
         "generated_at": dt.datetime.now(dt.timezone.utc).isoformat(),
         "source": "arXiv Atom API (submittedDate + lastUpdatedDate)",
+        "index_scope": "limited rolling snapshots from representative arXiv categories; not the full archive",
         "refresh_methods": ["submittedDate", "lastUpdatedDate"],
         "paper_count": len(papers), "pinned_ids": pinned, "topic_catalog": topic_catalog(), "papers": papers
     }
