@@ -8,7 +8,7 @@
  // OpenAlex field identifiers are stable; IDs are from the public fields hierarchy.
  // Cross-listed research receives multiple eligible fields.
  const FIELDS={
-  quantum:["31","17","26"], mathematics:["26"], astrophysics:["31","19"],
+  quantum:["31","17","26"], statmech:["31"], condmat:["31","25"], mathematics:["26"], astrophysics:["31","19"],
   computer:["17"], biology:["11","13","28"], medicine:["27","28","13","29"],
   chemistry:["16","25","15"], engineering:["22","15","17","21"],
   social:["33","20","32","18"]
