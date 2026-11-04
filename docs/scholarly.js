@@ -224,7 +224,7 @@ async function search(){
   items=selected.map(x=>({...x.work,__source:x.source})).filter(w=>Boolean(arxivURL(w)));
   total=sourceTotal;
   let localNote="";
-  if(!items.length&&SecondSource&&!rateLimited&&page===1){
+  if(!items.length&&SecondSource&&page===1){
    try{
     setStatus("Checking a second scholarly index for verified arXiv identifiers…");
     const cross=await SecondSource.search(q,{signal:ctl.signal,from,to});
