@@ -39,7 +39,7 @@
   }
   chooser.addEventListener("change",update);
   button.addEventListener("click",()=>{toggle(chooser.value);update()});
-  if(typeof window!=="undefined")window.addEventListener("axiovo:author-follow-change",update);
+
   wrap.append(chooser,button);parent.append(wrap);update();return wrap;
  }
  return {KEY,list,isFollowing,toggle,mount};
