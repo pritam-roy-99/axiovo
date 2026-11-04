@@ -1,6 +1,6 @@
 /* ResearchLens offline shell. Do not cache remote APIs, PDFs or the live feed. */
 "use strict";
-const CACHE = "litveyra-shell-v2";
+const CACHE = "axiovo-shell-v3";
 const SHELL = [
   "./", "./index.html", "./workspace.html", "./copilot.html",
   "./lab.html", "./paper.html", "./profiles.html", "./methodology.html",
@@ -12,14 +12,14 @@ const SHELL = [
   "./assistant-core.js", "./copilot.js", "./lab.js", "./workspace.js",
   "./paper.js", "./profiles.js", "./profiles-social.js", "./social.js",
   "./social-config.js", "./cloud-sync.js", "./relevance.js",
-  "./research-intelligence.js", "./data/feed.json", "./manifest.webmanifest", "./icons/researchlens.svg"
+  "./research-intelligence.js", "./unified-workspace.js", "./data/feed.json", "./manifest.webmanifest", "./icons/researchlens.svg"
 ];
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(CACHE).then((cache) =>
       Promise.allSettled(SHELL.map((url) => cache.add(url))).then((results) => {
         const failures = results.filter((x) => x.status === "rejected");
-        if (failures.length) console.warn("ResearchLens shell: some assets unavailable", failures.length);
+        if (failures.length) console.warn("Axiovo shell: some assets unavailable", failures.length);
       })
     ).then(() => self.skipWaiting())
   );
@@ -27,7 +27,7 @@ self.addEventListener("install", (event) => {
 self.addEventListener("activate", (event) => {
   event.waitUntil(Promise.all([
     caches.keys().then((names) =>
-      Promise.all(names.filter((name) => (name.startsWith("researchlens-shell-") || name.startsWith("litveyra-shell-")) && name !== CACHE)
+      Promise.all(names.filter((name) => (name.startsWith("researchlens-shell-") || name.startsWith("litveyra-shell-") || name.startsWith("axiovo-shell-")) && name !== CACHE)
         .map((name) => caches.delete(name)))),
     self.clients.claim()
   ]));
