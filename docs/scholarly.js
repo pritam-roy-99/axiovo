@@ -8,6 +8,7 @@ const SearchCore=window.ResearchLensSearch;
 const SemanticCore=window.ResearchLensSemanticSearch;
 const Arxiv=window.ResearchLensArxiv;
 const CachedArxiv=window.ResearchLensCachedArxiv;
+const SecondSource=window.AxiovoMultiSource;
 const OPENALEX_COOLDOWN="researchlens-openalex-429-until";
 let cachedFeedPromise=null;
 function cooldownUntil(){try{return Number(sessionStorage.getItem(OPENALEX_COOLDOWN)||0)}catch{return 0}}
@@ -223,6 +224,19 @@ async function search(){
   items=selected.map(x=>({...x.work,__source:x.source})).filter(w=>Boolean(arxivURL(w)));
   total=sourceTotal;
   let localNote="";
+  if(!items.length&&SecondSource&&!rateLimited&&page===1){
+   try{
+    setStatus("Checking a second scholarly index for verified arXiv identifiers…");
+    const cross=await SecondSource.search(q,{signal:ctl.signal,from,to});
+    if(ctl.signal.aborted||requestController!==ctl)return;
+    items=cross.items||[];
+    if(items.length)localNote="OpenAlex returned no matching papers. Showing "+items.length+
+     " papers with explicit arXiv identifiers from Semantic Scholar. Index coverage remains incomplete.";
+   }catch(error){
+    if(ctl.signal.aborted||requestController!==ctl)return;
+    semanticError=String(error.message||error).slice(0,120);
+   }
+  }
   if(!items.length){
    const offline=await offlineArxivFallback(plan,{reason:mainError|| (rateLimited?"OpenAlex rate limit":""),from,to,sort:effectiveSort,today});
    if(ctl.signal.aborted||requestController!==ctl)return;
