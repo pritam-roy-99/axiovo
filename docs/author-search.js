@@ -70,6 +70,45 @@
   function anchor(parent,label,url){
    const a=element("a",label);a.href=url;a.target="_blank";a.rel="noopener noreferrer";parent.append(a);return a;
   }
+  async function semanticScholarFallback(query){
+   try{
+    const params=new URLSearchParams({query,limit:"12",fields:"name,aliases,affiliations,paperCount"});
+    const r=await fetch("https://api.semanticscholar.org/graph/v1/author/search?"+params);
+    if(!r.ok)throw Error("Semantic Scholar HTTP "+r.status);
+    const data=await r.json();
+    const authors=(Array.isArray(data.data)?data.data:[]).filter(a=>/^\d+$/.test(String(a.authorId||"")))
+     .map(a=>({...a,__score:Math.max(rankName(a.name,query),...(a.aliases||[]).map(x=>rankName(x,query)))}))
+     .sort((a,b)=>b.__score-a.__score).slice(0,12);
+    if(!authors.length)return false;
+    candidates.replaceChildren();papers.replaceChildren();
+    status.textContent="OpenAlex unavailable. Semantic Scholar researcher identities found. Select a name to inspect its arXiv-linked papers; identical names may represent different people.";
+    for(const author of authors){
+     const box=element("div",undefined,"axiovo-author-identity");
+     const b=element("button",author.name+" · S2:"+author.authorId,"axiovo-author-choice");b.type="button";
+     box.append(b,element("small",(author.affiliations||[]).join("; ")+" · "+(author.paperCount||0)+" indexed works · Semantic Scholar"));
+     b.onclick=async()=>{
+      const id=author.authorId;const c=abort();
+      papers.replaceChildren();status.textContent="Retrieving indexed papers by "+author.name+"…";
+      try{
+       const api="https://api.semanticscholar.org/graph/v1/author/"+id+
+        "/papers?"+new URLSearchParams({limit:"100",fields:"title,year,externalIds,authors,publicationDate"});
+       const response=await fetch(api,{signal:c.signal});
+       if(!response.ok)throw Error("Semantic Scholar HTTP "+response.status);
+       const result=await response.json();if(c.signal.aborted)return;
+       const matched=(result.data||[]).map(p=>({p,id:arxiv?.parse(p.externalIds?.ArXiv)})).filter(x=>x.id);
+       status.textContent=matched.length+" arXiv IDs found in Semantic Scholar for "+author.name+". This provider may have missing publications.";
+       for(const item of matched){const card=element("article",undefined,"axiovo-author-paper");
+        anchor(card,item.p.title||"Untitled work",arxiv.abs(item.id.base));
+        card.append(element("small",String(item.p.publicationDate||item.p.year||"Date unavailable")+" · Semantic Scholar index date (not arXiv v1)"));
+        papers.append(card)}
+       if(!matched.length)papers.append(element("p","No arXiv identifiers present in this provider's returned author publications."));
+      }catch(e){if(!c.signal.aborted)status.textContent="Semantic Scholar paper retrieval failed. Try again or visit the original arXiv author search."}
+     };
+     candidates.append(box)
+    }
+    return true;
+   }catch(e){return false}
+  }
   async function localFallback(query){
    try{
     const response=await fetch("./data/feed.json",{cache:"no-store"});
@@ -150,7 +189,7 @@
     if(!r.ok)throw Error("OpenAlex HTTP "+r.status);
     const data=await r.json();if(ctl.signal.aborted)return;
     const matches=rankAuthors(data.results,query);
-    if(!matches.length){status.textContent="No matching researcher identities in OpenAlex. Checking local author names…";await localFallback(query);return}
+    if(!matches.length){status.textContent="No OpenAlex identities found. Trying another scholarly index…";if(!await semanticScholarFallback(query))await localFallback(query);return}
     status.textContent="Select a researcher identity below. Similar names are suggestions, not proof of the same person. Check institution or ORCID when available.";
     for(const author of matches){
      const wrap=element("div",undefined,"axiovo-author-identity");
@@ -164,7 +203,7 @@
      if(/^https:\/\/orcid\.org\/\d{4}-\d{4}-\d{4}-[\dX]{4}$/i.test(String(author.orcid||"")))anchor(wrap,"View ORCID ↗",author.orcid);
      candidates.append(wrap)
     }
-   }catch(err){if(!ctl.signal.aborted)await localFallback(query)}
+   }catch(err){if(!ctl.signal.aborted){if(!await semanticScholarFallback(query))await localFallback(query)}}
   });
   const urlQuery=new URLSearchParams(location.search).get("author");
   if(urlQuery){input.value=urlQuery.slice(0,120);form.requestSubmit()}
