@@ -1,6 +1,6 @@
 /* ResearchLens offline shell. Do not cache remote APIs, PDFs or the live feed. */
 "use strict";
-const CACHE = "researchlens-shell-v1";
+const CACHE = "litveyra-shell-v2";
 const SHELL = [
   "./", "./index.html", "./workspace.html", "./copilot.html",
   "./lab.html", "./paper.html", "./profiles.html", "./methodology.html",
@@ -27,7 +27,7 @@ self.addEventListener("install", (event) => {
 self.addEventListener("activate", (event) => {
   event.waitUntil(Promise.all([
     caches.keys().then((names) =>
-      Promise.all(names.filter((name) => name.startsWith("researchlens-shell-") && name !== CACHE)
+      Promise.all(names.filter((name) => (name.startsWith("researchlens-shell-") || name.startsWith("litveyra-shell-")) && name !== CACHE)
         .map((name) => caches.delete(name)))),
     self.clients.claim()
   ]));
