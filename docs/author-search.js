@@ -11,28 +11,43 @@
  const SOURCE="S4306400194";
  function clean(value){return String(value||"").normalize("NFKD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]+/g," ").trim().replace(/\s+/g," ")}
  function rankName(name,query){
-  const n=clean(name),q=clean(query);if(!n||!q)return 0;if(n===q)return 100;
+  const n=clean(name),q=clean(query);
+  if(!n||!q)return 0;
+  if(n===q)return 100;
   const nWords=n.split(" "),qWords=q.split(" ");
-  if(n.startsWith(q+" ")||q.startsWith(n+" "))return 88;
-  if(qWords.length>1&&qWords.every(part=>nWords.some(w=>w===part||w.startsWith(part))))return 80;
-  if(nWords.length>1&&qWords.length>1&&nWords[nWords.length-1]===qWords[qWords.length-1]){
-   let score=62;
-   if(nWords[0]===qWords[0])score+=20;
-   else if(nWords[0][0]===qWords[0][0])score+=12;
-   return score;
+  // Never suggest an unrelated person just because they have the same family name.
+  if(nWords.length<2||qWords.length<2)return 0;
+  const first=nWords[0],qFirst=qWords[0],last=nWords[nWords.length-1],qLast=qWords[qWords.length-1];
+  const lastMatch=last===qLast||(Math.min(last.length,qLast.length)>=5&&
+   (last.startsWith(qLast)||qLast.startsWith(last)));
+  if(!lastMatch)return 0;
+  if(first===qFirst){
+   if(nWords.length===qWords.length)return 96;
+   // Exact first and last names with a middle initial are legitimate variants.
+   return 91;
   }
-  if(n.includes(q)||q.includes(n))return 55;
-  let dist=0;
-  const prev=Array.from({length:q.length+1},(_,i)=>i);
-  for(let i=1;i<=n.length;i++){
-   const curr=[i];
-   for(let j=1;j<=q.length;j++)curr[j]=Math.min(curr[j-1]+1,prev[j]+1,prev[j-1]+(n[i-1]===q[j-1]?0:1));
-   prev.splice(0,prev.length,...curr);dist=curr[q.length];
+  if(first.length===1&&first[0]===qFirst[0]||qFirst.length===1&&first[0]===qFirst[0])
+   return 82;
+  // Spelling variants must be a close match in the given name as well.
+  function distance(a,b){
+   let prev=Array.from({length:b.length+1},(_,i)=>i);
+   for(let i=1;i<=a.length;i++){
+    const next=[i];
+    for(let j=1;j<=b.length;j++)next[j]=Math.min(next[j-1]+1,prev[j]+1,prev[j-1]+(a[i-1]===b[j-1]?0:1));
+    prev=next;
+   }
+   return prev[b.length]
   }
-  return Math.max(0,Math.round((1-dist/Math.max(n.length,q.length))*50));
+  if(Math.min(first.length,qFirst.length)>=5&&distance(first,qFirst)<=1)return 79;
+  return 0;
  }
  function canonicalId(raw){
   const m=String(raw||"").match(/(?:^|\/)(A\d{5,14})$/i);return m?m[1].toUpperCase():"";
+ }
+ function officialAuthorUrl(name){
+  return "https://arxiv.org/search/?"+new URLSearchParams({
+   query:String(name||"").trim(),searchtype:"author",abstracts:"show",order:"-announced_date_first",size:"50"
+  }).toString();
  }
  function searchParams(query){
   const p=new URLSearchParams({search:String(query||"").trim(),per_page:"25",
@@ -50,7 +65,7 @@
  function rankAuthors(rows,query){
   return (Array.isArray(rows)?rows:[]).filter(a=>canonicalId(a.id)).map(a=>({
    ...a,__similarity:Math.max(rankName(a.display_name,query),...(a.display_name_alternatives||[]).slice(0,15).map(x=>rankName(x,query)))
-  })).sort((a,b)=>b.__similarity-a.__similarity||Number(b.works_count||0)-Number(a.works_count||0)).slice(0,20)
+  })).filter(a=>a.__similarity>=75).sort((a,b)=>b.__similarity-a.__similarity||Number(b.works_count||0)-Number(a.works_count||0)).slice(0,20)
  }
  function arxivFromCache(work,feed){
   const title=clean(work?.display_name||work?.title);
@@ -78,7 +93,7 @@
     const data=await r.json();
     const authors=(Array.isArray(data.data)?data.data:[]).filter(a=>/^\d+$/.test(String(a.authorId||"")))
      .map(a=>({...a,__score:Math.max(rankName(a.name,query),...(a.aliases||[]).map(x=>rankName(x,query)))}))
-     .sort((a,b)=>b.__score-a.__score).slice(0,12);
+     .filter(a=>a.__score>=75).sort((a,b)=>b.__score-a.__score).slice(0,12);
     if(!authors.length)return false;
     candidates.replaceChildren();papers.replaceChildren();
     status.textContent="OpenAlex unavailable. Semantic Scholar researcher identities found. Select a name to inspect its arXiv-linked papers; identical names may represent different people.";
@@ -115,10 +130,16 @@
     if(!response.ok)throw Error("Local feed unavailable");
     const data=await response.json(),feed=Array.isArray(data.papers)?data.papers:[];
     const names=[...new Set(feed.flatMap(p=>p.authors||[]).filter(a=>typeof a==="string"))];
-    const matches=names.map(name=>({name,score:rankName(name,query)})).filter(x=>x.score>=55)
+    const matches=names.map(name=>({name,score:rankName(name,query)})).filter(x=>x.score>=75)
      .sort((a,b)=>b.score-a.score||a.name.localeCompare(b.name)).slice(0,14);
     candidates.replaceChildren();
-    if(!matches.length){status.textContent="Author identity service unavailable. No matching names in the limited local paper snapshot.";return}
+    if(!matches.length){
+     status.textContent="No confidently matching author names in Axiovo's limited cached index. That does not mean the researcher has no arXiv papers.";
+     const link=element("p");
+     anchor(link,"Search this exact author name on arXiv ↗",officialAuthorUrl(query));
+     candidates.append(link);
+     return;
+    }
     status.textContent="Local-only name matches. Identity not verified: identical names may belong to different researchers.";
     for(const row of matches){
      const b=element("button",row.name+" · search cached papers","axiovo-author-choice");
@@ -163,7 +184,7 @@
     papers.append(box);
    }
    const possible=feed.filter(p=>!seen.has(p.id)&&
-    (p.authors||[]).some(name=>rankName(name,author.display_name)>=78))
+    (p.authors||[]).some(name=>rankName(name,author.display_name)>=80))
     .sort((a,b)=>String(b.published||"").localeCompare(String(a.published||""))).slice(0,30);
    if(possible.length){
     papers.append(element("h3","Additional cached arXiv matches (author identity not verified)"));
@@ -180,10 +201,16 @@
     (problem?" OpenAlex unavailable: "+problem+".":"")+
     (!verified.length&&!possible.length?" No matches in these sources; this does not mean the author has no arXiv papers.":"");
   }
+  function addOfficialSearch(query){
+   const box=element("p",undefined,"axiovo-author-official");
+   anchor(box,"Search “"+query+"” on original arXiv ↗",officialAuthorUrl(query));
+   papers.prepend(box);
+  }
   form.addEventListener("submit",async e=>{
    e.preventDefault();const query=input.value.trim();if(query.length<2){status.textContent="Enter at least two characters of an author's name.";return}
    const ctl=abort();candidates.replaceChildren();papers.replaceChildren();
    status.textContent="Finding matching and similar researcher names…";
+   addOfficialSearch(query);
    try{
     const r=await fetch("https://api.openalex.org/authors?"+searchParams(query),{signal:ctl.signal,headers:{Accept:"application/json"}});
     if(!r.ok)throw Error("OpenAlex HTTP "+r.status);
@@ -211,5 +238,5 @@
  if(typeof document!=="undefined"){
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
  }
- return {clean,rankName,canonicalId,searchParams,worksParams,rankAuthors};
+ return {clean,rankName,canonicalId,searchParams,worksParams,rankAuthors,officialAuthorUrl};
 });
