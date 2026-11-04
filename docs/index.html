@@ -228,7 +228,7 @@ function showRecommendations(){
 
  const interests=new Set(followed);
  for(const p of all.filter(x=>saved.includes(x.id)))for(const t of p.topics||[])interests.add(t);
- const ranked=all.filter(p=>!hidden.includes(p.id)&&!saved.includes(p.id)).map(p=>({p,score:(p.topics||[]).filter(t=>interests.has(t)).length*5+(sameAuthor(p)?8:0)})).sort((a,b)=>b.score-a.score||String(b.p.published).localeCompare(String(a.p.published))).slice(0,5);
+ const ranked=all.filter(p=>!hidden.includes(p.id)&&!saved.includes(p.id)).map(p=>({p,score:(p.topics||[]).filter(t=>interests.has(t)).length*5+(sameAuthor(p)?8:0)+(feedback?.score(p,all,localRatings())||0)})).sort((a,b)=>b.score-a.score||String(b.p.published).localeCompare(String(a.p.published))).slice(0,5);
  if(!ranked.length){const x=document.createElement("p");x.className="small";x.textContent="Follow topics or save papers to personalize this section.";root.append(x);return}
  for(const item of ranked){const row=document.createElement("p");const a=document.createElement("a");a.href="./paper.html?id="+encodeURIComponent(item.p.id);a.textContent=item.p.title;row.append(a);root.append(row)}
 }
