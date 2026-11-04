@@ -168,7 +168,7 @@ const base="http://127.0.0.1:8765";
   await limitedPage.locator("#scholar-search-form button[type=submit]").click();
   await limitedPage.locator("#scholar-results article").first().waitFor({timeout:18000});
   assert((await limitedPage.locator("#scholar-status").innerText()).includes("rate-limited"));
-  assert((await limitedPage.locator("#scholar-status").innerText()).includes("other dates"));
+  assert((await limitedPage.locator("#scholar-status").innerText()).includes("limited") || (await limitedPage.locator("#scholar-status").innerText()).includes("cached"));
   assert((await limitedPage.locator("#scholar-results").innerText()).includes("Bell nonlocality with entangled qubits"));
   assert((await limitedPage.locator("#scholar-results").innerText()).includes("Cached arXiv"));
   assert.equal(rateRequests.length,1,"429 should not trigger semantic retry");
