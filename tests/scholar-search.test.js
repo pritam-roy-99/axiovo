@@ -52,4 +52,7 @@ const condPlan=S.plan({field:"condmat",topic:"Topological phases of matter",subt
 const condPaper={...quantum,id:"https://openalex.org/WC",display_name:"Topological phases of quantum matter"};
 assert.equal(S.match(condPaper,condPlan),true);
 assert.equal(S.match({...quantum,id:"https://openalex.org/WY",display_name:"Quantum computing with qubits"},condPlan),false);
+const hepPlan=S.plan({field:"highenergy",topic:"Scattering amplitudes",subtopic:""},"Scattering amplitudes",{today:"2026-11-03"});
+assert.equal(S.match({...quantum,id:"https://openalex.org/WHEP",display_name:"Scattering amplitudes in gauge theory"},hepPlan),true);
+assert.equal(S.match({...medical,id:"https://openalex.org/WHEPM",display_name:"Scattering amplitudes in gauge theory"},hepPlan),false);
 console.log("Field-restricted scholarly search tests passed.");
