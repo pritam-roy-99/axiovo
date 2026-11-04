@@ -40,10 +40,10 @@ class InstallableAppTests(unittest.TestCase):
         self.assertIn('"127.0.0.1"', script)
         self.assertIn('ThreadingHTTPServer', script)
 
-    def test_worker_does_not_precache_external_data(self):
+    def test_worker_precaches_snapshot_but_not_remote_apis(self):
         worker = (DOCS / "sw.js").read_text()
         shell = re.search(r"const SHELL = \[(.*?)\];", worker, re.S).group(1)
-        self.assertNotIn("feed.json", shell)
+        self.assertIn("feed.json", shell)
         self.assertNotIn("openalex.org", shell)
 
 
