@@ -88,7 +88,24 @@ if(filtered.length>50)text(root,"p","Showing the first 50 matching saved papers.
 }
 function init(){
  fillFocus();$("library-search").addEventListener("input",renderLibrary);$("library-filter").addEventListener("change",renderLibrary);
- $("quick-search").addEventListener("submit",e=>{e.preventDefault();const q=$("research-query").value.trim();if(q)location.href="./?view=scholarly&q="+encodeURIComponent(q)+"#discover"});
+ $("quick-search").addEventListener("submit",e=>{
+  e.preventDefault();
+  const q=$("research-query").value.trim();if(!q)return;
+  const input=document.getElementById("scholar-query");
+  const form=document.getElementById("scholar-search-form");
+  const switcher=document.getElementById("rl-source-scholarly");
+  if(!input||!form||!switcher){
+   location.href="./?view=scholarly&q="+encodeURIComponent(q)+"#discover";return;
+  }
+  switcher.click();
+  input.value=q;
+  const url=new URL(location.href);
+  url.searchParams.set("view","scholarly");
+  url.searchParams.set("q",q);url.hash="discover";
+  history.replaceState({source:"scholarly"},"",url);
+  window.dispatchEvent(new Event("researchlens:discover-navigation"));
+  form.requestSubmit();
+ });
  $("export-library").onclick=()=>{const papers=library();if(!papers.length){$("library-count").textContent="No papers to export";return}download("axiovo-library.json",JSON.stringify({version:1,exported_at:new Date().toISOString(),papers,metadata},null,2),"application/json")};
  $("export-citations").onclick=()=>{const papers=library();if(!papers.length){$("library-count").textContent="No papers to export";return}download("axiovo-library.bib",papers.map(bib).join("\n"),"text/plain")};
  renderLibrary();
