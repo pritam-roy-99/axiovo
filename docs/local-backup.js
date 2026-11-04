@@ -11,7 +11,7 @@
  "use strict";
  const KEYS=[
   "researchlens-reading-list","researchlens-read","researchlens-hidden",
-  "researchlens-followed-topics","researchlens-author-follows","researchlens-last-visit",
+  "researchlens-followed-topics","researchlens-author-follows","researchlens-last-visit","axiovo-paper-feedback-v1",
   "researchlens-library-metadata-v1","researchlens-field-saved-v1",
   "researchlens-field-explorer-v1","researchlens-research-projects-v1",
   "researchlens-research-interest-settings-v1","researchlens-interests-by-field-v1",
