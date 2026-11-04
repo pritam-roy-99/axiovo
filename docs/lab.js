@@ -1,4 +1,4 @@
-/* ResearchLens research tools. Browser-only, evidence-linked, opt-in storage. */
+/* Litveyra research tools. Browser-only, evidence-linked, opt-in storage. */
 (function() {
 "use strict";
 const $=id=>document.getElementById(id);
@@ -161,7 +161,7 @@ function exportComparison(){
  $("lab-compare-a-note").value||"No researcher evidence notes entered.",
  "", "## Paper B", "https://arxiv.org/abs/"+b, "",
  $("lab-compare-b-note").value||"No researcher evidence notes entered.",
- "", "These entries are user-authored. ResearchLens has not verified mathematical correctness."
+ "", "These entries are user-authored. Litveyra has not verified mathematical correctness."
  ];
  const blob=new Blob([lines.join("\n")],{type:"text/markdown;charset=utf-8"});
  const url=URL.createObjectURL(blob),anchor=document.createElement("a");

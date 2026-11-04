@@ -21,7 +21,7 @@ async function offlineArxivFallback(plan,{reason="",from="",to="",sort="",today=
   const feed=await cachedFeedPromise;
   const found=CachedArxiv.find(feed,{field:plan.field,query:plan.query,from,to,sort,today,limit:20});
   let message="OpenAlex is rate-limited. Showing "+found.items.length+
-   " matching papers from ResearchLens's cached arXiv index ("+found.indexed+" indexed papers).";
+   " matching papers from Litveyra's cached arXiv index ("+found.indexed+" indexed papers).";
   if(found.outsideDates)message+=" No cached matches fall within the chosen date range; these results are from other dates.";
   if(!found.items.length)message+=" No matching papers in the limited cache. This does not mean arXiv has no matching research.";
   message+=" This is a partial local snapshot, not an exhaustive historical arXiv search.";
@@ -155,7 +155,7 @@ async function search(){
  const official=$("official-search");if(official&&Arxiv)official.href=Arxiv.officialSearchUrl(q);
  if(!q){busy=false;setStatus("Enter a research topic, paper title or arXiv identifier.");return}
  const dates=normalizeSearchDates();
- if(!SearchCore){busy=false;setStatus("Search tools unavailable. Reload ResearchLens.");return}
+ if(!SearchCore){busy=false;setStatus("Search tools unavailable. Reload Litveyra.");return}
  if(Arxiv?.parse(q)){
   if(requestController)requestController.abort();requestController=null;
   busy=false;items=[];total=0;directArxivPaper(q);

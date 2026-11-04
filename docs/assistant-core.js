@@ -1,4 +1,4 @@
-/* Source-grounded literature tools shared by the unified ResearchLens Assistant. */
+/* Source-grounded literature tools shared by the unified Litveyra Assistant. */
 (function(root,factory){
  const api=factory();if(typeof module==="object"&&module.exports)module.exports=api;
  if(root)root.ResearchLensAssistantCore=api;
@@ -56,7 +56,7 @@
  }
  function evidenceReport(query,sources,mode){
   const safe=(sources||[]).slice(0,15);
-  const header=["ResearchLens source-linked research report","Question: "+query,"Task: "+mode,"Coverage: indexed arXiv metadata, plus any retrieved OpenAlex bibliographic records.",""];
+  const header=["Litveyra source-linked research report","Question: "+query,"Task: "+mode,"Coverage: indexed arXiv metadata, plus any retrieved OpenAlex bibliographic records.",""];
   safe.forEach((s,i)=>{
    header.push("["+(i+1)+"] "+s.title,"Source: "+s.url,
     "Date: "+(s.date||"unknown")+"; Provider: "+s.provider,

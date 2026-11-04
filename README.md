@@ -1,8 +1,8 @@
-# ResearchLens
+# Litveyra
 
 ## What makes this project different
 
-**ResearchLens is an open-source, local-first research discovery and reading workspace**, rather than a pay-per-paper AI PDF analysis service. Its intended workflow is **discover → verify the original source → save → annotate → revisit and discuss**.
+**Litveyra is an open-source, local-first research discovery and reading workspace**, rather than a pay-per-paper AI PDF analysis service. Its intended workflow is **discover → verify the original source → save → annotate → revisit and discuss**.
 
 - **Open and inspectable:** the code is public; arXiv metadata and OpenAlex provenance are explicitly identified.
 - **Use without a hosted account:** browser-local reading, PDF notes and personal research interests; export options are available in the workspace.
@@ -11,26 +11,26 @@
 
 **Important limits:** historical search is not a complete arXiv mirror. Hosted social accounts and model inference require separate setup, and local storage is device/browser-specific. Paper analysis and comparison are not unique to this project. We do not claim scientifically validated novelty or correctness from automated reports.
 
-**Naming:** Other unrelated projects and websites use “Research Lens” or “ResearchLens”. This repository is independent of them. A distinctive product name and a trademark/domain check should be considered before an app-store launch.
+**Naming:** Other unrelated projects and websites use “Research Lens” or “Litveyra”. This repository is independent of them. A distinctive product name and a trademark/domain check should be considered before an app-store launch.
 
 ## Install or run locally (no build step)
 
-- **Android / desktop:** Open [ResearchLens](https://pritam-roy-99.github.io/researchlens/) in Chrome or Edge and use **Install app** or **Add to Home screen** when the browser offers it.
+- **Android / desktop:** Open [Litveyra](https://pritam-roy-99.github.io/researchlens/) in Chrome or Edge and use **Install app** or **Add to Home screen** when the browser offers it.
 - **Run on your computer:** Download or clone this GitHub repository, then run `python3 run.py` (Windows: `py run.py`). The app opens in your browser on a local address. Stop with Ctrl+C.
 - **Offline:** Previously visited app pages and scripts can work offline. Live scholarly search, remote PDFs, external discussions, and model downloads still need internet. Data saved in your browser is not automatically synced.
 
 See [LOCAL_APP.md](LOCAL_APP.md) for complete installation, update, and privacy instructions.
 
 
-**ResearchLens is a free, open-source research-discovery prototype with preliminary prior-literature exploration.** It is independent from arXiv and SciRate.
+**Litveyra is a free, open-source research-discovery prototype with preliminary prior-literature exploration.** It is independent from arXiv and SciRate.
 
-## Field Explorer (proposed ResearchLens 2.0 workspace)
+## Field Explorer (proposed Litveyra 2.0 workspace)
 
 Open **[Explore by field](https://pritam-roy-99.github.io/researchlens/fields.html)** after this feature branch is merged and deployed.
 
 - Nine discipline presets: quantum information/physics, mathematics, astrophysics, computer science/AI, biology, medicine/public health, chemistry/materials, engineering/robotics, and social sciences/economics.
 - Topic chips, suggested literature searches, custom research topics, and field-specific evaluation checklists.
-- Live OpenAlex search that keeps results on ResearchLens, with publication date-range filtering, relevance/newest/citation sorting, and paging.
+- Live OpenAlex search that keeps results on Litveyra, with publication date-range filtering, relevance/newest/citation sorting, and paging.
 - Source links to original OpenAlex, DOI, open-access and arXiv records when available.
 - A separate browser-local reading collection with BibTeX and JSON export, plus copy citation actions.
 - Responsive layout and shared day/night setting. The existing research feed, copilot, search, AI Lab and profiles are unchanged.
@@ -47,7 +47,7 @@ Open **[Explore by field](https://pritam-roy-99.github.io/researchlens/fields.ht
 
 The [research workspace](https://pritam-roy-99.github.io/researchlens/workspace.html) now includes **Relevant to your research** and **My research questions**.
 
-- Choose specific research interests or exact author names; ResearchLens additionally uses your Field Explorer topic and followed topics.
+- Choose specific research interests or exact author names; Litveyra additionally uses your Field Explorer topic and followed topics.
 - Rank papers from the **existing local arXiv snapshot** with transparent title, abstract, topic, project keyword and author matching. Each suggestion explains its match; existing saved papers are down-ranked and hidden papers are excluded.
 - Save a suggested paper into the existing arXiv reading list, view it on arXiv, or open the Copilot with its identifier.
 - Record research questions with an objective, searchable keywords and progress status; attach or remove papers, edit questions, or export/import your question data as JSON.
@@ -59,7 +59,7 @@ The [research workspace](https://pritam-roy-99.github.io/researchlens/workspace.
 
 Open [Research Tools](https://pritam-roy-99.github.io/researchlens/lab.html) from the shared navigation after deployment. The page combines:
 
-- **Stage 2, discovery:** bounded recent metadata mirror from arXiv OAI-PMH plus live OpenAlex searches directly on ResearchLens. This is *not* a complete local historical arXiv index or embedding search.
+- **Stage 2, discovery:** bounded recent metadata mirror from arXiv OAI-PMH plus live OpenAlex searches directly on Litveyra. This is *not* a complete local historical arXiv index or embedding search.
 - **Stage 3, reading:** PDF.js browser-local rendering of user-selected PDF files, page notes, export; side-by-side source-metadata comparison of two locally indexed arXiv papers and user-authored source-checked comparison notes.
 - **Stage 4, accounts:** optional GitHub OAuth / Supabase RLS-protected private reading and project backup/restore, reusing existing optional public paper discussions and researcher profiles. **Inactive until an owner configures Supabase**, moderation and abuse protections.
 - **Stage 5, connections:** live OpenAlex citation neighborhoods with source links, plus on-visit keyword watch against locally indexed papers. No background, email or push notifications.
@@ -74,7 +74,7 @@ The source is `scripts/build_intro_video.py`. GitHub Actions generates `docs/ass
 
 ## Unified Discover (arXiv + field-aware scholarly search)
 
-ResearchLens now offers **one Discover page** at [ResearchLens](https://pritam-roy-99.github.io/researchlens/#discover), with two clearly labeled source modes:
+Litveyra now offers **one Discover page** at [Litveyra](https://pritam-roy-99.github.io/researchlens/#discover), with two clearly labeled source modes:
 
 - **Latest arXiv:** the indexed new-submission feed, source categories, arXiv v1 date filters, followed quantum topics, saved and read status, keyboard shortcuts, recommendations, and historical arXiv-linked retrieval via OpenAlex.
 - **Search all fields:** discipline/topic presets, custom interests, live OpenAlex scholarly search, publication date and sort filters, pages, saved OpenAlex papers, and BibTeX/JSON export.
@@ -85,7 +85,7 @@ The two modes **do not claim the same source coverage or date semantics**: arXiv
 
 ## Unified Research Assistant
 
-ResearchLens combines the former AI Lab and Research Copilot into **one** interface: [Research Assistant](https://pritam-roy-99.github.io/researchlens/copilot.html).
+Litveyra combines the former AI Lab and Research Copilot into **one** interface: [Research Assistant](https://pritam-roy-99.github.io/researchlens/copilot.html).
 
 - Start from a scientific question, arXiv ID or indexed paper; choose literature discovery, contributions, technical explanation, reviewer checks, speculative directions, or claim-and-assumption analysis.
 - Paper selection and comparison integrate AI Lab's separate metadata analysis. A source-linked comparison shows indexed abstracts, original-submission chronology, shared concepts and a checklist for human verification.
@@ -98,7 +98,7 @@ ResearchLens combines the former AI Lab and Research Copilot into **one** interf
 
 ## Researcher-friendly discovery and reading-list controls
 
-ResearchLens now prioritizes **Discover** before **Workspace** in the top navigation and homepage actions. The arXiv and wider scholarly discovery interfaces share a **primary research field** preference. Researchers can select a main discipline, one of its established research areas, and then a curated specialized interest. The nine supported discipline presets have **246 field-specific subtopic suggestions**. Selecting a subtopic starts a corresponding live OpenAlex metadata search and updates the browser-local research interest used by the workspace and recommendations.
+Litveyra now prioritizes **Discover** before **Workspace** in the top navigation and homepage actions. The arXiv and wider scholarly discovery interfaces share a **primary research field** preference. Researchers can select a main discipline, one of its established research areas, and then a curated specialized interest. The nine supported discipline presets have **246 field-specific subtopic suggestions**. Selecting a subtopic starts a corresponding live OpenAlex metadata search and updates the browser-local research interest used by the workspace and recommendations.
 
 The limited local arXiv feed is primarily a quantum/physics snapshot. Choosing another discipline switches to broader OpenAlex discovery instead of presenting quantum papers as if they matched that discipline. Field menus are compact in-page controls rather than Android's full-screen native selectors.
 
@@ -118,7 +118,7 @@ The preferences live in `localStorage` under `researchlens-field-explorer-v1` an
 
 ## Discipline-specific OpenAlex search relevance
 
-ResearchLens Discover no longer treats a bare broad keyword as a complete field-specific search. The integrated `scholar-search.js` adds:
+Litveyra Discover no longer treats a bare broad keyword as a complete field-specific search. The integrated `scholar-search.js` adds:
 - OpenAlex `primary_topic.field.id` filters using discipline-related fields, with explicit selection of the relevant main field.
 - Quantum-specific contextuality disambiguation, distinguishing mathematical/physical contextuality from unrelated clinical, educational and social-science uses.
 - Client-side title/abstract/topic screening of 100 API candidates per batch. Results without a matching classified field or topical evidence are excluded.
@@ -137,11 +137,11 @@ Discover now uses a staged retrieval strategy rather than relying solely on exac
 3. Recheck the semantic candidates against discipline classification, source date and specific domain anchors. E.g. Preparation contextuality must concern quantum contextuality *and* preparation, not contextual urbanism or clinical medicine.
 4. Deduplicate candidates, retain verified lexical results ahead of fallback matches and label each new AI semantic candidate visibly. The fallback can be turned off by the user.
 
-The semantic query and field preferences are transmitted to OpenAlex; a local AI model is not installed and no unpublished manuscript is uploaded. Semantic search is subject to OpenAlex availability, usage budgets, and rate limits. Only 50 records per semantic request are possible, and the fallback is attempted on the first search batch. This is a **relevance aid**, not an exhaustive review, a novelty assessment, or a guarantee that all papers are correctly classified. An OpenAlex field restriction and topical anchors can still omit relevant cross-disciplinary results. ResearchLens falls back to standard bibliographic results if the semantic service fails.
+The semantic query and field preferences are transmitted to OpenAlex; a local AI model is not installed and no unpublished manuscript is uploaded. Semantic search is subject to OpenAlex availability, usage budgets, and rate limits. Only 50 records per semantic request are possible, and the fallback is attempted on the first search batch. This is a **relevance aid**, not an exhaustive review, a novelty assessment, or a guarantee that all papers are correctly classified. An OpenAlex field restriction and topical anchors can still omit relevant cross-disciplinary results. Litveyra falls back to standard bibliographic results if the semantic service fails.
 
 ## arXiv-first discovery, revisions and reading controls
 
-ResearchLens now treats the local JSON feed as **a latest-announcements cache**, not as the authority for which papers exist. The main paper search offers **Search all arXiv**: it queries public OpenAlex metadata restricted to works with an arXiv-hosted copy, with direct links to the authoritative arXiv abstract and PDF pages. The all-field scholarly explorer is also restricted to arXiv-hosted works. Any valid exact arXiv ID, such as `2608.13942v1`, can be opened **without either database containing the paper**.
+Litveyra now treats the local JSON feed as **a latest-announcements cache**, not as the authority for which papers exist. The main paper search offers **Search all arXiv**: it queries public OpenAlex metadata restricted to works with an arXiv-hosted copy, with direct links to the authoritative arXiv abstract and PDF pages. The all-field scholarly explorer is also restricted to arXiv-hosted works. Any valid exact arXiv ID, such as `2608.13942v1`, can be opened **without either database containing the paper**.
 
 - The page understands modern identifiers (`2608.13942v1`) and legacy identifiers (`cond-mat/0207270v2`). An unversioned ID opens arXiv's latest revision, while a `vN` suffix opens that exact requested revision, if it exists. OpenAlex's `submittedVersion` designation is **not** treated as an arXiv version number.
 - Each result offers a responsive, high-contrast action bar: **Read on arXiv**, **PDF**, **Research Assistant**, and **Save paper**. Historical search and the wider field explorer include a revision-number control for opening the correct arXiv version.
@@ -177,21 +177,21 @@ This replaces the confusing duplicate quantum-topic chip strip and repeated disc
 
 An optional localhost-only Qwen/Ollama HTTP service is included in `api/server.py`, but the public static website does not call it. The original ZIP contains a more extensive FastAPI/SQLite development implementation that has not been fully imported.
 
-## Search historical arXiv-linked papers inside ResearchLens
+## Search historical arXiv-linked papers inside Litveyra
 
 The homepage **Search historical arXiv papers here** button no longer redirects to arXiv. It opens an in-page search result pane with paper cards, date-range filtering, pagination, OpenAlex/DOI links and links to original arXiv records when the API exposes them. Press Enter in the main search field for the same in-site search.
 
 This on-page history feature queries OpenAlex for works with an arXiv-hosted copy, using OpenAlex source S4306400194. It **does not guarantee complete arXiv coverage**, and OpenAlex publication dates **may differ from arXiv original submission dates**. The existing local index remains available via **Return to local feed**. Search URLs encode the query and dates, so they can be shared.
 
-The local feed is still a small arXiv metadata snapshot. Neither OpenAlex results nor their citation data are automatically added to ResearchLens's permanent local database.
+The local feed is still a small arXiv metadata snapshot. Neither OpenAlex results nor their citation data are automatically added to Litveyra's permanent local database.
 
-## ResearchLens Research Copilot
+## Litveyra Research Copilot
 
 **[Launch Copilot](https://pritam-roy-99.github.io/researchlens/copilot.html)** or open it from any research paper. The copilot has five task modes: literature discovery, contribution comparison, explaining results, reviewer checks, and research directions.
 
 The **evidence-only** mode works on the static site immediately and retrieves clickable paper references from the local arXiv snapshot. Use **Search wider literature** to query external OpenAlex. The optional **local Ollama** mode connects to an open-weight Qwen3.5 9B or 27B model running on the visitor's own computer. A much smaller Qwen2.5 WebGPU option is also provided for experimentation. GitHub Pages hosts no GPUs and provides **no shared inference server**.
 
-Conversation history is held in tab memory and may be exported with source links. Research drafts are not posted to a ResearchLens backend. If the user selects Ollama, prompts and retrieved evidence are sent to the configured localhost Ollama process. WebGPU mode requires downloading model assets from third-party model hosts.
+Conversation history is held in tab memory and may be exported with source links. Research drafts are not posted to a Litveyra backend. If the user selects Ollama, prompts and retrieved evidence are sent to the configured localhost Ollama process. WebGPU mode requires downloading model assets from third-party model hosts.
 
 Scientific explanations, model comparisons, and citations are generated from **limited, unverified evidence**. Do not interpret them as formal theorem equivalence or novelty checks.
 
@@ -200,7 +200,7 @@ Scientific explanations, model comparisons, and citations are generated from **l
 ## New SciRate-style discovery and community workflow
 
 - **Date browsing:** The research feed filters by a date range of first arXiv submission, for records present in its local snapshot. Global OpenAlex search also supports inclusive publication-date ranges.
-- **Historical arXiv:** The homepage builds a direct arXiv advanced-search link using the selected dates and keywords; it also links to [OpenAlex global search](https://pritam-roy-99.github.io/researchlens/search.html), which supports date-only queries. ResearchLens does not locally mirror every paper in arXiv; historical links go to their authoritative records.
+- **Historical arXiv:** The homepage builds a direct arXiv advanced-search link using the selected dates and keywords; it also links to [OpenAlex global search](https://pritam-roy-99.github.io/researchlens/search.html), which supports date-only queries. Litveyra does not locally mirror every paper in arXiv; historical links go to their authoritative records.
 - **Recommendations:** A transparent, device-local "Recommended for me" feed based on topics the researcher follows and papers they save. No server-side personalization data collection.
 - **Paper profiles:** Each record has a shareable \`paper.html?id=<arXiv ID>\` page, PDF / arXiv / SciRate / DOI link-outs (where available), related articles, and author search links.
 - **Real shared discussions and endorsements:** Paper discussion pages look up a GitHub Issue associated with the arXiv ID. Visitors with GitHub accounts can add comments and 👍 reactions to the issue, visible to other researchers. A first discussion thread is seeded for arXiv:2608.13942 at [GitHub issue #1](https://github.com/pritam-roy-99/researchlens/issues/1). This is GitHub-hosted, **not native in-site social functionality**.
@@ -208,15 +208,15 @@ Scientific explanations, model comparisons, and citations are generated from **l
 - **Day/night mode:** Accessible light/dark theme toggle on site pages, stored locally and shared across visits.
 - **Quality controls:** GitHub Actions validates Python tests and browser JavaScript syntax before Pages deploy.
 
-No author-provided profile or manuscript is implicitly endorsed by ResearchLens. Community reactions are not measures of scientific correctness or novelty.
+No author-provided profile or manuscript is implicitly endorsed by Litveyra. Community reactions are not measures of scientific correctness or novelty.
 
-For optional *native* ResearchLens authentication, public profiles, follows, comments and votes, the repository includes [SOCIAL_SETUP.md](SOCIAL_SETUP.md), [supabase/schema.sql](supabase/schema.sql), and conditional frontend integration. That backend is **not active** until a Supabase project, GitHub OAuth, and moderation safeguards are configured. The GitHub Issues discussion route works separately.
+For optional *native* Litveyra authentication, public profiles, follows, comments and votes, the repository includes [SOCIAL_SETUP.md](SOCIAL_SETUP.md), [supabase/schema.sql](supabase/schema.sql), and conditional frontend integration. That backend is **not active** until a Supabase project, GitHub OAuth, and moderation safeguards are configured. The GitHub Issues discussion route works separately.
 
 ## Research workflow and first-load experience
 
 - A pre-rendered static 30-paper snapshot appears at first paint with verified index count and synchronization timestamp. JavaScript progressively upgrades it to a searchable, paginated feed.
 - Homepage displays local coverage (five arXiv categories plus curated historical IDs) and the oldest/newest source v1 publication dates. This is not complete arXiv coverage.
-- **Global scholarly search:** [OpenAlex live search](https://pritam-roy-99.github.io/researchlens/search.html) queries the external OpenAlex corpus, which is much larger than ResearchLens's local GitHub Pages snapshot. It is not copied into our database.
+- **Global scholarly search:** [OpenAlex live search](https://pritam-roy-99.github.io/researchlens/search.html) queries the external OpenAlex corpus, which is much larger than Litveyra's local GitHub Pages snapshot. It is not copied into our database.
 - **Quantum topic subscriptions:** [all-research Atom feed](https://pritam-roy-99.github.io/researchlens/feeds/all.xml) and [example contextuality Atom feed](https://pritam-roy-99.github.io/researchlens/feeds/contextuality.xml).
 - **Triage:** j/k navigate, s save, r mark as read, h hide, Enter open selected arXiv record. Bookmarks, read/hidden lists and followed topics are browser-local.
 - Export bookmarks as BibTeX, RIS, or JSON; import JSON to restore a reading list and preferences. Paper cards offer arXiv ID and BibTeX copy plus a shareable search URL.
@@ -226,13 +226,13 @@ For optional *native* ResearchLens authentication, public profiles, follows, com
 
 ## AI Lab (new, public, experimental)
 
-Open **[ResearchLens AI Lab](https://pritam-roy-99.github.io/researchlens/ai.html)** from the homepage or from any paper card.
+Open **[Litveyra AI Lab](https://pritam-roy-99.github.io/researchlens/ai.html)** from the homepage or from any paper card.
 
 **Immediately usable without AI hardware:** Select a paper or paste your own manuscript title and abstract, click **Generate evidence report**, and inspect the title/abstract-derived key concepts, publication-dated candidate related papers, and source links. The report can be exported as text. This is deterministic lexical retrieval, not machine learning or proof verification.
 
 **Optional in-browser open-weight AI:** Click **Load open-weight AI model**. On a compatible WebGPU browser and sufficiently capable GPU, the site imports [WebLLM v0.2.86](https://github.com/mlc-ai/web-llm) from a CDN and downloads **Qwen2.5-0.5B-Instruct-q4f16_1-MLC** by default (approximately 1 GB graphics memory required, plus downloads and headroom). Alternatively, users can select Qwen3.5-0.8B or Qwen2.5-1.5B with higher hardware requirements. After the first load, model assets can be cached. The generative assistant explains claimed contributions, discusses limitations, and compares *the supplied abstracts* with citations to selected arXiv identifiers. It does **not** establish novelty or review proofs. Model accuracy has not been benchmarked.
 
-The optional model runs in the user's browser, not in the GitHub Pages server. **It is experimental, may fail on unsupported WebGPU browsers or devices, and is not claimed to work on every machine.** No API key is needed; browser model downloads use third-party CDNs and Hugging Face. The draft's title and abstract are not sent to ResearchLens's server. Do not insert confidential data unless comfortable with local device and browser risks.
+The optional model runs in the user's browser, not in the GitHub Pages server. **It is experimental, may fail on unsupported WebGPU browsers or devices, and is not claimed to work on every machine.** No API key is needed; browser model downloads use third-party CDNs and Hugging Face. The draft's title and abstract are not sent to Litveyra's server. Do not insert confidential data unless comfortable with local device and browser risks.
 
 The local Ollama API (`api/server.py`) is a separate experimental developer mode and is **not automatically connected to the public site**.
 
@@ -240,7 +240,7 @@ The local Ollama API (`api/server.py`) is a separate experimental developer mode
 
 1. Open **Settings → Pages** in this repository.
 2. Under Build and deployment, set **Source: GitHub Actions**.
-3. Open **Actions → Refresh arXiv and deploy ResearchLens → Run workflow** to fetch real papers and deploy.
+3. Open **Actions → Refresh arXiv and deploy Litveyra → Run workflow** to fetch real papers and deploy.
 4. Once deployment succeeds, visit https://pritam-roy-99.github.io/researchlens/.
 
 The scheduled refresh checks hourly at minute 17 UTC, with supplementary post-announcement checks at minute 47 during 00:00–05:59 UTC Monday–Friday, on a best-effort basis. Upstream arXiv releases and GitHub scheduling can delay updates. If the API is unavailable, the previous snapshot is retained.
