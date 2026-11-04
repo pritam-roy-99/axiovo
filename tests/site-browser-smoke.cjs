@@ -178,6 +178,64 @@ const base="http://127.0.0.1:8765";
   assert.equal(rateRequests.length,1,"Cooldown should avoid repeated calls during the same session");
   await limited.close();
 
+  // Mobile-first Axiovo navigation and local question-first library workflow.
+  const researchContext=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true});
+  await researchContext.addInitScript(()=>{
+   localStorage.setItem("researchlens-reading-list",JSON.stringify(["2610.00111"]));
+   localStorage.setItem("researchlens-research-projects-v1",JSON.stringify([{
+    id:"p-test-1",title:"Measurement contextuality",question:"Can we witness a new operational separation?",
+    keywords:"contextuality quantum experiments",status:"exploring",paper_ids:[],updated_at:"2026-11-01T00:00:00Z"
+   }]));
+  });
+  await researchContext.route("**/data/feed.json",route=>route.fulfill({
+   status:200,contentType:"application/json",
+   body:JSON.stringify({generated_at:"2026-11-03T00:00:00Z",papers:[{
+    id:"2610.00111",title:"Quantum contextuality and operational witnesses",
+    authors:["A. Scientist"],published:"2026-10-03T00:00:00Z",
+    abstract:"A contextuality experiment",categories:["quant-ph"],primary_category:"quant-ph"
+   }]})
+  }));
+  await researchContext.route("https://api.openalex.org/**",route=>route.fulfill({
+   status:200,contentType:"application/json",body:JSON.stringify({meta:{count:0},results:[]})
+  }));
+  await researchContext.route("https://cdn.jsdelivr.net/**",route=>route.fulfill({
+   status:200,contentType:"application/javascript",body:""
+  }));
+  const research=await researchContext.newPage();
+  research.on("pageerror",err=>errors.push(research.url()+": "+err.message));
+  await research.goto(base+"/#workspace",{waitUntil:"domcontentloaded"});
+  await research.locator("#library-list select[aria-label^='Attach']").first().waitFor({timeout:16000});
+  assert(await research.locator(".axiovo-mobile-nav").isVisible(),"Mobile bottom navigation not visible");
+  assert.equal(await research.locator(".axiovo-mobile-nav a").count(),4);
+  assert((await research.locator(".axiovo-credit").innerText()).includes("ChatGPT by OpenAI"));
+  const attach=research.locator("#library-list select[aria-label^='Attach']").first();
+  await attach.selectOption("p-test-1");
+  const linked=await research.evaluate(()=>JSON.parse(localStorage.getItem("researchlens-research-projects-v1")));
+  assert(linked[0].paper_ids.includes("2610.00111"));
+  const note=research.locator("#library-list textarea").first();
+  await note.fill("Check the assumptions in Theorem 1");
+  await note.dispatchEvent("change");
+  await research.locator(".axiovo-mobile-nav a[href='./#discover']").click();
+  await research.locator("#discover-shell").waitFor({state:"visible"});
+  await research.locator(".axiovo-mobile-nav a[href='./#workspace']").click();
+  await research.locator("#workspace-panel").waitFor({state:"visible"});
+  assert.equal(await research.locator("#library-list textarea").first().inputValue(),"Check the assumptions in Theorem 1");
+  await research.goto(base+"/community.html",{waitUntil:"domcontentloaded"});
+  assert((await research.locator("main").innerText()).includes("GitHub Issues"));
+  await research.goto(base+"/profiles.html",{waitUntil:"domcontentloaded"});
+  assert((await research.locator("h1").innerText()).includes("Settings"));
+  for(const width of [360,390,430]){
+   await research.setViewportSize({width,height:844});
+   for(const url of ["/","/#workspace","/copilot.html","/community.html"]){
+    await research.goto(base+url,{waitUntil:"domcontentloaded"});
+    await research.locator("main").first().waitFor();
+    if(url==="/#workspace")await research.locator("#library-list").waitFor({timeout:14000});
+    const metrics=await research.evaluate(()=>({viewport:document.documentElement.clientWidth,scroll:document.documentElement.scrollWidth}));
+    assert(metrics.scroll<=metrics.viewport+3,url+" mobile overflow at "+width+": "+JSON.stringify(metrics));
+   }
+  }
+  await researchContext.close();
+
   // Check the core desktop layout separately from the mobile touch session.
   const desktop=await browser.newContext({viewport:{width:1366,height:820}});
   await desktop.route("https://api.openalex.org/**",route=>route.fulfill({
