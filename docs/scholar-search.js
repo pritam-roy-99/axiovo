@@ -69,7 +69,7 @@
   const src=norm(title+" "+abs);
   const meta=norm(labels);
   const qt=terms(p.query);
-  if(!qt.length)return false;
+  if(!qt.length)return true; // Broad field browse: no mandatory research area or keyword.
   if(p.context){
    // Contextuality is polysemous. Require physical evidence and the requested
    // specialized qualifier, e.g. "preparation" or "sensing", not merely
