@@ -188,7 +188,7 @@
   window.addEventListener("researchlens:field-changed",e=>{
    const next=normalize({field:e.detail?.field,topic:e.detail?.topic},Fields);
    if(next.field===current.field&&next.topic===current.topic)return;
-   current=next;areaSelected=Boolean(e.detail?.areaSelected??e.detail?.topic);render();emit("external");
+   current=next;areaSelected=Boolean(e.detail?.areaSelected);render();emit("external");
   });
   window.addEventListener("axiovo:taxonomy-changed",()=>{
    const normalized=normalize(current,Fields);
