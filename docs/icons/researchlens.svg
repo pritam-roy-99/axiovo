@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-label="ResearchLens">
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-label="Litveyra">
 <rect width="512" height="512" rx="116" fill="#0b2239"/>
-<circle cx="245" cy="224" r="125" fill="none" stroke="#66d6ec" stroke-width="30"/>
-<path d="M155 335V132h92c64 0 99 32 99 93 0 38-18 64-49 78l64 78" fill="none" stroke="#ffffff" stroke-linecap="round" stroke-linejoin="round" stroke-width="29"/>
-<path d="M294 334l73 84" stroke="#66d6ec" stroke-width="31" stroke-linecap="round"/>
+<circle cx="256" cy="256" r="158" fill="none" stroke="#66d6ec" stroke-width="24"/>
+<path d="M183 143v209h160" fill="none" stroke="#ffffff" stroke-width="42" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="342" cy="352" r="19" fill="#66d6ec"/>
 </svg>
