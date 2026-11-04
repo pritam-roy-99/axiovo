@@ -26,8 +26,8 @@ const authors=[
 ];
 const ranked=A.rankAuthors(authors,"John Smith");
 assert.equal(ranked[0].display_name,"John Smith");
-assert.equal(ranked.length,3,"Only distinct valid OpenAlex identities are shown");
-assert.equal(new Set(ranked.map(x=>x.id)).size,3);
+assert.equal(ranked.length,2,"Only confidently matching distinct valid OpenAlex identities are shown");
+assert.equal(new Set(ranked.map(x=>x.id)).size,2);
 
 assert.equal(A.rankName("Shubhayan Sarkar","Shubhayan Sarkar"),100);
 assert(A.rankName("Shubhayan Sarkar","Shubhayan Sarka")>=75);
