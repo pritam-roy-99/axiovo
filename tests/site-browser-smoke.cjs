@@ -195,6 +195,31 @@ const base="http://127.0.0.1:8765";
   }
   await desktop.close();
 
+  // Narrow phone widths: no horizontal document scrolling, and navigation is
+  // visible with all four destinations. Optional account settings stay outside
+  // the primary bottom bar.
+  for(const width of [360,390,430]){
+   const phone=await browser.newContext({viewport:{width,height:800},isMobile:true,hasTouch:true});
+   await phone.route("https://api.openalex.org/**",route=>route.fulfill({status:200,contentType:"application/json",body:"{\"meta\":{\"count\":0},\"results\":[]}"}));
+   await phone.route("https://cdn.jsdelivr.net/**",route=>route.fulfill({status:200,contentType:"application/javascript",body:""}));
+   const mobile=await phone.newPage();
+   mobile.on("pageerror",err=>errors.push(mobile.url()+": "+err.message));
+   for(const url of ["/","/#workspace","/copilot.html","/lab.html","/profiles.html"]){
+    await mobile.goto(base+url,{waitUntil:"domcontentloaded"});
+    await mobile.locator(".rl-nav a").first().waitFor({timeout:12000});
+    if(url==="/#workspace")await mobile.locator("#library-list").waitFor({timeout:12000});
+    const metrics=await mobile.evaluate(()=>({
+      viewport:document.documentElement.clientWidth,
+      page:document.documentElement.scrollWidth,
+      menu:document.querySelectorAll(".rl-nav a").length
+    }));
+    assert(metrics.page<=metrics.viewport+3,"Phone "+width+" "+url+" horizontal overflow: "+JSON.stringify(metrics));
+    assert.equal(metrics.menu,4,"There should be four primary destinations");
+   }
+   await phone.close();
+  }
+
+
   assert.deepEqual(errors,[],"Unexpected JavaScript exceptions");
   console.log("Browser smoke passed: responsive focus, source search, saved arXiv vN, 7 routes and redirects.");
  }finally{

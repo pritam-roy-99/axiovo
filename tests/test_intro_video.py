@@ -32,7 +32,7 @@ class IntroVideoTests(unittest.TestCase):
         self.assertTrue(any(x.get("kind")=="captions" and x.get("srclang")=="en" for x in parser.tracks))
         self.assertIn("Read video transcript",html)
         self.assertIn("Find papers",html)
-        self.assertIn("My workspace",html)
+        self.assertTrue("My research library" in html or "My Library" in html)
         self.assertIn("Axiovo combines",html)
         self.assertIn("axiom",html)
 

@@ -7,7 +7,7 @@ ROOT=Path(__file__).resolve().parents[1]/"docs"
 class ResearchUXTests(unittest.TestCase):
     def test_navigation_order(self):
         nav=(ROOT/"navigation.js").read_text(encoding="utf8")
-        self.assertLess(nav.index('["./#discover","Discover"]'),nav.index('["./#workspace","Workspace"]'))
+        self.assertLess(nav.index('["./#discover","Discover"]'),nav.index('["./#workspace","Library"]'))
 
     def test_unified_ai_link_and_bookmark_buttons(self):
         home=(ROOT/"index.html").read_text(encoding="utf8")
