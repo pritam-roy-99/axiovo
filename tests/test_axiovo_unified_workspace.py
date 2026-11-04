@@ -36,7 +36,7 @@ class UnifiedWorkspaceTests(unittest.TestCase):
     def test_shared_data_and_no_duplicated_persistence_schema(self):
         js = (DOCS / "unified-workspace.js").read_text()
         self.assertIn('fetch("./workspace.html"', js)
-        self.assertIn('script("./workspace.js")', js)
+        self.assertIn('load("./workspace.js")', js)
         self.assertIn('script("./research-intelligence.js")', js)
         original = (DOCS / "workspace.js").read_text()
         self.assertIn("researchlens-library-change", original)
