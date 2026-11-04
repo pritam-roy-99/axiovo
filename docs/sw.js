@@ -12,7 +12,7 @@ const SHELL = [
   "./assistant-core.js", "./copilot.js", "./lab.js", "./workspace.js",
   "./paper.js", "./profiles.js", "./profiles-social.js", "./social.js",
   "./social-config.js", "./cloud-sync.js", "./relevance.js",
-  "./research-intelligence.js", "./manifest.webmanifest", "./icons/researchlens.svg"
+  "./research-intelligence.js", "./data/feed.json", "./manifest.webmanifest", "./icons/researchlens.svg"
 ];
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -34,7 +34,7 @@ self.addEventListener("activate", (event) => {
 });
 function shellRequest(url) {
   return url.origin === self.location.origin &&
-    (url.pathname.endsWith("/") || /\.(?:html|js|css|svg|webmanifest)$/.test(url.pathname));
+    (url.pathname.endsWith("/") || url.pathname.endsWith("/data/feed.json") || /\.(?:html|js|css|svg|webmanifest)$/.test(url.pathname));
 }
 self.addEventListener("fetch", (event) => {
   const req = event.request;
