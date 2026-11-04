@@ -1,4 +1,4 @@
-// ResearchLens AI Lab. All generative inference is opt-in and runs locally via WebGPU.
+// Litveyra AI Lab. All generative inference is opt-in and runs locally via WebGPU.
 // Evidence report is deterministic and must never be represented as a scientific verdict.
 const $ = id => document.getElementById(id);
 let papers=[],current=null,evidence=null,engine=null,loading=false,indexGeneratedAt="unknown",reportGeneratedAt="",docFreq=new Map(),avgLength=1;
@@ -66,14 +66,14 @@ catch(err){$("ai-result").textContent="Generation failed: "+String(err.message||
 }
 $("search").addEventListener("input",()=>{const q=$("search").value.toLowerCase().trim();selectOptions(papers.filter(p=>[p.title,p.id,(p.authors||[]).join(" "),p.abstract].join(" ").toLowerCase().includes(q)).slice(0,120))});
 $("paper").addEventListener("change",()=>{evidence=null;$("download").disabled=true;$("report").classList.add("hidden");updateSelected()});
-$("analyze").addEventListener("click",makeEvidence);$("download").addEventListener("click",()=>{if(!evidence)return;const text="ResearchLens Preliminary Literature Evidence\n"+evidence.title+"\n"+evidence.id+"\nGenerated: "+evidence.reportGeneratedAt+"\nIndex snapshot: "+evidence.indexGeneratedAt+"\nSearch query: "+evidence.query+"\nLocal algorithm: abstract/title token cosine overlap (not novelty evidence)\n\nKeywords: "+evidence.keywords.join(", ")+"\n\nCandidate literature (not novelty findings):\n"+evidence.near.map(x=>(x.earlier?"Earlier date: ":"Not established earlier: ")+x.paper.title+" https://arxiv.org/abs/"+x.paper.id+" lexicalRank="+x.score.toFixed(3)).join("\n")+"\n\nExternal OpenAlex results (if searched; not validated prior-art matches):\n"+(evidence.external||[]).map(x=>(x.year||"Year unknown")+" | "+x.title+" | "+x.id).join("\n")+"\n\nNOT a scientific novelty or correctness verdict.";const url=URL.createObjectURL(new Blob([text],{type:"text/plain"}));const a=document.createElement("a");a.href=url;a.download="researchlens-evidence-"+evidence.id+".txt";a.click();URL.revokeObjectURL(url)});
+$("analyze").addEventListener("click",makeEvidence);$("download").addEventListener("click",()=>{if(!evidence)return;const text="Litveyra Preliminary Literature Evidence\n"+evidence.title+"\n"+evidence.id+"\nGenerated: "+evidence.reportGeneratedAt+"\nIndex snapshot: "+evidence.indexGeneratedAt+"\nSearch query: "+evidence.query+"\nLocal algorithm: abstract/title token cosine overlap (not novelty evidence)\n\nKeywords: "+evidence.keywords.join(", ")+"\n\nCandidate literature (not novelty findings):\n"+evidence.near.map(x=>(x.earlier?"Earlier date: ":"Not established earlier: ")+x.paper.title+" https://arxiv.org/abs/"+x.paper.id+" lexicalRank="+x.score.toFixed(3)).join("\n")+"\n\nExternal OpenAlex results (if searched; not validated prior-art matches):\n"+(evidence.external||[]).map(x=>(x.year||"Year unknown")+" | "+x.title+" | "+x.id).join("\n")+"\n\nNOT a scientific novelty or correctness verdict.";const url=URL.createObjectURL(new Blob([text],{type:"text/plain"}));const a=document.createElement("a");a.href=url;a.download="researchlens-evidence-"+evidence.id+".txt";a.click();URL.revokeObjectURL(url)});
 $("draft-analyze").addEventListener("click",()=>{
  const title=$("draft-title").value.trim(), abstract=$("draft-abstract").value.trim();
  if(title.length<8||abstract.length<80){alert("Please provide a meaningful title and an abstract of at least 80 characters.");return}
  const draft={id:"private-draft",title,abstract,authors:["Local private draft"],categories:[],primary_category:"private",published:new Date().toISOString(),updated:new Date().toISOString(),topics:[]};
  papers=papers.filter(p=>p.id!=="private-draft");papers.unshift(draft);current=draft;
  $("search").value="";selectOptions(papers.slice(0,120));$("paper").value=draft.id;updateSelected();makeEvidence();
- $("selected").textContent="Private draft · text remains in browser memory and is not sent to ResearchLens servers.";
+ $("selected").textContent="Private draft · text remains in browser memory and is not sent to Litveyra servers.";
  document.getElementById("report").scrollIntoView({behavior:"smooth",block:"start"});
 });
 
