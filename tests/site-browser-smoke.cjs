@@ -69,6 +69,14 @@ const base="http://127.0.0.1:8765";
   assert(await page.evaluate(()=>window.__axiovoSamePage),"Quick search should not reload the page");
   await page.locator("#workflow-workspace").click();
   await page.locator("#workspace-panel").waitFor({state:"visible"});
+  assert.equal(new URL(page.url()).searchParams.get("q"),"contextuality and steering",
+    "Workspace tab should preserve the existing scholarly search");
+  await page.locator("#workflow-discover").click();
+  await page.locator("#scholarly-discovery").waitFor({state:"visible"});
+  assert.equal(await page.locator("#scholar-query").inputValue(),"contextuality and steering",
+    "Returning to Discover should preserve its query");
+  await page.locator("#workflow-workspace").click();
+  await page.locator("#workspace-panel").waitFor({state:"visible"});
 
   await page.goto(base+"/copilot.html",{waitUntil:"domcontentloaded"});
   await page.locator("#paper-picker").waitFor();
