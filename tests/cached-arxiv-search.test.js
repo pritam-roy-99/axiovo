@@ -33,4 +33,18 @@ assert.equal(Cache.find(papers,{field:"quantum",query:"Bell nonlocality",today:"
 assert.equal(Cache.find(papers,{field:"medicine",query:"Bell nonlocality",today:"2026-11-03"}).items.length,0);
 assert.equal(Cache.find(papers,{field:"quantum",query:"Quantum computing",today:"2026-11-03"}).items.length,1);
 assert.equal(Cache.find(papers,{field:"quantum",query:"Random unrelated phrase",today:"2026-11-03"}).items.length,0);
+const physicsExtra=[
+ {id:"2610.00122",title:"Nonequilibrium statistical mechanics of driven diffusive systems",
+  abstract:"Critical phenomena and entropy production",published:"2026-10-02",
+  categories:["cond-mat.stat-mech"],primary_category:"cond-mat.stat-mech"},
+ {id:"2610.00123",title:"Superconductivity in twisted bilayer graphene",
+  abstract:"Correlated electron transport and moiré materials",published:"2026-10-02",
+  categories:["cond-mat.supr-con"],primary_category:"cond-mat.supr-con"},
+ {id:"2610.00124",title:"Stock market trends",
+  abstract:"Financial time series",published:"2026-10-02",
+  categories:["q-fin.ST"],primary_category:"q-fin.ST"}
+];
+assert.equal(Cache.find(physicsExtra,{field:"statmech",query:"Nonequilibrium statistical mechanics",today:"2026-11-03"}).items.length,1);
+assert.equal(Cache.find(physicsExtra,{field:"condmat",query:"Superconductivity",today:"2026-11-03"}).items.length,1);
+assert.equal(Cache.find(physicsExtra,{field:"statmech",query:"Stock market",today:"2026-11-03"}).items.length,0);
 console.log("Cached arXiv fallback under OpenAlex rate limiting passed");
