@@ -1,6 +1,6 @@
-# Run ResearchLens on your own device
+# Run Litveyra on your own device
 
-ResearchLens is a lightweight, installable web app. It does not require Node,
+Litveyra is a lightweight, installable web app. It does not require Node,
 Docker, a database, or an account to use the basic reading workspace.
 
 ## Option A: Install from GitHub Pages (phone, tablet, or desktop)
@@ -9,7 +9,7 @@ Docker, a database, or an account to use the basic reading workspace.
 2. In Chrome for Android, open the browser menu and choose **Install app** or
    **Add to Home screen**, if offered. On desktop Chrome/Edge, use the browser's
    install option if shown.
-3. Launch ResearchLens from your home screen or applications list.
+3. Launch Litveyra from your home screen or applications list.
 
 Installation availability depends on the browser and platform. The interface
 and cached app assets, including the last downloaded arXiv snapshot, can work offline, but **live arXiv/OpenAlex searches,
