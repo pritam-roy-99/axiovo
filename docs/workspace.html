@@ -18,7 +18,7 @@
 <form id="research-project-form" class="rl-project-form">
 <input type="hidden" id="research-project-id">
 <div class="rl-project-form-grid"><div><label for="research-project-title">Project title</label><input id="research-project-title" type="text" maxlength="160" required placeholder="e.g. Contextuality-certified sensing"></div>
-<div><label for="research-project-keywords">Precise keywords</label><input id="research-project-keywords" type="text" maxlength="300" required placeholder="contextuality, quantum sensing, metrology"></div></div>
+<div><label for="research-project-keywords">Precise keywords</label><input id="research-project-keywords" type="text" maxlength="300" required placeholder="e.g. thermodynamics, gene regulation, causal inference"></div></div>
 <label for="research-project-question">Research question or objective</label><textarea id="research-project-question" rows="2" maxlength="1000" placeholder="What operational advantage should be certified, and under which assumptions?"></textarea>
 <div class="rl-paper-actions"><button id="research-project-save" type="submit" class="rl-button primary">Save research question</button><button id="research-project-cancel" type="button" class="rl-button secondary">Clear</button><span id="project-status" class="rl-subtext" role="status"></span></div>
 </form></details>
@@ -29,7 +29,7 @@
 <div class="rl-section-head"><div><span class="rl-eyebrow">PERSONALIZED DISCOVERY</span><h2 id="research-recs-heading">Relevant to your research</h2></div><span id="research-rec-count" class="rl-counter">Loading…</span></div>
 <p class="rl-subtext">Ranked from the existing local arXiv index using explicit topic, keyword and followed-author matches. Every recommendation shows its reason.</p>
 <details class="rl-preferences"><summary>Adjust my research interests</summary><form id="research-interest-form" class="rl-settings-form">
-<label for="research-interest">Specific interests (comma-separated)</label><textarea id="research-interest" rows="2" maxlength="1200" placeholder="quantum steering, Bell nonlocality, cryptography"></textarea>
+<label for="research-interest">Specific interests (comma-separated)</label><textarea id="research-interest" rows="2" maxlength="1200" placeholder="e.g. machine learning, condensed matter, molecular biology"></textarea>
 <label for="research-authors">Follow authors (exact full names, comma-separated)</label><textarea id="research-authors" rows="2" maxlength="1200" placeholder="Researcher name"></textarea>
 <div class="rl-paper-actions"><button type="submit" class="rl-button primary">Save interests</button><span id="interest-status" class="rl-subtext" role="status"></span></div>
 <p class="rl-note" id="interest-summary"></p></form></details>
@@ -51,5 +51,5 @@
 <div id="library-list" class="rl-stack"></div><div class="rl-library-footer"><button type="button" id="export-library" class="rl-button secondary">Export library JSON</button><button type="button" id="export-citations" class="rl-button secondary">Export BibTeX</button></div>
 <p class="rl-note">Your reading statuses and notes stay in this browser. Export a backup before switching devices or clearing site data.</p></section>
 </div>
-<section class="rl-section rl-bottom"><div><span class="rl-eyebrow">FIND AN ANSWER</span><h2>Explore your next research question</h2><p class="rl-subtext">Search by concept, method, theorem, title, or author. Results stay inside Axiovo.</p></div><form id="quick-search" class="rl-quick-search"><label class="rl-visually-hidden" for="research-query">Research question</label><input type="search" id="research-query" maxlength="220" placeholder="e.g. contextuality and quantum sensing" required><button class="rl-button primary" type="submit">Search papers</button></form></section>
+<section class="rl-section rl-bottom"><div><span class="rl-eyebrow">FIND AN ANSWER</span><h2>Explore your next research question</h2><p class="rl-subtext">Search by concept, method, theorem, title, or author. Results stay inside Axiovo.</p></div><form id="quick-search" class="rl-quick-search"><label class="rl-visually-hidden" for="research-query">Research question</label><input type="search" id="research-query" maxlength="220" placeholder="e.g. statistical mechanics or computational biology" required><button class="rl-button primary" type="submit">Search papers</button></form></section>
 </main><footer class="rl-page-footer">Axiovo · Research assistance and metadata exploration, not automated scientific verification.</footer></body></html>
