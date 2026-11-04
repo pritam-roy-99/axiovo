@@ -2,6 +2,8 @@
 (function(){
  "use strict";
  function init(){
+  const tour=document.getElementById("axiovo-video-details");
+  if(tour&&window.matchMedia("(max-width:700px)").matches)tour.open=false;
   const welcome=document.getElementById("axiovo-onboarding");
   if(!welcome)return;
   const KEY="axiovo-onboarding-dismissed-v1";

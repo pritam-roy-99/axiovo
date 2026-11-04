@@ -36,7 +36,7 @@ class RouteAuditTests(unittest.TestCase):
 
     def test_all_public_routes_have_valid_script_order(self):
         pages=("index.html","workspace.html","copilot.html","lab.html","paper.html",
-               "profiles.html","methodology.html","search.html","fields.html","ai.html")
+               "profiles.html","community.html","methodology.html","search.html","fields.html","ai.html")
         for name in pages:
             with self.subTest(page=name):
                 p=self.page(name)

@@ -82,3 +82,7 @@ body{min-width:0;max-width:100%}
  .axiovo-onboarding-actions{width:100%}.axiovo-onboarding-actions>*{flex:1 1 130px}
  .rl-home-demo-head{flex-wrap:wrap}.rl-home-demo-head span:last-child{white-space:normal}
 }
+
+.axiovo-video-details summary{cursor:pointer;font-size:13px;color:#d6edfa;padding:8px 5px;font-weight:700}
+@media(min-width:701px){.axiovo-video-details summary{display:none}}
+@media(max-width:700px){.axiovo-video-details:not([open]){border:1px solid #456985;border-radius:9px;padding:7px}.axiovo-video-details:not([open]) summary{padding:10px}}
