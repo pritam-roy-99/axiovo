@@ -14,7 +14,8 @@ const search=A.searchParams("Maria Garcia");
 assert.equal(search.get("search"),"Maria Garcia");
 const params=A.worksParams("https://openalex.org/A5023471898");
 assert(params.get("filter").includes("authorships.author.id:A5023471898"));
-assert(params.get("filter").includes("locations.source.id:S4306400194"));
+assert(!params.get("filter").includes("locations.source.id:"),"Do not exclude indexed arXiv works by provider tagging");
+assert.equal(params.get("per_page"),"200");
 assert.equal(params.get("sort"),"publication_date:desc");
 assert.throws(()=>A.worksParams("not-an-id"),/Invalid/);
 const authors=[
