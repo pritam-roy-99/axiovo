@@ -204,6 +204,7 @@ function startup(){
      projects=[...map.values()].slice(0,30);persistProjects();render();message($("project-status"),"Imported "+incoming.length+" research questions.")
    }catch(err){message($("project-status"),"Import failed: "+err.message)}finally{e.target.value=""}
  };
+ window.addEventListener("researchlens:workspace-activated",()=>{drawSettings();renderRecommendations()});
  window.addEventListener("storage",e=>{
    if(e.key===PROJECTS){projects=(Array.isArray(read(PROJECTS,[]))?read(PROJECTS,[]):[]).map(R.cleanProject).filter(Boolean);render()}
    if(e.key===META){settings=read(META,{interests:[],authors:[]});drawSettings();renderRecommendations()}
