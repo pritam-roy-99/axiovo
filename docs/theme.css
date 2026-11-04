@@ -67,3 +67,18 @@ body{min-width:0;max-width:100%}
  .rl-workspace-columns{grid-template-columns:minmax(0,1fr)!important}
  .rl-page-footer,.axiovo-credit{padding-bottom:14px}
 }
+
+.axiovo-onboarding{display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap;margin:0 0 18px;
+ background:var(--rl-panel,#fff);border:1px solid var(--rl-border,#d4e2ec);border-radius:14px;padding:15px 18px;color:var(--rl-text,#1d3d54)}
+.axiovo-onboarding[hidden]{display:none!important}
+.axiovo-onboarding strong{font-size:16px}
+.axiovo-onboarding p{font-size:12px;line-height:1.55;max-width:670px;margin:5px 0}
+.axiovo-onboarding-actions{display:flex;flex-wrap:wrap;gap:8px}
+.axiovo-onboarding-actions button,.axiovo-onboarding-actions a{background:var(--rl-soft,#edf4f8);color:var(--rl-text,#17374c);
+ border:1px solid var(--rl-border,#c8dbe8);border-radius:9px;padding:11px 13px;min-height:44px;
+ font-size:12px;font-weight:700;text-decoration:none;cursor:pointer}
+.axiovo-onboarding-actions button:first-child{background:#126e9a;color:#fff}
+@media(max-width:700px){.axiovo-onboarding{padding:13px;gap:11px}
+ .axiovo-onboarding-actions{width:100%}.axiovo-onboarding-actions>*{flex:1 1 130px}
+ .rl-home-demo-head{flex-wrap:wrap}.rl-home-demo-head span:last-child{white-space:normal}
+}
