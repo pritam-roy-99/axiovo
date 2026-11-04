@@ -34,7 +34,7 @@ text(art,"p",(p.authors||[]).slice(0,4).join(", ")+(p.authors?.length>4?" et al.
 const r=text(art,"div","","rl-paper-actions");link(r,"Read on arXiv",p.url);
 if(p.arxiv_id){const cop=document.createElement("a");cop.href="./copilot.html?id="+encodeURIComponent(p.arxiv_id);cop.textContent="Research Assistant";r.append(cop)}
 return art}
-function showRecent(){const root=$("recent-list");root.replaceChildren();const p=fieldPrefs();const query=String(p.subtopic||p.topic||"").trim().toLowerCase();let pick=storedFeed.slice().sort((a,b)=>String(b.published||"").localeCompare(String(a.published||"")));
+function showRecent(){const root=$("recent-list");if(!root)return;root.replaceChildren();const p=fieldPrefs();const query=String(p.subtopic||p.topic||"").trim().toLowerCase();let pick=storedFeed.slice().sort((a,b)=>String(b.published||"").localeCompare(String(a.published||"")));
 if(query){const terms=query.split(/\s+/).filter(t=>t.length>3);const relevant=pick.filter(w=>terms.some(t=>(w.title+" "+(w.abstract||"")).toLowerCase().includes(t)));if(relevant.length>=2)pick=relevant}
 recent=pick.slice(0,6).map(normalizeArxiv).filter(Boolean);
 if(!recent.length){text(root,"div","No recent papers in the latest synced announcements. Search the historical arXiv-linked index in Discover.","rl-empty");return}
@@ -43,7 +43,7 @@ for(const p of recent)root.append(paperCard(p))
 function saveMeta(key,value){metadata[key]={...(metadata[key]||{status:"to-read",note:""}),...value};write(META_KEY,metadata)}
 function renderLibrary(){const root=$("library-list");root.replaceChildren();const q=$("library-search").value.trim().toLowerCase(),status=$("library-filter").value;const papers=library();lookup=new Map(papers.map(p=>[p.key,p]));$("library-count").textContent=papers.length+" papers";
 const filtered=papers.filter(p=>(status==="all"||(metadata[p.key]?.status||"to-read")===status)&&(!q||[p.title,(p.authors||[]).join(" "),p.arxiv_id||""].join(" ").toLowerCase().includes(q)));
-if(!filtered.length){text(root,"div",papers.length?"No saved papers match these filters.":"No saved papers yet. Save articles in the arXiv feed or Field Explorer, then return here.","rl-empty");return}
+if(!filtered.length){text(root,"div",papers.length?"No saved papers match these filters.":"No saved papers yet. Find papers in Discover and save them to your library.","rl-empty");return}
 for(const p of filtered.slice(0,50)){
  const art=paperCard(p);const row=text(art,"div","","rl-entry-tools");
  const select=document.createElement("select");select.setAttribute("aria-label","Reading status for "+p.title);
@@ -84,7 +84,7 @@ function init(){
  $("export-library").onclick=()=>{const papers=library();if(!papers.length){$("library-count").textContent="No papers to export";return}download("axiovo-library.json",JSON.stringify({version:1,exported_at:new Date().toISOString(),papers,metadata},null,2),"application/json")};
  $("export-citations").onclick=()=>{const papers=library();if(!papers.length){$("library-count").textContent="No papers to export";return}download("axiovo-library.bib",papers.map(bib).join("\n"),"text/plain")};
  renderLibrary();
- fetch("./data/feed.json",{cache:"no-store"}).then(r=>{if(!r.ok)throw Error("HTTP "+r.status);return r.json()}).then(data=>{storedFeed=Array.isArray(data.papers)?data.papers:[];$("feed-status").textContent= "Latest arXiv announcements: "+storedFeed.length+" records · refreshed "+(data.generated_at?new Date(data.generated_at).toLocaleString():"date unavailable");showRecent();renderLibrary()}).catch(()=>{$("feed-status").textContent="Recent feed is temporarily unavailable. Saved papers are still accessible.";text($("recent-list"),"div","Please try the arXiv feed from the navigation.","rl-empty")});
+ fetch("./data/feed.json",{cache:"no-store"}).then(r=>{if(!r.ok)throw Error("HTTP "+r.status);return r.json()}).then(data=>{storedFeed=Array.isArray(data.papers)?data.papers:[];if($("feed-status"))$("feed-status").textContent= "Latest arXiv announcements: "+storedFeed.length+" records · refreshed "+(data.generated_at?new Date(data.generated_at).toLocaleString():"date unavailable");showRecent();renderLibrary()}).catch(()=>{if($("feed-status"))$("feed-status").textContent="Recent feed is temporarily unavailable. Saved papers are still accessible.";if($("recent-list"))text($("recent-list"),"div","Please try the arXiv feed from the navigation.","rl-empty")});
  window.addEventListener("storage",()=>{fillFocus();renderLibrary()});
  window.addEventListener("researchlens-library-change",renderLibrary);
  window.addEventListener("researchlens:workspace-activated",()=>{fillFocus();renderLibrary()});
