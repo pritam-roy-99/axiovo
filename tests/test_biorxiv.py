@@ -12,6 +12,7 @@ class BioRxivTests(unittest.TestCase):
         self.assertEqual(x["title"],"Cell structure and function")
         self.assertEqual(x["authors"],["A. Researcher","B. Scientist"])
         self.assertIn("www.biorxiv.org/content/10.1101/",x["url"])
+        self.assertEqual(normalize({"doi":"10.64898/2026.08.28.747819","title":"New DOI format","authors":"A. Scientist"})["doi"],"10.64898/2026.08.28.747819")
         self.assertIsNone(normalize({"doi":"bad","title":"fake"}))
 
     def test_preserves_distinct_records_and_versions(self):

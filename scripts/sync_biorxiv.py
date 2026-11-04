@@ -16,7 +16,7 @@ ENDPOINT = "https://api.biorxiv.org/details/biorxiv/100/0/json"
 
 def normalize(item: dict) -> dict | None:
     doi = str(item.get("doi") or "").strip()
-    if not re.fullmatch(r"10\.1101/[A-Za-z0-9._;()/:+-]+", doi):
+    if not re.fullmatch(r"10\.(?:1101|64898)/[A-Za-z0-9._;()/:+-]+", doi):
         return None
     title = " ".join(str(item.get("title") or "").split())
     if not title:
@@ -54,7 +54,7 @@ def build(payload: dict, prior: dict | None = None) -> dict:
     papers = sorted(index.values(), key=lambda x: (x.get("date", ""), x.get("doi", "")), reverse=True)[:600]
     return {
         "generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
-        "source": "bioRxiv public API", "interval": "last 14 days; cached records retained",
+        "source": "bioRxiv public API", "interval": "100 most recent records; cached records retained",
         "papers": papers,
         "note": "Recent cached metadata only. Search the official bioRxiv site for comprehensive historical coverage.",
     }

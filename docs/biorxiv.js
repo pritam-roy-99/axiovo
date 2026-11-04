@@ -9,7 +9,7 @@
  "use strict";
  const KEY="axiovo-biorxiv-reading-v1",META="axiovo-biorxiv-notes-v1";
  function normalize(p){
-  if(!p||!/^10\.1101\/[a-z0-9._;()/:+-]+$/i.test(String(p.doi||"")))return null;
+  if(!p||!/^10\.(?:1101|64898)\/[a-z0-9._;()/:+-]+$/i.test(String(p.doi||"")))return null;
   return {doi:String(p.doi),title:String(p.title||"").slice(0,500),
    authors:Array.isArray(p.authors)?p.authors.map(String).slice(0,100):[],
    abstract:String(p.abstract||"").slice(0,12000),
