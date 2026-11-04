@@ -31,12 +31,15 @@ class IntroVideoTests(unittest.TestCase):
         self.assertTrue(any(x.get("src")=="./assets/researchlens-tour.mp4" for x in parser.sources))
         self.assertTrue(any(x.get("kind")=="captions" and x.get("srclang")=="en" for x in parser.tracks))
         self.assertIn("Read video transcript",html)
-        self.assertIn("Discover research",html)
+        self.assertIn("Find papers",html)
         self.assertIn("My workspace",html)
+        self.assertIn("Axiovo combines",html)
+        self.assertIn("axiom",html)
 
     def test_video_builder_python_syntax(self):
         script=ROOT/"scripts/build_intro_video.py"
         ast.parse(script.read_text(encoding="utf8"),filename=str(script))
+        self.assertIn("What does Axiovo mean?",script.read_text(encoding="utf8"))
 
 if __name__=="__main__":
     unittest.main()
