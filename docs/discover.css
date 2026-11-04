@@ -180,3 +180,21 @@
  text-decoration:underline;text-underline-offset:3px;padding:5px 0}
 .rl-official-source:focus-visible{outline:3px solid #59b6e8;outline-offset:3px}
 @media(max-width:760px){#scholar-result-heading+.muted{flex-basis:100%}.rl-official-source{white-space:normal}}
+
+
+/* Personal field/subfield editor: touch-friendly and contained within viewport. */
+.rl-focus-interest{display:inline-flex;max-width:100%;min-width:0;align-items:stretch;vertical-align:middle;gap:2px}
+.rl-focus-interest>.rl-focus-chip{min-width:0;max-width:100%;white-space:normal;overflow-wrap:anywhere}
+.rl-focus-remove{flex:0 0 32px;min-width:32px;min-height:38px;border:1px solid var(--rl-border,#cadbe8);border-radius:9px;background:var(--rl-panel,#fff);color:var(--rl-text,#19354b);font-size:20px;cursor:pointer}
+.rl-focus-remove:hover{background:var(--rl-soft,#edf4f9);color:#b3261e}
+.rl-focus-editor{display:flex;max-width:100%;flex-wrap:wrap;align-items:center;gap:6px;padding:3px 0}
+.rl-focus-editor input{flex:1 1 160px;width:160px;min-width:0;max-width:100%;min-height:42px;border:1px solid var(--rl-border,#cadbe8);border-radius:9px;padding:9px;background:var(--rl-panel,#fff);color:var(--rl-text,#19354b)}
+.rl-focus-editor button,.rl-focus-restore{min-height:42px;border:1px solid var(--rl-border,#cadbe8);border-radius:9px;padding:8px 11px;background:var(--rl-panel,#fff);color:var(--rl-text,#19354b);font-weight:650;cursor:pointer}
+.rl-focus-restore{display:inline-flex;align-items:center;white-space:normal;text-align:left}
+.rl-focus-editor-status{font-size:12px;margin:9px 0 0;color:var(--rl-muted,#607a91)}
+.rl-focus-editor button:focus-visible,.rl-focus-restore:focus-visible,.rl-focus-remove:focus-visible{outline:3px solid #66bde8;outline-offset:2px}
+@media(max-width:600px){
+ .rl-focus-editor{width:100%}
+ .rl-focus-restore{width:100%;justify-content:center}
+ .rl-focus-subrow,.rl-focus-area,.rl-focus-submain,.rl-focus-chiplist{min-width:0;max-width:100%}
+}
