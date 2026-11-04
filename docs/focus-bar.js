@@ -123,7 +123,7 @@
    subs.replaceChildren();
    const picked=followed();
    const curated=Fields.fieldTopics(current.field,current.topic);
-   const subtopics=Interest?Interest.order([...new Set([...curated,...picked])],picked):curated;
+   const subtopics=Interest?Interest.order(curated.slice(),picked):curated;
    const any=document.createElement("button");any.type="button";
    any.className="rl-focus-chip"+(!current.subtopic?" active":"");any.textContent="All "+current.topic;
    any.setAttribute("aria-pressed",String(!current.subtopic));any.onclick=()=>chooseSubtopic("");subs.append(any);
@@ -142,6 +142,10 @@
     if(Custom)wrap.append(removeButton("Remove subtopic "+topic,()=>{
       if(!window.confirm("Remove "+topic+" from this research area on your device?"))return;
       if(Custom.removeInterest(current.field,current.topic,topic,localStorage)){
+       if(Interest&&picked.some(x=>x.toLowerCase()===topic.toLowerCase())){
+        write(Interest.KEY,Interest.toggle(load(Interest.KEY,{}),current.field,current.topic,topic));
+        window.dispatchEvent(new Event("researchlens:interests-changed"));
+       }
        if(current.subtopic===topic)current={...current,subtopic:""};
        inform("Removed subtopic: "+topic);refreshTaxonomy("subtopic-removed");
       }
