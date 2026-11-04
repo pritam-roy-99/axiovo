@@ -176,6 +176,56 @@ const base="http://127.0.0.1:8765";
   }
   await desktop.close();
 
+  // Regression: a saved paper and its private note survive source and view
+  // transitions without losing OpenAlex search context or duplicating entries.
+  const workflow = await browser.newContext({viewport:{width:1100,height:800}});
+  await workflow.addInitScript(() => {
+    localStorage.setItem("researchlens-reading-list",JSON.stringify(["2610.00333"]));
+  });
+  await workflow.route("**/data/feed.json",route=>route.fulfill({
+    status:200,contentType:"application/json",
+    body:JSON.stringify({papers:[{
+      id:"2610.00333",title:"Bell nonlocality with entangled qubits",
+      authors:["A. Researcher"],published:"2026-10-03",abstract:"A Bell-test paper",
+      categories:["quant-ph"],primary_category:"quant-ph"
+    }]})
+  }));
+  await workflow.route("https://api.openalex.org/**",route=>route.fulfill({
+    status:200,contentType:"application/json",body:JSON.stringify({meta:{count:0},results:[]})
+  }));
+  await workflow.route("https://cdn.jsdelivr.net/**",route=>route.fulfill({
+    status:200,contentType:"application/javascript",body:""
+  }));
+  const wf=await workflow.newPage();
+  wf.on("pageerror",err=>errors.push(wf.url()+": "+err.message));
+  await wf.goto(base+"/?view=scholarly#workspace",{waitUntil:"domcontentloaded"});
+  await wf.locator("#library-list .rl-paper").first().waitFor({timeout:15000});
+  assert.equal(await wf.locator("#library-list .rl-paper").count(),1);
+  const note=wf.locator("#library-list textarea").first();
+  await note.fill("Check the nonlocality assumptions");
+  await note.dispatchEvent("change");
+  await wf.locator("#workflow-discover").click();
+  await wf.locator("#discover-shell").waitFor({state:"visible"});
+  assert.equal(new URL(wf.url()).searchParams.get("view"),"scholarly");
+  await wf.locator("#rl-source-arxiv").click();
+  await wf.locator("#arxiv-discovery").waitFor({state:"visible"});
+  assert(!new URL(wf.url()).searchParams.has("view"));
+  await wf.locator("#rl-source-scholarly").click();
+  await wf.locator("#scholarly-discovery").waitFor({state:"visible"});
+  assert.equal(new URL(wf.url()).searchParams.get("view"),"scholarly");
+  await wf.locator("#workflow-workspace").click();
+  await wf.locator("#workspace-panel").waitFor({state:"visible"});
+  assert.equal(new URL(wf.url()).searchParams.get("view"),"scholarly");
+  assert.equal(await wf.locator("#library-list .rl-paper").count(),1);
+  assert.equal(await wf.locator("#library-list textarea").first().inputValue(),"Check the nonlocality assumptions");
+  await wf.locator("#research-query").fill("quantum steering");
+  await wf.locator("#quick-search button[type=submit]").click();
+  await wf.locator("#scholarly-discovery").waitFor({state:"visible",timeout:12000});
+  assert.equal(await wf.locator("#scholar-query").inputValue(),"quantum steering");
+  assert.equal(new URL(wf.url()).searchParams.get("q"),"quantum steering");
+  assert.equal(new URL(wf.url()).searchParams.get("view"),"scholarly");
+  await workflow.close();
+
   assert.deepEqual(errors,[],"Unexpected JavaScript exceptions");
   console.log("Browser smoke passed: responsive focus, source search, saved arXiv vN, 7 routes and redirects.");
  }finally{
