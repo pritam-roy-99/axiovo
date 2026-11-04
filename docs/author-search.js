@@ -128,7 +128,7 @@
        " · "+Number(author.works_count||0)+" indexed works"+
        (author.orcid?" · ORCID listed":"")+
        (clean(author.display_name)===clean(query)?" · Exact name":" · Similar name")));
-     if(author.orcid)anchor(wrap,"View ORCID ↗",author.orcid);
+     if(/^https:\/\/orcid\.org\/\d{4}-\d{4}-\d{4}-[\dX]{4}$/i.test(String(author.orcid||"")))anchor(wrap,"View ORCID ↗",author.orcid);
      candidates.append(wrap)
     }
    }catch(err){if(!ctl.signal.aborted)await localFallback(query)}
