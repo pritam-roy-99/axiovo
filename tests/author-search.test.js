@@ -28,4 +28,21 @@ const ranked=A.rankAuthors(authors,"John Smith");
 assert.equal(ranked[0].display_name,"John Smith");
 assert.equal(ranked.length,3,"Only distinct valid OpenAlex identities are shown");
 assert.equal(new Set(ranked.map(x=>x.id)).size,3);
+
+assert.equal(A.rankName("Shubhayan Sarkar","Shubhayan Sarkar"),100);
+assert(A.rankName("Shubhayan Sarkar","Shubhayan Sarka")>=75);
+for(const wrong of ["Siddhartha Sarkar","Sourav Sarkar","Sudipta Sarkar","Abhishek Sarkar","Amal Sarkar","Antara Sarkar","Chitrak Sarkar","Kanad Sarkar","Palash Sarkar"]){
+ assert.equal(A.rankName(wrong,"Shubhayan Sarkar"),0,"Unrelated author suggested: "+wrong);
+}
+assert.equal(A.rankName("Shubhayan Sarkar","S. Sarkar"),82);
+const rankedSarkar=A.rankAuthors([
+ {id:"https://openalex.org/A5021006857",display_name:"Shubhayan Sarkar",works_count:32},
+ {id:"https://openalex.org/A5076543210",display_name:"Siddhartha Sarkar",works_count:100},
+ {id:"https://openalex.org/A5076543211",display_name:"Sourav Sarkar",works_count:90}
+],"Shubhayan Sarkar");
+assert.deepEqual(rankedSarkar.map(x=>x.display_name),["Shubhayan Sarkar"]);
+const sourceUrl=new URL(A.officialAuthorUrl("Shubhayan Sarkar"));
+assert.equal(sourceUrl.hostname,"arxiv.org");
+assert.equal(sourceUrl.searchParams.get("query"),"Shubhayan Sarkar");
+assert.equal(sourceUrl.searchParams.get("searchtype"),"author");
 console.log("Author identity and similar-name search regression tests passed");
