@@ -25,7 +25,8 @@
   const attribution=document.createElement("span");
   attribution.textContent="Independent open-source project; not an official OpenAI product.";
   const methods=document.createElement("a");methods.href="./methodology.html";methods.textContent="Methods & limitations";
-  footer.append(stamp,attribution,methods);
+  const privacy=document.createElement("a");privacy.href="./privacy.html";privacy.textContent="Privacy & device data";
+  footer.append(stamp,attribution,methods,privacy);
   if(!document.querySelector(".axiovo-credit"))document.body.append(footer);
  }
  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",mount);

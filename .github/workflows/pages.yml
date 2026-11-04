@@ -28,6 +28,10 @@ jobs:
           python-version: '3.12'
       - name: Test metadata processing
         run: python -m unittest discover -s tests -v
+      - name: Security and privacy baseline gate
+        run: python scripts/security_audit.py
+      - name: Validate local data restore safety
+        run: node tests/local-backup.test.js
       - name: Validate website scripts
         run: python -m scripts.validate_site
       - name: Test research relevance ranking
