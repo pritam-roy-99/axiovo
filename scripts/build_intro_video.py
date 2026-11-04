@@ -135,14 +135,14 @@ def frame(n):
         label(d,620,265,"Compare papers",F18)
         paper(d,619,304,"Paper A","Methods & assumptions",width=258)
     elif n==6:
-        for i in range(3):
-            y=278+i*61
-            d.line((230,y,450,343),fill=BORDER,width=2)
-            d.line((510,343,730,y),fill=BORDER,width=2)
-            for x in (219,740):d.ellipse((x-20,y-20,x+20,y+20),fill=BLUE,outline=CYAN,width=2)
-        d.ellipse((447,310,513,376),fill=BLUE,outline=CYAN,width=2)
-        label(d,458,334,"Idea",F12)
-        label(d,54,421,"Research questions    ·    Related papers    ·    Export backup",F12,MUTED)
+        card(d,(56,245,895,438),SURFACE2,12)
+        label(d,77,262,"My research question",F18)
+        card(d,(78,305,610,351),SURFACE,9)
+        label(d,93,318,"What enables secure quantum networks?",F14)
+        pill(d,77,376,"Keywords: quantum networks, steering")
+        card(d,(641,305,866,401),SURFACE,10)
+        label(d,657,323,"Related papers",F14)
+        label(d,657,352,"Source-linked results",F12,CYAN)
     else:
         card(d,(65,255,143,334),BLUE,15)
         label(d,89,268,"A",F32)
