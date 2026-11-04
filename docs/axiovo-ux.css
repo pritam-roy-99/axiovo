@@ -1,0 +1,69 @@
+/* Shared Axiovo usability layer: mobile-first four-destination navigation. */
+*,*::before,*::after{box-sizing:border-box}
+html{overflow-x:clip}
+body{min-width:0;overflow-x:clip}
+.rl-global-header{display:flex;align-items:center;flex-wrap:wrap;gap:10px;justify-content:space-between}
+.rl-global-header .rl-logo{flex:0 0 auto}
+.rl-global-header .rl-nav{display:flex;align-items:center;justify-content:center;flex:1 1 auto;gap:4px;flex-wrap:wrap;min-width:0}
+.rl-global-header .rl-nav>a,.axiovo-settings-link{font-size:13px;white-space:nowrap;padding:10px 12px;border-radius:9px;text-decoration:none}
+.rl-global-header .rl-nav>a[aria-current="page"]{background:#176b9d;color:#fff}
+.axiovo-header-utilities{display:flex;align-items:center;gap:8px;flex:0 0 auto}
+.axiovo-more{position:relative;z-index:110}
+.axiovo-more>summary{cursor:pointer;list-style:none;color:#d8ebff;font-size:13px;padding:10px 12px;border-radius:9px}
+.axiovo-more>summary::-webkit-details-marker{display:none}
+.axiovo-more>summary::after{content:"⌄";padding-left:7px}
+.axiovo-more-menu{position:absolute;right:0;top:100%;display:grid;gap:2px;min-width:205px;padding:7px;border:1px solid #9ab8cc;border-radius:11px;background:#102a42;box-shadow:0 8px 22px #071a2c88}
+.axiovo-more-menu a{display:block;padding:10px;color:#e2f3ff;text-decoration:none;font-size:13px;border-radius:7px}
+.axiovo-more-menu a:hover,.axiovo-more-menu a:focus-visible{background:#1e587c}
+.axiovo-mobile-nav{display:none}
+.axiovo-credit{display:flex;gap:12px;flex-wrap:wrap;align-items:center;justify-content:center;text-align:center;font:12px/1.6 system-ui,sans-serif;padding:22px 14px;background:#102238;color:#d7e8f4}
+.axiovo-credit a{color:#a5defa!important}
+.axiovo-onboarding{border:1px solid #b5d6e9;background:#edf7fc;color:#1b4764;padding:14px 17px;border-radius:13px;margin:0 0 18px;max-width:100%}
+.axiovo-onboarding h2{margin:0 0 5px;font-size:16px;line-height:1.4;color:inherit}
+.axiovo-onboarding p{font-size:13px;line-height:1.6;margin:0 0 9px;color:inherit}
+.axiovo-onboarding-actions{display:flex;gap:8px;flex-wrap:wrap}
+.axiovo-onboarding a,.axiovo-onboarding button{display:inline-block;border-radius:8px;padding:9px 11px;border:1px solid #739fb7;background:#fff;color:#175b80;font-size:13px;font-weight:650;text-decoration:none;cursor:pointer}
+.axiovo-progress{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:0 0 13px}
+.axiovo-progress strong{font-size:14px}
+.axiovo-progress a{font-size:12px}
+.axiovo-workspace-priority{scroll-margin-top:24px}
+.axiovo-library-project{display:flex;gap:6px;align-items:center;flex-wrap:wrap;width:100%;margin-top:8px}
+.axiovo-library-project label{font-size:12px;font-weight:700;margin:0!important}
+.axiovo-library-project select{max-width:min(100%,320px);flex:1 1 200px;min-width:0}
+.axiovo-saved-banner{display:flex;align-items:center;gap:7px;flex-wrap:wrap;font-size:13px;color:#2a617e}
+.axiovo-mobile-nav a:focus-visible,.axiovo-more summary:focus-visible,.axiovo-onboarding button:focus-visible{outline:3px solid #70cbf4;outline-offset:2px}
+:root[data-theme="dark"] .axiovo-onboarding{background:#163248;border-color:#395d75;color:#e2f1fc}
+:root[data-theme="dark"] .axiovo-onboarding a,:root[data-theme="dark"] .axiovo-onboarding button{background:#20455f;color:#e1f4ff}
+@media(max-width:900px){
+ .rl-global-header .rl-nav{justify-content:flex-start}
+}
+@media(max-width:700px){
+ body{padding-bottom:72px}
+ .rl-global-header{min-width:0;padding:10px 13px!important;gap:8px}
+ .rl-global-header .rl-nav{display:none}
+ .rl-global-header .rl-logo{font-size:19px}
+ .axiovo-header-utilities{margin-left:auto}
+ .axiovo-settings-link{padding:8px 6px;font-size:12px}
+ .theme-toggle{padding:7px 9px}
+ .axiovo-mobile-nav{position:fixed;bottom:0;left:0;right:0;z-index:1000;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:2px;max-width:100vw;padding:6px max(4px,env(safe-area-inset-right)) calc(7px + env(safe-area-inset-bottom)) max(4px,env(safe-area-inset-left));background:#0e2941;border-top:1px solid #466980;box-shadow:0 -4px 18px #03162944}
+ .axiovo-mobile-nav a{display:flex;align-items:center;justify-content:center;min-width:0;min-height:44px;padding:6px 2px;text-align:center;color:#dbeeff;text-decoration:none;font-size:11px;font-weight:650;border-radius:9px;white-space:normal;overflow-wrap:break-word}
+ .axiovo-mobile-nav a[aria-current="page"]{background:#1b79b0;color:#fff}
+ .axiovo-credit{margin-bottom:calc(7px + env(safe-area-inset-bottom))}
+ .rl-home-hero-grid,.hero .rl-home-hero-grid{grid-template-columns:minmax(0,1fr)!important}
+ .hero,.rl-home-demo,main,.rl-workspace,.panel,.rl-focus-bar,.rl-discover-switch,.rl-discover-options,.rl-shortcuts,.rl-workspace-columns{min-width:0;max-width:100%}
+ img,video,canvas,iframe{max-width:100%;height:auto}
+ .rl-home-demo video{width:100%;aspect-ratio:16/9}
+ .rl-unified-switch{width:100%;min-width:0}
+ .rl-unified-switch a{flex:1 1 120px;text-align:center;justify-content:center}
+ .rl-field-choice-list,.rl-focus-chiplist,.rl-focus-areas{max-width:100%;min-width:0}
+ .rl-workspace-columns{grid-template-columns:minmax(0,1fr)!important}
+ .rl-project-form-grid,.rl-library-controls{grid-template-columns:minmax(0,1fr)!important}
+ .rl-shortcuts{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ .rl-recs-grid{grid-template-columns:minmax(0,1fr)!important}
+}
+@media(max-width:390px){
+ .axiovo-mobile-nav a{font-size:10.5px}
+ .rl-global-header .rl-logo{font-size:18px}
+ .hero{padding:22px 12px}
+ main{padding-left:12px!important;padding-right:12px!important}
+}
