@@ -43,7 +43,7 @@ for(const p of recent)root.append(paperCard(p))
 function saveMeta(key,value){metadata[key]={...(metadata[key]||{status:"to-read",note:""}),...value};write(META_KEY,metadata)}
 function renderLibrary(){const root=$("library-list");root.replaceChildren();const q=$("library-search").value.trim().toLowerCase(),status=$("library-filter").value;const papers=library();lookup=new Map(papers.map(p=>[p.key,p]));$("library-count").textContent=papers.length+" papers";
 const filtered=papers.filter(p=>(status==="all"||(metadata[p.key]?.status||"to-read")===status)&&(!q||[p.title,(p.authors||[]).join(" "),p.arxiv_id||""].join(" ").toLowerCase().includes(q)));
-if(!filtered.length){text(root,"div",papers.length?"No saved papers match these filters.":"No saved papers yet. Save articles in the arXiv feed or Field Explorer, then return here.","rl-empty");return}
+if(!filtered.length){text(root,"div",papers.length?"No saved papers match these filters.":"No saved papers yet. Open Discover and save papers; they will appear here automatically.","rl-empty");return}
 for(const p of filtered.slice(0,50)){
  const art=paperCard(p);const row=text(art,"div","","rl-entry-tools");
  const select=document.createElement("select");select.setAttribute("aria-label","Reading status for "+p.title);
@@ -58,7 +58,7 @@ if(filtered.length>50)text(root,"p","Showing the first 50 matching saved papers.
 }
 function init(){
  fillFocus();$("library-search").addEventListener("input",renderLibrary);$("library-filter").addEventListener("change",renderLibrary);
- $("quick-search").addEventListener("submit",e=>{e.preventDefault();const q=$("research-query").value.trim();if(q)location.href="./?view=scholarly&q="+encodeURIComponent(q)+"#discover"});
+ $("quick-search").addEventListener("submit",e=>{e.preventDefault();const q=$("research-query").value.trim();if(!q)return;if(document.getElementById("discover-shell"))window.dispatchEvent(new CustomEvent("axiovo:discover-search",{detail:{query:q}}));else location.href="./?view=scholarly&q="+encodeURIComponent(q)+"#discover"});
  $("export-library").onclick=()=>{const papers=library();if(!papers.length){$("library-count").textContent="No papers to export";return}download("axiovo-library.json",JSON.stringify({version:1,exported_at:new Date().toISOString(),papers,metadata},null,2),"application/json")};
  $("export-citations").onclick=()=>{const papers=library();if(!papers.length){$("library-count").textContent="No papers to export";return}download("axiovo-library.bib",papers.map(bib).join("\n"),"text/plain")};
  renderLibrary();
