@@ -40,7 +40,7 @@ function init(){
  const params=new URLSearchParams(location.search);
  let primary="general";try{primary=JSON.parse(localStorage.getItem("researchlens-field-explorer-v1")||"{}").field||"general"}catch{}
  function updateFieldLabel(){
-  let field="general";try{field=JSON.parse(localStorage.getItem("researchlens-field-explorer-v1")||"{}").field||"quantum"}catch{}
+  let field="general";try{field=JSON.parse(localStorage.getItem("researchlens-field-explorer-v1")||"{}").field||"general"}catch{}
   const config=window.ResearchLensFields;
   const name=config?.FIELDS?.[field]?.name||"your field";
   if(b.firstChild?.nodeType===Node.TEXT_NODE)b.firstChild.textContent="Explore "+name+" ";
