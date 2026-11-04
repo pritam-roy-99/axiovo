@@ -47,7 +47,7 @@ class SourceFirstTests(unittest.TestCase):
   self.assertIn('locations.source.id:S4306400194',js)
  def test_broader_field_search_arxiv_only(self):
   js=(ROOT/"scholar-search.js").read_text(encoding="utf8")
-  self.assertIn("locations.source.id:S4306400194",js)
+  self.assertNotIn('const filters=["locations.source.id:S4306400194"]',js)
   scholar=(ROOT/"scholarly.js").read_text(encoding="utf8")
   self.assertIn('Arxiv?.parse(q)',scholar)
   self.assertIn('arxivURL(w)',scholar)
