@@ -142,7 +142,7 @@ const base="http://127.0.0.1:8765";
   await discover.close();
 
   // OpenAlex 429 must not leave Discover empty or trigger repeated semantic calls.
-  const limited=await browser.newContext({viewport:{width:1100,height:800}});
+  const limited=await browser.newContext({viewport:{width:1100,height:800},serviceWorkers:"block"});
   const rateRequests=[];
   await limited.route("https://api.openalex.org/**",route=>{
    rateRequests.push(route.request().url());
@@ -169,7 +169,6 @@ const base="http://127.0.0.1:8765";
   await limitedPage.locator("#scholar-results article").first().waitFor({timeout:18000});
   assert((await limitedPage.locator("#scholar-status").innerText()).includes("rate-limited"));
   assert((await limitedPage.locator("#scholar-status").innerText()).includes("limited") || (await limitedPage.locator("#scholar-status").innerText()).includes("cached"));
-  console.log("fallback debug:",JSON.stringify({status:await limitedPage.locator("#scholar-status").innerText(),results:(await limitedPage.locator("#scholar-results").innerText()).slice(0,700)}));
   assert((await limitedPage.locator("#scholar-results").innerText()).includes("Bell nonlocality with entangled qubits"));
   assert((await limitedPage.locator("#scholar-results").innerText()).includes("Cached arXiv"));
   assert.equal(rateRequests.length,1,"429 should not trigger semantic retry");
