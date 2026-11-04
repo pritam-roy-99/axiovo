@@ -1,0 +1,34 @@
+{
+  "name": "ResearchLens",
+  "short_name": "ResearchLens",
+  "description": "Discover, read and organize research on your own device.",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f3f7fb",
+  "theme_color": "#0b2239",
+  "lang": "en",
+  "icons": [
+    {
+      "src": "./icons/researchlens.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Discover papers",
+      "url": "./#discover"
+    },
+    {
+      "name": "My workspace",
+      "url": "./workspace.html"
+    },
+    {
+      "name": "Research Assistant",
+      "url": "./copilot.html"
+    }
+  ]
+}
