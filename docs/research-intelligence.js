@@ -18,7 +18,7 @@ settings.interests=Array.isArray(settings.interests)?settings.interests.slice(0,
 settings.authors=Array.isArray(settings.authors)?settings.authors.slice(0,20):[];
 let feed=[],filtered=[],pickedProject="";
 const Arxiv=window.ResearchLensArxiv;
-function persistProjects(){write(PROJECTS,projects)}
+function persistProjects(){if(write(PROJECTS,projects))window.dispatchEvent(new Event("axiovo:projects-updated"))}
 function persistSettings(){write(META,settings)}
 function link(parent,url,label){if(!/^https:\/\//.test(url||""))return;const a=texts(parent,"a",label);a.href=url;a.target="_blank";a.rel="noopener noreferrer"}
 function projectName(p){return p.title+(p.status==="completed"?" (completed)":"")}
@@ -205,6 +205,7 @@ function startup(){
    }catch(err){message($("project-status"),"Import failed: "+err.message)}finally{e.target.value=""}
  };
  window.addEventListener("researchlens:workspace-activated",()=>{drawSettings();renderRecommendations()});
+ window.addEventListener("axiovo:projects-updated",()=>{projects=(Array.isArray(read(PROJECTS,[]))?read(PROJECTS,[]):[]).map(R.cleanProject).filter(Boolean);render()});
  window.addEventListener("storage",e=>{
    if(e.key===PROJECTS){projects=(Array.isArray(read(PROJECTS,[]))?read(PROJECTS,[]):[]).map(R.cleanProject).filter(Boolean);render()}
    if(e.key===META){settings=read(META,{interests:[],authors:[]});drawSettings();renderRecommendations()}
