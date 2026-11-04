@@ -2,7 +2,7 @@
 "use strict";
 const assert=require("node:assert/strict");
 const {FIELDS,SUBTOPICS,fieldTopics,fieldKey}=require("../docs/research-fields.js");
-assert.equal(Object.keys(FIELDS).length,11);
+assert.equal(Object.keys(FIELDS).length,12);
 for(const [field,spec] of Object.entries(FIELDS)){
  assert.ok(spec.name && spec.topics.length>=8,"field has credible research areas: "+field);
  for(const topic of spec.topics){
@@ -17,7 +17,9 @@ assert.deepEqual(fieldTopics("medicine","Clinical trials"),["Randomized controll
 assert.equal(fieldKey("biology"),"biology");
 assert.equal(fieldKey("statmech"),"statmech");
 assert.equal(fieldKey("condmat"),"condmat");
-for(const id of ["statmech","condmat"]){
+assert.equal(fieldKey("highenergy"),"highenergy");
+assert.ok(fieldTopics("highenergy","Scattering amplitudes").includes("Spinor-helicity and on-shell methods"));
+for(const id of ["statmech","condmat","highenergy"]){
  assert.equal(FIELDS[id].topics.length,12);
  assert.ok(Object.values(SUBTOPICS[id]).every(x=>x.length>=4));
 }

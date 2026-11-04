@@ -33,8 +33,8 @@ hr{border:0;border-top:1px solid #e0e9f0;margin:16px 0}.info{border-left:3px sol
 :root[data-theme=dark] .rl-selected-paper{background:#173248;color:#d4eef9;border-color:#346987}
 @media(max-width:690px){.columns{grid-template-columns:minmax(0,1fr)}.panel{padding:14px}main{padding:11px}.intro{padding:5px}}
 </style><link rel="manifest" href="./manifest.webmanifest"><meta name="theme-color" content="#0b2239"><link rel="icon" type="image/svg+xml" href="./icons/researchlens.svg"><script defer src="./pwa.js"></script></head><body>
-<header><b><span class="mark">L</span> Axiovo Assistant</b><a href="./">Paper feed</a><a href="./workspace.html">My workspace</a><a href="./lab.html">Research tools</a></header>
-<main><section class="intro"><h1>Your scientific research assistant</h1><p>One place to discover prior literature, analyze a paper, compare contributions, organize source-linked evidence, and ask an optional local AI model. All scientific conclusions require source verification.</p></section>
+<header><b><span class="mark">A</span> Axiovo Assistant</b><a href="./">Paper feed</a><a href="./workspace.html">My workspace</a><a href="./lab.html">Research tools</a></header>
+<main><section class="intro"><h1>Your scientific research assistant</h1><p>Discover literature, compare claims and assumptions, run technical research reviews, and use a locally installed open-weight model. All conclusions require original-source verification. All scientific conclusions require source verification.</p></section>
 <div class="columns"><aside class="panel">
 <h2>Choose your task</h2>
 <button class="btn mode block active" data-mode="literature">Find relevant papers</button>
@@ -43,6 +43,8 @@ hr{border:0;border-top:1px solid #e0e9f0;margin:16px 0}.info{border-left:3px sol
 <button class="btn mode block" data-mode="review">Reviewer checklist</button>
 <button class="btn mode block" data-mode="ideas">Research directions</button>
 <button class="btn mode block" data-mode="claims">Analyze a paper’s claims</button>
+<button class="btn mode block" data-mode="deepreview">Deep technical literature review</button>
+<button class="btn mode block" data-mode="derivations">Check derivation assumptions</button>
 <hr>
 <h2>Choose a paper</h2>
 <label for="paper-search">Find an indexed paper by title or arXiv ID</label><input id="paper-search" type="search" maxlength="260" placeholder="Search titles, author, arXiv ID"><label for="paper-picker">Indexed papers</label><select id="paper-picker" aria-label="Select paper"><option value="">Select a paper…</option></select>
@@ -53,7 +55,7 @@ hr{border:0;border-top:1px solid #e0e9f0;margin:16px 0}.info{border-left:3px sol
 <hr>
 <h2>AI engine</h2><label for="engine">Inference mode</label>
 <select id="engine"><option value="evidence">Evidence-only (no model, immediate)</option><option value="ollama">Local Qwen via Ollama (stronger)</option><option value="browser">On-device Qwen in browser (experimental)</option></select>
-<div id="ollama-settings" hidden><label for="model">Ollama model</label><select id="model"><option value="qwen3.5:9b">Qwen3.5 9B · recommended</option><option value="qwen3.5:27b">Qwen3.5 27B · stronger</option><option value="qwen3.5:4b">Qwen3.5 4B · lighter</option></select><label for="ollama-url">Local Ollama address</label><input id="ollama-url" value="http://127.0.0.1:11434" readonly><button class="btn block" id="test-ollama" style="margin-top:9px">Check local model connection</button><p class="muted">Start Ollama on your computer and allow this site's origin via OLLAMA_ORIGINS. This connection stays on your computer. No public API keys.</p></div>
+<div id="ollama-settings" hidden><label for="model">Ollama model</label><select id="model"><option value="qwen3.5:9b">Qwen3.5 9B · recommended</option><option value="qwen3.5:27b">Qwen3.5 27B · stronger</option><option value="qwen3.5:35b">Qwen3.5 35B · larger</option><option value="qwen3.5:4b">Qwen3.5 4B · lighter</option></select><button class="btn block" id="detect-models" style="margin-top:8px">Detect installed local models</button><p class="muted" id="detected-models">Select a model above, or detect models already installed on your device.</p><label for="reasoning-depth">Analysis depth</label><select id="reasoning-depth"><option value="standard">Standard · faster</option><option value="deep">Detailed · more evidence and checks</option></select><label for="ollama-url">Local Ollama address</label><input id="ollama-url" value="http://127.0.0.1:11434" readonly><button class="btn block" id="test-ollama" style="margin-top:9px">Check local model connection</button><p class="muted">The model runs on your computer. Larger models need substantial RAM/VRAM. Allow this site's origin using OLLAMA_ORIGINS. The hosted website has no free GPU or server inference by default.</p></div>
 <div id="browser-settings" hidden><label for="browser-model">WebGPU model</label><select id="browser-model"><option value="Qwen2.5-0.5B-Instruct-q4f16_1-MLC">Qwen2.5 0.5B · small</option><option value="Qwen2.5-1.5B-Instruct-q4f16_1-MLC">Qwen2.5 1.5B · moderate</option></select><button class="btn block" id="load-browser" style="margin-top:9px">Download and load model</button><p class="muted">Downloads can be large. Requires compatible WebGPU graphics hardware. Outputs are experimental.</p></div>
 <p id="engine-status" class="status" role="status">Evidence retrieval is ready. No model is running.</p>
 <hr><h2>Workspace</h2><button class="btn block" id="download-evidence">Export evidence report</button><button class="btn block" id="new-chat" style="margin-top:8px">New conversation</button><button class="btn block" id="export-chat" style="margin-top:8px">Export conversation + sources</button>

@@ -6,6 +6,12 @@ Axiovo combines **axiom** (a foundational starting point for reasoning) with **n
 
 **One continuous workflow:** Discover papers and open **My workspace** on the same homepage. Older workspace URLs redirect to the unified research interface; browser-local saved papers and notes remain under their existing keys.
 
+## Research fields and local AI
+
+Axiovo includes 12 top-level disciplines, including a dedicated **High-energy physics & particle physics** field with research areas for quantum field theory, Standard Model phenomenology, lattice QCD, collider physics, scattering amplitudes and more. Each topic has fine-grained interests, which can be customized and saved in your browser.
+
+The optional Research Assistant provides evidence-led source retrieval, literature comparison, deep technical reviews and assumption-checking workflows. For model-generated answers, connect a locally running [Ollama](https://ollama.com/) instance, detect installed models and choose an analysis depth. Hosted GPU inference and mathematically verified results are not included in the free static GitHub Pages deployment.
+
 ## What makes this project different
 
 **Axiovo is an open-source, local-first research discovery and reading workspace**, rather than a pay-per-paper AI PDF analysis service. Its intended workflow is **discover → verify the original source → save → annotate → revisit and discuss**.
