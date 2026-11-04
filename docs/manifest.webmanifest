@@ -23,12 +23,16 @@
       "url": "./#discover"
     },
     {
-      "name": "My workspace",
+      "name": "My Library",
       "url": "./#workspace"
     },
     {
-      "name": "Research Assistant",
+      "name": "Research AI",
       "url": "./copilot.html"
+    },
+    {
+      "name": "Community",
+      "url": "./community.html"
     }
   ]
 }
