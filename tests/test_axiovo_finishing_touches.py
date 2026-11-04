@@ -5,7 +5,7 @@ ROOT=Path(__file__).resolve().parents[1]/"docs"
 class FinishingTouchesTests(unittest.TestCase):
  def test_internal_community_and_truthful_status(self):
   nav=(ROOT/"navigation.js").read_text()
-  self.assertIn('["./community.html","Community"]',nav)
+  self.assertNotIn('["./community.html","Community"]',nav)
   page=(ROOT/"community.html").read_text()
   self.assertIn("GitHub Issues",page)
   self.assertIn('href="./community.html"',(ROOT/"profiles.html").read_text())
