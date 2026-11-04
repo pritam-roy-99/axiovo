@@ -50,7 +50,7 @@ jobs:
         run: node tests/cached-arxiv-search.test.js
       - name: Refresh research metadata
         id: refresh
-        continue-on-error: true
+        continue-on-error: false
         run: python scripts/sync.py
       - name: Report synchronization outcome
         if: steps.refresh.outcome == 'failure'
@@ -58,6 +58,8 @@ jobs:
           echo '### arXiv synchronization failed' >> "$GITHUB_STEP_SUMMARY"
           echo 'The previous feed is preserved. Check the refresh step logs and retry.' >> "$GITHUB_STEP_SUMMARY"
           echo '::warning::Could not refresh arXiv data. Existing records are preserved.'
+      - name: Audit internal routes and HTML assets
+        run: python scripts/audit_internal_links.py
       - name: Optional citation metadata enrichment
         if: steps.refresh.outcome == 'success'
         continue-on-error: true
