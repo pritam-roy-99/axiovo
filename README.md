@@ -317,6 +317,39 @@ Then open http://localhost:8000.
 - `api/server.py`: Optional localhost-only Ollama analysis API.
 - `.github/workflows/pages.yml`: Scheduled refresh and Pages deployment.
 
+## Positioning: Axiovo, Zotero, and Semantic Scholar
+
+**Axiovo is a local-first daily research-reading workspace, not a replacement for a complete scholarly index or reference manager.** Reading lists, local notes, followed topics and preference signals do not require an account; optional external, community and hosted integrations have their own terms.
+
+| Workflow | Axiovo | Zotero | Semantic Scholar |
+| --- | --- | --- | --- |
+| Best use | Daily preprint discovery, version-specific arXiv links, offline-friendly reading list | Reference management, PDF annotation, citations in manuscripts | Large-scale scholarly search, citation graph and recommendations |
+| Source coverage | Limited recent arXiv category snapshots plus external lookups; **not** a full mirror | Imported and collected references | Broad scholarly corpus |
+| Local-first without account | Yes, for core reading workflows | Yes, via local Zotero library | Search without an account; library features vary |
+| arXiv revisions | Version-exact source links and saved revision IDs | Managed via imported source records | Metadata varies by indexed record |
+| Transfer between tools | BibTeX and RIS export; arXiv-ID import from RIS and local JSON backup | BibTeX and RIS import/export, Connector | Citation and collection export features |
+
+Axiovo's paper record and fallback results label provenance and limitations. A successful search does **not** establish priority, novelty, correctness or complete coverage. See [Zotero translators](https://www.zotero.org/support/dev/translators) and [OpenAlex API guidance](https://help.openalex.org/api/authentication/) for relevant provider limits.
+
+## Prioritized roadmap and implemented features
+
+**Shipped or integrated into the current source:**
+
+1. **More disciplines and resilient discovery:** Broader representative arXiv category snapshots, explicit arXiv IDs, OpenAlex search and independently indexed Semantic Scholar fallback on empty or rate-limited searches. Scope remains partial.
+2. **Zotero interoperability:** Copy DOI/arXiv IDs, export Zotero-compatible RIS, import RIS records containing unambiguous arXiv IDs without overwriting saved papers. To add citations to Zotero, import the RIS file or use the Zotero Connector on the source arXiv page; the static site does not write directly into a Zotero account.
+3. **Private local feed learning:** Per-paper *More like this* and *Less like this* preference signals influence recommendations in-browser. These local settings are included in device backups and are not transmitted to a ranking service.
+4. **Per-topic Atom subscriptions:** Generated during deployment for all available topic labels, with subscription links for followed topics. Feed updates depend on successful metadata refreshes.
+5. **Account-free data transfer:** Device-data export and conservative restore in Settings. This is a manual backup workflow rather than automatic encrypted cross-device sync.
+6. **Reader polish:** Expandable full abstracts, saved exact arXiv versions, author-follow preferences and existing private research notes.
+
+**Deferred pending architecture, permissions and testing:**
+
+- **Anonymous aggregated popularity:** Global save/follow counts need a service and abuse protection. Local likes are not presented as real community votes.
+- **Automatic email digests:** Would require an opt-in mailing backend, secure email storage and unsubscribe handling. Atom feeds provide a no-account alternative.
+- **Automatic cross-device sync and encrypted sharing:** Not present. Portable private backups avoid an unreviewed cloud storage model.
+- **Full arXiv historical indexing:** Requires larger ingestion infrastructure, archival reconciliation and robust source deduplication.
+- **Version-anchored highlights and PDF annotations:** Extend existing note storage with structured source/version anchors and tests before relying on them.
+
 ## Roadmap
 
 Broader full-text retrieval; verified citation networks; evidence-linked claim comparisons; optional authenticated open-weight AI inference; better research reading tools; expert commentary and corrections; moderated manuscript submission with persistent identifiers and preservation arrangements.
