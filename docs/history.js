@@ -9,6 +9,7 @@ const $=id=>document.getElementById(id);
 const PAGE_SIZE=25;
 const Arxiv=window.ResearchLensArxiv;
 const ARXIV_SOURCE="S4306400194";
+const Cache=window.ResearchLensCachedArxiv,Other=window.AxiovoMultiSource;
 let page=1,found=0,loading=false,controller=null,active=false,lastRequest=null;
 const btn=$("all-arxiv"),back=$("back-local"),view=$("history-view"),feed=$("local-feed-view");
 if(!btn||!back||!view||!feed)return;
@@ -103,6 +104,32 @@ function paperCard(w){
  row.append(copy);card.append(row);
  return card;
 }
+async function recover(p,signal,reason){
+ if(p.q&&Other&&!p.from&&!p.to){
+  try{const result=await Other.search(p.q,{signal});
+   if(signal.aborted)return null;
+   if(result.items?.length)return {works:result.items.slice(0,PAGE_SIZE),source:"Semantic Scholar",reason:reason+" · Showing records with verified arXiv IDs from a second scholarly index."};
+  }catch(e){if(e.name==="AbortError")return null}
+ }
+ try{
+  const res=await fetch("./data/feed.json",{signal,cache:"no-store"});
+  if(!res.ok)throw Error("Snapshot unavailable");
+  const data=await res.json();
+  if(signal.aborted)return null;
+  const results=Cache?.find(data,{field:"general",query:p.q,from:p.from,to:p.to,today:new Date().toISOString().slice(0,10),sort:p.sort==="old"?"publication_date:asc":"publication_date:desc",limit:PAGE_SIZE});
+  if(results?.items?.length)return {works:results.items,source:"local arXiv cache",reason:reason+" · Limited cached index ("+results.indexed+" records), not the full archive."};
+ }catch(e){if(e.name==="AbortError")return null}
+ return {works:[],source:"alternative indexes",reason:reason+" · No matching records in available alternative indexes. This does not mean the paper is absent from arXiv."};
+}
+function showRecovered(result,p){
+ const root=$("history-cards");root.replaceChildren();
+ historyInfo(result.reason,p.q);
+ let shown=0;
+ for(const w of result.works){const card=paperCard(w);if(card){root.append(card);shown++}}
+ if(!shown)root.append(el("div","No records returned by available fallback sources. Try the official arXiv search for complete history.","empty"));
+ found=shown;$("history-count").textContent=shown+" "+result.source+" results · partial coverage";
+ $("history-pagination").replaceChildren();
+}
 function pager(){
  const root=$("history-pagination");root.replaceChildren();
  const maxPages=Math.max(1,Math.ceil(Math.min(found,10000)/PAGE_SIZE));
@@ -123,7 +150,7 @@ async function search(n=1,fromUrl=false){
  $("history-count").textContent="Searching…";
  $("history-pagination").replaceChildren();
  historyInfo("Historical arXiv-hosted search via OpenAlex. Publication dates may differ from original arXiv submission dates. This index is not exhaustive.",p.q);
- const filters=["locations.source.id:"+ARXIV_SOURCE];
+ const filters=[]; // Verify actual arXiv URLs after retrieval, not potentially missing source IDs.
  if(p.from)filters.push("from_publication_date:"+p.from);
  if(p.to)filters.push("to_publication_date:"+p.to);
  const qs=new URLSearchParams({filter:filters.join(","),page:String(page),per_page:String(PAGE_SIZE),select:"id,display_name,title,publication_date,authorships,doi,locations,primary_location,best_oa_location"});
@@ -152,17 +179,17 @@ async function search(n=1,fromUrl=false){
   let rows=(payload.results||[]).filter(w=>Boolean(arxivLocation(w)));
   if(p.sort==="title")rows=[...rows].sort((a,b)=>(a.display_name||"").localeCompare(b.display_name||""));
   $("history-count").textContent=rows.length+" arXiv-hosted papers on this page · "+found.toLocaleString()+" indexed matches";
-  if(!rows.length)root.append(el("div","No arXiv-linked records returned in this OpenAlex search batch. This does not mean the paper is absent from arXiv; use the official source search or an exact arXiv ID.","empty"));
+  if(!rows.length){const fallback=await recover(p,controller.signal,"OpenAlex returned no arXiv-linked papers for this page");if(fallback)showRecovered(fallback,p)}
   else for(const w of rows){const card=paperCard(w);if(card)root.append(card)}
   if(Arxiv?.parse(p.q)&&!rows.length){
    const x=el("div","This paper may not be indexed by OpenAlex. Open the source record: ","empty");
    addLink(x,"Open "+p.q+" on arXiv ↗",Arxiv.abs(p.q),"rl-paper-action primary");
    root.append(x);
   }
-  pager();
+  if(rows.length)pager();
  }catch(e){if(e.name==="AbortError")return;
-   root.replaceChildren(el("div","The external search provider could not return results ("+String(e.message||e).slice(0,160)+"). Local Axiovo papers are still available.","empty"));
-   $("history-count").textContent="Search temporarily unavailable";found=0;pager();
+   const fallback=await recover(p,controller.signal,String(e.message||e).slice(0,160));
+   if(fallback)showRecovered(fallback,p);
  }finally{loading=false}
 }
 btn.addEventListener("click",()=>search(1));
