@@ -44,7 +44,7 @@ body{min-width:0;max-width:100%}
  .rl-global-header .rl-settings-link{font-size:12px;min-height:40px}
  .rl-global-header .theme-toggle{min-height:40px}
  .rl-global-header .rl-nav{position:fixed;left:0;right:0;bottom:0;z-index:999;
-  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:2px;
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:2px;
   padding:7px 5px calc(7px + env(safe-area-inset-bottom,0px));
   background:#0b2239;border-top:1px solid #436c88;box-shadow:0 -8px 26px #06172438}
  .rl-global-header .rl-nav a{font-size:11px;line-height:1.25;text-align:center;min-width:0;
