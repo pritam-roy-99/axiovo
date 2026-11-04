@@ -1,5 +1,5 @@
 "use strict";
-/* Historical arXiv-linked search rendered inside ResearchLens.
+/* Historical arXiv-linked search rendered inside Litveyra.
  * OpenAlex source filter limits to papers with a harvested arXiv copy,
  * but this is not a complete arXiv archive and publication_date may
  * differ from arXiv's original submission date.
@@ -118,7 +118,7 @@ async function search(n=1,fromUrl=false){
  if(controller)controller.abort();
  controller=new AbortController();loading=true;page=n;switchView(true);
  const root=$("history-cards");root.replaceChildren(el("div","Searching arXiv-hosted papers through OpenAlex…","empty"));
- if(direct){const directBox=el("div",undefined,"rl-source-notice");directBox.textContent="Exact arXiv ID supplied. The official record is available independently of ResearchLens indexing: ";addLink(directBox,"Open arXiv:"+direct.requested+" ↗",Arxiv.abs(direct.requested),"rl-paper-action primary");root.append(directBox)}
+ if(direct){const directBox=el("div",undefined,"rl-source-notice");directBox.textContent="Exact arXiv ID supplied. The official record is available independently of Litveyra indexing: ";addLink(directBox,"Open arXiv:"+direct.requested+" ↗",Arxiv.abs(direct.requested),"rl-paper-action primary");root.append(directBox)}
  $("history-count").textContent="Searching…";
  $("history-pagination").replaceChildren();
  historyInfo("Historical arXiv-hosted search via OpenAlex. Publication dates may differ from original arXiv submission dates. This index is not exhaustive.",p.q);
@@ -160,7 +160,7 @@ async function search(n=1,fromUrl=false){
   }
   pager();
  }catch(e){if(e.name==="AbortError")return;
-   root.replaceChildren(el("div","The external search provider could not return results ("+String(e.message||e).slice(0,160)+"). Local ResearchLens papers are still available.","empty"));
+   root.replaceChildren(el("div","The external search provider could not return results ("+String(e.message||e).slice(0,160)+"). Local Litveyra papers are still available.","empty"));
    $("history-count").textContent="Search temporarily unavailable";found=0;pager();
  }finally{loading=false}
 }
