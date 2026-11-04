@@ -47,4 +47,12 @@ const physicsExtra=[
 assert.equal(Cache.find(physicsExtra,{field:"statmech",query:"Nonequilibrium statistical mechanics",today:"2026-11-03"}).items.length,1);
 assert.equal(Cache.find(physicsExtra,{field:"condmat",query:"Superconductivity",today:"2026-11-03"}).items.length,1);
 assert.equal(Cache.find(physicsExtra,{field:"statmech",query:"Stock market",today:"2026-11-03"}).items.length,0);
+const particlePapers=[
+ {id:"2610.00130",title:"Higgs boson collider physics",abstract:"LHC precision measurement",published:"2026-10-05",categories:["hep-ex"],primary_category:"hep-ex"},
+ {id:"2610.00131",title:"Renormalization in quantum field theory",abstract:"Perturbative gauge theories",published:"2026-10-05",categories:["hep-th"],primary_category:"hep-th"},
+ {id:"2610.00132",title:"Medical treatment analysis",abstract:"Clinical trial",published:"2026-10-05",categories:["q-bio.MN"],primary_category:"q-bio.MN"}
+];
+assert.equal(Cache.find(particlePapers,{field:"highenergy",query:"Higgs boson",today:"2026-11-03"}).items.length,1);
+assert.equal(Cache.find(particlePapers,{field:"highenergy",query:"Renormalization quantum field theory",today:"2026-11-03"}).items.length,1);
+assert.equal(Cache.find(particlePapers,{field:"highenergy",query:"Medical treatment",today:"2026-11-03"}).items.length,0);
 console.log("Cached arXiv fallback under OpenAlex rate limiting passed");
