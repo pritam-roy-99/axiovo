@@ -1,63 +1,76 @@
-/* One entry point for Discover and Workspace. Legacy workspace.html supplies
- * the reusable workspace markup, while its controls and data stay unchanged.
- * The same page origin preserves researchlens-* browser-local saved data.
+/* Axiovo: one Discover ↔ Library workflow, with revision-safe navigation.
+ * Fetches the legacy Workspace markup without changing existing browser data.
  */
-(function () {
-  "use strict";
-  const discover = document.getElementById("discover-shell");
-  const panel = document.getElementById("workspace-panel");
-  const navDiscover = document.getElementById("workflow-discover");
-  const navWorkspace = document.getElementById("workflow-workspace");
-  if (!discover || !panel) return;
-  let mounting = null;
-  function script(url) {
-    return new Promise((resolve, reject) => {
-      const el = document.createElement("script");
-      el.src = url;
-      el.onload = resolve;
-      el.onerror = () => reject(new Error("Unable to load " + url));
-      document.body.appendChild(el);
-    });
-  }
-  function mountWorkspace() {
-    if (mounting) return mounting;
-    mounting = (async () => {
-      const response = await fetch("./workspace.html", {cache:"no-store"});
-      if (!response.ok) throw new Error("Workspace view unavailable (HTTP " + response.status + ")");
-      const doc = new DOMParser().parseFromString(await response.text(), "text/html");
-      const main = doc.querySelector("main.rl-workspace");
-      if (!main) throw new Error("Workspace content is missing");
-      panel.replaceChildren(...Array.from(main.children));
-      await script("./relevance.js");
-      await script("./workspace.js");
-      await script("./research-intelligence.js");
-      window.dispatchEvent(new Event("researchlens:workspace-activated"));
-    })().catch((error) => {
-      mounting = null;
-      const message = document.createElement("p");
-      message.setAttribute("role","alert");
-      message.textContent = error.message + ". The standalone workspace remains available.";
-      panel.replaceChildren(message);
-      const fallback = document.createElement("a");
-      fallback.href = "./workspace.html?standalone=1";
-      fallback.textContent = "Open standalone workspace";
-      panel.appendChild(fallback);
-    });
-    return mounting;
-  }
-  async function render() {
-    const showWorkspace = location.hash === "#workspace" || location.hash === "#library";
-    discover.hidden = showWorkspace;
-    panel.hidden = !showWorkspace;
-    if (navDiscover) navDiscover.setAttribute("aria-current", showWorkspace ? "false" : "page");
-    if (navWorkspace) navWorkspace.setAttribute("aria-current", showWorkspace ? "page" : "false");
-    if (showWorkspace) await mountWorkspace();
-    if (showWorkspace) window.scrollTo(0,0);
-    else if (location.hash === "#discover") document.getElementById("discover")?.scrollIntoView({block:"start"});
-    else window.scrollTo(0,0);
-    if (showWorkspace) window.dispatchEvent(new Event("researchlens:workspace-activated"));
-  }
-  window.addEventListener("hashchange", render);
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", render);
-  else render();
+(function(){
+ "use strict";
+ const discover=document.getElementById("discover-shell");
+ const workspace=document.getElementById("workspace-panel");
+ const discoverTab=document.getElementById("workflow-discover");
+ const workspaceTab=document.getElementById("workflow-workspace");
+ if(!discover||!workspace)return;
+ let mountPromise=null,renderVersion=0;
+ function loadScript(src){
+  return new Promise((resolve,reject)=>{
+   const s=document.createElement("script");s.src=src;s.onload=resolve;
+   s.onerror=()=>reject(new Error("Unable to load "+src));document.body.append(s);
+  });
+ }
+ function mount(){
+  if(mountPromise)return mountPromise;
+  mountPromise=(async()=>{
+   const response=await fetch("./workspace.html",{cache:"no-store"});
+   if(!response.ok)throw Error("Workspace unavailable (HTTP "+response.status+")");
+   const doc=new DOMParser().parseFromString(await response.text(),"text/html");
+   const main=doc.querySelector("main.rl-workspace");
+   if(!main)throw Error("Workspace content missing");
+   workspace.replaceChildren(...Array.from(main.children));
+   await loadScript("./relevance.js");
+   await loadScript("./workspace.js");
+   await loadScript("./research-intelligence.js");
+  })().catch(err=>{
+   mountPromise=null;workspace.replaceChildren();
+   const p=document.createElement("p");p.setAttribute("role","alert");p.textContent=String(err.message||err);
+   const a=document.createElement("a");a.href="./workspace.html?standalone=1";a.textContent="Open standalone library";
+   workspace.append(p,a);
+  });
+  return mountPromise;
+ }
+ const onLibrary=()=>location.hash==="#workspace"||location.hash==="#library";
+ function highlight(tab,on){
+  if(!tab)return;
+  if(on)tab.setAttribute("aria-current","page");
+  else tab.removeAttribute("aria-current");
+ }
+ async function render(){
+  const version=++renderVersion,showLibrary=onLibrary();
+  discover.hidden=showLibrary;workspace.hidden=!showLibrary;
+  highlight(discoverTab,!showLibrary);highlight(workspaceTab,showLibrary);
+  document.querySelectorAll(".rl-nav a").forEach(link=>{
+   if(link.hash==="#workspace")highlight(link,showLibrary);
+   if(link.hash==="#discover")highlight(link,!showLibrary);
+  });
+  if(showLibrary)await mount();
+  if(version!==renderVersion)return;
+  if(showLibrary)window.dispatchEvent(new Event("researchlens:workspace-activated"));
+  if(showLibrary)window.scrollTo(0,0);
+ }
+ // Keep view switching on the same page, retaining the active search filters.
+ document.addEventListener("click",event=>{
+  const anchor=event.target.closest?.("a[href]");
+  if(!anchor||event.defaultPrevented||event.button!==0||event.ctrlKey||event.metaKey||
+     event.altKey||event.shiftKey||(anchor.target&&anchor.target!=="_self"))return;
+  const next=new URL(anchor.href);
+  if(next.origin!==location.origin||next.pathname!==location.pathname ||
+     !["#discover","#workspace","#library"].includes(next.hash))return;
+  if(next.search&&next.search!==location.search)return; // Preserve intentional deep links
+  event.preventDefault();
+  const current=new URL(location.href);current.hash=next.hash;
+  if(current.href!==location.href)history.pushState({}, "", current.href);
+  render();
+ });
+ window.addEventListener("hashchange",render);
+ window.addEventListener("popstate",render);
+ window.addEventListener("axiovo:navigate",render);
+ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",render);
+ else render();
 })();
