@@ -41,9 +41,9 @@ const base="http://127.0.0.1:8765";
   await page.locator("#workspace-panel #library-list").waitFor({timeout:12000});
   assert((await page.locator("#workspace-panel").isVisible()),"Workspace must appear in the unified page");
   await page.locator("#workflow-discover").click();
-  assert(await page.locator("#discover-shell").isVisible());
+  await page.locator("#discover-shell").waitFor({state:"visible",timeout:12000});
   await page.locator("#workflow-workspace").click();
-  assert(await page.locator("#workspace-panel").isVisible());
+  await page.locator("#workspace-panel").waitFor({state:"visible",timeout:12000});
 
   await page.goto(base+"/copilot.html",{waitUntil:"domcontentloaded"});
   await page.locator("#paper-picker").waitFor();
