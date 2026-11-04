@@ -20,6 +20,7 @@ function init(){
    if(wider)u.searchParams.set("view","scholarly");
    else u.searchParams.delete("view");
    window.history.replaceState({source:wider?"scholarly":"arxiv"},"",u.pathname+u.search+"#discover");
+   window.dispatchEvent(new Event("axiovo:navigate"));
   }
  }
  window.addEventListener("researchlens:focus-change",e=>{
