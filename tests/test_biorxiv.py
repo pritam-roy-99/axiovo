@@ -15,6 +15,13 @@ class BioRxivTests(unittest.TestCase):
         self.assertEqual(normalize({"doi":"10.64898/2026.08.28.747819","title":"New DOI format","authors":"A. Scientist"})["doi"],"10.64898/2026.08.28.747819")
         self.assertIsNone(normalize({"doi":"bad","title":"fake"}))
 
+    def test_official_doi_prefixes_and_provenance(self):
+        from scripts.sync_biorxiv import candidate_endpoints
+        x=normalize({"doi":"10.64898/2026.08.28.747819","title":"BioRxiv test","authors":"A; B"})
+        self.assertEqual(x["doi"],"10.64898/2026.08.28.747819")
+        self.assertTrue(all("biorxiv.org" in url for url in candidate_endpoints()))
+        self.assertIsNone(normalize({"doi":"nonsense","title":"Bad record"}))
+
     def test_preserves_distinct_records_and_versions(self):
         a={"doi":"10.1101/2026.10.01.123456","title":"A biology study",
            "authors":"A. Researcher","date":"2026-10-01","version":"1"}
