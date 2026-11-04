@@ -1,4 +1,4 @@
-name: Refresh arXiv and deploy ResearchLens
+name: Refresh scholarly metadata and deploy Axiovo
 on:
   push:
     branches: [main]
@@ -48,12 +48,12 @@ jobs:
         run: node tests/focus-bar.test.js
       - name: Test rate-limited arXiv fallback
         run: node tests/cached-arxiv-search.test.js
-      - name: Refresh research metadata
-        id: refresh
-        continue-on-error: false
-        run: python scripts/sync.py
       - name: Refresh free bioRxiv metadata
         run: python scripts/sync_biorxiv.py
+      - name: Refresh research metadata
+        id: refresh
+        continue-on-error: true
+        run: python scripts/sync.py
       - name: Report synchronization outcome
         if: steps.refresh.outcome == 'failure'
         run: |
@@ -70,7 +70,7 @@ jobs:
           OPENALEX_BATCH_SIZE: '10'
         run: python -m scripts.enrich
       - name: Commit refreshed feed to default branch
-        if: steps.refresh.outcome == 'success' && github.event_name != 'push'
+        if: github.event_name != 'push'
         continue-on-error: true
         run: |
           git config user.name "github-actions[bot]"
