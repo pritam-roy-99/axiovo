@@ -3,6 +3,8 @@
  "use strict";
  const KEY="axiovo-onboarding-seen-v1";
  function init(){
+  const tour=document.getElementById("axiovo-video-details");
+  if(tour&&window.matchMedia("(max-width:700px)").matches)tour.open=false;
   const box=document.getElementById("axiovo-onboarding");
   if(!box)return;
   try{box.hidden=localStorage.getItem(KEY)==="yes"}catch{box.hidden=false}
