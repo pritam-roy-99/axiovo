@@ -17,7 +17,7 @@ class UsabilityTests(unittest.TestCase):
         self.assertIn('["./#discover","Discover"]',nav)
         self.assertIn('["./#workspace","Library"]',nav)
         self.assertIn('["./copilot.html","Research AI"]',nav)
-        self.assertIn('["https://github.com/pritam-roy-99/researchlens/issues","Community"]',nav)
+        self.assertIn('["./community.html","Community"]',nav)
         self.assertNotIn('["./profiles.html","Profile"]',nav)
         self.assertIn('settings.href="./profiles.html"',nav)
     def test_app_footer_credits_are_accurate(self):
