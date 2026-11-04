@@ -1,6 +1,6 @@
-/* One entry point for Discover and Workspace. Legacy workspace.html supplies
- * the reusable workspace markup, while its controls and data stay unchanged.
- * The same page origin preserves researchlens-* browser-local saved data.
+/* The Discover and Workspace views share the homepage and the same browser-local
+ * reading library. Keep URL query parameters, source selection and view synchronized.
+ * The old workspace.html remains an independently usable fallback.
  */
 (function () {
   "use strict";
@@ -9,55 +9,104 @@
   const navDiscover = document.getElementById("workflow-discover");
   const navWorkspace = document.getElementById("workflow-workspace");
   if (!discover || !panel) return;
+
   let mounting = null;
-  function script(url) {
+  let renderSerial = 0;
+
+  function loadScript(url) {
     return new Promise((resolve, reject) => {
-      const el = document.createElement("script");
-      el.src = url;
-      el.onload = resolve;
-      el.onerror = () => reject(new Error("Unable to load " + url));
-      document.body.appendChild(el);
+      const script = document.createElement("script");
+      script.src = url;
+      script.onload = resolve;
+      script.onerror = () => reject(new Error("Could not load " + url));
+      document.body.appendChild(script);
     });
   }
+
   function mountWorkspace() {
     if (mounting) return mounting;
     mounting = (async () => {
-      const response = await fetch("./workspace.html", {cache:"no-store"});
-      if (!response.ok) throw new Error("Workspace view unavailable (HTTP " + response.status + ")");
+      const response = await fetch("./workspace.html", {cache: "no-store"});
+      if (!response.ok) throw new Error("Workspace unavailable (HTTP " + response.status + ")");
       const doc = new DOMParser().parseFromString(await response.text(), "text/html");
       const main = doc.querySelector("main.rl-workspace");
-      if (!main) throw new Error("Workspace content is missing");
+      if (!main) throw new Error("Workspace content was not found");
       panel.replaceChildren(...Array.from(main.children));
-      await script("./relevance.js");
-      await script("./workspace.js");
-      await script("./research-intelligence.js");
-      window.dispatchEvent(new Event("researchlens:workspace-activated"));
-    })().catch((error) => {
+      await loadScript("./relevance.js");
+      await loadScript("./workspace.js");
+      await loadScript("./research-intelligence.js");
+    })().catch(error => {
       mounting = null;
       const message = document.createElement("p");
-      message.setAttribute("role","alert");
-      message.textContent = error.message + ". The standalone workspace remains available.";
-      panel.replaceChildren(message);
+      message.setAttribute("role", "alert");
+      message.textContent = error.message + ". You can still open the standalone workspace.";
       const fallback = document.createElement("a");
       fallback.href = "./workspace.html?standalone=1";
       fallback.textContent = "Open standalone workspace";
-      panel.appendChild(fallback);
+      panel.replaceChildren(message, fallback);
     });
     return mounting;
   }
-  async function render() {
-    const showWorkspace = location.hash === "#workspace" || location.hash === "#library";
-    discover.hidden = showWorkspace;
-    panel.hidden = !showWorkspace;
-    if (navDiscover) navDiscover.setAttribute("aria-current", showWorkspace ? "false" : "page");
-    if (navWorkspace) navWorkspace.setAttribute("aria-current", showWorkspace ? "page" : "false");
-    if (showWorkspace) await mountWorkspace();
-    if (showWorkspace) window.scrollTo(0,0);
-    else if (location.hash === "#discover") document.getElementById("discover")?.scrollIntoView({block:"start"});
-    else window.scrollTo(0,0);
-    if (showWorkspace) window.dispatchEvent(new Event("researchlens:workspace-activated"));
+
+  function workspaceRoute() {
+    return location.hash === "#workspace" || location.hash === "#library";
   }
+
+  async function render() {
+    const token = ++renderSerial;
+    const workspace = workspaceRoute();
+    discover.hidden = workspace;
+    panel.hidden = !workspace;
+    if (navDiscover) {
+      if (workspace) navDiscover.removeAttribute("aria-current");
+      else navDiscover.setAttribute("aria-current", "page");
+    }
+    if (navWorkspace) {
+      if (workspace) navWorkspace.setAttribute("aria-current", "page");
+      else navWorkspace.removeAttribute("aria-current");
+    }
+    document.querySelectorAll(".rl-global-header .rl-nav a").forEach(a => {
+      if (a.hash === "#workspace") {
+        if (workspace) a.setAttribute("aria-current", "page");
+        else a.removeAttribute("aria-current");
+      } else if (a.hash === "#discover") {
+        if (!workspace) a.setAttribute("aria-current", "page");
+        else a.removeAttribute("aria-current");
+      }
+    });
+    if (workspace) await mountWorkspace();
+    if (token !== renderSerial) return;
+    if (workspace) {
+      window.dispatchEvent(new Event("researchlens:workspace-activated"));
+      window.scrollTo(0, 0);
+    } else if (location.hash === "#discover") {
+      document.getElementById("discover")?.scrollIntoView({block: "start"});
+    } else window.scrollTo(0, 0);
+  }
+
+  /* Internal view switches must not erase ?view=scholarly, ?q=..., date
+   * filters or other search context just because their href is ./#workspace. */
+  document.addEventListener("click", event => {
+    const anchor = event.target.closest?.("a[href]");
+    if (!anchor || event.defaultPrevented || event.button !== 0 ||
+        event.metaKey || event.ctrlKey || event.shiftKey || event.altKey ||
+        anchor.target && anchor.target !== "_self") return;
+    const url = new URL(anchor.href);
+    if (url.origin !== location.origin || url.pathname !== location.pathname ||
+        !["#discover", "#workspace", "#library"].includes(url.hash)) return;
+    if (url.search && url.search !== location.search) return;
+    event.preventDefault();
+    const next = new URL(location.href);
+    next.hash = url.hash;
+    if (next.href !== location.href) history.pushState({}, "", next.href);
+    render();
+  });
+
   window.addEventListener("hashchange", render);
+  window.addEventListener("popstate", render);
+  /* Discover's source toggle changes the URL with replaceState, which by
+   * design does not dispatch hashchange or popstate. */
+  window.addEventListener("researchlens:discover-navigation", render);
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", render);
   else render();
 })();
