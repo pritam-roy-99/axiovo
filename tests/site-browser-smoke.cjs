@@ -36,6 +36,25 @@ const base="http://127.0.0.1:8765";
   await page.locator("#scholarly-discovery").waitFor({state:"visible"});
   assert.equal(await page.locator("#scholar-query").inputValue(),"Adaptive trials");
 
+  // User-editable hierarchy: save a new subfield and sub-subfield on mobile,
+  // hide them independently and keep the customization in browser storage.
+  await page.locator('#rl-focus-areas .rl-focus-editor input').fill("Quantum statistical medicine");
+  await page.locator('#rl-focus-areas .rl-focus-editor button[type="submit"]').click();
+  assert((await page.locator("#rl-focus-trail").innerText()).includes("Quantum statistical medicine"));
+  await page.locator("#rl-focus-custom").fill("Fluctuation based diagnostics");
+  await page.locator("#rl-focus-apply").click();
+  assert((await page.locator("#rl-focus-trail").innerText()).includes("Fluctuation based diagnostics"));
+  await page.reload({waitUntil:"domcontentloaded"});
+  assert((await page.locator("#rl-focus-trail").innerText()).includes("Fluctuation based diagnostics"));
+  page.once("dialog",dialog=>dialog.accept());
+  await page.getByRole("button",{name:"Remove subtopic Fluctuation based diagnostics"}).click();
+  assert(!(await page.locator("#rl-focus-subtopics").innerText()).includes("Fluctuation based diagnostics"));
+  page.once("dialog",dialog=>dialog.accept());
+  await page.getByRole("button",{name:"Remove research area Quantum statistical medicine"}).click();
+  assert(!(await page.locator("#rl-focus-areas").innerText()).includes("Quantum statistical medicine"));
+  await page.reload({waitUntil:"domcontentloaded"});
+  assert(!(await page.locator("#rl-focus-areas").innerText()).includes("Quantum statistical medicine"));
+
   await page.goto(base+"/workspace.html",{waitUntil:"domcontentloaded"});
   await page.waitForURL(url=>url.hash==="#workspace",{timeout:12000});
   await page.locator("#workspace-panel #library-list").waitFor({timeout:12000});

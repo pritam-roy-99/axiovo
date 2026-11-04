@@ -16,7 +16,7 @@
   return {field,topic,subtopic};
  };
  function mount(){
-  const Fields=window.ResearchLensFields,Interest=window.ResearchLensInterests;
+  const Fields=window.ResearchLensFields,Interest=window.ResearchLensInterests,Custom=window.ResearchLensCustomTaxonomy;
   const root=document.getElementById("rl-focus-bar");
   if(!root||!Fields)return;
   const byId=id=>document.getElementById("rl-focus-"+id);
@@ -28,6 +28,32 @@
   const fieldChoices=byId("fields"),areas=byId("areas"),subs=byId("subtopics");
   const headline=byId("headline"),hint=byId("hint"),trail=byId("trail"),custom=byId("custom"),apply=byId("apply");
   const followed=()=>Interest?.get(load(Interest.KEY,{}),current.field,current.topic)||[];
+  function inform(message){
+   let status=document.getElementById("rl-focus-editor-status");
+   if(!status){status=document.createElement("p");status.id="rl-focus-editor-status";status.setAttribute("role","status");status.className="rl-focus-editor-status";root.append(status)}
+   status.textContent=message;
+  }
+  function refreshTaxonomy(reason){
+   current=normalize(current,Fields);
+   render();emit(reason);
+   window.dispatchEvent(new Event("axiovo:taxonomy-changed"));
+  }
+  function removeButton(label,act){
+   const b=document.createElement("button");
+   b.type="button";b.className="rl-focus-remove";b.textContent="×";
+   b.setAttribute("aria-label",label);b.title=label;b.onclick=act;
+   return b;
+  }
+  function inputRow(label,placeholder,act){
+   const form=document.createElement("form");form.className="rl-focus-editor";
+   const input=document.createElement("input");input.type="text";input.maxLength=100;
+   input.placeholder=placeholder;input.setAttribute("aria-label",label);
+   const b=document.createElement("button");b.type="submit";b.textContent="+ Add";
+   form.append(input,b);
+   form.onsubmit=e=>{e.preventDefault();const result=act(input.value);
+     if(result?.ok)input.value="";else inform(result?.reason||"Unable to add item")};
+   return form;
+  }
   const emit=reason=>{
    const old=load(KEY,{});
    const query=current.subtopic||current.topic;
@@ -65,14 +91,39 @@
    areas.replaceChildren();
    const followingTopics=Fields.FIELDS[current.field].topics.slice();
    for(const topic of followingTopics){
+    const wrap=document.createElement("span");wrap.className="rl-focus-interest";
     const button=document.createElement("button");button.type="button";button.className="rl-focus-chip"+(topic===current.topic?" active":"");
     button.textContent=topic;button.setAttribute("aria-pressed",String(topic===current.topic));
-    button.onclick=()=>chooseTopic(topic);areas.append(button);
+    button.onclick=()=>chooseTopic(topic);wrap.append(button);
+    if(Custom&&followingTopics.length>1)wrap.append(removeButton("Remove research area "+topic,()=>{
+      if(!window.confirm("Remove "+topic+" from your research areas on this device? You can restore default suggestions."))return;
+      if(Custom.removeArea(current.field,topic,localStorage)){
+       inform("Removed research area: "+topic);
+       refreshTaxonomy("area-removed");
+      }
+    }));
+    areas.append(wrap);
+   }
+   if(Custom){
+    areas.append(inputRow("New research area","Add your research area",name=>{
+      const r=Custom.addArea(current.field,name,localStorage);
+      if(r.ok){current={...current,topic:r.value,subtopic:""};
+        inform("Added research area: "+r.value);refreshTaxonomy("area-added")}
+      return r;
+    }));
+    const reset=document.createElement("button");reset.type="button";reset.className="rl-focus-restore";
+    reset.textContent="Restore default areas and subtopics";
+    reset.onclick=()=>{
+      if(!window.confirm("Restore this field's default research topics? Your personal additions will be cleared."))return;
+      Custom.restore(current.field,localStorage);
+      inform("Default research areas and subtopics restored");refreshTaxonomy("restore");
+    };
+    areas.append(reset);
    }
    subs.replaceChildren();
    const picked=followed();
    const curated=Fields.fieldTopics(current.field,current.topic);
-   const subtopics=Interest?Interest.order([...new Set([...curated,...picked])],picked):curated;
+   const subtopics=Interest?Interest.order(curated.slice(),picked):curated;
    const any=document.createElement("button");any.type="button";
    any.className="rl-focus-chip"+(!current.subtopic?" active":"");any.textContent="All "+current.topic;
    any.setAttribute("aria-pressed",String(!current.subtopic));any.onclick=()=>chooseSubtopic("");subs.append(any);
@@ -87,7 +138,19 @@
     star.title=(isFollowing?"Unfollow ":"Follow ")+topic;
     star.setAttribute("aria-label",(isFollowing?"Unfollow ":"Follow ")+topic);
     star.setAttribute("aria-pressed",String(isFollowing));star.onclick=()=>toggleFollow(topic);
-    wrap.append(star);subs.append(wrap);
+    wrap.append(star);
+    if(Custom)wrap.append(removeButton("Remove subtopic "+topic,()=>{
+      if(!window.confirm("Remove "+topic+" from this research area on your device?"))return;
+      if(Custom.removeInterest(current.field,current.topic,topic,localStorage)){
+       if(Interest&&picked.some(x=>x.toLowerCase()===topic.toLowerCase())){
+        write(Interest.KEY,Interest.toggle(load(Interest.KEY,{}),current.field,current.topic,topic));
+        window.dispatchEvent(new Event("researchlens:interests-changed"));
+       }
+       if(current.subtopic===topic)current={...current,subtopic:""};
+       inform("Removed subtopic: "+topic);refreshTaxonomy("subtopic-removed");
+      }
+    }));
+    subs.append(wrap);
    }
    headline.textContent="Explore "+spec.name;
    hint.textContent="Choose an area, then a subtopic. Search arXiv-hosted papers across historical records without the local feed's category limits.";
@@ -95,10 +158,20 @@
    const source=document.getElementById("rl-source-scholarly");
    if(source&&source.firstChild?.nodeType===Node.TEXT_NODE)source.firstChild.textContent="Explore "+spec.name+" ";
   }
+  apply.textContent="Add subtopic";
   apply.onclick=()=>{
    const val=Interest?.clean(custom.value)||custom.value.trim().slice(0,100);
    if(val.length<3){custom.setCustomValidity("Enter at least three characters.");custom.reportValidity();return}
-   custom.setCustomValidity("");current={...current,subtopic:val};toggleFollow(val);custom.value="";render();emit("subtopic")
+   const result=Custom?.addInterest(current.field,current.topic,val,localStorage);
+   if(!result?.ok){custom.setCustomValidity(result?.reason||"Unable to add subtopic");custom.reportValidity();return}
+   custom.setCustomValidity("");
+   current={...current,subtopic:result.value};
+   const existing=followed();
+   if(Interest&&!existing.some(x=>x.toLowerCase()===result.value.toLowerCase())){
+    write(Interest.KEY,Interest.toggle(load(Interest.KEY,{}),current.field,current.topic,result.value));
+   }
+   custom.value="";inform("Added subtopic: "+result.value);refreshTaxonomy("subtopic-added");
+   window.dispatchEvent(new Event("researchlens:interests-changed"));
   };
   custom.addEventListener("input",()=>custom.setCustomValidity(""));
   custom.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();apply.click()}});
@@ -108,6 +181,12 @@
    const next=normalize({field:e.detail?.field,topic:e.detail?.topic},Fields);
    if(next.field===current.field&&next.topic===current.topic)return;
    current=next;render();emit("external");
+  });
+  window.addEventListener("axiovo:taxonomy-changed",()=>{
+   const normalized=normalize(current,Fields);
+   if(normalized.topic!==current.topic||normalized.subtopic!==current.subtopic){
+    current=normalized;render();emit("taxonomy-updated");
+   }else render();
   });
   window.addEventListener("storage",e=>{if(e.key===KEY||e.key===Interest?.KEY){current=normalize(load(KEY,{}),Fields);render()}});
   render();

@@ -18,6 +18,7 @@ class UnifiedFocusTests(unittest.TestCase):
   self.assertIn('id="arxiv-legacy-focus" hidden',html)
   self.assertIn('class="panel rl-scholar-legacy-focus" hidden',html)
   self.assertIn('src="./focus-bar.js"',html)
+  self.assertLess(html.index('src="./custom-taxonomy.js"'),html.index('src="./focus-bar.js"'))
   self.assertLess(html.index('id="rl-focus-bar"'),html.index('id="arxiv-discovery"'))
  def test_source_navigation_and_synchronization(self):
   source=(ROOT/"focus-bar.js").read_text(encoding="utf8")
@@ -25,6 +26,10 @@ class UnifiedFocusTests(unittest.TestCase):
   self.assertIn("function chooseTopic",source)
   self.assertIn("function chooseSubtopic",source)
   self.assertIn("ResearchLensInterests",source)
+  self.assertIn("Custom.addArea",source)
+  self.assertIn("Custom.removeArea",source)
+  self.assertIn("Custom?.addInterest",source)
+  self.assertIn("Custom.removeInterest",source)
   self.assertIn("researchlens:focus-change",source)
   explorer=(ROOT/"scholarly.js").read_text(encoding="utf8")
   self.assertIn('window.addEventListener("researchlens:focus-change"',explorer)

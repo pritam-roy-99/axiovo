@@ -91,7 +91,7 @@ function drawSubtopics(){
  const holder=$("subtopic-list");holder.replaceChildren();
  const followed=followedInterests();
  const curated=fieldTopics(state.field,state.topic);
- const items=interestsAPI?interestsAPI.order([...new Set([...curated,...followed])],followed):curated;
+ const items=interestsAPI?interestsAPI.order(curated.slice(),followed):curated;
  $("subtopic-label").textContent="Research interests within "+state.topic;
  const note=node("p",followed.length?
   "Following "+followed.length+" interests in this topic. Select a subtopic to search, or use its star to follow or unfollow.":
@@ -302,8 +302,27 @@ document.addEventListener("pointerdown",e=>{if(!$("field-details").contains(e.ta
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&$("field-details").open){$("field-details").open=false;$("field-trigger").focus()}});$("sort").value=state.sort||"relevance";$("from").value=state.from||"";$("to").value=state.to||"";const dateRestore=normalizeSearchDates();drawField();drawSaved();if(dateRestore.changed)setStatus("Saved future publication dates were cleared. Research is available through "+dateRestore.until+".");
 $("field").onchange=()=>{state.field=$("field").value;state.topic=FIELDS[state.field].topics[0];state.subtopic="";state.customSubtopic=false;state.query=state.topic;$("query").value=state.query;persist();drawField();window.dispatchEvent(new CustomEvent("researchlens:field-changed",{detail:{field:state.field,topic:state.topic}}));page=1;search()};
 $("use-custom").onclick=()=>{const t=$("custom").value.trim();if(t.length<3){setStatus("Enter at least three characters for a custom topic.");return}state.subtopic=t;state.customSubtopic=true;state.query=t;$("query").value=t;persist();drawSubtopics();page=1;search()};
-$("use-subtopic").onclick=()=>{const t=$("custom-subtopic").value.trim();if(t.length<3){setStatus("Enter at least three characters for a subtopic.");return}subtopicSelect(t);toggleInterest(t);$("custom-subtopic").value="";setStatus("Following the specialized interest: "+t)};
+$("use-subtopic").onclick=()=>{
+ const t=$("custom-subtopic").value.trim();
+ if(t.length<3){setStatus("Enter at least three characters for a subtopic.");return}
+ const result=window.ResearchLensCustomTaxonomy?.addInterest(state.field,state.topic,t,localStorage);
+ if(!result?.ok){setStatus(result?.reason||"Could not add subtopic");return}
+ subtopicSelect(result.value);
+ if(!followedInterests().some(x=>x.toLowerCase()===result.value.toLowerCase()))toggleInterest(result.value);
+ $("custom-subtopic").value="";
+ setStatus("Added specialized subtopic: "+result.value);
+ window.dispatchEvent(new Event("axiovo:taxonomy-changed"));
+};
 window.addEventListener("researchlens:interests-changed",()=>{drawTopics();drawSubtopics()});
+window.addEventListener("axiovo:taxonomy-changed",()=>{
+ if(!FIELDS[state.field].topics.includes(state.topic)){
+  state.topic=FIELDS[state.field].topics[0];state.subtopic="";state.query=state.topic;
+ }else if(state.subtopic&&!fieldTopics(state.field,state.topic).includes(state.subtopic)){
+  state.subtopic="";state.query=state.topic;
+ }
+ $("query").value=state.query;
+ persist();drawField();
+});
 window.addEventListener("researchlens:focus-change",e=>{
  const focus=e.detail||{};
  const newField=fieldKey(focus.field);

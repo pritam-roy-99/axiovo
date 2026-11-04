@@ -1,12 +1,12 @@
 /* ResearchLens offline shell. Do not cache remote APIs, PDFs or the live feed. */
 "use strict";
-const CACHE = "axiovo-shell-v3";
+const CACHE = "axiovo-shell-v4";
 const SHELL = [
   "./", "./index.html", "./workspace.html", "./copilot.html",
   "./lab.html", "./paper.html", "./profiles.html", "./methodology.html",
   "./theme.css", "./theme.js", "./workspace.css", "./discover.css",
   "./lab.css", "./paper-actions.css", "./navigation.js", "./pwa.js",
-  "./research-fields.js", "./focus-bar.js", "./scholar-search.js",
+  "./research-fields.js", "./custom-taxonomy.js", "./focus-bar.js", "./scholar-search.js",
   "./cached-arxiv-search.js", "./semantic-search.js", "./interests.js",
   "./scholarly.js", "./discover.js", "./history.js", "./arxiv-versions.js",
   "./assistant-core.js", "./copilot.js", "./lab.js", "./workspace.js",
