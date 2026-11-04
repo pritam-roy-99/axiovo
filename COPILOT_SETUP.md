@@ -13,6 +13,18 @@ Live interface: https://pritam-roy-99.github.io/researchlens/copilot.html
 - Conversation history stays in the current browser tab, not in an account or central store. Export it to a text file with source URLs.
 - Enter an arXiv ID or open Copilot directly from a paper card. Draft abstracts or technical claims are optional and never sent to Axiovo servers.
 
+## Advanced evidence-grounded research modes
+
+The unified Assistant now offers **Deep technical literature review** and **Derivation and assumption audit**. These modes can identify missing definitions, conditions, likely proof checks and counterexamples to explore, but they **cannot independently certify** derivations without the complete mathematical context and a separate verifier.
+
+In Ollama mode, click **Detect installed local models**. Axiovo queries your locally running Ollama instance and adds compatible installed model names to the selector. You can then choose a compact or large open-weight model according to your computer's available memory. Choose **Detailed** for a longer research report, with sections for assumptions, source-supported claims, limitations and verification tasks. This uses more compute and context than the standard mode.
+
+**Important:** "Most advanced" depends on hardware, task and benchmarks. Axiovo does not provide a hosted frontier AI model for free. Running Qwen, or another installed Ollama model, is optional and local; the free hosted website continues to offer evidence-only retrieval without requiring an account. Model-generated references are only preliminary and must be checked against the original arXiv records.
+
+## High-energy physics coverage
+
+The main research selector includes **High-energy physics & particle physics**, with 12 areas and 48 subtopics for QFT, phenomenology, collider experiments, lattice QCD, particle astrophysics, strings, EFTs, Higgs and electroweak theory, scattering amplitudes and particle cosmology. This maps onto arXiv's hep-th, hep-ph, hep-ex and hep-lat categories, plus related work. The local recent snapshot remains limited; broader arXiv-linked discovery uses OpenAlex and is not a complete high-energy literature index.
+
 ## Preferred open-weight model
 
 Qwen3.5 9B is a reasonable performance/resource starting point for local scientific reading assistance. Qwen3.5 27B provides more capacity but requires considerably more memory and compute. Neither model verifies mathematics automatically or proves originality. Independent benchmarking with quantum-information material is still needed.
