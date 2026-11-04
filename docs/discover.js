@@ -38,7 +38,7 @@ function init(){
  c?.addEventListener("click",()=>show("biorxiv"));
  window.addEventListener("popstate",()=>{const mode=new URLSearchParams(location.search).get("view");show(mode==="scholarly"||mode==="biorxiv"?mode:"arxiv",false)});
  const params=new URLSearchParams(location.search);
- let primary="quantum";try{primary=JSON.parse(localStorage.getItem("researchlens-field-explorer-v1")||"{}").field||"quantum"}catch{}
+ let primary="general";try{primary=JSON.parse(localStorage.getItem("researchlens-field-explorer-v1")||"{}").field||"general"}catch{}
  function updateFieldLabel(){
   let field="quantum";try{field=JSON.parse(localStorage.getItem("researchlens-field-explorer-v1")||"{}").field||"quantum"}catch{}
   const config=window.ResearchLensFields;
@@ -49,7 +49,7 @@ function init(){
  window.addEventListener("researchlens:choose-field",updateFieldLabel);
  updateFieldLabel();
  const requested=params.get("view");
- show(requested==="biorxiv"?"biorxiv":requested==="scholarly"||(!requested&&primary!=="quantum")?"scholarly":"arxiv",false);
+ show(requested==="biorxiv"?"biorxiv":requested==="scholarly"||(!requested&&primary!=="general")?"scholarly":"arxiv",false);
 }
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
 })();
