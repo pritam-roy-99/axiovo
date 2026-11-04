@@ -35,3 +35,9 @@
  .rl-paper-actionbar > a,.rl-paper-actionbar > button,.rl-paper-actionbar .rl-paper-action,.rl-paper-actionbar .rl-save-button{flex:1 1 calc(50% - 7px)}
  .rl-paper-actionbar > a:first-child,.rl-paper-actionbar .rl-paper-action.primary{flex:1 1 100%}
 }
+
+/* Paper author following; selection is explicit because arXiv does not expose reliable submitter identity. */
+.axiovo-author-follow{display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap;max-width:100%}
+.axiovo-author-select{width:auto;max-width:min(245px,72vw);min-height:40px;border:1px solid #bdd6e8;border-radius:9px;padding:7px;background:var(--rl-panel,#fff);color:var(--rl-text,#17324b);font-size:13px}
+.axiovo-author-follow-button{min-height:40px;white-space:nowrap}
+:root[data-theme="dark"] .axiovo-author-select{background:#20334a;color:#e4eef8;border-color:#425c73}

@@ -26,6 +26,7 @@ jobs:
         run: |
           node tests/assistant-core.test.js
           node tests/field-taxonomy.test.js
+          node tests/author-follow.test.js
       - name: Test personalized research interest controls
         run: node tests/interests.test.js
       - name: User-editable research field hierarchy tests
