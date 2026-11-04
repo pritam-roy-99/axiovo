@@ -2,7 +2,7 @@
 (function(){
  "use strict";
  const KEY="researchlens-theme",PALETTE_KEY="axiovo-palette-v1";
- const allowed=["ocean","forest","violet","rose","amber"];
+ const allowed=["ocean","forest","violet","rose","amber","slate","teal","indigo","coral","mint","plum"];
  let theme="light",palette="ocean";
  try{theme=localStorage.getItem(KEY)==="dark"?"dark":"light";
      palette=localStorage.getItem(PALETTE_KEY)||"ocean"}catch{}
