@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build a self-hosted ResearchLens explainer, captions and poster.
+"""Build a self-hosted Axiovo explainer, captions and poster.
 
 The storyboard is a product walkthrough, not a recording of the live UI.
 Audio narration uses espeak-ng/espeak when installed; captions are always made.
@@ -17,24 +17,24 @@ from PIL import Image, ImageDraw, ImageFont
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "docs" / "assets"
 WIDTH, HEIGHT, FPS = 960, 540, 12
-SECONDS = 6
+SECONDS = 9
 SCENES = [
- ("Meet ResearchLens", "Make progress, not just bookmarks.",
-  "ResearchLens brings the scientific reading workflow together."),
- ("Find new papers", "Track recently indexed arXiv research.",
-  "Find new papers and open their original arXiv records."),
- ("Explore your field", "Search scholarly literature in one place.",
-  "Choose your discipline and explore titles, authors and research topics."),
- ("See why it matters", "Recommendations explain their matches.",
-  "Follow specific interests and understand why each paper is suggested."),
- ("Organize your reading", "From To read to Finished.",
-  "Save papers, take notes, and maintain your personal reading collection."),
- ("Read and compare", "Source-linked research, not just summaries.",
-  "Read local PDFs and compare scientific papers with your own evidence notes."),
- ("Follow the literature", "Citation maps and research questions.",
-  "Explore citation connections and review matching papers when you visit."),
- ("Start researching", "ResearchLens is free and open source.",
-  "Discover, understand, connect and follow up with ResearchLens."),
+ ("What does Axiovo mean?", "AXIO = axiom  |  NOVO = new", 
+  "Axiovo joins axiom, a foundation of reasoning, with novo, new. Our goal is research that builds on evidence."),
+ ("Step 1: Open Discover", "Start with the latest arXiv papers.",
+  "Choose Discover papers. Browse recent arXiv records by date, and open the original source before saving."),
+ ("Step 2: Explore your field", "Select a field, topic, and subtopic.",
+  "Choose your discipline and specific topic. Search wider arXiv-linked literature without leaving Axiovo."),
+ ("Step 3: Follow interests", "See why papers are recommended.",
+  "Follow research interests. Recommendations explain keyword matches, but cannot establish scientific novelty or correctness."),
+ ("Step 4: Open My workspace", "Your saved papers are one click away.",
+  "Save a paper, then select My workspace on the same page. Set its reading status and add private notes."),
+ ("Step 5: Read and assess", "Open PDF tools and check claims.",
+  "Use Research Tools for local PDFs and paper comparisons. Research Assistant provides source-linked evidence with optional AI."),
+ ("Step 6: Record research questions", "Keep projects and reading connected.",
+  "Add a research question and keywords in My workspace. Review related recommendations and export your work."),
+ ("Start with Axiovo", "Find papers. Keep evidence. Build knowledge.",
+  "Return to Discover any time. Axiovo is free and open source; full historical coverage is still in development."),
 ]
 BG=(8,27,47); SURFACE=(14,43,67); SURFACE2=(22,59,85)
 WHITE=(242,249,254); MUTED=(161,193,211); BLUE=(38,135,206)
@@ -74,8 +74,8 @@ def base(n):
     im=Image.new("RGB",(WIDTH,HEIGHT),BG);d=ImageDraw.Draw(im)
     card(d,(14,12,946,527),(9,33,55),22)
     card(d,(31,25,64,58),BLUE,9)
-    label(d,42,31,"R",F18)
-    label(d,78,31,"ResearchLens",F18)
+    label(d,42,31,"A",F18)
+    label(d,78,31,"Axiovo",F18)
     label(d,785,34,"OPEN RESEARCH",F12,MUTED)
     d.line((32,72,928,72),fill=BORDER,width=1)
     pill(d,37,92,f"GUIDED TOUR  ·  {n+1} / {len(SCENES)}")
@@ -87,11 +87,12 @@ def frame(n):
     im,d=base(n)
     card(d,(35,224,925,462))
     if n==0:
-        for i,(name,sub) in enumerate([("Discover","papers"),("Read","source material"),("Organize","your library"),("Follow up","open questions")]):
-            x=54+i*218;card(d,(x,259,x+194,412),SURFACE2,14)
-            pill(d,x+13,274,str(i+1))
-            label(d,x+13,326,name,F18)
-            label(d,x+13,358,sub,F12,MUTED)
+        card(d,(54,261,461,412),SURFACE2,14)
+        card(d,(489,261,896,412),SURFACE2,14)
+        label(d,81,289,"AXIO",F32,CYAN)
+        label(d,82,348,"Axiom: foundations",F18,WHITE)
+        label(d,515,289,"NOVO",F32,CYAN)
+        label(d,517,348,"New discovery",F18,WHITE)
     elif n==1:
         x=55
         for word in ("quant-ph","cs.IT","physics.optics"):
@@ -105,9 +106,9 @@ def frame(n):
         label(d,69,286,"Quantum information & physics",F14,WHITE)
         label(d,470,246,"Search",F12,MUTED)
         card(d,(470,275,901,320),SURFACE2,9)
-        label(d,483,286,"Bell nonlocality and steering",F14,WHITE)
+        label(d,483,286,"Contextuality and quantum networks",F14,WHITE)
         paper(d,56,343,"Device-independent cryptography","Live research search")
-        paper(d,474,343,"Network steering witnesses","Results stay on ResearchLens")
+        paper(d,474,343,"Network steering witnesses","Results stay on Axiovo")
     elif n==3:
         x=55
         for word in ("Steering","Contextuality","Quantum sensing"):
@@ -134,21 +135,21 @@ def frame(n):
         label(d,620,265,"Compare papers",F18)
         paper(d,619,304,"Paper A","Methods & assumptions",width=258)
     elif n==6:
-        for i in range(3):
-            y=278+i*61
-            d.line((230,y,450,343),fill=BORDER,width=2)
-            d.line((510,343,730,y),fill=BORDER,width=2)
-            for x in (219,740):d.ellipse((x-20,y-20,x+20,y+20),fill=BLUE,outline=CYAN,width=2)
-        d.ellipse((447,310,513,376),fill=BLUE,outline=CYAN,width=2)
-        label(d,458,334,"Paper",F12)
-        label(d,54,421,"References    ·    Citing works    ·    Research updates",F12,MUTED)
+        card(d,(56,245,895,438),SURFACE2,12)
+        label(d,77,262,"My research question",F18)
+        card(d,(78,305,610,351),SURFACE,9)
+        label(d,93,318,"What enables secure quantum networks?",F14)
+        pill(d,77,376,"Keywords: quantum networks, steering")
+        card(d,(641,305,866,401),SURFACE,10)
+        label(d,657,323,"Related papers",F14)
+        label(d,657,352,"Source-linked results",F12,CYAN)
     else:
         card(d,(65,255,143,334),BLUE,15)
-        label(d,89,268,"R",F32)
-        label(d,175,267,"ResearchLens",F32)
+        label(d,89,268,"A",F32)
+        label(d,175,267,"Axiovo",F32)
         label(d,177,314,"Open source tools for researchers",F14,MUTED)
         pill(d,177,373,"Start exploring")
-        label(d,365,382,"pritam-roy-99.github.io/researchlens/",F12,CYAN)
+        label(d,365,382,"Discover  >  My workspace  >  Research tools",F12,CYAN)
     return im
 
 def timestamp(s):
@@ -196,11 +197,11 @@ def main():
                 else:im=im.copy()
                 draw=ImageDraw.Draw(im)
                 draw.rounded_rectangle((34,486,34+int(891*(i+t/(FPS*SECONDS))/len(images)),492),radius=3,fill=CYAN)
-                label(draw,36,505,"ResearchLens · open research discovery",F10,MUTED)
+                label(draw,36,505,"Axiovo · open research discovery",F10,MUTED)
                 proc.stdin.write(im.tobytes())
         proc.stdin.close();error=proc.stderr.read().decode(errors="replace")
         if proc.wait():raise RuntimeError("Video encoding failed: "+error[-1000:])
     assert (OUT/"researchlens-tour.mp4").stat().st_size>10000
-    print("ResearchLens MP4, poster and captions created")
+    print("Axiovo MP4, poster and captions created")
 
 if __name__=="__main__":main()

@@ -1,4 +1,4 @@
-# Optional Litveyra social backend setup
+# Optional Axiovo social backend setup
 
 This is an optional upgrade beyond the currently working GitHub Issues comments and reactions. GitHub Pages cannot securely host user identities or write access to a shared database by itself.
 

@@ -37,8 +37,13 @@ const base="http://127.0.0.1:8765";
   assert.equal(await page.locator("#scholar-query").inputValue(),"Adaptive trials");
 
   await page.goto(base+"/workspace.html",{waitUntil:"domcontentloaded"});
-  await page.locator("main h1").waitFor();
-  assert((await page.locator("main h1").innerText()).includes("Pick up"));
+  await page.waitForURL(url=>url.hash==="#workspace",{timeout:12000});
+  await page.locator("#workspace-panel #library-list").waitFor({timeout:12000});
+  assert((await page.locator("#workspace-panel").isVisible()),"Workspace must appear in the unified page");
+  await page.locator("#workflow-discover").click();
+  await page.locator("#discover-shell").waitFor({state:"visible",timeout:12000});
+  await page.locator("#workflow-workspace").click();
+  await page.locator("#workspace-panel").waitFor({state:"visible",timeout:12000});
 
   await page.goto(base+"/copilot.html",{waitUntil:"domcontentloaded"});
   await page.locator("#paper-picker").waitFor();
@@ -162,7 +167,7 @@ const base="http://127.0.0.1:8765";
   await desktop.route("https://cdn.jsdelivr.net/**",route=>route.fulfill({status:200,contentType:"application/javascript",body:""}));
   const screen=await desktop.newPage();
   screen.on("pageerror",err=>errors.push(screen.url()+": "+err.message));
-  for(const url of ["/","/workspace.html","/copilot.html","/lab.html"]){
+  for(const url of ["/","/?view=scholarly#discover","/#workspace","/copilot.html","/lab.html"]){
    await screen.goto(base+url,{waitUntil:"domcontentloaded"});
    await screen.locator("main").first().waitFor();
    const metrics=await screen.evaluate(()=>({viewport:document.documentElement.clientWidth,

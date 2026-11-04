@@ -37,7 +37,7 @@ function renderProjects(){
  for(const p of projects){opt=document.createElement("option");opt.value=p.id;opt.textContent=p.title;choose.append(opt)}
  choose.value=projects.some(p=>p.id===selected)?selected:"";pickedProject=choose.value;
  message($("research-project-count"),projects.length+" questions");
- if(!projects.length){texts(root,"div","Start with a research question and a few precise keywords. Litveyra will surface matching papers from its current local index.").className="rl-empty";return}
+ if(!projects.length){texts(root,"div","Start with a research question and a few precise keywords. Axiovo will surface matching papers from its current local index.").className="rl-empty";return}
  for(const p of projects){
   const item=texts(root,"article","","rl-project-card");
   const heading=texts(item,"div","","rl-section-head");
@@ -204,6 +204,7 @@ function startup(){
      projects=[...map.values()].slice(0,30);persistProjects();render();message($("project-status"),"Imported "+incoming.length+" research questions.")
    }catch(err){message($("project-status"),"Import failed: "+err.message)}finally{e.target.value=""}
  };
+ window.addEventListener("researchlens:workspace-activated",()=>{drawSettings();renderRecommendations()});
  window.addEventListener("storage",e=>{
    if(e.key===PROJECTS){projects=(Array.isArray(read(PROJECTS,[]))?read(PROJECTS,[]):[]).map(R.cleanProject).filter(Boolean);render()}
    if(e.key===META){settings=read(META,{interests:[],authors:[]});drawSettings();renderRecommendations()}

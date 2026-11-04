@@ -1,6 +1,6 @@
 {
-  "name": "Litveyra",
-  "short_name": "Litveyra",
+  "name": "Axiovo",
+  "short_name": "Axiovo",
   "description": "Discover, read and organize research on your own device.",
   "id": "./",
   "start_url": "./",
@@ -24,7 +24,7 @@
     },
     {
       "name": "My workspace",
-      "url": "./workspace.html"
+      "url": "./#workspace"
     },
     {
       "name": "Research Assistant",

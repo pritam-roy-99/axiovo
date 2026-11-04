@@ -58,13 +58,14 @@ if(filtered.length>50)text(root,"p","Showing the first 50 matching saved papers.
 }
 function init(){
  fillFocus();$("library-search").addEventListener("input",renderLibrary);$("library-filter").addEventListener("change",renderLibrary);
- $("quick-search").addEventListener("submit",e=>{e.preventDefault();const q=$("research-query").value.trim();if(q)location.href="./fields.html?q="+encodeURIComponent(q)});
- $("export-library").onclick=()=>{const papers=library();if(!papers.length){$("library-count").textContent="No papers to export";return}download("researchlens-library.json",JSON.stringify({version:1,exported_at:new Date().toISOString(),papers,metadata},null,2),"application/json")};
- $("export-citations").onclick=()=>{const papers=library();if(!papers.length){$("library-count").textContent="No papers to export";return}download("researchlens-library.bib",papers.map(bib).join("\n"),"text/plain")};
+ $("quick-search").addEventListener("submit",e=>{e.preventDefault();const q=$("research-query").value.trim();if(q)location.href="./?view=scholarly&q="+encodeURIComponent(q)+"#discover"});
+ $("export-library").onclick=()=>{const papers=library();if(!papers.length){$("library-count").textContent="No papers to export";return}download("axiovo-library.json",JSON.stringify({version:1,exported_at:new Date().toISOString(),papers,metadata},null,2),"application/json")};
+ $("export-citations").onclick=()=>{const papers=library();if(!papers.length){$("library-count").textContent="No papers to export";return}download("axiovo-library.bib",papers.map(bib).join("\n"),"text/plain")};
  renderLibrary();
  fetch("./data/feed.json",{cache:"no-store"}).then(r=>{if(!r.ok)throw Error("HTTP "+r.status);return r.json()}).then(data=>{storedFeed=Array.isArray(data.papers)?data.papers:[];$("feed-status").textContent= "Latest arXiv announcements: "+storedFeed.length+" records · refreshed "+(data.generated_at?new Date(data.generated_at).toLocaleString():"date unavailable");showRecent();renderLibrary()}).catch(()=>{$("feed-status").textContent="Recent feed is temporarily unavailable. Saved papers are still accessible.";text($("recent-list"),"div","Please try the arXiv feed from the navigation.","rl-empty")});
  window.addEventListener("storage",()=>{fillFocus();renderLibrary()});
  window.addEventListener("researchlens-library-change",renderLibrary);
+ window.addEventListener("researchlens:workspace-activated",()=>{fillFocus();renderLibrary()});
 }
 init();
 })();

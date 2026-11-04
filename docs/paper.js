@@ -13,7 +13,7 @@ function tokens(s){return new Set((String(s||"").toLowerCase().match(/[a-z]{4,}/
 function overlap(a,b){const x=tokens(a),y=tokens(b);if(!x.size||!y.size)return 0;return [...x].filter(t=>y.has(t)).length/Math.sqrt(x.size*y.size)}
 function bibEntry(p){return "@misc{arxiv"+p.id.replace(/\W/g,"")+",\n  title={"+p.title.replace(/[{}]/g,"")+"},\n  author={"+(p.authors||[]).join(" and ")+"},\n  year={"+(p.published||"").slice(0,4)+"},\n  eprint={"+p.id+"},\n  archivePrefix={arXiv}\n}"}
 function mount(p,all){
-document.title=p.title+" | Litveyra";
+document.title=p.title+" | Axiovo";
 $("title").textContent=p.title;$("authors").textContent=(p.authors||[]).join(", ")+" · first submitted "+(p.published||"unknown").slice(0,10)+(requested?.explicit?" · requested revision v"+requested.version:" · latest revision link");
 $("abstract").textContent=p.abstract||"Abstract unavailable in this index";
 const links=$("links");links.replaceChildren();
@@ -73,7 +73,7 @@ if(valid){fetch("data/feed.json",{cache:"no-cache"}).then(r=>r.json()).then(d=>{
  else{
  $("title").textContent="arXiv:"+id;
  $("authors").textContent=requested?.explicit?"Requested arXiv revision v"+requested.version:"Latest arXiv revision";
- $("abstract").textContent="This paper does not need to be in Litveyra's local feed to be accessible. Open the authoritative arXiv record below to read its abstract, available versions and PDF.";
+ $("abstract").textContent="This paper does not need to be in Axiovo's local feed to be accessible. Open the authoritative arXiv record below to read its abstract, available versions and PDF.";
  const links=$("links");links.replaceChildren();
  external(links,"Read on arXiv",window.ResearchLensArxiv.abs(id),"btn primary");
  external(links,"PDF",window.ResearchLensArxiv.pdf(id));

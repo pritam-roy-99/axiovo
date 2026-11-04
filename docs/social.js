@@ -1,4 +1,4 @@
-/* Optional hosted Litveyra accounts. Requires Supabase setup by repository owner. */
+/* Optional hosted Axiovo accounts. Requires Supabase setup by repository owner. */
 (async function(){
 const cfg=window.ResearchLensSocialConfig||{};
 if(!cfg.url||!cfg.anonKey)return;
