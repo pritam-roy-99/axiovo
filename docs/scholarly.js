@@ -335,9 +335,12 @@ window.addEventListener("researchlens:focus-change",e=>{
  const newSubtopic=String(focus.subtopic||"").trim();
  const incomingSelected=focus.areaSelected!==false;
   if(state.field===newField&&state.topic===newTopic&&state.subtopic===newSubtopic&&state.areaSelected===incomingSelected)return;
- state.field=newField;state.topic=newTopic;state.subtopic=newSubtopic;
+ state.field=newField;state.topic=newTopic;state.subtopic=newSubtopic;state.areaSelected=incomingSelected;
  state.customSubtopic=!!newSubtopic&&!fieldTopics(newField,newTopic).includes(newSubtopic);
- state.query=newSubtopic||newTopic;
+ state.query=state.areaSelected?(newSubtopic||newTopic):"";
+ const arxivFrom=document.getElementById("date-from")?.value||"";
+ const arxivTo=document.getElementById("date-to")?.value||"";
+ if(arxivFrom||arxivTo){$("from").value=arxivFrom||arxivTo;$("to").value=arxivTo||arxivFrom;}
  $("field").value=newField;$("query").value=state.query;
  persist();drawField();page=1;search();
 });
