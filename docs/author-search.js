@@ -124,6 +124,25 @@
     return true;
    }catch(e){return false}
   }
+  async function inspireFallback(query,signal){
+   const helper=window.AxiovoInspireAuthors;
+   if(!helper)return false;
+   try{
+    const entries=await helper.search(query,signal);
+    if(signal?.aborted||!entries.length)return false;
+    candidates.replaceChildren();papers.replaceChildren();
+    status.textContent=entries.length+" arXiv-linked paper(s) with this exact printed author name in INSPIRE-HEP. INSPIRE covers primarily physics; author identity remains unverified when names are shared.";
+    for(const item of entries){
+     const card=element("article",undefined,"axiovo-author-paper");
+     anchor(card,item.title,"https://arxiv.org/abs/"+encodeURIComponent(item.id));
+     card.append(element("small",item.date+" · INSPIRE-HEP metadata · arXiv:"+item.id));
+     papers.append(card);
+    }
+    const verify=element("p");anchor(verify,"Verify all available records with official arXiv author search ↗",officialAuthorUrl(query));
+    papers.prepend(verify);
+    return true;
+   }catch(e){return false}
+  }
   async function localFallback(query){
    try{
     const response=await fetch("./data/feed.json",{cache:"no-store"});
@@ -216,7 +235,7 @@
     if(!r.ok)throw Error("OpenAlex HTTP "+r.status);
     const data=await r.json();if(ctl.signal.aborted)return;
     const matches=rankAuthors(data.results,query);
-    if(!matches.length){status.textContent="No OpenAlex identities found. Trying another scholarly index…";if(!await semanticScholarFallback(query))await localFallback(query);return}
+    if(!matches.length){status.textContent="No OpenAlex identities found. Trying another scholarly index…";if(!await semanticScholarFallback(query)&&!await inspireFallback(query,ctl.signal))await localFallback(query);return}
     status.textContent="Select a researcher identity below. Similar names are suggestions, not proof of the same person. Check institution or ORCID when available.";
     for(const author of matches){
      const wrap=element("div",undefined,"axiovo-author-identity");
@@ -230,7 +249,7 @@
      if(/^https:\/\/orcid\.org\/\d{4}-\d{4}-\d{4}-[\dX]{4}$/i.test(String(author.orcid||"")))anchor(wrap,"View ORCID ↗",author.orcid);
      candidates.append(wrap)
     }
-   }catch(err){if(!ctl.signal.aborted){if(!await semanticScholarFallback(query))await localFallback(query)}}
+   }catch(err){if(!ctl.signal.aborted){if(!await semanticScholarFallback(query)&&!await inspireFallback(query,ctl.signal))await localFallback(query)}}
   });
   const urlQuery=new URLSearchParams(location.search).get("author");
   if(urlQuery){input.value=urlQuery.slice(0,120);form.requestSubmit()}
