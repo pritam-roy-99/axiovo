@@ -5,7 +5,7 @@
  "use strict";
  const api=factory();
  if(typeof module==="object"&&module.exports)module.exports=api;
- if(root)root.AxiovoMultiSource=factory();
+ if(root)root.AxiovoMultiSource=api;
 })(typeof window!=="undefined"?window:null,function(){
  "use strict";
  const pattern=/^(?:\d{4}\.\d{4,5}|[a-z-]+(?:\.[a-z]{2})?\/\d{7})$/i;
