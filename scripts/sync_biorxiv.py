@@ -5,8 +5,9 @@ bioRxiv's public API returns up to 30 records per page. Keep the last
 successful snapshot on transient network failures, never fabricate papers.
 """
 from __future__ import annotations
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 import json
+import sys
 from pathlib import Path
 import re
 import urllib.request
@@ -16,7 +17,7 @@ ENDPOINT = "https://api.biorxiv.org/details/biorxiv/100/0/json"
 
 def normalize(item: dict) -> dict | None:
     doi = str(item.get("doi") or "").strip()
-    if not re.fullmatch(r"10\.(?:1101|64898)/[A-Za-z0-9._;()/:+-]+", doi):
+    if not re.fullmatch(r"10\.\d{4,9}/[A-Za-z0-9._;()/:+-]+", doi):
         return None
     title = " ".join(str(item.get("title") or "").split())
     if not title:
@@ -59,25 +60,56 @@ def build(payload: dict, prior: dict | None = None) -> dict:
         "note": "Recent cached metadata only. Search the official bioRxiv site for comprehensive historical coverage.",
     }
 
+def candidate_endpoints() -> list[str]:
+    """Use the documented official recent-post and interval APIs, then legacy mirror."""
+    today = datetime.now(timezone.utc).date()
+    start = today - timedelta(days=14)
+    return [
+        "https://api.biorxiv.org/details/biorxiv/7d/0/json",
+        "https://api.biorxiv.org/details/biorxiv/14d/0/json",
+        "https://api.biorxiv.org/details/biorxiv/100/0/json",
+        f"https://api.biorxiv.org/details/biorxiv/{start}/{today}/0/json",
+        "https://connect.biorxiv.org/api/detail/100/0/json",
+    ]
+
+
 def main() -> None:
     previous = {}
     try:
         previous = json.loads(TARGET.read_text(encoding="utf8"))
     except (OSError, ValueError):
         pass
-    request = urllib.request.Request(ENDPOINT, headers={
-        "User-Agent": "Axiovo/0.6 (+https://github.com/pritam-roy-99/axiovo; noncommercial metadata reader)",
-        "Accept": "application/json",
-    })
-    try:
-        with urllib.request.urlopen(request, timeout=25) as response:
-            payload = json.load(response)
-        result = build(payload, previous)
-        TARGET.parent.mkdir(parents=True, exist_ok=True)
-        TARGET.write_text(json.dumps(result, indent=2, ensure_ascii=False) + "\n", encoding="utf8")
-        print(f"bioRxiv: synchronized {len(result['papers'])} valid papers")
-    except (OSError, ValueError, TypeError, json.JSONDecodeError) as error:
-        print("WARNING: bioRxiv public API unavailable; preserving prior snapshot:", error)
+    errors = []
+    for url in candidate_endpoints():
+        request = urllib.request.Request(url, headers={
+            "User-Agent": "Axiovo/0.7 (+https://github.com/pritam-roy-99/axiovo; public scholarly metadata)",
+            "Accept": "application/json",
+        })
+        try:
+            with urllib.request.urlopen(request, timeout=18) as response:
+                payload = json.load(response)
+            entries = payload.get("collection") if isinstance(payload, dict) else None
+            if isinstance(entries, list) and entries:
+                sample = entries[0]
+                if isinstance(sample, dict):
+                    doi = str(sample.get("doi") or "")
+                    print("bioRxiv endpoint sample:", len(entries), "records; DOI prefix", doi.split("/")[0])
+            result = build(payload, previous)
+            result["interval"] = "Latest official bioRxiv records, limited to 30 per response; prior records retained"
+            result["endpoint"] = url
+            TARGET.parent.mkdir(parents=True, exist_ok=True)
+            TARGET.write_text(json.dumps(result, indent=2, ensure_ascii=False) + "\n", encoding="utf8")
+            print(f"bioRxiv: synchronized {len(result['papers'])} valid papers via {url}")
+            return
+        except (OSError, ValueError, TypeError, json.JSONDecodeError) as error:
+            errors.append(f"{url}: {str(error)[:160]}")
+            print("WARNING: bioRxiv source unavailable:", errors[-1])
+
+    if (previous.get("papers") or []):
+        print("WARNING: all official bioRxiv endpoints failed; retaining",len(previous["papers"]),"cached records")
+        return
+    print("ERROR: all bioRxiv endpoints failed, and cached bioRxiv data is empty", file=sys.stderr)
+    sys.exit(1)
 
 if __name__ == "__main__":
     main()
