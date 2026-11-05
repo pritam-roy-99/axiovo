@@ -40,7 +40,7 @@ class UnifiedDiscoverTests(unittest.TestCase):
     def test_legacy_field_explorer_preserves_links(self):
         html=(ROOT/"fields.html").read_text(encoding="utf8")
         self.assertIn("location.replace(url.href)",html)
-        self.assertIn('next.searchParams.set("view","scholarly")',html)
+        self.assertIn('url.searchParams.set("q",q.slice(0,300))',html)
         self.assertIn("old.forEach",html)
 
     def test_in_page_search_is_scoped_and_lazily_initialized(self):
