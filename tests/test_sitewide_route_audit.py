@@ -29,7 +29,7 @@ class RouteAuditTests(unittest.TestCase):
     def test_canonical_search_redirect_retains_input(self):
         html=self.read("search.html")
         self.assertIn('old.forEach',html) if False else None
-        self.assertIn('previous.forEach',html)
+        self.assertIn('const q=before.get("q")||before.get("query")',html)
         self.assertIn('next.searchParams.set("view","scholarly")',html)
         self.assertIn('location.replace(next.href)',html)
         self.assertNotIn('https://api.openalex.org/works?',html)
