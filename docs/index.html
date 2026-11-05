@@ -50,7 +50,8 @@ body.axiovo-home .axiovo-entry-footer{justify-content:center}
 <track kind="captions" src="./assets/axiovo-tour.vtt" srclang="en" label="English captions" default>
 Your browser does not support video. The transcript is available below.
 </video>
-<figcaption>Recorded website walkthrough. Individual archive indexes and live search results can change after recording.</figcaption>
+<p id="axiovo-video-error" role="status" hidden>Video could not load from GitHub Pages. <a href="./assets/axiovo-tour.mp4" target="_blank" rel="noopener noreferrer">Check the MP4 file directly</a> or use the transcript below.</p>
+<figcaption>Guided Axiovo tour. When browser recording is unavailable, the video may use an illustrated walkthrough instead. Live research results can change.</figcaption>
 <details class="rl-home-transcript"><summary>Read video transcript</summary>
 <p>Choose arXiv, bioRxiv or ChemRxiv. Each opens its own Discover page with fields, topics, subfields, search and source-linked papers. Save papers in My Library, then use Research Assistant or Research Tools when needed. Search coverage and source availability are indicated independently.</p>
 </details>
@@ -85,5 +86,17 @@ Your browser does not support video. The transcript is available below.
 <p class="axiovo-entry-help">Independent open-source research tool. Not affiliated with arXiv, bioRxiv or ChemRxiv.</p>
 </div>
 </main>
+<script>
+(function(){
+ const video=document.querySelector(".axiovo-video-top video");
+ const source=video?.querySelector("source");
+ const error=document.getElementById("axiovo-video-error");
+ if(!video||!error)return;
+ const fail=()=>{error.hidden=false};
+ video.addEventListener("error",fail);
+ source?.addEventListener("error",fail);
+ video.addEventListener("loadedmetadata",()=>{error.hidden=true});
+})();
+</script>
 </body>
 </html>
