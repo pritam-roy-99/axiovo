@@ -150,7 +150,7 @@ jobs:
             docs/assets/researchlens-tour.mp4
             docs/assets/researchlens-tour-poster.jpg
             docs/assets/researchlens-tour.vtt
-          key: axiovo-full-research-workflow-tour-v4-${{ hashFiles('scripts/build_live_demo.py', 'docs/index.html', 'docs/discover.html', 'docs/discover-modes.js', 'docs/workspace.js', 'docs/workspace.html', 'docs/paper.html', 'docs/paper-research.js', 'docs/compare.html', 'docs/compare.js', 'docs/copilot.html', 'docs/lab.html', 'docs/research-workflow.css') }}
+          key: axiovo-full-research-workflow-tour-v4-${{ hashFiles('scripts/build_live_demo.py', 'docs/index.html', 'docs/discover.html', 'docs/discover-modes.js', 'docs/workspace.js', 'docs/workspace.html', 'docs/paper.html', 'docs/paper-research.js', 'docs/compare.html', 'docs/compare.js', 'docs/copilot.html', 'docs/copilot.js', 'docs/lab.html', 'docs/research-workflow.css') }}
       - name: Install Chromium browser test dependencies
         run: |
           python -m pip install --disable-pip-version-check Pillow playwright
