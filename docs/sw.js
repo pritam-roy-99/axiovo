@@ -1,6 +1,6 @@
 /* Axiovo offline shell. Do not cache remote APIs, PDFs or the live feed. */
 "use strict";
-const CACHE = "axiovo-shell-v36";
+const CACHE = "axiovo-shell-v37";
 const SHELL = [
   "./", "./index.html", "./arxiv.html", "./biorxiv.html", "./chemrxiv.html", "./discover.html", "./workspace.html", "./copilot.html",
   "./lab.html", "./paper.html", "./compare.html", "./profiles.html", "./community.html", "./methodology.html", "./privacy.html",
