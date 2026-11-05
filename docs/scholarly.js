@@ -216,6 +216,14 @@ if(original){
  };
  versions.append(version,selected,saveExact);art.append(versions);
 }
+const primaryActions=node("div",undefined,"axiovo-action-group axiovo-action-main");
+const secondaryActions=node("div",undefined,"axiovo-action-group axiovo-action-secondary");
+for(const control of Array.from(row.children)){
+ if(control.classList.contains("axiovo-author-follow")||control.textContent==="Copy BibTeX")secondaryActions.append(control);
+ else primaryActions.append(control);
+}
+row.classList.add("axiovo-scholar-actions");
+row.append(primaryActions,secondaryActions);
 art.append(row);return art}
 function render(){const root=$("results");root.replaceChildren();const isAnnouncement=!showingSaved&&["arxiv-announcement","arxiv-oai"].includes(items[0]?.__source);const perPage=40;const display=showingSaved?saved.slice().reverse():isAnnouncement?items.slice((page-1)*perPage,page*perPage):items;$("result-heading").textContent=showingSaved?"Your saved papers":"Literature results";if(!display.length){root.append(node("div",showingSaved?"No papers saved yet. Save papers from your search results.":"No matching records to display.","empty"))}else for(const w of display)root.append(renderPaper(w));
 $("pagination").textContent=showingSaved?saved.length+" locally saved":isAnnouncement?("Announcement papers "+(display.length?(page-1)*perPage+1:0)+"–"+Math.min(page*perPage,items.length)+" of "+items.length):("Search batch "+page+" · "+items.length+" relevant papers shown");$("prev").disabled=showingSaved||busy||page===1;$("next").disabled=showingSaved||busy||(isAnnouncement?page*perPage>=items.length:page*100>=Math.min(total,10000))}
