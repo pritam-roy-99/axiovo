@@ -168,23 +168,33 @@ def import_papers(con: sqlite3.Connection, source: str, items: list,
                     (paper_id, p["version"], p["metadata_updated_at"],
                      p["source_url"] + ("v" + p["version"] if source == "arxiv" else "")),
                 )
-            # Replace ordering on authoritative snapshot, do not delete authors globally.
+            # Names alone cannot establish researcher identity. Retain the
+            # previous author row for the same paper/position and matching
+            # normalized name, but do not conflate two papers' authors.
+            previous_authors = {
+                row["position"]: (row["author_id"], row["normalized_name"])
+                for row in con.execute(
+                    "SELECT pa.position,pa.author_id,a.normalized_name "
+                    "FROM paper_authors pa JOIN authors a ON a.id=pa.author_id "
+                    "WHERE pa.paper_id=?", (paper_id,)
+                )
+            }
             con.execute("DELETE FROM paper_authors WHERE paper_id=?", (paper_id,))
             for pos, name in enumerate(p["authors"]):
                 normalized = normalize_name(name)
-                existing = con.execute(
-                    "SELECT id FROM authors WHERE normalized_name=? ORDER BY id LIMIT 1", (normalized,)
-                ).fetchone()
-                if existing:
-                    author_id = existing["id"]
+                old = previous_authors.get(pos)
+                if old and old[1] == normalized:
+                    author_id = old[0]
                 else:
                     author_id = con.execute(
                         "INSERT INTO authors(name,normalized_name) VALUES(?,?)", (name, normalized)
                     ).lastrowid
                 con.execute(
-                    "INSERT OR IGNORE INTO paper_authors(paper_id,author_id,position) VALUES(?,?,?)",
+                    "INSERT INTO paper_authors(paper_id,author_id,position) VALUES(?,?,?)",
                     (paper_id, author_id, pos),
                 )
+            # Remove stale orphan person rows created by changed author lists.
+            con.execute("DELETE FROM authors WHERE id NOT IN (SELECT author_id FROM paper_authors)")
             con.execute("DELETE FROM paper_categories WHERE paper_id=?", (paper_id,))
             for category in p["categories"]:
                 con.execute(
