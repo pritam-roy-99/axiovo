@@ -9,7 +9,8 @@ const $=id=>document.getElementById(id);
 const PAGE_SIZE=25;
 const Arxiv=window.ResearchLensArxiv;
 const ARXIV_SOURCE="S4306400194";
-const Cache=window.ResearchLensCachedArxiv,Other=window.AxiovoMultiSource;
+const Cache=window.ResearchLensCachedArxiv,Other=window.AxiovoMultiSource,Daily=window.AxiovoDailyArchive;
+let dailyResult=null,dailySignature="";
 let page=1,found=0,loading=false,controller=null,active=false,lastRequest=null;
 const btn=$("all-arxiv"),back=$("back-local"),view=$("history-view"),feed=$("local-feed-view");
 if(!btn||!back||!view||!feed)return;
@@ -26,7 +27,7 @@ function historyInfo(message,query=""){
  link.id="history-official-link";link.href=Arxiv?.officialSearchUrl(query)||"https://arxiv.org/search/advanced";
  link.target="_blank";link.rel="noopener noreferrer";parent.append(link);
 }
-function pageInfo(){return {q:$("q").value.trim(),from:$("date-from").value,to:$("date-to").value,sort:$("order").value}}
+function pageInfo(){return {q:$("q").value.trim(),from:$("date-from").value,to:$("date-to").value,sort:$("order").value,category:$("category")?.value||""}}
 function switchView(on){
  active=on;view.hidden=!on;feed.hidden=on;back.hidden=!on;btn.textContent=on?"Update full-history results":"Search all arXiv history";
  if(on)view.scrollIntoView({behavior:"smooth",block:"start"});
@@ -132,15 +133,30 @@ function showRecovered(result,p){
  found=shown;$("history-count").textContent=shown+" "+result.source+" results · partial coverage";
  $("history-pagination").replaceChildren();
 }
+function showDaily(p){
+ const root=$("history-cards");root.replaceChildren();
+ const results=dailyResult?.papers||[];
+ found=results.length;
+ const start=(page-1)*PAGE_SIZE;
+ const selected=results.slice(start,start+PAGE_SIZE);
+ for(const paper of selected){const card=paperCard(Cache.toWork(paper));if(card)root.append(card)}
+ if(!selected.length)root.append(el("div","No arXiv first submissions match these filters in the fully harvested dates.","empty"));
+ $("history-count").textContent=found.toLocaleString()+" matching papers across "+dailyResult.coveredDays+" complete arXiv submission date(s)";
+ historyInfo("Complete dated archive for these UTC days ("+dailyResult.totalHarvested.toLocaleString()+" source records). Showing every matching first submission through pagination, not a limited sample.",p.q);
+ pager();
+}
 function pager(){
  const root=$("history-pagination");root.replaceChildren();
- const maxPages=Math.max(1,Math.ceil(Math.min(found,10000)/PAGE_SIZE));
- const prev=el("button","← Previous","btn");prev.disabled=page===1;prev.onclick=()=>search(page-1);
+ const maxPages=Math.max(1,Math.ceil((dailyResult?found:Math.min(found,10000))/PAGE_SIZE));
+ const prev=el("button","← Previous","btn");prev.disabled=page===1;prev.onclick=()=>{if(dailyResult){page--;showDaily(pageInfo())}else search(page-1)};
  root.append(prev,el("span","Page "+page+" of "+maxPages,"small"));
- const next=el("button","Next →","btn");next.disabled=page>=maxPages;next.onclick=()=>search(page+1);root.append(next);
+ const next=el("button","Next →","btn");next.disabled=page>=maxPages;next.onclick=()=>{if(dailyResult){page++;showDaily(pageInfo())}else search(page+1)};root.append(next);
 }
 async function search(n=1,fromUrl=false){
  const p=pageInfo();
+ const signature=JSON.stringify(p);
+ if(dailyResult&&dailySignature===signature){page=n;switchView(true);showDaily(p);return}
+ dailyResult=null;dailySignature="";
  const direct=Arxiv?.parse(p.q);
  if(p.from&&p.to&&p.from>p.to){historyInfo("Start date must be before or equal to end date.",p.q);switchView(true);return}
  if(p.q.length>0&&p.q.length<3&& !/^\d{4}\.\d{4,5}(?:v\d+)?$/.test(p.q)){historyInfo("Enter at least 3 letters, or use the date fields alone.",p.q);switchView(true);return}
@@ -152,6 +168,27 @@ async function search(n=1,fromUrl=false){
  $("history-count").textContent="Searching…";
  $("history-pagination").replaceChildren();
  historyInfo("Historical arXiv-hosted search via OpenAlex. Publication dates may differ from original arXiv submission dates. This index is not exhaustive.",p.q);
+ // Prefer all submitted papers from complete, per-date arXiv shards whenever possible.
+ // An unharvested date is *not* proof that arXiv contains no papers on that day.
+ if(Daily&&(p.from||p.to)){
+  const from=p.from||p.to,to=p.to||p.from;
+  try{
+   const archived=await Daily.search({from,to,query:p.q,category:p.category,sort:p.sort,signal:controller.signal});
+   if(controller.signal.aborted)return;
+   if(archived.complete){
+    dailyResult=archived;dailySignature=signature;
+    showDaily(p);
+    return;
+   }
+   historyInfo("Incomplete date coverage: "+archived.missing.slice(0,6).join(", ")+
+    (archived.missing.length>6?" and "+(archived.missing.length-6)+" more":"")+
+    ". Falling back to a partial external index. Use the official arXiv search to verify missing papers.",p.q);
+  }catch(e){
+   if(e.name==="AbortError")return;
+   historyInfo("Complete date search unavailable: "+String(e.message||e)+". External index results below are not exhaustive.",p.q);
+  }
+ }
+
  const filters=[]; // Verify actual arXiv URLs after retrieval, not potentially missing source IDs.
  if(p.from)filters.push("from_publication_date:"+p.from);
  if(p.to)filters.push("to_publication_date:"+p.to);
@@ -196,7 +233,7 @@ async function search(n=1,fromUrl=false){
 }
 btn.addEventListener("click",()=>search(1));
 $("arxiv-live-search")?.addEventListener("click",()=>search(1));
-back.addEventListener("click",()=>{if(controller)controller.abort();switchView(false);const u=new URL(location.href);u.searchParams.delete("history");u.searchParams.delete("page");window.history.replaceState({},"",u.pathname+u.search)});
+back.addEventListener("click",()=>{if(controller)controller.abort();dailyResult=null;dailySignature="";switchView(false);const u=new URL(location.href);u.searchParams.delete("history");u.searchParams.delete("page");window.history.replaceState({},"",u.pathname+u.search)});
 $("q").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();search(1)}});
 const urlParams=new URLSearchParams(location.search);
 if(urlParams.get("from"))$("date-from").value=urlParams.get("from").slice(0,10);

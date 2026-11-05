@@ -58,6 +58,7 @@ jobs:
         run: node tests/focus-bar.test.js
       - name: Test rate-limited arXiv fallback
         run: node tests/cached-arxiv-search.test.js
+          node tests/arxiv-daily-archive.test.js
       - name: Refresh free bioRxiv metadata
         if: github.event_name != 'push'
         id: biorxiv
@@ -69,6 +70,15 @@ jobs:
           echo '### bioRxiv metadata synchronization failed' >> "$GITHUB_STEP_SUMMARY"
           echo 'No live bioRxiv results were available. Cached records are preserved, if any.' >> "$GITHUB_STEP_SUMMARY"
           echo '::warning::bioRxiv synchronization unsuccessful; review diagnostics in logs.'
+      - name: Harvest every arXiv first submission for selected UTC days
+        if: github.event_name != 'push'
+        id: daily_archive
+        continue-on-error: true
+        run: python -m scripts.arxiv_daily_archive
+      - name: Report incomplete daily archive coverage
+        if: steps.daily_archive.outcome == 'failure'
+        run: |
+          echo '::warning::Complete daily archive harvesting was unavailable; earlier verified day shards remain.'
       - name: Refresh research metadata
         if: github.event_name != 'push'
         id: refresh
@@ -95,7 +105,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docs/data/feed.json docs/data/biorxiv.json
+          git add docs/data/feed.json docs/data/biorxiv.json docs/data/arxiv-days/
           if ! git diff --cached --quiet; then
             git commit -m "data: refresh arXiv index [skip ci]"
             git fetch origin main

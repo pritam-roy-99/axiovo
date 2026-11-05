@@ -169,12 +169,50 @@ def fetch_by_ids(ids):
             time.sleep(3.2)
     return found
 
+
+def read_verified_daily_records(today=None, lookback=7):
+    """Use date-complete harvested first submissions before category samples."""
+    today = today or dt.datetime.now(dt.timezone.utc).date()
+    folder = ROOT / "docs" / "data" / "arxiv-days"
+    try:
+        manifest = json.loads((folder / "manifest.json").read_text(encoding="utf8"))
+    except (OSError, ValueError):
+        return []
+    verified = {}
+    for age in range(lookback):
+        day = (today - dt.timedelta(days=age)).isoformat()
+        item = manifest.get("days", {}).get(day, {})
+        if not item.get("complete"):
+            continue
+        try:
+            shard = json.loads((folder / (day + ".json")).read_text(encoding="utf8"))
+        except (OSError, ValueError):
+            continue
+        papers = shard.get("papers")
+        if not (shard.get("complete") and shard.get("date") == day
+                and isinstance(papers, list)
+                and len(papers) == shard.get("paper_count") == shard.get("source_total") == item.get("count")):
+            continue
+        for paper in papers:
+            if str(paper.get("published", ""))[:10] != day:
+                continue
+            prior = verified.get(paper.get("id"))
+            if not prior or (paper.get("version", 1), paper.get("updated", "")) > (prior.get("version", 1), prior.get("updated", "")):
+                verified[paper["id"]] = paper
+    return list(verified.values())
+
+
 def main():
     try:
         old = json.loads(TARGET.read_text(encoding="utf-8")) if TARGET.exists() else {}
     except (ValueError, OSError):
         old = {}
-    fresh = fetch_recent()
+    fresh = read_verified_daily_records()
+    if fresh:
+        print("Using",len(fresh),"complete-date submissions instead of sampled category batches")
+    else:
+        print("No complete recent daily archive available; falling back to category sampling")
+        fresh = fetch_recent()
     pinned = read_pinned_ids()
     historical = fetch_by_ids(pinned)
     if pinned:

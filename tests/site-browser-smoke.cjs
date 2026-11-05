@@ -304,6 +304,38 @@ const base="http://127.0.0.1:8765";
   assert(await audit.locator("#axiovo-author-candidates a[href*='arxiv.org/search/']").count()>0);
   await auditContext.close();
 
+  // Date-complete archive: render all 151 papers, not a 25/30-record sample.
+  const dailyContext=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true});
+  const dailyRecords=Array.from({length:151},(_,i)=>({
+   id:"2611."+String(i+1).padStart(5,"0"),version:1,title:"Archive paper "+String(i+1),
+   abstract:"Science across every field",authors:["Scientist "+i],
+   primary_category:i%2?"quant-ph":"math.AG",
+   categories:[i%2?"quant-ph":"math.AG"],published:"2026-11-05T12:00:00Z",updated:"2026-11-05T12:00:00Z"
+  }));
+  await dailyContext.route("**/data/arxiv-days/manifest.json",route=>route.fulfill({
+   status:200,contentType:"application/json",
+   body:JSON.stringify({schema:1,days:{"2026-11-05":{complete:true,count:151}}})
+  }));
+  await dailyContext.route("**/data/arxiv-days/2026-11-05.json",route=>route.fulfill({
+   status:200,contentType:"application/json",
+   body:JSON.stringify({date:"2026-11-05",complete:true,paper_count:151,
+    source_total:151,papers:dailyRecords})
+  }));
+  await dailyContext.route("https://cdn.jsdelivr.net/**",route=>route.fulfill({status:200,body:""}));
+  const dailyPage=await dailyContext.newPage();
+  dailyPage.on("pageerror",err=>errors.push("daily archive: "+err.message));
+  await dailyPage.goto(base+"/",{waitUntil:"domcontentloaded"});
+  await dailyPage.locator("#date-from").fill("2026-11-05");
+  await dailyPage.locator("#date-to").fill("2026-11-05");
+  await dailyPage.locator("#all-arxiv").click();
+  await dailyPage.locator("#history-count").getByText("151 matching papers").waitFor({timeout:12000});
+  assert.equal(await dailyPage.locator("#history-cards article").count(),25);
+  assert((await dailyPage.locator("#history-pagination").innerText()).includes("Page 1 of 7"));
+  await dailyPage.locator("#history-pagination button").filter({hasText:"Next"}).click();
+  assert((await dailyPage.locator("#history-pagination").innerText()).includes("Page 2 of 7"));
+  assert.equal(await dailyPage.locator("#history-cards article").count(),25);
+  await dailyContext.close();
+
   // Check the core desktop layout separately from the mobile touch session.
   const desktop=await browser.newContext({viewport:{width:1366,height:820}});
   await desktop.route("https://api.openalex.org/**",route=>route.fulfill({
