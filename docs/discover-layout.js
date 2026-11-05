@@ -22,7 +22,16 @@ function init(){
  if(!document.body.classList.contains("axiovo-discover"))return;
  const focus=document.getElementById("rl-focus-bar");
  const subrow=focus?.querySelector(".rl-focus-subrow");
- if(focus&&subrow)disclosure(focus,[subrow],"Refine subtopics and add interests","axiovo-advanced-focus");
+ if(focus&&subrow){
+  const advanced=disclosure(focus,[subrow],"Refine subtopics and add interests","axiovo-advanced-focus");
+  let saved={};
+  try{saved=JSON.parse(localStorage.getItem("researchlens-field-explorer-v1")||"{}")||{}}catch{}
+  if(advanced&&(saved.subtopic||saved.areaSelected))advanced.open=true;
+  window.addEventListener("researchlens:focus-change",event=>{
+   if(advanced&&["topic","subtopic","area-added","subtopic-added"].includes(event.detail?.reason))
+    advanced.open=true;
+  });
+ }
  const provider=document.querySelector(".axiovo-provider-line");
  if(provider)disclosure(provider.parentElement,[provider],"Additional research sources","axiovo-additional-sources");
  const arxiv=document.getElementById("arxiv-discovery");
