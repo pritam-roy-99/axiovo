@@ -52,13 +52,28 @@
    <label for="retrieval-scope">Search scope for public questions</label>
    <select id="retrieval-scope"><option value="local">Indexed arXiv records</option><option value="all">Also search public arXiv metadata</option></select>
    <label for="engine">Answer mode</label>
-   <select id="engine"><option value="evidence">Source evidence</option><option value="ollama">Local Ollama model</option><option value="browser">On-device WebGPU model</option></select>
+   <select id="engine"><option value="evidence">Source evidence</option><option value="ollama">Local Ollama model</option><option value="browser">On-device WebGPU model</option><option value="hosted">Hosted AI (bring your own API key)</option></select>
    <div id="ollama-settings" hidden>
     <label for="model">Ollama model</label><select id="model"><option value="qwen3.5:9b">Qwen3.5 9B</option><option value="qwen3.5:27b">Qwen3.5 27B</option><option value="qwen3.5:35b">Qwen3.5 35B</option><option value="qwen3.5:4b">Qwen3.5 4B</option></select>
     <div class="rd-actions"><button class="rd-button rd-secondary" id="detect-models" type="button">Detect installed models</button><button class="rd-button rd-secondary" id="test-ollama" type="button">Check connection</button></div>
     <p class="rd-small" id="detected-models"></p>
     <label for="reasoning-depth">Analysis depth</label><select id="reasoning-depth"><option value="standard">Standard</option><option value="deep">Detailed</option></select>
     <p class="rd-small">Run Ollama locally and allow the Axiovo origin. <a href="./lab.html">Open Research Tools</a>.</p>
+   </div>
+   <div id="hosted-settings" hidden>
+    <label for="hosted-provider">AI provider</label>
+    <select id="hosted-provider">
+     <option value="openrouter">OpenRouter free-model router (free quota)</option>
+     <option value="openai">OpenAI API (billing may apply)</option>
+     <option value="moonshot">Kimi / Moonshot API (billing may apply)</option>
+     <option value="gemini">Google Gemini API (tier-dependent free quota)</option>
+    </select>
+    <label for="hosted-model">Provider model ID</label>
+    <input id="hosted-model" type="text" maxlength="100" autocomplete="off" value="openrouter/free" aria-describedby="hosted-guide">
+    <label for="hosted-key">Your provider API key (kept only in this page memory)</label>
+    <input id="hosted-key" type="password" autocomplete="off" spellcheck="false" maxlength="250" placeholder="Enter your own API key">
+    <button class="rd-button rd-secondary" type="button" id="clear-hosted-key">Clear API key</button>
+    <p class="rd-small" id="hosted-guide">The key and research prompt are sent directly from your browser to the provider you select. No key is stored by Axiovo. Do not use a shared key, and do not paste confidential papers or unpublished research unless you accept that provider's policies. Free models have limits and can change.</p>
    </div>
    <div id="browser-settings" hidden>
     <label for="browser-model">WebGPU model</label><select id="browser-model"><option value="Qwen2.5-0.5B-Instruct-q4f16_1-MLC">Qwen2.5 0.5B</option><option value="Qwen2.5-1.5B-Instruct-q4f16_1-MLC">Qwen2.5 1.5B</option></select>
