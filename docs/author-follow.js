@@ -32,7 +32,8 @@
   const button=document.createElement("button");button.type="button";button.className="rl-paper-action axiovo-author-follow-button";
   function update(){
    const followed=isFollowing(chooser.value);
-   button.textContent=followed?"★ Following author":"☆ Follow author";
+   chooser.title=chooser.value;
+   button.textContent=followed?"★ Following":"☆ Follow author";
    button.setAttribute("aria-pressed",String(followed));
    button.setAttribute("aria-label",(followed?"Unfollow ":"Follow ")+chooser.value);
    button.title="Follow an explicitly selected coauthor. arXiv metadata does not identify the uploader or corresponding author.";
