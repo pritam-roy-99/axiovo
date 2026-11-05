@@ -4,7 +4,7 @@
 (function(root,factory){
  const api=factory();
  if(typeof module==="object"&&module.exports)module.exports=api;
- if(root)root.ResearchLensArxiv=api;
+ if(root)root.AxiovoArxiv=api;
 })(typeof globalThis!=="undefined"?globalThis:null,function(){
  "use strict";
  const PATTERN=/^(?:arxiv:)?((?:\d{4}\.\d{4,5}|[a-z-]+(?:\.[a-z]{2})?\/\d{7}))(?:v([1-9]\d*))?$/i;
