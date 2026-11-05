@@ -16,7 +16,7 @@
   }
   return {last:times.filter(x=>x<=now).at(-1),next:times.find(x=>x>now)};
  }
- const timeFormat=new Intl.DateTimeFormat(undefined,{dateStyle:"medium",timeStyle:"short",timeZoneName:"short"});
+ const timeFormat=new Intl.DateTimeFormat(undefined,{year:"numeric",month:"short",day:"numeric",hour:"numeric",minute:"2-digit",timeZoneName:"short"});
  const relative=m=>m<60?Math.max(0,Math.floor(m))+" min":m<1440?Math.floor(m/60)+" h":Math.floor(m/1440)+" days";
  function init(){
   if(document.body.classList.contains("axiovo-home"))return;
