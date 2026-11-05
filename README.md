@@ -144,7 +144,7 @@ The OAI workflow can run daily and stores at most 4,000 recently modified metada
 
 The homepage now includes a 48-second narrated, illustrated walkthrough explaining paper discovery, field-aware search, recommendations, reading lists, PDF notes, citation links and research questions. It is **a scripted product animation**, not a recording of live interactions or a claim that an AI video model generated live screenshots. The video uses accessible native browser controls, English captions (WebVTT), a poster image, a text transcript and no autoplay.
 
-The source is `scripts/build_intro_video.py`. GitHub Actions generates `docs/assets/researchlens-tour.mp4`, the poster and captions during deployment, then caches the assets so routine hourly metadata updates don't re-encode the video. The build uses Pillow, FFmpeg and espeak-ng. No commercial video API credentials are needed. Media is served directly from GitHub Pages.
+The source is `scripts/build_intro_video.py`. GitHub Actions generates `docs/assets/axiovo-tour.mp4`, the poster and captions during deployment, then caches the assets so routine hourly metadata updates don't re-encode the video. The build uses Pillow, FFmpeg and espeak-ng. No commercial video API credentials are needed. Media is served directly from GitHub Pages.
 
 ## Unified Discover (arXiv + field-aware scholarly search)
 
