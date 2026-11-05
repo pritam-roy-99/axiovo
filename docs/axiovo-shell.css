@@ -248,3 +248,10 @@ html body header.rl-global-header > a.rl-logo > span.rl-logo-mark{
 .axiovo-audio-caption{max-height:82px;overflow:auto;margin:5px 0}
 .axiovo-audio-player>div{display:flex;flex-wrap:wrap;gap:5px}
 .axiovo-audio-player :is(select,button){font:inherit;min-height:34px;max-width:100%;padding:4px 7px;border:1px solid #799cb5;border-radius:6px;background:#183c59;color:#fff}
+
+.axiovo-follow-details {margin-top:6px;font-size:.83rem}
+.axiovo-follow-details summary {cursor:pointer;font-weight:700;color:var(--rd-link,#126b9e)}
+.axiovo-follow-details .axiovo-author-follow {display:inline-flex;flex-wrap:wrap;gap:5px;margin:5px 5px 0 0;max-width:100%}
+.axiovo-follow-details .axiovo-author-follow :is(select,button) {max-width:100%;min-height:36px;border:1px solid var(--rd-border,#bcd2e3);border-radius:7px;padding:5px 8px;color:var(--rd-ink,#15344c);background:var(--rd-surface,#fff);font:inherit}
+.axiovo-follow-details .axiovo-author-follow [hidden] {display:none}
+.axiovo-follow-details>a {display:inline-block;font-size:.79rem}

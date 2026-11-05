@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#0b2239">
-<meta name="description" content="Search arXiv, bioRxiv and ChemRxiv, compare original preprints, and organize your reading with Axiovo.">
-<title>Axiovo | A research workspace for preprints</title>
+<meta name="description" content="Explore arXiv, bioRxiv and ChemRxiv through predefined research subfields and sub-subtopics. Read, compare and save original preprints.">
+<title>Axiovo | Explore preprints by research topic</title>
 <link rel="icon" type="image/svg+xml" href="./icons/axiovo.svg">
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="stylesheet" href="./theme.css">
@@ -21,33 +21,43 @@
 <body class="axiovo-home axiovo-research">
 <header class="rl-global-header"><a class="rl-logo" href="./" aria-label="Axiovo home"><span class="rl-logo-mark" aria-hidden="true">A</span> Axiovo</a></header>
 <main class="rd-page">
-<section class="rd-home-hero" aria-labelledby="welcome-title">
+<section class="rd-home-hero rd-topic-home" aria-labelledby="welcome-title">
  <div class="rd-hero-content">
-  <p class="rd-kicker"><span aria-hidden="true"></span> PREPRINT DISCOVERY &amp; READING</p>
-  <h1 id="welcome-title">Find the work.<br>Follow the evidence.</h1>
-  <p class="rd-lead">Search three preprint archives, verify original records, and turn promising results into an organized reading list.</p>
-  <form class="rd-searchbar rd-home-search" action="./desk.html" method="get" role="search">
-   <label class="rd-sr-only" for="home-query">Search across the archives</label>
-   <input name="q" id="home-query" type="search" maxlength="220" placeholder="Paper title, method, author, DOI or arXiv ID">
-   <button type="submit" class="rd-button rd-primary">Find papers <span aria-hidden="true">→</span></button>
-  </form>
-  <div class="rd-examples" aria-label="Example searches">
-   <span>Try</span><a href="./desk.html?q=uncertainty+quantification">Uncertainty quantification</a>
-   <a href="./desk.html?q=protein+design">Protein design</a>
-   <a href="./desk.html?q=polymer+recycling">Polymer recycling</a>
-  </div>
+  <p class="rd-kicker"><span aria-hidden="true"></span> RESEARCH DISCOVERY</p>
+  <h1 id="welcome-title">Find papers on the question you’re asking.</h1>
+  <p class="rd-lead">Choose arXiv, bioRxiv, or ChemRxiv. Start with an archive subject and narrow through Axiovo’s own research subfields and sub-subtopics.</p>
+  <div class="rd-actions"><a class="rd-button rd-primary" href="#axiovo-archive-title">Choose an archive ↓</a><a class="rd-button rd-hero-link" href="./desk.html">Search all three archives</a></div>
  </div>
- <div class="rd-hero-preview" aria-hidden="true">
-  <div class="rd-preview-top"><span>RESEARCH DESK</span><span>● ● ●</span></div>
-  <div class="rd-preview-content">
-   <span class="rd-preview-tag">ONE QUERY</span>
-   <strong>Three views of the literature</strong>
-   <div class="rd-preview-row"><span class="rd-source-dot arxiv"></span><span>arXiv</span><i></i><i></i></div>
-   <div class="rd-preview-row"><span class="rd-source-dot biorxiv"></span><span>bioRxiv</span><i></i><i></i></div>
-   <div class="rd-preview-row"><span class="rd-source-dot chemrxiv"></span><span>ChemRxiv</span><i></i><i></i></div>
-   <div class="rd-preview-foot"><span>Original records</span><span>Compare abstracts</span><span>Save citations</span></div>
-  </div>
+ <div class="rd-topic-preview" aria-label="Example research path">
+  <span>EXAMPLE RESEARCH PATH</span>
+  <ol><li>Mathematical Physics</li><li>Quantum many-body theory</li><li>Lieb-Robinson bounds</li></ol>
+  <a href="./arxiv.html?category=math-ph&amp;topic=quantum-many-body-theory&amp;subtopic=lieb-robinson-bounds">See papers on this path →</a>
  </div>
+</section>
+<section class="axiovo-video-top rd-home-section rd-tour rd-tour-first" aria-labelledby="axiovo-home-demo-heading">
+ <div class="rd-tour-copy">
+  <p class="rd-kicker">GUIDED TOUR</p><h2 id="axiovo-home-demo-heading">See a research session</h2>
+  <p>From a first query to a source-checked shortlist. The illustrated tour includes narration and English captions.</p>
+  <details class="rl-home-transcript"><summary>Read video transcript</summary>
+   <ol>
+    <li>Welcome to Axiovo. Search arXiv, bioRxiv, and ChemRxiv from a single research desk.</li>
+    <li>Explore the subject directory of each archive. Search by category code, field name, or a subfield you have added.</li>
+    <li>Enter a research question, a paper title, or an identifier. Use the date filters and check coverage separately for each archive.</li>
+    <li>Open the original record, or add papers to a side-by-side comparison. Read their abstracts and export the citations you need.</li>
+    <li>Save a search to rerun later, and keep papers from all three archives together in your library. Your searches and notes stay on this device.</li>
+    <li>Open Research Tools for PDF annotation, or use the Research Assistant to investigate a paper. Always follow the evidence back to its source.</li>
+   </ol>
+  </details>
+ </div>
+ <figure class="rl-home-demo">
+  <video controls playsinline preload="none" width="960" height="540" poster="./assets/axiovo-tour-poster.svg" aria-label="Axiovo research workflow tour">
+   <source src="./assets/axiovo-tour.mp4?v=research-desk-1" type="video/mp4">
+   <track kind="captions" src="./assets/axiovo-tour.vtt?v=research-desk-1" srclang="en" label="English captions" default>
+   A transcript is available.
+  </video>
+  <p id="axiovo-video-error" role="status" hidden>Video playback is unavailable. You can read the transcript alongside the player.</p>
+  <figcaption>Illustrated tour with narration and English captions.</figcaption>
+ </figure>
 </section>
 <section class="rd-home-section" aria-labelledby="axiovo-archive-title">
  <div class="rd-section-heading"><div><p class="rd-kicker">BROWSE BY SUBJECT</p><h2 id="axiovo-archive-title">Explore the archives</h2></div><a class="rd-text-link" href="./desk.html">Open Research Desk <span aria-hidden="true">→</span></a></div>
@@ -68,7 +78,15 @@
    <span class="rd-card-link">Browse ChemRxiv <span aria-hidden="true">↗</span></span>
   </a>
  </div>
- <p class="rd-small">Subject directories and searchable paper coverage are tracked separately. <a href="./methodology.html">See data sources and coverage</a>.</p>
+ <p class="rd-small">Predefined research subfields are curated by Axiovo. Paper coverage is reported separately for each archive. <a href="./methodology.html">See data sources and coverage</a>.</p>
+</section>
+<section class="rd-home-section" aria-labelledby="rd-topic-examples">
+ <div class="rd-section-heading"><div><p class="rd-kicker">GO BEYOND THE ARCHIVE SUBJECT</p><h2 id="rd-topic-examples">Try a research path</h2></div></div>
+ <div class="rd-tools">
+  <a href="./arxiv.html?category=cond-mat.mes-hall&amp;topic=topological-phases-of-matter&amp;subtopic=higher-order-topology"><strong>Higher-order topology</strong><span>arXiv › Mesoscale physics › Topological phases</span><b aria-hidden="true">→</b></a>
+  <a href="./biorxiv.html?category=Genomics&amp;topic=transcriptomics&amp;subtopic=spatial-transcriptomics"><strong>Spatial transcriptomics</strong><span>bioRxiv › Genomics › Transcriptomics</span><b aria-hidden="true">→</b></a>
+  <a href="./chemrxiv.html?category=Catalysis&amp;topic=electrocatalysis&amp;subtopic=electrochemical-co2-reduction"><strong>Electrochemical CO₂ reduction</strong><span>ChemRxiv › Catalysis › Electrocatalysis</span><b aria-hidden="true">→</b></a>
+ </div>
 </section>
 <section class="rd-home-section" aria-labelledby="rd-workflow-title">
  <div class="rd-section-heading"><div><p class="rd-kicker">YOUR WORKSPACE</p><h2 id="rd-workflow-title">Pick up where you left off</h2></div></div>
@@ -77,31 +95,6 @@
   <a href="./lab.html"><strong>Research Tools</strong><span>Read and annotate a PDF, then trace citations</span><b aria-hidden="true">→</b></a>
   <a href="./copilot.html"><strong>Research Assistant</strong><span>Explore source-linked evidence and analysis</span><b aria-hidden="true">→</b></a>
  </div>
-</section>
-<section class="axiovo-video-top rd-home-section rd-tour" aria-labelledby="axiovo-home-demo-heading">
- <div class="rd-tour-copy">
-  <p class="rd-kicker">GUIDED TOUR</p><h2 id="axiovo-home-demo-heading">See a research session</h2>
-  <p>From a first query to a source-checked shortlist. The illustrated tour includes narration and English captions.</p>
-  <details class="rl-home-transcript"><summary>Read video transcript</summary>
-   <ol>
-    <li>Welcome to Axiovo. Search arXiv, bioRxiv, and ChemRxiv from a single research desk.</li>
-    <li>Explore the subject directory of each archive. Search by category code, field name, or a subfield you have added.</li>
-    <li>Enter a research question, a paper title, or an identifier. Use the date filters and check coverage separately for each archive.</li>
-    <li>Open the original record, or add papers to a side-by-side comparison. Read their abstracts and export the citations you need.</li>
-    <li>Save a search to rerun later, and keep papers from all three archives together in your library. Your searches and notes stay on this device.</li>
-    <li>Open Research Tools for PDF annotation, or use the Research Assistant to investigate a paper. Always follow the evidence back to its source.</li>
-   </ol>
-  </details>
- </div>
- <figure class="rl-home-demo">
-  <video controls playsinline preload="none" width="960" height="540" poster="./assets/axiovo-tour-poster.svg" aria-label="Axiovo research workflow tour">
-   <source src="./assets/axiovo-tour.mp4?v=research-desk-1" type="video/mp4">
-   <track kind="captions" src="./assets/axiovo-tour.vtt?v=research-desk-1" srclang="en" label="English captions" default>
-   The transcript is available above.
-  </video>
-  <p id="axiovo-video-error" role="status" hidden>Video playback is unavailable. You can read the transcript alongside the player.</p>
-  <figcaption>Illustrated workflow. Paper availability is shown in the Research Desk.</figcaption>
- </figure>
 </section>
 </main>
 </body>

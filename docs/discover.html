@@ -15,11 +15,11 @@
   const archive=(params.get("archive")||params.get("view")||"").toLowerCase();
   const options={arxiv:"arxiv.html",biorxiv:"biorxiv.html",chemrxiv:"chemrxiv.html"};
   const isLibrary=old.hash==="#workspace"||old.hash==="#library"||params.get("view")==="workspace";
-  const isSearch=["q","query","author","from","to","date","sort"].some(k=>params.has(k));
+  const isSearch=["q","query","author","from","to","date","sort","category","topic","subtopic","refine"].some(k=>params.has(k));
   const selected=isLibrary?"workspace.html":options[archive]||(isSearch||archive==="scholarly"?"arxiv.html":"");
   const target=new URL(selected?"./"+selected:"./",old);
   if(!isLibrary&&selected!==""){
-    for(const key of ["q","query","author","from","to","sort"]){
+    for(const key of ["q","query","author","affiliation","from","to","date","sort","category","topic","subtopic","refine","match","crosslisted"]){
       if(params.has(key))target.searchParams.set(key,params.get(key));
     }
   }

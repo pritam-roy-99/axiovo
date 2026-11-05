@@ -1,0 +1,71 @@
+/* Archive discovery uses the same surfaces and controls as the Research Desk. */
+.axiovo-explore .ex-page {padding-top:24px}
+.ex-hero {margin-bottom:21px}
+.ex-archives {display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.ex-archives a {display:inline-flex;gap:6px;align-items:center;min-height:38px;padding:6px 10px;border:1px solid var(--rd-border);border-radius:7px;background:var(--rd-surface);text-decoration:none;font-size:.85rem;font-weight:750}
+.ex-archives a[aria-current="page"] {background:var(--rd-soft);border-color:var(--rd-link);box-shadow:inset 0 -2px var(--rd-link)}
+.ex-hero-copy {display:flex;align-items:end;justify-content:space-between;gap:12px 20px;flex-wrap:wrap}
+.ex-hero-copy h1 {font-size:clamp(2rem,5vw,3.45rem);letter-spacing:-.06em;line-height:1.06;margin:5px 0 7px}
+.ex-hero-copy p:not(.rd-kicker,.ex-count) {color:var(--rd-muted);line-height:1.5}
+.ex-count {font-size:.77rem;font-weight:700;color:var(--rd-muted);border:1px solid var(--rd-border);background:var(--rd-surface);border-radius:8px;padding:7px 9px}
+.ex-layout {display:grid;grid-template-columns:minmax(235px,.34fr) minmax(0,1fr);align-items:start;gap:16px}
+.ex-sidebar,.ex-main {min-width:0}
+.ex-guide h2,.ex-search h2 {font-size:1.15rem;letter-spacing:-.028em;margin:4px 0 8px}
+.ex-finder {position:relative;margin:12px 0 14px}
+.ex-finder label,.ex-steps label,.ex-personal form label {font-size:.84rem;font-weight:720}
+.ex-finder input,.ex-steps select,.ex-personal form :is(input,select) {width:100%;min-width:0;min-height:41px;padding:8px 10px;color:var(--rd-ink);background:var(--rd-surface);border:1px solid var(--rd-border);border-radius:8px;font:inherit;font-size:.88rem}
+.ex-suggestions {margin-top:6px;border:1px solid var(--rd-border);border-radius:8px;padding:4px;background:var(--rd-soft);max-height:310px;overflow:auto}
+.ex-suggestions button {display:block;width:100%;text-align:left;padding:6px;border:0;border-radius:5px;background:transparent;color:var(--rd-ink);font:inherit;cursor:pointer}
+.ex-suggestions button:hover {background:var(--rd-surface)}
+.ex-suggestions button strong,.ex-suggestions button span {display:block;overflow-wrap:anywhere}
+.ex-suggestions button strong {font-size:.84rem}
+.ex-suggestions button span {font-size:.73rem;color:var(--rd-muted)}
+.ex-suggestions p {padding:6px}
+.ex-steps {display:grid;gap:6px}
+.ex-steps label:not(:first-child) {margin-top:5px}
+.ex-step-number {display:inline-grid;place-items:center;width:20px;height:20px;background:var(--rd-soft);color:var(--rd-link);border-radius:6px;margin-right:4px;font-size:.73rem}
+.ex-steps select:disabled {color:var(--rd-muted);opacity:.8}
+.ex-guide-actions {display:flex;flex-wrap:wrap;gap:5px;margin-top:12px}
+.ex-guide-actions .rd-button {flex:1}
+.ex-personal {border-top:1px solid var(--rd-border);margin-top:13px;padding-top:9px}
+.ex-personal summary {font-size:.84rem;color:var(--rd-link);font-weight:730;cursor:pointer}
+.ex-personal form {display:grid;gap:6px;margin:8px 0}
+.ex-personal form label {display:grid;gap:3px}
+.ex-personal>.rd-small,.ex-personal>.rd-button {margin-top:7px}
+.ex-personal-list {display:grid;gap:5px;margin-top:6px}
+.ex-personal-row {display:grid;grid-template-columns:minmax(0,1fr) auto;gap:5px;align-items:center}
+.ex-personal-row .rd-button {min-height:32px;font-size:.75rem;padding:4px 6px;text-align:left;overflow-wrap:anywhere}
+.ex-personal-row span {font-size:.78rem;color:var(--rd-muted);overflow-wrap:anywhere}
+.ex-search>p {margin-bottom:11px}
+.ex-search .rd-label {font-size:.8rem}
+.ex-date-presets {display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}
+.ex-date-presets .rd-button {min-height:34px;padding:6px 8px;font-size:.76rem}
+.ex-crosslist {display:inline-flex;gap:5px;align-items:center;font-size:.84rem;margin-top:8px}
+.ex-results {margin-top:19px}
+.ex-results h2 {scroll-margin-top:12px}
+.ex-result-summary {padding:11px 13px}
+.ex-result-summary>p:first-child {font-size:.9rem;font-weight:740}
+.ex-result-summary .rd-small {margin-top:4px}
+.ex-result-summary .rd-advanced {margin-top:5px}
+#archive-results {display:grid;gap:9px;margin-top:9px}
+.ex-paper {border:1px solid var(--rd-border);margin:0!important;padding:12px 13px}
+.ex-paper .rd-kicker {display:inline;color:var(--rd-link);font-size:.72rem;letter-spacing:0}
+.ex-paper h3 {font-size:1.04rem;line-height:1.36;margin:4px 0}
+.ex-paper h3 a {text-decoration:none}
+.ex-paper h3 a:hover {text-decoration:underline}
+.ex-paper mark {color:#302710;background:#ffe5a0;border-radius:2px}
+.ex-paper details {margin:6px 0;font-size:.85rem;color:var(--rd-muted)}
+.ex-paper details p {margin-top:6px;line-height:1.6}
+.ex-paper summary {color:var(--rd-link);cursor:pointer;font-weight:710}
+.ex-provider-note {margin-top:4px!important}
+@media(max-width:740px){
+ .axiovo-explore .ex-page {padding-top:15px}
+ .ex-layout {grid-template-columns:minmax(0,1fr)}
+ .ex-hero {margin-bottom:14px}
+ .ex-hero-copy p:not(.rd-kicker,.ex-count) {font-size:.89rem}
+}
+
+.ex-choices {display:flex;flex-wrap:wrap;gap:5px;margin:2px 0 3px}
+.ex-choice {border:1px solid var(--rd-border);border-radius:7px;background:var(--rd-soft);color:var(--rd-link);font:inherit;font-size:.76rem;font-weight:700;min-height:30px;padding:4px 7px;text-align:left;cursor:pointer}
+.ex-choice:hover,.ex-choice[aria-pressed="true"] {border-color:var(--rd-link);background:var(--rd-surface)}
+.ex-choice[aria-pressed="true"] {box-shadow:inset 0 -2px var(--rd-link)}

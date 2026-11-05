@@ -1,63 +1,121 @@
 <!doctype html>
-<html lang="en"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>arXiv research discovery | Axiovo</title>
-<meta name="description" content="Browse all arXiv subject areas and original preprints. Independent source-specific preprint search, saved research topics and articles.">
-<link rel="stylesheet" href="./theme.css"><link rel="stylesheet" href="./research-entry.css"><link rel="stylesheet" href="./archive-browser.css">
-<script defer src="./theme.js"></script><script defer src="./navigation.js"></script>
-<script defer src="./archive-taxonomy.js"></script><script defer src="./arxiv-versions.js"></script><script defer src="./arxiv-daily-archive.js"></script><script defer src="./archive-data.js"></script><script defer src="./abstract-audio.js"></script><script defer src="./archive-browser.js"></script>
-<link rel="stylesheet" href="./axiovo-shell.css?v=2"></head><body class="axiovo-archive-page" data-archive="arxiv">
-<header></header>
-<main class="axiovo-browser">
-<nav class="axiovo-breadcrumb"><a href="./">Home</a><span aria-hidden="true">/</span><strong>arXiv</strong></nav>
-<section class="axiovo-browser-hero" aria-labelledby="archive-title">
- <span class="axiovo-browser-kicker">PREPRINT ARCHIVE</span>
- <h1 id="archive-title">arXiv</h1><p>Physics, mathematics, computing and more</p>
- <p class="axiovo-browser-description">Find every active arXiv category, search arXiv DOI metadata, or browse verified UTC submission batches.</p>
- <div class="axiovo-browser-status" id="archive-sync-status" role="status">Checking source coverage…</div>
-</section>
-<section class="axiovo-browser-fields" aria-labelledby="browse-heading">
- <div class="axiovo-browser-heading"><h2 id="browse-heading">Explore arXiv subjects</h2><p>Select a topic, a field and a subfield. Modify your saved subfields at any time.</p></div>
- <div class="axiovo-browser-steps">
-  <div class="axiovo-browser-step"><span>01 · Topic</span><label for="archive-topic">Select primary topic</label><select id="archive-topic"></select></div>
-  <div class="axiovo-browser-step"><span>02 · Field</span><label for="archive-field">Research field</label><select id="archive-field"></select></div>
-  <div class="axiovo-browser-step"><span>03 · Subfield</span><label for="archive-subfield">Specific research area</label><select id="archive-subfield"></select></div>
- </div>
- <div class="axiovo-browser-taxonomy" id="archive-category-list" aria-label="Available subject categories"></div>
- <details class="axiovo-category-directory" id="archive-directory">
-  <summary id="archive-directory-label">Browse the full subject directory</summary>
-  <label for="archive-category-query">Filter the directory by name or code</label>
-  <input id="archive-category-query" type="search" placeholder="e.g. optics or plant biology">
-  <p class="axiovo-hint" id="archive-category-count" role="status"></p>
-  <div class="axiovo-browser-chips" id="archive-category-matches"></div>
- </details>
- <details class="axiovo-edit-fields"><summary>Customize my subfields</summary>
-  <form id="archive-custom-form" class="axiovo-custom-form">
-   <label for="archive-custom">Add a research subfield<input id="archive-custom" type="text" maxlength="90" placeholder="Specific method or research topic"></label>
-   <button type="submit">Add subfield</button><button type="button" id="archive-reset" class="axiovo-secondary">Reset to default</button>
-  </form><div id="archive-custom-list" class="axiovo-browser-chips"></div>
-  <p>These are personal search preferences, not official archive classifications. Stored in this browser.</p>
- </details>
-</section>
-<section class="axiovo-browser-search" aria-labelledby="archive-search-heading">
- <div class="axiovo-browser-heading"><h2 id="archive-search-heading">Search arXiv papers</h2><p>Search the selected subfield or the full archive, keeping each source separate.</p></div>
- <form id="archive-search-form" role="search">
-  <label for="archive-query">Title, author, abstract, keyword, DOI or ID</label>
-  <div class="axiovo-searchline"><input id="archive-query" type="search" placeholder="Search within arXiv…" autocomplete="off" maxlength="300" aria-describedby="archive-search-help"><button type="submit">Search papers</button></div>
-  <p id="archive-search-help" class="axiovo-hint">Open a paper by its original identifier, or combine a query with the filters below.</p>
-  <div class="axiovo-browser-filters">
-   <label>Scope<select id="archive-scope"><option value="subfield">Selected subfield</option><option value="all">Whole archive</option></select></label>
-   <label>Sort<select id="archive-sort"><option value="relevance">Most relevant</option><option value="recent">Newest</option><option value="cited">Most cited (when available)</option></select></label>
-   <label>First submitted from<input id="archive-from" type="date"></label><label>To<input id="archive-to" type="date"></label>
-   <label>Author<input id="archive-author" type="search" maxlength="100" placeholder="Author or initials"></label><label>Affiliation<input id="archive-affiliation" type="search" maxlength="120" placeholder="University or institute"></label>
-  </div>
- </form>
-</section>
-<section class="axiovo-browser-results" aria-labelledby="archive-results-heading">
- <div class="axiovo-results-head"><h2 id="archive-results-heading">Research papers</h2><p id="archive-result-count" role="status" aria-live="polite">Choose a subject or enter a search.</p></div>
- <div id="archive-results"></div><div id="archive-result-actions"></div><p><a class="axiovo-compare-link" href="./desk.html#rd-queue-heading">Open Research Desk comparison →</a></p>
-</section>
-<footer class="axiovo-browser-disclaimer">Axiovo is independent of arXiv. Archive classification menus can be complete even when the searchable paper index is not. Source availability, publication dates, metadata and citation links are verified separately.</footer>
-</main>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Browse arXiv by archive subject, research topic and sub-subtopic. Search and read source-linked preprints in Axiovo.">
+<title>Explore arXiv research | Axiovo</title>
+<link rel="icon" type="image/svg+xml" href="./icons/axiovo.svg">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="stylesheet" href="./theme.css">
+<link rel="stylesheet" href="./research-entry.css">
+<link rel="stylesheet" href="./axiovo-shell.css?v=2">
+<link rel="stylesheet" href="./research-desk.css">
+<link rel="stylesheet" href="./topic-explorer.css">
+<script defer src="./theme.js"></script>
+<script defer src="./navigation.js"></script>
+<script defer src="./arxiv-versions.js"></script>
+<script defer src="./arxiv-daily-archive.js"></script>
+<script defer src="./archive-taxonomy.js"></script>
+<script defer src="./topic-atlas.js"></script>
+<script defer src="./archive-data.js"></script>
+<script defer src="./abstract-audio.js"></script>
+<script defer src="./author-follow.js"></script>
+<script defer src="./topic-explorer.js"></script>
 <script defer src="./pwa.js"></script>
-</body></html>
+</head>
+<body class="axiovo-archive-page axiovo-research axiovo-explore" data-explore-source="arxiv">
+<header></header>
+<main class="rd-page ex-page">
+ <section class="ex-hero" aria-labelledby="archive-title">
+  <nav class="ex-archives" aria-label="Preprint archives"><a href="./arxiv.html" aria-current="page"><span class="rd-source-dot arxiv" aria-hidden="true"></span>arXiv</a><a href="./biorxiv.html"><span class="rd-source-dot biorxiv" aria-hidden="true"></span>bioRxiv</a><a href="./chemrxiv.html"><span class="rd-source-dot chemrxiv" aria-hidden="true"></span>ChemRxiv</a></nav>
+  <div class="ex-hero-copy">
+   <div><p class="rd-kicker">TOPIC EXPLORER</p><h1 id="archive-title">Explore arXiv</h1>
+   <p>Choose an archive subject, then narrow with Axiovo’s own subfields and sub-subtopics.</p></div>
+   <p class="ex-count" id="archive-taxonomy-count">Loading the topic directory…</p>
+  </div>
+ </section>
+ <noscript><p>Enable JavaScript to use the topic explorer or <a href="https://arxiv.org/search/">search arXiv directly</a>.</p></noscript>
+ <div class="ex-layout">
+  <aside class="ex-sidebar" aria-label="Explore by research topic">
+   <section class="rd-panel ex-guide" aria-labelledby="ex-guide-title">
+    <p class="rd-kicker">BROWSE THE TOPIC MAP</p>
+    <h2 id="ex-guide-title">Choose a research path</h2>
+    <form id="archive-topic-finder" role="search" class="ex-finder">
+     <label class="rd-label" for="archive-topic-find">Find any subject, topic or sub-subtopic</label>
+     <input id="archive-topic-find" type="search" placeholder="Name, method or category code" maxlength="100" autocomplete="off" aria-describedby="archive-topic-find-status">
+     <p id="archive-topic-find-status" class="rd-sr-only" role="status"></p>
+     <div id="archive-topic-suggestions" class="ex-suggestions" hidden></div>
+    </form>
+    <div class="ex-steps">
+     <label for="archive-field"><span class="ex-step-number" aria-hidden="true">1</span> Archive subject</label>
+     <select id="archive-field"><option value="">All subjects</option></select>
+     <label for="archive-topic"><span class="ex-step-number" aria-hidden="true">2</span> Research subfield</label>
+     <select id="archive-topic" disabled><option value="">Choose a subject first</option></select>
+     <div class="ex-choices" id="archive-topic-options" role="group" aria-label="Suggested research subfields" hidden></div>
+     <label for="archive-subfield"><span class="ex-step-number" aria-hidden="true">3</span> Sub-subtopic</label>
+     <select id="archive-subfield" disabled><option value="">Choose a research topic first</option></select>
+     <div class="ex-choices" id="archive-subtopic-options" role="group" aria-label="Suggested sub-subtopics" hidden></div>
+    </div>
+    <div class="ex-guide-actions">
+     <a class="rd-button rd-primary" href="#archive-results-heading">See papers <span aria-hidden="true">↓</span></a>
+     <button class="rd-button rd-secondary" id="archive-clear-path" type="button" disabled>Clear path</button>
+    </div>
+    <details class="ex-personal">
+     <summary>My topics and saved paths</summary>
+     <p class="rd-small">Add your own topics and sub-subtopics, or keep this path on this device.</p>
+     <button class="rd-button rd-secondary" id="archive-save-path" type="button" disabled>Save current path</button>
+     <div id="archive-saved-paths" class="ex-personal-list"></div>
+     <form id="archive-custom-form">
+      <label for="archive-custom-kind">Add a<select id="archive-custom-kind"><option value="topic">Research topic</option><option value="subtopic">Sub-subtopic under the selected topic</option></select></label>
+      <label for="archive-custom">Name<input id="archive-custom" type="text" maxlength="85" placeholder="e.g. your method or research question" required></label>
+      <button class="rd-button rd-secondary" type="submit" id="archive-custom-add" disabled>Add to this subject</button>
+     </form>
+     <div id="archive-custom-list" class="ex-personal-list"></div>
+     <button class="rd-button rd-secondary" id="archive-reset-custom" type="button" hidden>Reset personal topics for this subject</button>
+     <p id="archive-personal-status" class="rd-small" role="status"></p>
+    </details>
+   </section>
+  </aside>
+  <div class="ex-main">
+   <section class="rd-panel ex-search" aria-labelledby="archive-search-heading">
+    <h2 id="archive-search-heading">Search arXiv papers</h2>
+    <p class="rd-small" id="archive-scope-label">Scope: the whole archive.</p>
+    <form id="archive-search-form" role="search">
+     <label class="rd-label" for="archive-query">Keywords, title or paper identifier</label>
+     <div class="rd-searchbar"><input id="archive-query" type="search" maxlength="220" placeholder="Search within the selected path"><button class="rd-button rd-primary" type="submit">Search papers</button></div>
+     <div class="ex-date-presets" role="group" aria-label="Date shortcuts">
+      <button class="rd-button rd-secondary" id="archive-latest" type="button">Latest papers</button>
+      <button class="rd-button rd-secondary" id="archive-latest-verified" type="button">Latest verified day</button>
+      <button class="rd-button rd-secondary" id="archive-week" type="button">Past 7 days</button>
+      <button class="rd-button rd-secondary" id="archive-date-open" type="button">Choose dates</button>
+     </div>
+     <details class="rd-advanced" id="archive-advanced"><summary>Author, dates and other filters</summary>
+      <div class="rd-filter-grid">
+       <label>Author<input id="archive-author" type="search" maxlength="100" placeholder="Given name and surname" list="archive-author-options"></label>
+       <datalist id="archive-author-options"></datalist>
+       <label>First submitted (UTC) from<input id="archive-from" type="date"></label>
+       <label>First submitted (UTC) through<input id="archive-to" type="date"></label>
+       <label>Match<select id="archive-match"><option value="metadata">Title and metadata</option><option value="title">Title only</option></select></label>
+       <label>Sort<select id="archive-sort"><option value="relevance">Relevance</option><option value="recent">Newest</option><option value="cited">Most cited where available</option></select></label>
+       <label>Affiliation<input id="archive-affiliation" type="search" maxlength="100" placeholder="When supplied by source"></label>
+      </div>
+      <label class="ex-crosslist"><input id="archive-crosslisted" type="checkbox"> Papers with multiple arXiv categories</label>
+     </details>
+    </form>
+   </section>
+   <section class="ex-results" aria-labelledby="archive-results-heading">
+    <div class="rd-section-heading"><div><p class="rd-kicker">SOURCE-LINKED RECORDS</p><h2 id="archive-results-heading" tabindex="-1">Papers</h2></div><a class="rd-text-link" href="./desk.html#rd-queue-heading">Open comparison shortlist →</a></div>
+    <div class="rd-panel ex-result-summary">
+     <p id="archive-result-count" role="status" aria-live="polite">Loading papers…</p>
+     <p id="archive-sync-status" class="rd-small">Coverage depends on the selected dates and metadata provider.</p>
+     <details id="archive-match-details" class="rd-advanced" hidden><summary>How this topic is matched</summary><p class="rd-small" id="archive-match-terms"></p></details>
+    </div>
+    <div id="archive-results"></div>
+    <div id="archive-result-actions" class="rd-actions"></div>
+   </section>
+  </div>
+ </div>
+</main>
+</body>
+</html>

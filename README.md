@@ -140,22 +140,27 @@ Open [Research Tools](https://pritam-roy-99.github.io/axiovo/lab.html) from the 
 
 The OAI workflow can run daily and stores at most 4,000 recently modified metadata records. For requirements, operational limits, privacy and setup, see [RESEARCH_TOOLS_SETUP.md](RESEARCH_TOOLS_SETUP.md). These are functional foundations, not claims of complete full-corpus semantic retrieval, reliable PDF theorem comparison, production community moderation, or automated scientific alerts.
 
-## Research Desk and homepage tour
+## Topic Explorer, Library, and Research Assistant
 
-The homepage starts with preprint search and three subject directories. The
-[Research Desk](https://pritam-roy-99.github.io/axiovo/desk.html) separates
-arXiv, bioRxiv and ChemRxiv results and coverage. It supports rerunnable
-browser-local searches, a three-paper comparison, library saving and RIS
-export. Abstract read-aloud uses installed English voices and a scientific
-pronunciation lexicon.
+Open an archive and choose **Archive subject → Research subfield → Sub-subtopic**.
+The TSV catalogs in `docs/data/topics/` define Axiovo’s research subfields and
+synonyms for all supported archive subjects. The subject picker preserves the
+official category codes. The topic finder searches across all three levels inside
+the chosen archive. Paths can be shared as URLs and saved or extended in the browser.
 
-GitHub Pages generates the illustrated, captioned tour using
-`python scripts/build_intro_video.py` with Pillow and FFmpeg. It assembles
-the checked-in audio takes, which were generated with the Kokoro
-`af_heart` voice. To regenerate the takes, install `kokoro-onnx==0.6.1`
-and pass the [v1.1 release](https://github.com/thewh1teagle/kokoro-onnx/releases/tag/model-files-v1.1)
+The Research Desk searches the three archives in separate result sections.
+The Library puts saved papers first and has a Following view for author name
+lookups. The Research Assistant offers related arXiv sources and inspection of
+original abstracts, with optional local models in a separate settings panel.
+Subject coverage and paper coverage are distinct. Date completeness is shown
+only for verified arXiv submission batches.
+
+Regenerate the shared archive pages with `python scripts/build_archive_pages.py`.
+GitHub Pages assembles the captioned homepage tour from the checked-in narration
+using `python scripts/build_intro_video.py` with Pillow and FFmpeg. To regenerate
+the voice takes, install `kokoro-onnx==0.6.1` and pass the
+[v1.1 release](https://github.com/thewh1teagle/kokoro-onnx/releases/tag/model-files-v1.1)
 English model and voice files to `--regenerate-narration MODEL VOICES`.
-The video remains optional, below the search and subject controls.
 
 ## Unified Discover (arXiv + field-aware scholarly search)
 

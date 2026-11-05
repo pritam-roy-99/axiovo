@@ -9,13 +9,11 @@
   const nav=document.createElement("nav");nav.className="rl-nav";nav.setAttribute("aria-label","Main navigation");
   const file=location.pathname.split("/").pop()||"index.html";
   const archivePage=["arxiv.html","biorxiv.html","chemrxiv.html"].includes(file);
-  const defaultLinks=[["./#axiovo-archive-title","Discover"],["./workspace.html","Library"],["./copilot.html","Research AI"],["./desk.html","Research Desk"]];
-  const archiveLinks=[["./","Archives"],["./workspace.html","Library"],["./copilot.html","Research AI"],["./desk.html","Research Desk"]];
-  const links=archivePage?archiveLinks:defaultLinks;
+  const links=[["./#axiovo-archive-title","Explore"],["./desk.html","Research Desk"],["./workspace.html","Library"],["./copilot.html","Research Assistant"]];
   for(const [href,label] of links){
    const a=document.createElement("a");a.href=href;a.textContent=label;
    const target=href.split("#")[0].slice(2);
-   if(file===target&&(!href.includes("#")||location.hash===href.slice(href.indexOf("#"))))a.setAttribute("aria-current","page");
+   if((archivePage&&href.includes("#"))||file===target)a.setAttribute("aria-current","page");
    nav.append(a);
   }
   const settings=document.createElement("a");settings.href="./profiles.html";settings.className="rl-settings-link";

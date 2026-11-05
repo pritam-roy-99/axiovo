@@ -68,38 +68,70 @@ function merge(...groups){
  }
  return [...results.values()];
 }
+function queryWords(query){
+ return (clean(query).match(/"[^"]+"|[^\s"]+/g)||[]).map(word=>word.replace(/^"|"$/g,"")).filter(Boolean);
+}
 function matchesText(value,term){
- const hay=simple(value),needle=simple(term);
- return !needle||needle.split(" ").every(word=>hay.includes(word));
+ const hay=simple(value);
+ return queryWords(term).map(simple).filter(Boolean).every(word=>hay.includes(word));
+}
+const normalizePhrase=value=>simple(value).split(" ").map(word=>word.length>4?
+ word.replace(/ies$/,"y").replace(/(?<![siu])s$/,""):word).join(" ");
+function topicHit(p,terms=[]){
+ if(!terms.length)return null;
+ const title=" "+normalizePhrase(p.title)+" ";
+ const abstract=" "+normalizePhrase(p.abstract)+" ";
+ for(const field of [title,abstract])for(const term of terms){
+  const phrase=normalizePhrase(term);
+  if(phrase&&field.includes(" "+phrase+" "))return {term,where:field===title?"title":"abstract"};
+ }
+ return null;
 }
 function categoryMatch(p,category){
  const exact=category.codes||[category.code];
  return p.categories.some(code=>exact.some(value=>simple(code)===simple(value)));
 }
-function matches(p,criteria){
- if(criteria.from&&(!p.date||p.date<criteria.from)||criteria.to&&(!p.date||p.date>criteria.to))return false;
- const id=parseArxiv(criteria.q),doi=parseDOI(criteria.q);
- if(id&&(p.source!=="arxiv"||p.id.toLowerCase()!==id.base.toLowerCase()||(id.explicit&&p.recordId.toLowerCase()!==id.requested.toLowerCase())))return false;
- if(doi&&p.doi!==doi)return false;
- const text=[p.title,p.abstract,p.authors.join(" "),p.categories.join(" "),p.id,p.doi].join(" ");
- if(!id&&!doi&&!matchesText(text,criteria.q)||!matchesText(p.authors.join(" "),criteria.author)||!matchesText(p.affiliations.join(" "),criteria.affiliation))return false;
- const category=criteria.category;
- if(category&&!categoryMatch(p,category)){
-  if(p.source!=="chemrxiv"||p.categories.length)return false;
-  if(p.provenance!=="Crossref subject query"&&!matchesText(text,category.name))return false;
- }
- return matchesText(text,criteria.refinement);
+function identifier(value){
+ const doi=parseDOI(value);
+ const arxiv=parseArxiv(value)||(doi.startsWith("10.48550/arxiv.")?parseArxiv(doi.slice("10.48550/arxiv.".length)):null);
+ return {arxiv,doi:arxiv?"":doi};
 }
-function rank(p,q){
- return q?(matchesText(p.title,q)?8:0)+(matchesText(p.abstract,q)?3:0)+(matchesText(p.authors.join(" "),q)?5:0):0;
+function matchesAuthor(authors,query){
+ const words=simple(query).split(" ").filter(Boolean);
+ return !words.length||authors.some(author=>{
+  const parts=simple(author).split(" ");
+  return words.every(word=>parts.some(part=>part===word||(word.length===1&&part.startsWith(word))));
+ });
+}
+function matchScore(p,c){
+ if(c.from&&(!p.date||p.date<c.from)||c.to&&(!p.date||p.date>c.to))return null;
+ const {arxiv:id,doi}=identifier(c.q);
+ if(id&&(p.source!=="arxiv"||p.id.toLowerCase()!==id.base.toLowerCase()||(id.explicit&&p.recordId.toLowerCase()!==id.requested.toLowerCase())))return null;
+ if(doi&&p.doi!==doi)return null;
+ if(c.crosslisted&&(p.source!=="arxiv"||p.categories.length<2))return null;
+ const text=[p.title,p.abstract,p.authors.join(" "),p.categories.join(" "),p.id,p.doi].join(" ");
+ if(!id&&!doi&&!matchesText(c.match==="title"?p.title:text,c.q))return null;
+ if(!matchesAuthor(p.authors,c.author)||!matchesText(p.affiliations.join(" "),c.affiliation))return null;
+ const terms=c.topicTerms||[],hit=topicHit(p,terms);
+ if(terms.length&&!hit)return null;
+ const category=c.category;
+ if(category&&!categoryMatch(p,category)){
+  if(p.source==="arxiv"||p.categories.length)return null;
+  const inferredSubject=p.source==="chemrxiv"&&(p.provenance==="Crossref subject query"||matchesText(text,category.name));
+  const inferredBioSubject=p.source==="biorxiv"&&p.provenance==="Europe PMC"&&topicHit(p,c.categoryTerms||[]);
+  if(!inferredSubject&&!inferredBioSubject&&!hit)return null;
+ }
+ if(!matchesText(text,c.refinement))return null;
+ const queryScore=c.q?(matchesText(p.title,c.q)?8:0)+(matchesText(p.abstract,c.q)?3:0)+(matchesAuthor(p.authors,c.q)?5:0):0;
+ return queryScore+(hit?(hit.where==="title"?12:4):0);
 }
 function filter(papers,criteria){
- return papers.filter(p=>matches(p,criteria)).sort((a,b)=>
-  (criteria.sort==="cited"?(b.citations??-1)-(a.citations??-1):criteria.sort==="recent"?0:rank(b,criteria.q)-rank(a,criteria.q))
-  ||b.date.localeCompare(a.date)||a.title.localeCompare(b.title));
+ return papers.map(p=>({p,score:matchScore(p,criteria)})).filter(row=>row.score!==null).sort(({p:a,score:x},{p:b,score:y})=>
+  (criteria.sort==="cited"?(b.citations??-1)-(a.citations??-1):criteria.sort==="recent"?0:y-x)
+  ||b.date.localeCompare(a.date)||a.title.localeCompare(b.title)).map(row=>row.p);
 }
 async function request(url,signal,json=true){
- const timeout=AbortSignal.timeout(14000);
+ const timeout=AbortSignal.timeout(11000);
  const response=await fetch(url,{signal:signal?AbortSignal.any([signal,timeout]):timeout});
  if(!response.ok)throw Error("HTTP "+response.status);
  return json?response.json():response.text();
@@ -139,11 +171,11 @@ function dataCiteArxiv(item){
  const submitted=list(p.dates).find(d=>d.dateType==="Submitted"&&d.dateInformation==="v1");
  const categories=list(p.subjects).filter(s=>s.subjectScheme==="arXiv").map(s=>s.subject?.match(/\(([^()]*)\)$/)?.[1]).filter(Boolean);
  return normalize("arxiv",{id:id.base,title:p.titles?.[0]?.title,date:submitted?.date,doi:p.doi,
-  authors:list(p.creators).map(a=>a.name),categories,primary_category:categories[0],
+  authors:list(p.creators).map(a=>a.name),affiliations:list(p.creators).flatMap(a=>list(a.affiliation).map(x=>x.name)),categories,primary_category:categories[0],
   abstract:list(p.descriptions).find(d=>d.descriptionType==="Abstract")?.description,provenance:"arXiv DOI metadata via DataCite"});
 }
 async function arxivLive(c,signal,cursor){
- const id=parseArxiv(c.q);
+ const id=identifier(c.q).arxiv;
  if(id){
   if(id.explicit)return {papers:[],total:0,provider:"Check the requested revision at the original arXiv record",next:null};
   const data=await request(endpoints.arxiv+"/10.48550/arXiv."+id.base,signal);
@@ -156,12 +188,13 @@ async function arxivLive(c,signal,cursor){
   const codes=c.category.codes||[c.category.code];
   clauses.push("("+codes.map(code=>"subjects.subject:"+quoted(code)).join(" OR ")+")");
  }
- const term=words([c.q,c.refinement].filter(Boolean).join(" "));
- if(term)clauses.push(...term.split(/\s+/).filter(Boolean).map(quoted));
- if(words(c.author))clauses.push("creators.name:"+quoted(c.author));
+ const keywordField=c.match==="title"?"titles.title:":"";
+ clauses.push(...queryWords([c.q,c.refinement].filter(Boolean).join(" ")).map(term=>keywordField+quoted(term)));
+ if(c.topicTerms?.length)clauses.push("("+c.topicTerms.map(quoted).join(" OR ")+")");
+ if(words(c.author))clauses.push(...queryWords(c.author).map(part=>"creators.name:"+quoted(part)));
  if(c.from||c.to)clauses.push("publicationYear:["+(c.from?.slice(0,4)||"1991")+" TO "+(c.to?.slice(0,4)||today().slice(0,4))+"]");
  if(clauses.length)q.set("query",clauses.join(" AND "));
- if(c.sort==="recent"||!term)q.set("sort","-published,-registered");
+ if(c.sort==="recent"||(!c.q&&!c.topicTerms?.length))q.set("sort","-published,-registered");
  const result=await request(endpoints.arxiv+"?"+q,signal);
  const papers=list(result.data).map(dataCiteArxiv).filter(Boolean);
  const next=result.links?.next?new URL(result.links.next,endpoints.arxiv).searchParams.get("page[cursor]"):null;
@@ -170,7 +203,8 @@ async function arxivLive(c,signal,cursor){
 async function bioNative(c,signal,cursor){
  const doi=parseDOI(c.q);
  const start=Number(cursor)||0;
- const interval=(c.from||(c.to?"2013-11-01":daysAgo(14)))+"/"+(c.to||today());
+ const startDate=c.from||(c.to||c.category?.legacy?"2013-11-01":daysAgo(c.category?7:2));
+ const interval=startDate+"/"+(c.to||today());
  const query=c.category?("?"+new URLSearchParams({category:c.category.code.toLowerCase()})):"";
  const url=endpoints.bio+(doi?doi+"/na/json":interval+"/"+start+"/json")+query;
  const data=await request(url,signal);
@@ -181,17 +215,20 @@ async function bioNative(c,signal,cursor){
  return {papers,total,provider:"bioRxiv API",next:!doi&&data.collection.length&&start+data.collection.length<total?start+data.collection.length:null};
 }
 async function bioIndex(c,signal,cursor){
- const parts=['SRC:PPR AND JOURNAL:"bioRxiv"'];
- const term=words(c.q);
- if(term)parts.push(term.split(/\s+/).map(x=>quoted(x)).join(" AND "));
+ const parts=['SRC:PPR AND PUBLISHER:"bioRxiv"'];
+ const keywordField=c.match==="title"?"TITLE:":"TITLE_ABS:";
+ parts.push(...queryWords([c.q,c.refinement].filter(Boolean).join(" ")).map(term=>keywordField+quoted(term)));
+ if(c.topicTerms?.length)parts.push("("+c.topicTerms.map(term=>"TITLE_ABS:"+quoted(term)).join(" OR ")+")");
  if(words(c.author))parts.push("AUTH:"+quoted(c.author));
  if(c.from||c.to)parts.push("FIRST_PDATE:["+ (c.from||"2013-11-01")+" TO "+(c.to||today())+"]");
  const query=new URLSearchParams({query:parts.join(" AND "),format:"json",pageSize:"50",resultType:"core",cursorMark:cursor||"*"});
+ if(c.sort==="recent")query.set("sort","FIRST_PDATE_D desc");
  const data=await request(endpoints.pmc+query,signal);
  const rows=list(data.resultList?.result);
  const papers=rows.filter(p=>/^biorxiv$/i.test(clean(p.bookOrReportDetails?.publisher||p.journalTitle||p.journalInfo?.journal?.title))).map(p=>
   normalize("biorxiv",{doi:p.doi,title:p.title,authors:p.authorList?.author?.map(a=>a.fullName)||clean(p.authorString).split(/,\s*/),
-   date:p.firstPublicationDate,abstract:p.abstractText,provenance:"Europe PMC"})).filter(Boolean);
+   date:p.firstPublicationDate,abstract:p.abstractText,provenance:"Europe PMC",citations:p.citedByCount,
+   affiliations:list(p.authorList?.author).flatMap(a=>list(a.authorAffiliationDetailsList?.authorAffiliation).map(x=>x.affiliation))})).filter(Boolean);
  return {papers,total:Number(data.hitCount)||0,provider:"Europe PMC",next:rows.length&&data.nextCursorMark!==query.get("cursorMark")?data.nextCursorMark||null:null};
 }
 function dateParts(value){
@@ -201,10 +238,11 @@ function dateParts(value){
 async function chemLive(c,signal,cursor){
  const doi=parseDOI(c.q);
  const filters=["type:posted-content"];
- if(c.from)filters.push("from-pub-date:"+c.from);
- if(c.to)filters.push("until-pub-date:"+c.to);
- const query=new URLSearchParams({rows:"50",filter:filters.join(","),sort:c.sort==="recent"||!c.q?"published":"score",order:"desc",cursor:cursor||"*"});
- const term=words([c.q,c.category?.name,c.refinement].filter(Boolean).join(" "));
+ if(c.from)filters.push("from-posted-date:"+c.from);
+ if(c.to)filters.push("until-posted-date:"+c.to);
+ const query=new URLSearchParams({rows:"50",filter:filters.join(","),sort:c.sort==="recent"||(!c.q&&!c.category&&!c.topicTerms?.length)?"published":"score",order:"desc",cursor:cursor||"*"});
+ const scope=c.topicTerms?.[0]||c.category?.name;
+ const term=words([c.q,scope,c.refinement].filter(Boolean).join(" "));
  if(term)query.set("query.bibliographic",term);
  if(words(c.author))query.set("query.author",words(c.author));
  const endpoint=doi?"https://api.crossref.org/works/"+doi:endpoints.chem+query;
@@ -218,20 +256,23 @@ async function chemLive(c,signal,cursor){
 }
 function live(source,criteria,signal,cursor){
  if(source==="arxiv")return arxivLive(criteria,signal,cursor);
- if(source==="biorxiv")return criteria.category||parseDOI(criteria.q)||(!criteria.q&&!criteria.author)?
+ if(source==="biorxiv")return parseDOI(criteria.q)||(!criteria.q&&!criteria.author&&!criteria.refinement&&!criteria.topicTerms?.length)?
   bioNative(criteria,signal,cursor):bioIndex(criteria,signal,cursor);
  return chemLive(criteria,signal,cursor);
 }
 function sourceLink(source,criteria={}){
  if(source==="arxiv"){
-  if(parseArxiv(criteria.q))return root.AxiovoArxiv.abs(criteria.q);
-  if(criteria.from||criteria.to)return root.AxiovoDailyArchive.officialDateSearchUrl({from:criteria.from,to:criteria.to,query:criteria.q});
-  if(criteria.q)return root.AxiovoArxiv.officialSearchUrl(criteria.q);
+  const id=identifier(criteria.q).arxiv;
+  if(id)return root.AxiovoArxiv.abs(id.requested);
+  const query=criteria.q||criteria.topicTerms?.[0]||criteria.refinement;
+  if((criteria.from||criteria.to)&&root.AxiovoDailyArchive)return root.AxiovoDailyArchive.officialDateSearchUrl({from:criteria.from||"1991-01-01",to:criteria.to||today(),query});
+  if(query)return root.AxiovoArxiv.officialSearchUrl(query);
   if(criteria.category?.code)return "https://arxiv.org/list/"+criteria.category.code+"/recent";
  }
  if(parseDOI(criteria.q))return "https://doi.org/"+parseDOI(criteria.q);
- if(source==="biorxiv"&&criteria.q)return "https://www.biorxiv.org/search/"+encodeURIComponent(criteria.q);
- if(source==="chemrxiv"&&criteria.q)return "https://chemrxiv.org/action/doSearch?AllField="+encodeURIComponent(criteria.q);
+ const query=criteria.q||criteria.topicTerms?.[0]||criteria.category?.name||criteria.refinement;
+ if(source==="biorxiv"&&query)return "https://www.biorxiv.org/search/"+encodeURIComponent(query);
+ if(source==="chemrxiv"&&query)return "https://chemrxiv.org/action/doSearch?AllField="+encodeURIComponent(query);
  return official[source];
 }
 function saved(p){
@@ -268,6 +309,6 @@ function addComparison(p){
 function removeComparison(p){
  return write(COMPARISON,comparison().filter(item=>recordKey(item)!==recordKey(p)));
 }
-root.AxiovoArchiveData={names,clean,simple,read,write,normalize,workKey,recordKey,merge,filter,snapshot,datedArxiv,live,sourceLink,
+root.AxiovoArchiveData={names,clean,simple,read,write,normalize,workKey,recordKey,merge,filter,topicHit,categoryMatch,identifier,snapshot,datedArxiv,live,sourceLink,
  saved,save,unsave,savedRecords,parseDOI,comparison,addComparison,removeComparison};
 })(window);

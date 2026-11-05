@@ -8,8 +8,11 @@ const sandbox={
  localStorage:{getItem:key=>storage.get(key),setItem:(key,value)=>storage.set(key,value)},
  fetch:async url=>{
   assert.match(String(url),/ebi\.ac\.uk\/europepmc/);
+  const query=new URL(String(url)).searchParams.get("query");
+  assert.match(query,/PUBLISHER:"bioRxiv"/);
+  assert.doesNotMatch(query,/JOURNAL:/);
   return {ok:true,json:async()=>({hitCount:2,resultList:{result:[
-   {doi:"10.1101/123456",title:"Protein design",bookOrReportDetails:{publisher:"bioRxiv"}},
+   {doi:"10.1101/123456",title:"Protein design with spatially resolved transcriptomics",bookOrReportDetails:{publisher:"bioRxiv"}},
    {doi:"10.1101/234567",title:"Clinical study",bookOrReportDetails:{publisher:"medRxiv"}}
   ]}})};
  }
@@ -33,8 +36,16 @@ assert.equal(data.comparison().length,2);
 assert.equal(data.save(revision),true);
 assert.equal(data.saved(revision),true);
 assert.equal(data.savedRecords("arxiv")[0].recordId,"2207.00001v2");
-data.live("biorxiv",{q:"protein design"}).then(result=>{
+const criteria={category:{code:"Genomics",name:"Genomics"},topicTerms:["spatial transcriptomics","spatially resolved transcriptomics"]};
+data.live("biorxiv",criteria).then(result=>{
  assert.equal(result.papers.length,1);
  assert.equal(result.papers[0].id,"10.1101/123456");
+ assert.equal(data.filter(result.papers,criteria).length,1);
+ const other=data.normalize("biorxiv",{doi:"10.1101/123450",title:"Spatial transcriptomics",category:"Ecology"});
+ assert.equal(data.filter([other],criteria).length,0);
+ const a=data.normalize("arxiv",{id:"2611.00001",title:"Paper A",authors:["Roy, Pritam"],categories:["quant-ph","math-ph"]});
+ const b=data.normalize("arxiv",{id:"2611.00002",title:"Paper B",authors:["Pritam Other","Alice Roy"]});
+ assert.equal(data.filter([a,b],{author:"Pritam Roy",crosslisted:true}).length,1);
+ assert.equal(data.filter([a,b],{author:"Pritam Roy"}).length,1);
  console.log("Archive taxonomy, exact revision matching, shortlist storage and bioRxiv source verification passed.");
 }).catch(error=>{console.error(error);process.exitCode=1});

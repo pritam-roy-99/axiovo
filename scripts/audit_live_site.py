@@ -12,7 +12,7 @@ from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeo
 BASE=os.environ.get("AXIOVO_BASE_URL","https://pritam-roy-99.github.io/axiovo/").rstrip("/")+"/"
 PAGES=("","arxiv.html","biorxiv.html","chemrxiv.html","discover.html#discover",
        "discover.html#workspace","workspace.html","paper.html","compare.html",
-       "copilot.html","lab.html","profiles.html","community.html",
+       "copilot.html","desk.html","lab.html","profiles.html","community.html",
        "methodology.html","privacy.html","fields.html","search.html","ai.html")
 failures=[]
 visited=set()
@@ -108,7 +108,7 @@ def main():
         # Crawl every first-party anchor reachable from the main navigation pages.
         targets=set()
         for path in ("","arxiv.html","biorxiv.html","chemrxiv.html",
-                     "discover.html","workspace.html","copilot.html","lab.html",
+                     "discover.html","workspace.html","copilot.html","desk.html","lab.html",
                      "profiles.html","paper.html","compare.html"):
             if not check(page,path):continue
             for href in page.locator('a[href]').evaluate_all("(els)=>els.map(a=>a.href)"):
@@ -133,7 +133,7 @@ def main():
             page.wait_for_url(f"**/{src}.html",timeout=12000)
             if page.locator("#archive-field").count()!=1:failures.append(f"Archive click failed {src}")
             note("CLICK homepage -> "+src)
-            details=page.locator(".axiovo-edit-fields")
+            details=page.locator(".ex-personal")
             if details.count():
                 details.locator("summary").click()
                 if not page.locator("#archive-custom").is_visible():

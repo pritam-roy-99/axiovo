@@ -51,7 +51,7 @@ function renderProjects(){
   for(const [value,label] of [["exploring","Exploring"],["active","Active"],["paused","Paused"],["completed","Completed"]]){const o=document.createElement("option");o.value=value;o.textContent=label;select.append(o)}
   select.value=p.status;select.onchange=()=>{p.status=select.value;p.updated_at=new Date().toISOString();persistProjects();renderProjects()};
   controls.append(select);
-  const see=texts(controls,"button","Show matching papers");see.type="button";see.onclick=()=>{choose.value=p.id;pickedProject=p.id;renderRecommendations();$("research-recs").scrollIntoView({behavior:"smooth",block:"start"})};
+  const see=texts(controls,"button","Show matching papers");see.type="button";see.onclick=()=>{choose.value=p.id;pickedProject=p.id;renderRecommendations();document.getElementById("library-research-tools")?.setAttribute("open","");$("research-recs").scrollIntoView({behavior:"smooth",block:"start"})};
   const edit=texts(controls,"button","Edit");edit.type="button";edit.onclick=()=>{
     $("research-project-title").value=p.title;$("research-project-question").value=p.question;$("research-project-keywords").value=p.keywords;
     $("research-project-id").value=p.id;$("research-project-save").textContent="Update question";$("research-project-title").focus()};
@@ -211,10 +211,20 @@ function startup(){
    if(e.key===PROJECTS){projects=(Array.isArray(read(PROJECTS,[]))?read(PROJECTS,[]):[]).map(R.cleanProject).filter(Boolean);render()}
    if(e.key===META){settings=read(META,{interests:[],authors:[]});drawSettings();renderRecommendations()}
  });
+ let loaded=false;
+ function loadSuggestions(){
+  if(loaded)return;
+  loaded=true;
  fetch("./data/feed.json",{cache:"no-store"}).then(r=>{if(!r.ok)throw Error("HTTP "+r.status);return r.json()})
   .then(j=>{feed=Array.isArray(j.papers)?j.papers:[];message($("research-rec-status"),
     "Scored "+feed.length+" locally indexed arXiv records. This is lexical matching, not a novelty assessment.");renderRecommendations();loadLiveArxiv()})
   .catch(()=>{message($("research-rec-status"),"Announcement snapshot unavailable; trying live arXiv-linked literature.");loadLiveArxiv()});
+ }
+ const tools=document.getElementById("library-research-tools");
+ if(tools){
+  tools.addEventListener("toggle",()=>{if(tools.open)loadSuggestions()});
+  if(tools.open)loadSuggestions();
+ }else loadSuggestions();
  render();
 }
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",startup);else startup();

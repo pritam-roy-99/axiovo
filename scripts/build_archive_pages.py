@@ -1,0 +1,171 @@
+#!/usr/bin/env python3
+"""Generate the three static archive entry pages from one accessible layout."""
+
+from argparse import ArgumentParser
+from pathlib import Path
+
+DOCS = Path(__file__).resolve().parents[1] / "docs"
+ARCHIVES = {
+    "arxiv": ("arXiv", "https://arxiv.org/search/", "submission"),
+    "biorxiv": ("bioRxiv", "https://www.biorxiv.org/", "posting"),
+    "chemrxiv": ("ChemRxiv", "https://chemrxiv.org/", "posting"),
+}
+TEMPLATE = """<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Browse {name} by archive subject, research topic and sub-subtopic. Search and read source-linked preprints in Axiovo.">
+<title>Explore {name} research | Axiovo</title>
+<link rel="icon" type="image/svg+xml" href="./icons/axiovo.svg">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="stylesheet" href="./theme.css">
+<link rel="stylesheet" href="./research-entry.css">
+<link rel="stylesheet" href="./axiovo-shell.css?v=2">
+<link rel="stylesheet" href="./research-desk.css">
+<link rel="stylesheet" href="./topic-explorer.css">
+<script defer src="./theme.js"></script>
+<script defer src="./navigation.js"></script>
+<script defer src="./arxiv-versions.js"></script>
+<script defer src="./arxiv-daily-archive.js"></script>
+<script defer src="./archive-taxonomy.js"></script>
+<script defer src="./topic-atlas.js"></script>
+<script defer src="./archive-data.js"></script>
+<script defer src="./abstract-audio.js"></script>
+<script defer src="./author-follow.js"></script>
+<script defer src="./topic-explorer.js"></script>
+<script defer src="./pwa.js"></script>
+</head>
+<body class="axiovo-archive-page axiovo-research axiovo-explore" data-explore-source="{source}">
+<header></header>
+<main class="rd-page ex-page">
+ <section class="ex-hero" aria-labelledby="archive-title">
+  <nav class="ex-archives" aria-label="Preprint archives">{navigation}</nav>
+  <div class="ex-hero-copy">
+   <div><p class="rd-kicker">TOPIC EXPLORER</p><h1 id="archive-title">Explore {name}</h1>
+   <p>Choose an archive subject, then narrow with Axiovo’s own subfields and sub-subtopics.</p></div>
+   <p class="ex-count" id="archive-taxonomy-count">Loading the topic directory…</p>
+  </div>
+ </section>
+ <noscript><p>Enable JavaScript to use the topic explorer or <a href="{official}">search {name} directly</a>.</p></noscript>
+ <div class="ex-layout">
+  <aside class="ex-sidebar" aria-label="Explore by research topic">
+   <section class="rd-panel ex-guide" aria-labelledby="ex-guide-title">
+    <p class="rd-kicker">BROWSE THE TOPIC MAP</p>
+    <h2 id="ex-guide-title">Choose a research path</h2>
+    <form id="archive-topic-finder" role="search" class="ex-finder">
+     <label class="rd-label" for="archive-topic-find">Find any subject, topic or sub-subtopic</label>
+     <input id="archive-topic-find" type="search" placeholder="Name, method or category code" maxlength="100" autocomplete="off" aria-describedby="archive-topic-find-status">
+     <p id="archive-topic-find-status" class="rd-sr-only" role="status"></p>
+     <div id="archive-topic-suggestions" class="ex-suggestions" hidden></div>
+    </form>
+    <div class="ex-steps">
+     <label for="archive-field"><span class="ex-step-number" aria-hidden="true">1</span> Archive subject</label>
+     <select id="archive-field"><option value="">All subjects</option></select>
+     <label for="archive-topic"><span class="ex-step-number" aria-hidden="true">2</span> Research subfield</label>
+     <select id="archive-topic" disabled><option value="">Choose a subject first</option></select>
+     <div class="ex-choices" id="archive-topic-options" role="group" aria-label="Suggested research subfields" hidden></div>
+     <label for="archive-subfield"><span class="ex-step-number" aria-hidden="true">3</span> Sub-subtopic</label>
+     <select id="archive-subfield" disabled><option value="">Choose a research topic first</option></select>
+     <div class="ex-choices" id="archive-subtopic-options" role="group" aria-label="Suggested sub-subtopics" hidden></div>
+    </div>
+    <div class="ex-guide-actions">
+     <a class="rd-button rd-primary" href="#archive-results-heading">See papers <span aria-hidden="true">↓</span></a>
+     <button class="rd-button rd-secondary" id="archive-clear-path" type="button" disabled>Clear path</button>
+    </div>
+    <details class="ex-personal">
+     <summary>My topics and saved paths</summary>
+     <p class="rd-small">Add your own topics and sub-subtopics, or keep this path on this device.</p>
+     <button class="rd-button rd-secondary" id="archive-save-path" type="button" disabled>Save current path</button>
+     <div id="archive-saved-paths" class="ex-personal-list"></div>
+     <form id="archive-custom-form">
+      <label for="archive-custom-kind">Add a<select id="archive-custom-kind"><option value="topic">Research topic</option><option value="subtopic">Sub-subtopic under the selected topic</option></select></label>
+      <label for="archive-custom">Name<input id="archive-custom" type="text" maxlength="85" placeholder="e.g. your method or research question" required></label>
+      <button class="rd-button rd-secondary" type="submit" id="archive-custom-add" disabled>Add to this subject</button>
+     </form>
+     <div id="archive-custom-list" class="ex-personal-list"></div>
+     <button class="rd-button rd-secondary" id="archive-reset-custom" type="button" hidden>Reset personal topics for this subject</button>
+     <p id="archive-personal-status" class="rd-small" role="status"></p>
+    </details>
+   </section>
+  </aside>
+  <div class="ex-main">
+   <section class="rd-panel ex-search" aria-labelledby="archive-search-heading">
+    <h2 id="archive-search-heading">Search {name} papers</h2>
+    <p class="rd-small" id="archive-scope-label">Scope: the whole archive.</p>
+    <form id="archive-search-form" role="search">
+     <label class="rd-label" for="archive-query">Keywords, title or paper identifier</label>
+     <div class="rd-searchbar"><input id="archive-query" type="search" maxlength="220" placeholder="Search within the selected path"><button class="rd-button rd-primary" type="submit">Search papers</button></div>
+     <div class="ex-date-presets" role="group" aria-label="Date shortcuts">
+      <button class="rd-button rd-secondary" id="archive-latest" type="button">Latest papers</button>
+      {latest_verified}
+      <button class="rd-button rd-secondary" id="archive-week" type="button">Past 7 days</button>
+      <button class="rd-button rd-secondary" id="archive-date-open" type="button">Choose dates</button>
+     </div>
+     <details class="rd-advanced" id="archive-advanced"><summary>Author, dates and other filters</summary>
+      <div class="rd-filter-grid">
+       <label>Author<input id="archive-author" type="search" maxlength="100" placeholder="Given name and surname" list="archive-author-options"></label>
+       <datalist id="archive-author-options"></datalist>
+       <label>{date_label} from<input id="archive-from" type="date"></label>
+       <label>{date_label} through<input id="archive-to" type="date"></label>
+       <label>Match<select id="archive-match"><option value="metadata">Title and metadata</option><option value="title">Title only</option></select></label>
+       <label>Sort<select id="archive-sort"><option value="relevance">Relevance</option><option value="recent">Newest</option><option value="cited">Most cited where available</option></select></label>
+       <label>Affiliation<input id="archive-affiliation" type="search" maxlength="100" placeholder="When supplied by source"></label>
+      </div>
+      {crosslist}
+     </details>
+    </form>
+   </section>
+   <section class="ex-results" aria-labelledby="archive-results-heading">
+    <div class="rd-section-heading"><div><p class="rd-kicker">SOURCE-LINKED RECORDS</p><h2 id="archive-results-heading" tabindex="-1">Papers</h2></div><a class="rd-text-link" href="./desk.html#rd-queue-heading">Open comparison shortlist →</a></div>
+    <div class="rd-panel ex-result-summary">
+     <p id="archive-result-count" role="status" aria-live="polite">Loading papers…</p>
+     <p id="archive-sync-status" class="rd-small">Coverage depends on the selected dates and metadata provider.</p>
+     <details id="archive-match-details" class="rd-advanced" hidden><summary>How this topic is matched</summary><p class="rd-small" id="archive-match-terms"></p></details>
+    </div>
+    <div id="archive-results"></div>
+    <div id="archive-result-actions" class="rd-actions"></div>
+   </section>
+  </div>
+ </div>
+</main>
+</body>
+</html>
+"""
+
+
+def render(source, name, official, dates):
+    navigation = "".join(
+        f'<a href="./{slug}.html"'
+        + (' aria-current="page"' if source == slug else "")
+        + f'><span class="rd-source-dot {slug}" aria-hidden="true"></span>{display}</a>'
+        for slug, (display, _, _) in ARCHIVES.items()
+    )
+    crosslist = (
+        '<label class="ex-crosslist"><input id="archive-crosslisted" type="checkbox"> Papers with multiple arXiv categories</label>'
+        if source == "arxiv" else ""
+    )
+    page = TEMPLATE.format(
+        source=source, name=name, official=official, navigation=navigation, crosslist=crosslist,
+        date_label="First submitted (UTC)" if dates == "submission" else "Posted",
+        latest_verified=('<button class="rd-button rd-secondary" id="archive-latest-verified" type="button">Latest verified day</button>' if source == "arxiv" else ""),
+    )
+    return "\n".join(line.rstrip() for line in page.splitlines()) + "\n"
+
+
+def main():
+    parser = ArgumentParser(description=__doc__)
+    parser.add_argument("--check", action="store_true", help="Verify the checked-in pages match the template")
+    args = parser.parse_args()
+    for source, (name, official, dates) in ARCHIVES.items():
+        page = DOCS / (source + ".html")
+        content = render(source, name, official, dates)
+        if args.check:
+            if not page.is_file() or page.read_text() != content:
+                raise SystemExit(f"Regenerate {page.name} with scripts/build_archive_pages.py")
+        else:
+            page.write_text(content)
+
+
+if __name__ == "__main__":
+    main()

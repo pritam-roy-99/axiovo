@@ -221,3 +221,25 @@
 @media(max-width:405px){
   .rd-sidebar,.rd-filter-grid {grid-template-columns:minmax(0,1fr)}
 }
+
+.rd-topic-home {grid-template-columns:minmax(0,1.65fr) minmax(0,1fr);padding:clamp(22px,4.3vw,53px);gap:25px}
+.rd-topic-home h1 {font-size:clamp(2.15rem,4.9vw,3.85rem);max-width:15ch;line-height:1.03}
+.rd-topic-home .rd-lead {margin-bottom:12px}
+.rd-topic-home .rd-actions .rd-button {min-height:42px;font-size:.85rem}
+.rd-hero-link {background:#173d5b;color:#f3faff;border-color:#658aa3}
+.rd-topic-preview {padding:16px;border:1px solid #9bc2d75c;border-radius:12px;background:#091f34aa;font-size:.87rem}
+.rd-topic-preview>span {color:#b9e6f3;font-size:.72rem;font-weight:800;letter-spacing:.08em}
+.rd-topic-preview ol {padding-left:1.4em;margin:10px 0}
+.rd-topic-preview li {padding:4px 0;line-height:1.38}
+.rd-topic-preview li:last-child {font-weight:770;color:#b9f3ee}
+.rd-topic-home .rd-topic-preview a {color:#f2faff;font-weight:750;font-size:.82rem}
+.rd-tour-first {display:block;margin-top:15px;padding:14px}
+.rd-tour-first .rd-tour-copy {margin-bottom:9px}
+.rd-tour-first .rd-tour-copy>p:not(.rd-kicker) {margin-top:4px}
+.rd-tour-first .rd-tour-copy details {margin-top:7px}
+.rd-tour-first video {width:100%;height:auto;max-height:330px;object-fit:contain}
+@media(max-width:690px){
+ .rd-topic-home {grid-template-columns:minmax(0,1fr);gap:14px}
+ .rd-topic-preview {padding:11px 13px}
+ .rd-topic-preview ol {margin:6px 0}
+}
