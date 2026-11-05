@@ -2,10 +2,10 @@
 /* This is a browser-local researcher dashboard; no private data is uploaded. */
 (()=>{
 const $=id=>document.getElementById(id);
-const META_KEY="researchlens-library-metadata-v1";
-const OLD_KEY="researchlens-reading-list";
-const FIELD_KEY="researchlens-field-saved-v1";
-const PROJECT_KEY="researchlens-research-projects-v1";
+const META_KEY="axiovo-library-metadata-v1";
+const OLD_KEY="axiovo-reading-list";
+const FIELD_KEY="axiovo-field-saved-v1";
+const PROJECT_KEY="axiovo-research-projects-v1";
 const COLLECTION_KEY="axiovo-paper-collections-v1";
 let activeCollection="all";
 function collections(){const val=read(COLLECTION_KEY,[]);return Array.isArray(val)?val.filter(x=>x&&typeof x.name==="string"&&Array.isArray(x.paper_keys)):[]}
@@ -37,21 +37,21 @@ function updateCollectionFilter(){
 }
 
 const fieldPrefs=()=>{
- try{const p=JSON.parse(localStorage.getItem("researchlens-field-explorer-v1")||"{}");return p&&typeof p==="object"?p:{}}catch{return{}}};
+ try{const p=JSON.parse(localStorage.getItem("axiovo-field-explorer-v1")||"{}");return p&&typeof p==="object"?p:{}}catch{return{}}};
 function read(key,fallback){try{return JSON.parse(localStorage.getItem(key)||"null")??fallback}catch{return fallback}}
 function write(key,data){try{localStorage.setItem(key,JSON.stringify(data));return true}catch{return false}}
 const statuses=new Set(["to-read","reading","done","cited"]); // done means reviewed in existing saved data
 let metadata=read(META_KEY,{});if(!metadata||typeof metadata!=="object"||Array.isArray(metadata))metadata={};
 let lookup=new Map(),recent=[],storedFeed=[];
 const paperKey=w=>w.key||w.arxiv_id&&"arxiv:"+w.arxiv_id||w.id&&"openalex:"+w.id||"";
-const arxivID=raw=>window.ResearchLensArxiv?.parse(raw)?.requested||"";
-function normalizeArxiv(p,requestedId){const id=arxivID(requestedId||p.id)||arxivID(p.link);if(!id)return null;return{key:"arxiv:"+id,arxiv_id:id,title:p.title||("arXiv:"+id),authors:p.authors||[],date:p.published||"",url:window.ResearchLensArxiv.abs(id),doi:p.doi||""}}
+const arxivID=raw=>window.AxiovoArxiv?.parse(raw)?.requested||"";
+function normalizeArxiv(p,requestedId){const id=arxivID(requestedId||p.id)||arxivID(p.link);if(!id)return null;return{key:"arxiv:"+id,arxiv_id:id,title:p.title||("arXiv:"+id),authors:p.authors||[],date:p.published||"",url:window.AxiovoArxiv.abs(id),doi:p.doi||""}}
 function normalizeOpenAlex(p){if(!p||typeof p!=="object")return null;const id=typeof p.id==="string"&&/^https:\/\/openalex.org\//.test(p.id)?p.id:null;if(!id)return null;
 const a=(p.authorships||[]).map(x=>x.author?.display_name).filter(Boolean);const link=(p.best_oa_location?.landing_page_url||p.doi||id);
 return {key:"openalex:"+id,title:p.display_name||p.title||"Untitled research",authors:a,date:String(p.publication_year||""),url:link,doi:p.doi||"",openalex_id:id}}
 function library(){
  const list=new Map();
- const local=read(OLD_KEY,[]);if(Array.isArray(local))for(const raw of local){const id=arxivID(raw);if(id)list.set("arxiv:"+id,normalizeArxiv(storedFeed.find(x=>window.ResearchLensArxiv?.base(x.id)===window.ResearchLensArxiv?.base(id))||{id},id))}
+ const local=read(OLD_KEY,[]);if(Array.isArray(local))for(const raw of local){const id=arxivID(raw);if(id)list.set("arxiv:"+id,normalizeArxiv(storedFeed.find(x=>window.AxiovoArxiv?.base(x.id)===window.AxiovoArxiv?.base(id))||{id},id))}
  const ext=read(FIELD_KEY,[]);if(Array.isArray(ext))for(const paper of ext){const p=normalizeOpenAlex(paper);if(p){const match=paper.locations?.map(x=>arxivID(x.landing_page_url||x.pdf_url)).find(Boolean);if(match&&list.has("arxiv:"+match))continue;list.set(p.key,p)}}
  return [...list.values()].filter(Boolean);
 }
@@ -59,7 +59,7 @@ function text(parent,tag,value,className){const el=document.createElement(tag);e
 function link(parent,label,url){if(!/^https:\/\//.test(url||""))return;const a=text(parent,"a",label);a.href=url;a.target="_blank";a.rel="noopener noreferrer"}
 function download(filename,content,mime){const blob=new Blob([content],{type:mime});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download=filename;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000)}
 function bib(p){const a=(p.authors||[]).join(" and ").replace(/[{}]/g,"");const key=(p.authors?.[0]?.split(" ").slice(-1)[0]||"research").replace(/\W/g,"")+"_"+(p.date||"nd").slice(0,4)+"_"+(p.title||"work").split(/\W+/).slice(0,2).join("");let out="@article{"+key+",\n  title = {"+p.title.replace(/[{}]/g,"")+"},\n  author = {"+a+"},\n  year = {"+(p.date||"").slice(0,4)+"},\n";if(p.arxiv_id)out+="  eprint = {"+p.arxiv_id+"},\n  archivePrefix = {arXiv},\n";if(p.doi)out+="  doi = {"+p.doi.replace(/^https:\/\/doi.org\//,"")+"},\n";out+="  url = {"+p.url+"}\n}\n";return out}
-function fillFocus(){const p=fieldPrefs();const names={general:"All research disciplines",quantum:"Quantum information & physics",statmech:"Statistical mechanics",condmat:"Condensed matter physics",highenergy:"High-energy physics & particle physics",mathematics:"Mathematics",astrophysics:"Astronomy & astrophysics",computer:"Computer science & AI",biology:"Biology & bioinformatics",medicine:"Medicine & public health",chemistry:"Chemistry & materials",engineering:"Engineering & robotics",social:"Social sciences & economics"};const label=names[p.field]||"Choose your research field";$("focus-name").textContent=label;const API=window.ResearchLensInterests;const followed=API?.get(read(API.KEY,{}),p.field||"general",p.topic||"")||[];$("focus-summary").textContent=(p.subtopic?"Current interest: "+p.topic+" / "+p.subtopic+". ":p.topic?"Current area: "+p.topic+". ":"Choose a field and area in Discover. ")+(followed.length?"Following: "+followed.slice(0,3).join(", ")+(followed.length>3?" and more.":"."):"Star specialized interests in Discover to personalize recommendations.");}
+function fillFocus(){const p=fieldPrefs();const names={general:"All research disciplines",quantum:"Quantum information & physics",statmech:"Statistical mechanics",condmat:"Condensed matter physics",highenergy:"High-energy physics & particle physics",mathematics:"Mathematics",astrophysics:"Astronomy & astrophysics",computer:"Computer science & AI",biology:"Biology & bioinformatics",medicine:"Medicine & public health",chemistry:"Chemistry & materials",engineering:"Engineering & robotics",social:"Social sciences & economics"};const label=names[p.field]||"Choose your research field";$("focus-name").textContent=label;const API=window.AxiovoInterests;const followed=API?.get(read(API.KEY,{}),p.field||"general",p.topic||"")||[];$("focus-summary").textContent=(p.subtopic?"Current interest: "+p.topic+" / "+p.subtopic+". ":p.topic?"Current area: "+p.topic+". ":"Choose a field and area in Discover. ")+(followed.length?"Following: "+followed.slice(0,3).join(", ")+(followed.length>3?" and more.":"."):"Star specialized interests in Discover to personalize recommendations.");}
 function paperCard(p){const art=document.createElement("article");art.className="rl-paper";const h=document.createElement("h3");const a=document.createElement("a");a.href=p.url;a.textContent=p.title;a.target="_blank";a.rel="noopener noreferrer";h.append(a);art.append(h);
 text(art,"p",(p.authors||[]).slice(0,4).join(", ")+(p.authors?.length>4?" et al.":"")+(p.date?" · "+p.date.slice(0,10):""),"rl-paper-meta");
 const r=text(art,"div","","rl-paper-actions");if(p.arxiv_id){const detail=document.createElement("a");detail.href="./paper.html?id="+encodeURIComponent(p.arxiv_id);detail.textContent="Paper details";detail.className="rl-paper-primary";r.append(detail)}link(r,"Read on arXiv",p.url);
@@ -103,7 +103,7 @@ for(const p of filtered.slice(0,50)){
   title.htmlFor="axiovo-project-"+p.arxiv_id;project.id=title.htmlFor;
   project.setAttribute("aria-label","Attach "+p.title+" to research question");
   let empty=document.createElement("option");empty.value="";empty.textContent=projects.length?"Choose question…":"Create a research question above";project.append(empty);
-  const base=window.ResearchLensArxiv?.base(p.arxiv_id)||p.arxiv_id;
+  const base=window.AxiovoArxiv?.base(p.arxiv_id)||p.arxiv_id;
   for(const q of projects){const opt=document.createElement("option");opt.value=q.id;opt.textContent=q.title;
    if(Array.isArray(q.paper_ids)&&q.paper_ids.includes(base))opt.textContent="✓ "+q.title+" (linked)";
    project.append(opt)}
@@ -143,9 +143,9 @@ function init(){
  renderLibrary();
  fetch("./data/feed.json",{cache:"no-store"}).then(r=>{if(!r.ok)throw Error("HTTP "+r.status);return r.json()}).then(data=>{storedFeed=Array.isArray(data.papers)?data.papers:[];if($("feed-status"))$("feed-status").textContent= "Latest arXiv announcements: "+storedFeed.length+" records · refreshed "+(data.generated_at?new Date(data.generated_at).toLocaleString():"date unavailable");showRecent();renderLibrary()}).catch(()=>{if($("feed-status"))$("feed-status").textContent="Recent feed is temporarily unavailable. Saved papers are still accessible.";if($("recent-list"))text($("recent-list"),"div","Please try the arXiv feed from the navigation.","rl-empty")});
  window.addEventListener("storage",()=>{fillFocus();renderLibrary()});
- window.addEventListener("researchlens-library-change",renderLibrary);
+ window.addEventListener("axiovo-library-change",renderLibrary);
  window.addEventListener("axiovo:projects-updated",renderLibrary);
- window.addEventListener("researchlens:workspace-activated",()=>{fillFocus();renderLibrary()});
+ window.addEventListener("axiovo:workspace-activated",()=>{fillFocus();renderLibrary()});
 }
 init();
 })();
