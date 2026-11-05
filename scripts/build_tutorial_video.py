@@ -131,6 +131,7 @@ def main():
             audio_entries=[]
             captions=["WEBVTT",""]
             voices_used=set()
+            chapters=[]
             elapsed=0.0
             with sync_playwright() as p:
                 browser=p.chromium.launch(headless=True,args=["--no-sandbox","--disable-dev-shm-usage"])
@@ -173,6 +174,7 @@ def main():
                     duration=media_duration(sound)
                     video_entries.extend([f"file '{shot.as_posix()}'",f"duration {duration:.3f}"])
                     audio_entries.append(f"file '{sound.as_posix()}'")
+                    chapters.append({"step":index,"title":title,"instruction":hint,"start_seconds":round(elapsed,2),"duration_seconds":round(duration,2)})
                     captions.extend([f"{cue(elapsed)} --> {cue(elapsed+duration-0.2)}",narration,""])
                     elapsed+=duration
                 browser.close()
@@ -192,6 +194,7 @@ def main():
             (OUT/"axiovo-tour.vtt").write_text("\n".join(captions)+"\n",encoding="utf-8")
             (OUT/"axiovo-tour-build.json").write_text(json.dumps({
                 "scenes":len(steps),"duration_seconds":round(elapsed,1),"voices":sorted(voices_used),
+                "chapters":chapters,
                 "source":"Real Chromium page captures","pronunciation":"Spoken-word technical corrections"
             },indent=2),encoding="utf-8")
             print(f"Axiovo tutorial recorded from actual pages: {len(steps)} steps, ~{elapsed:.0f} seconds, {output.stat().st_size} bytes",flush=True)
