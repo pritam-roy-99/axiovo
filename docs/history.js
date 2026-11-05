@@ -144,8 +144,11 @@ function showDaily(p){
  const selected=results.slice(start,start+PAGE_SIZE);
  for(const paper of selected){const card=paperCard(Cache.toWork(paper));if(card)root.append(card)}
  if(!selected.length)root.append(el("div","No arXiv first submissions match these filters in the fully harvested dates.","empty"));
- $("history-count").textContent=found.toLocaleString()+" matching papers across "+dailyResult.coveredDays+" complete arXiv submission date(s)";
- historyInfo("Complete dated archive for these UTC days ("+dailyResult.totalHarvested.toLocaleString()+" source records). Showing every matching first submission through pagination, not a limited sample.",p.q);
+ $("history-count").textContent=found.toLocaleString()+" matching papers from "+dailyResult.coveredDays+"/"+dailyResult.requestedDays+" fully harvested UTC date(s)";
+ const incomplete=dailyResult.missing.length>0;
+ historyInfo(incomplete?
+  "PARTIAL DATE COVERAGE: "+dailyResult.missing.length+" requested UTC date(s) have not been certified ("+dailyResult.missing.slice(0,6).join(", ")+(dailyResult.missing.length>6?", …":"")+"). Showing every matching paper from verified days only; not all papers in the requested range.":
+  "COMPLETE DATE BATCH: "+dailyResult.totalHarvested.toLocaleString()+" original arXiv submissions verified across all "+dailyResult.coveredDays+" requested UTC days. All matching papers are available through pagination.",p.q);
  pager();
 }
 function pager(){
@@ -178,7 +181,7 @@ async function search(n=1,fromUrl=false){
   try{
    const archived=await Daily.search({from,to,query:p.q,category:p.category,sort:p.sort,signal:controller.signal});
    if(controller.signal.aborted)return;
-   if(archived.complete){
+   if(archived.complete||archived.papers?.length){
     dailyResult=archived;dailySignature=signature;
     showDaily(p);
     return;

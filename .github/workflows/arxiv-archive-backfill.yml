@@ -4,6 +4,10 @@ on:
     branches: [main]
     paths:
       - .github/workflows/arxiv-archive-backfill.yml
+  schedule:
+    # Independent SciRate-style ingestion: revisit closed UTC dates and
+    # gradually backfill older gaps without competing with hourly OAI pulls.
+    - cron: '23 8,20 * * *'
   workflow_dispatch:
     inputs:
       from_date:
@@ -23,7 +27,7 @@ jobs:
   backfill:
     name: Harvest all arXiv first submissions for verified UTC dates
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

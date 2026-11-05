@@ -20,6 +20,7 @@ import tempfile
 import time
 import urllib.parse
 import urllib.request
+import urllib.error
 import xml.etree.ElementTree as ET
 
 try:
@@ -34,6 +35,7 @@ BASE = "https://export.arxiv.org/api/query"
 ATOM = "{http://www.w3.org/2005/Atom}"
 OPENSEARCH = "{http://a9.com/-/spec/opensearch/1.1/}"
 RECORDS_PER_PAGE = 1000
+RETRY_DELAYS = (12, 30, 60)  # Respect arXiv rate limits rather than immediately hammering a shared IP
 REQUEST_DELAY = 3.2
 MAX_PAGES_PER_DAY = 20
 BACKFILL_DAYS = 180
@@ -85,8 +87,23 @@ def fetch_day(day: dt.date, opener=None, sleep=time.sleep) -> dict:
                 "Axiovo/0.7 (https://github.com/pritam-roy-99/axiovo; daily submittedDate metadata)"),
             "Accept": "application/atom+xml",
         })
-        with opener(req, timeout=90) as response:
-            chunk, advertised_total = parse_page(response.read())
+        raw = None
+        for attempt in range(len(RETRY_DELAYS) + 1):
+            try:
+                with opener(req, timeout=90) as response:
+                    raw = response.read()
+                break
+            except urllib.error.HTTPError as error:
+                if error.code not in (429, 500, 502, 503, 504) or attempt == len(RETRY_DELAYS):
+                    raise
+                retry_header = error.headers.get("Retry-After", "") if error.headers else ""
+                seconds = int(retry_header) if retry_header.isdecimal() else RETRY_DELAYS[attempt]
+                sleep(min(120, max(3, seconds)))
+            except (TimeoutError, OSError):
+                if attempt == len(RETRY_DELAYS):
+                    raise
+                sleep(RETRY_DELAYS[attempt])
+        chunk, advertised_total = parse_page(raw)
         if total is None:
             total = advertised_total
             if total > MAX_PAGES_PER_DAY * RECORDS_PER_PAGE:
@@ -134,7 +151,9 @@ def select_days(today: dt.date, existing: dict, count: int = 5) -> list[dt.date]
     # Today may not be fully announced; previous day is refreshed as a revision
     # can be updated between successive checks. A day is only complete for the
     # API snapshot at fetched_at, not a promise that arXiv will never change it.
-    selected = [today - dt.timedelta(days=i) for i in (0, 1, 2)]
+    # Never mark an in-progress UTC day as fully covered.
+    # Two recently closed days are checked again for late metadata revisions.
+    selected = [today - dt.timedelta(days=i) for i in (1, 2)]
     for age in range(3, BACKFILL_DAYS + 1):
         day = today - dt.timedelta(days=age)
         if day.isoformat() not in existing.get("days", {}):
@@ -152,8 +171,8 @@ def manual_days(start: str, end: str, limit: int = 31) -> list[dt.date]:
     number = (last - first).days + 1
     if number > limit:
         raise ValueError(f"Select at most {limit} UTC days per manual backfill")
-    if last > dt.datetime.now(dt.timezone.utc).date():
-        raise ValueError("Future arXiv submission dates cannot be backfilled")
+    if last >= dt.datetime.now(dt.timezone.utc).date():
+        raise ValueError("Only completed UTC submission days can be backfilled")
     return [first + dt.timedelta(days=n) for n in range(number)]
 
 
@@ -164,6 +183,8 @@ def run(today: dt.date | None = None, count: int = 5, fetcher=fetch_day, days=No
     errors = []
     for day in (days if days is not None else select_days(today, manifest, count)):
         try:
+            if day >= today:
+                raise ValueError("UTC day has not finished; do not certify a partial date")
             payload = fetcher(day)
             if payload.get("date") != day.isoformat() or payload.get("complete") is not True:
                 raise RuntimeError("Unverified fetcher output")
@@ -202,3 +223,5 @@ if __name__ == "__main__":
     # stop the rest of the website from deploying.
     if result["failed"]:
         print("WARNING: some daily batches are unavailable; completeness remains explicit")
+    if not result["complete_days"]:
+        raise SystemExit("No completed arXiv date batches could be verified; leaving earlier archive untouched")

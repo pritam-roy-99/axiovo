@@ -202,21 +202,72 @@ def read_verified_daily_records(today=None, lookback=7):
     return list(verified.values())
 
 
+def read_oai_recent():
+    """Use all-category OAI-PMH harvest as the primary recent discovery source.
+
+    OAI datestamps refer to metadata updates, not first-submission or
+    announcement dates. OAI results improve recent coverage but must never
+    be used to certify a complete submission-day archive.
+    """
+    source = ROOT / "docs" / "data" / "oai-recent.json"
+    try:
+        snapshot = json.loads(source.read_text(encoding="utf8"))
+    except (OSError, ValueError, TypeError):
+        return [], False
+    results = []
+    for item in snapshot.get("papers", []):
+        identifier = str(item.get("id", ""))
+        if not re.fullmatch(r"(?:\d{4}\.\d{4,5}|[a-z-]+(?:\.[A-Za-z]{2})?/\d{7})", identifier, re.I):
+            continue
+        created = str(item.get("created", ""))
+        if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", created):
+            continue
+        # OAI 'created' has day resolution. Never invent an exact submission time.
+        updated = str(item.get("updated") or created)
+        updated = updated[:10] if re.fullmatch(r"\d{4}-\d{2}-\d{2}.*", updated) else created
+        categories = item.get("categories") or []
+        if not isinstance(categories, list):
+            categories = []
+        results.append({
+            "id": identifier, "version": 1,
+            "title": str(item.get("title", "")).strip(),
+            "abstract": str(item.get("abstract", "")).strip(),
+            "authors": list(item.get("authors") or []),
+            "categories": categories,
+            "primary_category": categories[0] if categories else "",
+            "published": created + "T00:00:00Z",
+            "published_date_precision": "day",
+            "updated": updated + "T00:00:00Z",
+            "link": "https://arxiv.org/abs/" + identifier,
+            "topics": [], "doi": str(item.get("doi", "")),
+            "metadata_source": "arXiv OAI-PMH",
+        })
+    return [p for p in results if p["title"]], bool(snapshot.get("complete_window"))
+
+
 def main():
     try:
         old = json.loads(TARGET.read_text(encoding="utf-8")) if TARGET.exists() else {}
     except (ValueError, OSError):
         old = {}
-    fresh = read_verified_daily_records()
-    if fresh:
-        print("Using",len(fresh),"complete-date submissions instead of sampled category batches")
-    else:
-        print("No complete recent daily archive available; falling back to category sampling")
+    dated = read_verified_daily_records()
+    oai_records, oai_complete = read_oai_recent()
+    if dated:
+        print("Verified complete-date records:", len(dated))
+    if oai_records:
+        print("All-category OAI-PMH records:", len(oai_records), "; latest update window complete:", oai_complete)
+    fresh = dated + oai_records
+    if not fresh:
+        print("No verified date shards or OAI metadata available; falling back to sampled categories")
         fresh = fetch_recent()
     pinned = read_pinned_ids()
-    historical = fetch_by_ids(pinned)
+    # Do not repeatedly request already-cached historical IDs every hour;
+    # this previously amplified arXiv HTTP 429 responses.
+    covered_ids = {p["id"] for p in old.get("papers", []) + fresh if p.get("id")}
+    pending = [id for id in pinned if re.sub(r"v\d+$", "", id) not in covered_ids]
+    historical = fetch_by_ids(pending)
     if pinned:
-        print("Pinned ID lookup:", len(historical), "resolved of", len(pinned))
+        print("Pinned ID lookup:", len(historical), "newly resolved of", len(pending), "missing IDs (", len(pinned), "total pins)")
     fresh.extend(historical)
     if not fresh:
         raise RuntimeError("Empty response; retaining existing data")
@@ -227,9 +278,10 @@ def main():
     papers = merge(papers, pinned_records, limit=3500)
     payload = {
         "generated_at": dt.datetime.now(dt.timezone.utc).isoformat(),
-        "source": "arXiv Atom API (submittedDate + lastUpdatedDate)",
-        "index_scope": "limited rolling snapshots from representative arXiv categories; not the full archive",
-        "refresh_methods": ["submittedDate", "lastUpdatedDate"],
+        "source": "official arXiv OAI-PMH and verified submission-date Atom batches, with category fallback",
+        "index_scope": "all-category recent OAI harvest (partial if incomplete) and independently verified full submission-day shards; older history remains partial",
+        "refresh_methods": ["OAI-PMH", "submittedDate date archive", "Atom category fallback"],
+        "oai_window_complete": oai_complete,
         "paper_count": len(papers), "pinned_ids": pinned, "topic_catalog": topic_catalog(), "papers": papers
     }
     TARGET.parent.mkdir(parents=True, exist_ok=True)

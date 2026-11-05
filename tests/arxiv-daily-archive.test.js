@@ -49,6 +49,10 @@ const Archive=require("../docs/arxiv-daily-archive.js");
  const missing=await Archive.search({from:"2026-11-03",to:"2026-11-05",fetcher});
  assert.equal(missing.complete,false);
  assert.deepEqual(missing.missing,["2026-11-03"]);
+ assert.equal(missing.coveredDays,2);
+ assert.equal(missing.requestedDays,3);
+ assert.equal(missing.papers.length,151,"Verified days must remain browsable even if another day is unavailable");
+ assert.equal(missing.complete,false,"Partial coverage must never claim a complete batch");
  const altered=async url=>{
   const r=await fetcher(url);
   if(url.endsWith("2026-11-04.json"))return{ok:true,json:async()=>({...await r.json(),source_total:50})};
