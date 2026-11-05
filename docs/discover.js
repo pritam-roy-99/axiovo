@@ -2,6 +2,7 @@
 (function(){
 "use strict";
 function init(){
+ if(document.body.classList.contains("axiovo-home"))return;
  const arxiv=document.getElementById("arxiv-discovery");
  const scholar=document.getElementById("scholarly-discovery");
  const biology=document.getElementById("biorxiv-discovery"),c=document.getElementById("rl-source-biorxiv");
