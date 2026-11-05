@@ -2,7 +2,7 @@
 (function(root,factory){
  const api=factory();
  if(typeof module==="object"&&module.exports)module.exports=api;
- if(root)root.ResearchLensSemanticSearch=api;
+ if(root)root.AxiovoSemanticSearch=api;
 })(typeof globalThis!=="undefined"?globalThis:null,function(){
  "use strict";
  const PROFILES={
