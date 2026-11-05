@@ -54,7 +54,7 @@ def main():
             assert set(cards.evaluate_all("(els)=>els.map(x=>x.dataset.archive)"))=={"arxiv","biorxiv","chemrxiv"}
             assert page.locator("#axiovo-entry-field").count()==0
             assert page.locator("body").get_attribute("class")=="axiovo-home"
-            target_is(".rl-nav a:nth-child(1)","discover.html#discover")
+            target_is(".rl-nav a:nth-child(1)","#axiovo-archive-title")
             target_is(".rl-nav a:nth-child(2)","discover.html#workspace")
             cards.nth(2).click()
             page.wait_for_url(lambda u:urlsplit(u).path.endswith("/chemrxiv.html"))
