@@ -117,10 +117,63 @@ function followedCount(topic){return interestsAPI?.get(read(interestsAPI.KEY,{})
 function drawTopics(){const holder=$("topic-list");holder.replaceChildren();const topics=FIELDS[state.field].topics.slice().sort((a,b)=>followedCount(b)-followedCount(a));for(const t of topics){const b=node("button",t,"topic"+(state.areaSelected&&t===state.topic?" active":""));b.type="button";b.setAttribute("aria-pressed",String(state.areaSelected&&t===state.topic));b.onclick=()=>topicSelect(t);holder.append(b)}}
 function drawField(){const f=FIELDS[state.field];$("field").value=state.field;$("field-label").textContent=f.name;for(const b of $("field-choices").querySelectorAll("button"))b.setAttribute("aria-pressed",String(b.dataset.field===state.field));$("field-summary").textContent=f.summary;$("field-heading").textContent="Explore "+f.name.toLowerCase();drawTopics();drawSubtopics();const holder=$("suggestions");holder.replaceChildren();for(const q of f.queries){const b=node("button",q,"template");b.type="button";b.onclick=()=>{state.subtopic="";state.query=q;$("query").value=q;persist();drawSubtopics();page=1;search()};holder.append(b)}const w=$("workflow");w.replaceChildren();const ol=document.createElement("ol");for(const step of f.workflow){ol.append(node("li",step))}ol.style.paddingLeft="20px";w.append(ol)}
 function drawSaved(){store(SAVED,saved);$("saved-count").textContent=saved.length;const root=$("saved-list");root.replaceChildren();if(!saved.length){root.append(node("p","No saved papers yet.","muted"));return}for(const w of saved.slice().reverse().slice(0,12)){const a=node("a",w.display_name||"Untitled");a.href=w.id||w.doi||"#";a.target="_blank";a.rel="noopener noreferrer";root.append(a)}}
-function renderPaper(w){const art=node("article",undefined,"paper");const header=node("div",undefined,"row");header.append(node("span",String(w.publication_year||"Year unknown"),"pill"));if(w.cited_by_count!==null&&w.cited_by_count!==undefined)header.append(node("span",w.cited_by_count+" citations","pill"));if(w.__source==="local-arxiv")header.append(node("span","Cached arXiv · offline fallback","pill"));const access=w.open_access?.is_oa;if(access)header.append(node("span","Open access","pill"));if(w.__source==="semantic")header.append(node("span","AI semantic match · verify topic","pill rl-semantic-badge"));art.append(header);
+/* Explicit same-day searches are arXiv announcement searches, not OpenAlex publication searches.
+ * Keep announcement dates separate from original submission dates.
+ */
+const ARCHIVE_MAP={
+ quantum:["quant-ph"],mathematics:["math","math-ph"],astrophysics:["astro-ph","gr-qc"],
+ computer:["cs"],biology:["q-bio"],medicine:["q-bio"],chemistry:["physics","cond-mat"],
+ engineering:["eess","physics"],condmat:["cond-mat"],statmech:["cond-mat"],
+ highenergy:["hep-","gr-qc","nucl-"],social:["econ","q-fin","physics"],general:[]
+};
+function announcementMatches(p,query,field){
+ const list=ARCHIVE_MAP[field]||[];
+ const categories=[p.primary_category,...(p.categories||[])].filter(Boolean);
+ const domain=!list.length||categories.some(cat=>list.some(prefix=>cat===prefix||cat.startsWith(prefix+".")||cat.startsWith(prefix+"-")));
+ if(!domain)return false;
+ const words=String(query||"").toLowerCase().split(/\\s+/).filter(Boolean);
+ if(!words.length)return true;
+ const hay=[p.id,p.title,p.abstract,...(p.authors||[])].join(" ").toLowerCase();
+ return words.every(w=>hay.includes(w));
+}
+function announcementWork(p){
+ const base=String(p.id||"");
+ return {id:"https://arxiv.org/abs/"+base,display_name:p.title,title:p.title,
+  publication_date:p.announcement_date,
+  publication_year:Number(p.announcement_date?.slice(0,4))||null,
+  authorships:(p.authors||[]).map(a=>({author:{display_name:a}})),
+  primary_location:{landing_page_url:"https://arxiv.org/abs/"+base,source:{display_name:"arXiv official announcement"}},
+  locations:[{landing_page_url:"https://arxiv.org/abs/"+base}],
+  __source:"arxiv-announcement",__abstract:p.abstract||"",
+  __announcement_date:p.announcement_date,__categories:p.categories||[]};
+}
+async function announcementDateSearch(query,from,to,field,signal){
+ if(!from||!to||from!==to)return null;
+ const today=new Date().toLocaleDateString("en-CA",{timeZone:"Asia/Kolkata"});
+ const yesterday=new Date(Date.now()-86400000).toLocaleDateString("en-CA",{timeZone:"Asia/Kolkata"});
+ if(from!==today&&from!==yesterday)return null;
+ try{
+  const response=await fetch("./data/announcements.json?ts="+Date.now(),{cache:"no-store",signal});
+  if(!response.ok)throw Error("Announcement snapshot HTTP "+response.status);
+  const batch=await response.json();
+  if(batch.announcement_date!==from||!Array.isArray(batch.papers)||!batch.papers.length){
+   return {items:[],message:"Official arXiv announcement batch for "+from+" is not yet in Axiovo. This is an ingestion delay, not evidence of zero papers. Check arXiv's new-paper listing or retry once synchronization succeeds."};
+  }
+  const records=batch.papers.filter(p=>announcementMatches(p,query,field));
+  return {items:records.map(announcementWork),
+   message:"Official arXiv announcement date "+from+": "+records.length+" matching papers from "+batch.count+" harvested entries"+
+   (batch.complete?".":". PARTIAL coverage: some archive feeds were unavailable.")+
+   " These dates are arXiv announcement dates, not OpenAlex publication or original-submission dates."};
+ }catch(error){
+  if(error.name==="AbortError")throw error;
+  return {items:[],message:"arXiv announcement records are not yet available in Axiovo ("+String(error.message||error)+"). Today's empty OpenAlex publication-date results are not authoritative. Browse arXiv's official new-paper list while this source is being synchronized."};
+ }
+}
+function renderPaper(w){const art=node("article",undefined,"paper");const header=node("div",undefined,"row");header.append(node("span",String(w.publication_year||"Year unknown"),"pill"));if(w.cited_by_count!==null&&w.cited_by_count!==undefined)header.append(node("span",w.cited_by_count+" citations","pill"));if(w.__source==="local-arxiv")header.append(node("span","Cached arXiv · offline fallback","pill"));
+if(w.__source==="arxiv-announcement")header.append(node("span","Official arXiv announcement","pill"));const access=w.open_access?.is_oa;if(access)header.append(node("span","Open access","pill"));if(w.__source==="semantic")header.append(node("span","AI semantic match · verify topic","pill rl-semantic-badge"));art.append(header);
 const h=node("h3",w.display_name||w.title||"Untitled research");art.append(h);
 const authors=(w.authorships||[]).slice(0,6).map(x=>x.author?.display_name).filter(Boolean);art.append(node("p",authors.join(", ")+(w.authorships?.length>6?" et al.":""),"authors"));
-const originalDate=w.publication_date||"";if(originalDate)art.append(node("p",(w.__source==="local-arxiv"?"arXiv first submitted: ":"Publication date in scholarly index (not verified arXiv v1): ")+originalDate,"meta"));
+const originalDate=w.publication_date||"";if(originalDate)art.append(node("p",(w.__source==="arxiv-announcement"?"arXiv announced: ":w.__source==="local-arxiv"?"arXiv first submitted: ":"Publication date in scholarly index (not verified arXiv v1): ")+originalDate,"meta"));
 const venue=w.primary_location?.source?.display_name;if(venue)art.append(node("p",venue,"authors"));
 if(w.__abstract)art.append(node("p",w.__abstract.slice(0,820)+(w.__abstract.length>820?"…":""),"summary"));if(w.abstract_inverted_index){const entries=[];for(const [term,positions] of Object.entries(w.abstract_inverted_index)){for(const pos of positions)if(pos<140)entries[pos]=term}if(entries.length)art.append(node("p",entries.filter(Boolean).join(" ").slice(0,820)+(entries.length>140?"…":""),"summary"))}
 const row=node("div",undefined,"row actions rl-paper-actionbar");const original=Arxiv?.candidates(w)[0];if(original){link(row,"Read on arXiv",Arxiv.abs(original.base));link(row,"PDF",Arxiv.pdf(original.base));}else{link(row,"OpenAlex",w.id)}
@@ -170,6 +223,14 @@ async function search(){
   const effectiveSort=sort==="relevance"&&(!q||state.areaSelected)?"publication_date:desc":sort;
  const plan=SearchCore.plan(state,q,{page,from,to,sort:effectiveSort,today});
  const ctl=new AbortController();requestController=ctl;
+ const sameDayAnnouncement=await announcementDateSearch(q,from,to,state.field,ctl.signal).catch(e=>e.name==="AbortError"?null:null);
+ if(ctl.signal.aborted||requestController!==ctl)return;
+ if(sameDayAnnouncement){
+  items=sameDayAnnouncement.items;total=items.length;busy=false;
+  setStatus(sameDayAnnouncement.message);
+  render();
+  return;
+ }
  const scope=FIELDS[plan.field].name;
  const fallbackEnabled=$("semantic-fallback")?.checked&&Boolean(SemanticCore)&&page===1;
  setStatus("Searching arXiv-hosted literature for "+scope+"…");
