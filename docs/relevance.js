@@ -1,10 +1,10 @@
-/* ResearchLens relevance: transparent lexical ranking, not semantic novelty assessment.
+/* Axiovo relevance: transparent lexical ranking, not semantic novelty assessment.
  * Pure functions are also available to the Node regression test runner.
  */
 (function(root,factory){
  const api=factory();
  if(typeof module==="object"&&module.exports)module.exports=api;
- if(root)root.ResearchLensRelevance=api;
+ if(root)root.AxiovoRelevance=api;
 })(typeof globalThis!=="undefined"?globalThis:null,function(){
  "use strict";
  const STOP=new Set(["the","and","with","for","from","into","this","that","these","those","using","based","under","over","between","through","toward","towards","study","studies","paper","new","via","our","their","are","was","were","has","have","how","can","does","when","which","what","quantum","research"]);
