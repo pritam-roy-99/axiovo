@@ -239,7 +239,7 @@ if((p.abstract||"").length>650){
  const full=document.createElement("p");full.textContent=p.abstract;
  more.append(summary,full);d.append(more);
 }
-const r=document.createElement("div");r.className="rl-paper-actionbar";const a=document.createElement("a");a.className="rl-paper-action primary";a.href="https://arxiv.org/abs/"+encodeURIComponent(p.id);a.target="_blank";a.rel="noopener noreferrer";a.textContent="Read on arXiv ↗";r.append(a);
+const r=document.createElement("div");r.className="rl-paper-actionbar";const detail=document.createElement("a");detail.className="rl-paper-action axiovo-paper-detail-action";detail.href="./paper.html?id="+encodeURIComponent(p.id);detail.textContent="Paper details";r.append(detail);const a=document.createElement("a");a.className="rl-paper-action primary";a.href="https://arxiv.org/abs/"+encodeURIComponent(p.id);a.target="_blank";a.rel="noopener noreferrer";a.textContent="Read on arXiv ↗";r.append(a);
 const saveButton=btn(saved.includes(p.id)?"Saved":"Save paper",()=>{saved=saved.includes(p.id)?saved.filter(x=>x!==p.id):[...saved,p.id];try{localStorage.setItem("researchlens-reading-list",JSON.stringify(saved))}catch(e){}window.dispatchEvent(new Event("researchlens-library-change"));showRecommendations();render()});
 saveButton.className="rl-save-button rl-paper-action"+(saved.includes(p.id)?" is-saved":"");
 saveButton.setAttribute("aria-pressed",String(saved.includes(p.id)));
@@ -268,7 +268,7 @@ r.append(btn("Copy ID",()=>navigator.clipboard?.writeText(p.id)));r.append(btn("
 const moreLabel=document.createElement("summary");moreLabel.textContent="More actions";
 const extraBody=document.createElement("div");extraBody.className="axiovo-paper-more-actions";
 for(const control of Array.from(r.children)){
- const important=control===a||control===saveButton||control===ai||
+ const important=control===detail||control===a||control===saveButton||control===ai||
  control.classList.contains("axiovo-author-follow")||
  (control.tagName==="BUTTON"&&control.textContent==="Copy BibTeX");
  if(!important)extraBody.append(control);
