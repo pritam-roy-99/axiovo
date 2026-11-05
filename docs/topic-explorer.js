@@ -238,7 +238,8 @@ function paperCard(p,c){
   const result=data.addComparison(p);
   compare.textContent=result==="added"?"In comparison":result==="full"?"Shortlist full (3 papers)":"Browser storage unavailable";
  });
- actions.append(compare);card.append(actions);window.AxiovoAuthorFollow?.attach(card,p.authors);return card;
+ actions.append(compare);card.append(actions);window.AxiovoAuthorFollow?.attach(card,p.authors);
+ window.AxiovoTopicReport?.attach(card,p,pathText());return card;
 }
 function filtered(state){
  const groups=(state.complete?[state.batch]:[state.local,state.batch,state.remote]).map(records=>data.filter(records,state.criteria));
