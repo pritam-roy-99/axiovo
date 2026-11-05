@@ -1,16 +1,16 @@
 /* ResearchLens offline shell. Do not cache remote APIs, PDFs or the live feed. */
 "use strict";
-const CACHE = "axiovo-shell-v30";
+const CACHE = "axiovo-shell-v31";
 const SHELL = [
   "./", "./index.html", "./discover.html", "./workspace.html", "./copilot.html",
-  "./lab.html", "./paper.html", "./profiles.html", "./community.html", "./methodology.html", "./privacy.html",
-  "./theme.css", "./theme.js", "./workspace.css", "./discover.css", "./paper-card-polish.css", "./research-entry.css", "./research-entry.js", "./discover-layout.css", "./discover-layout.js",
+  "./lab.html", "./paper.html", "./compare.html", "./profiles.html", "./community.html", "./methodology.html", "./privacy.html",
+  "./theme.css", "./theme.js", "./workspace.css", "./discover.css", "./paper-card-polish.css", "./research-entry.css", "./research-entry.js", "./discover-layout.css", "./discover-layout.js", "./discover-modes.js", "./research-workflow.css", "./paper-research.css",
   "./lab.css", "./paper-actions.css", "./navigation.js", "./pwa.js",
   "./research-fields.js", "./custom-taxonomy.js", "./focus-bar.js", "./scholar-search.js",
   "./cached-arxiv-search.js", "./arxiv-freshness.js", "./semantic-search.js", "./multisource-search.js", "./interests.js",
   "./scholarly.js", "./zotero-ris.js", "./library-outside-cache.js", "./local-feedback.js", "./author-follow.js", "./author-search.js", "./inspire-author.js", "./discover.js", "./arxiv-daily-archive.js", "./history.js", "./arxiv-versions.js",
   "./assistant-core.js", "./copilot.js", "./lab.js", "./workspace.js",
-  "./paper.js", "./profiles.js", "./local-backup.js", "./profiles-social.js", "./social.js",
+  "./paper.js", "./paper-research.js", "./compare.js", "./profiles.js", "./local-backup.js", "./profiles-social.js", "./social.js",
   "./social-config.js", "./cloud-sync.js", "./relevance.js",
   "./research-intelligence.js", "./unified-workspace.js", "./onboarding.js", "./biorxiv.js", "./appearance-picker.js", "./data/biorxiv.json", "./data/feed.json", "./manifest.webmanifest", "./icons/researchlens.svg"
 ];
