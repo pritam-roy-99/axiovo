@@ -57,5 +57,18 @@ async function load(){
  $("axiovo-chemrxiv-category")?.addEventListener("change",draw);
  draw();
 }
-if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",load);else load();
+function drawLibrary(){
+ let root=$("axiovo-chemrxiv-library");
+ if(!root)return;
+ root.replaceChildren();
+ const arr=saved();
+ const count=$("axiovo-chemrxiv-library-count");
+ if(count)count.textContent=arr.length+" saved ChemRxiv papers";
+ if(!arr.length){const note=document.createElement("p");note.textContent="No ChemRxiv preprints saved yet.";root.append(note);return}
+ arr.forEach(p=>root.append(card(p)));
+}
+window.addEventListener("researchlens:workspace-activated",drawLibrary);
+window.addEventListener("axiovo:chemrxiv-saved",drawLibrary);
+window.addEventListener("storage",e=>{if(e.key===KEY)drawLibrary()});
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",()=>{load();drawLibrary()});else{load();drawLibrary()}
 })();
