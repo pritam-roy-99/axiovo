@@ -116,7 +116,7 @@ function ris(p){
 }
 function recordCard(p){
  const article=node("article",undefined,"rd-result-card");
- article.append(node("p",[p.recordId,p.date,p.category,p.provenance].filter(Boolean).join(" · "),"rd-small"));
+ article.append(node("p",[p.recordId,p.date||(p.announcementDate?"Announced "+p.announcementDate:""),p.category,p.provenance].filter(Boolean).join(" · "),"rd-small"));
  const title=node("h4");title.append(link(p.title,p.url));article.append(title);
  article.append(node("p",p.authors.slice(0,6).join(", ")+(p.authors.length>6?" et al.":"")||"Authors unavailable","rd-small"));
  if(p.abstract){
