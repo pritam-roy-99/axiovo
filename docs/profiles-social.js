@@ -1,6 +1,6 @@
 /* Optional public profiles and follows, enabled only after Supabase setup. */
 (async function(){
-const cfg=window.ResearchLensSocialConfig||{};
+const cfg=window.AxiovoSocialConfig||{};
 if(!cfg.url||!cfg.anonKey||!/^https:\/\/[a-z0-9-]+\.supabase\.co$/i.test(cfg.url))return;
 const $=id=>document.getElementById(id);
 const root=$("hosted-accounts");if(!root)return;
