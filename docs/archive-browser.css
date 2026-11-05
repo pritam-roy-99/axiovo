@@ -45,3 +45,10 @@
 #archive-result-actions button{padding:10px 15px;border-radius:8px;border:1px solid var(--rl-border,#bed3df);background:var(--rl-panel,#fff);color:var(--rl-text,#19334a);cursor:pointer}
 @media(max-width:850px){.axiovo-browser-filters{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:650px){.axiovo-browser{padding:14px 12px 45px}.axiovo-browser-hero,.axiovo-browser-fields,.axiovo-browser-search,.axiovo-browser-results{padding:16px}.axiovo-browser-steps{grid-template-columns:minmax(0,1fr)}.axiovo-browser-filters{grid-template-columns:repeat(2,minmax(0,1fr))}.axiovo-searchline{flex-wrap:wrap}.axiovo-searchline button{width:100%}}
+
+.axiovo-paper-title-button{display:block;border:0;background:transparent;color:var(--rl-text,#19334a);text-align:left;font:inherit;font-size:inherit;font-weight:inherit;padding:0;cursor:pointer;line-height:inherit}
+.axiovo-paper-title-button:hover{color:var(--archive);text-decoration:underline}
+.axiovo-paper-title-button:focus-visible{outline:3px solid var(--archive);outline-offset:3px;border-radius:4px}
+.axiovo-article-details{padding:14px 16px;margin-top:13px;border:1px solid var(--rl-border,#ccdae5);background:var(--rl-soft,#f0f5f9);border-radius:10px;font-size:12px;line-height:1.6}
+.axiovo-article-details h4{font-size:13px;margin:12px 0 5px}
+.axiovo-article-details a{display:inline-block;margin:5px 10px 5px 0;font-weight:720;color:var(--archive)}
