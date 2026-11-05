@@ -226,7 +226,7 @@ jobs:
       - name: Verify homepage video plays and has valid streams
         run: |
           test -s docs/assets/axiovo-tour.mp4
-          test -s docs/assets/axiovo-tour-poster.jpg
+          test -s docs/assets/axiovo-tour-poster.svg
           test -s docs/assets/axiovo-tour.vtt
           python - <<'PY'
           from pathlib import Path
