@@ -3,13 +3,13 @@
 "use strict";
 /* Field Explorer: public scholarly search and browser-local reading collections. */
 const $=id=>document.getElementById("scholar-"+id);
-const {FIELDS,fieldTopics,fieldKey}=window.ResearchLensFields;
-const SearchCore=window.ResearchLensSearch;
-const SemanticCore=window.ResearchLensSemanticSearch;
-const Arxiv=window.ResearchLensArxiv;
-const CachedArxiv=window.ResearchLensCachedArxiv;
+const {FIELDS,fieldTopics,fieldKey}=window.AxiovoFields;
+const SearchCore=window.AxiovoSearch;
+const SemanticCore=window.AxiovoSemanticSearch;
+const Arxiv=window.AxiovoArxiv;
+const CachedArxiv=window.AxiovoCachedArxiv;
 const SecondSource=window.AxiovoMultiSource;
-const OPENALEX_COOLDOWN="researchlens-openalex-429-until";
+const OPENALEX_COOLDOWN="axiovo-openalex-429-until";
 let cachedFeedPromise=null;
 function cooldownUntil(){try{return Number(sessionStorage.getItem(OPENALEX_COOLDOWN)||0)}catch{return 0}}
 function setCooldown(){try{sessionStorage.setItem(OPENALEX_COOLDOWN,String(Date.now()+60*60*1000))}catch{}}
@@ -33,10 +33,10 @@ async function offlineArxivFallback(plan,{reason="",from="",to="",sort="",today=
 }
 
 
-const KEY="researchlens-field-explorer-v1", SAVED="researchlens-field-saved-v1";
-const interestsAPI=window.ResearchLensInterests;
+const KEY="axiovo-field-explorer-v1", SAVED="axiovo-field-saved-v1";
+const interestsAPI=window.AxiovoInterests;
 const followedInterests=()=>interestsAPI?.get(read(interestsAPI.KEY,{}),state.field,state.topic)||[];
-function toggleInterest(value){if(!interestsAPI)return;const next=interestsAPI.toggle(read(interestsAPI.KEY,{}),state.field,state.topic,value);store(interestsAPI.KEY,next);drawTopics();drawSubtopics();window.dispatchEvent(new Event("researchlens:interests-changed"))}
+function toggleInterest(value){if(!interestsAPI)return;const next=interestsAPI.toggle(read(interestsAPI.KEY,{}),state.field,state.topic,value);store(interestsAPI.KEY,next);drawTopics();drawSubtopics();window.dispatchEvent(new Event("axiovo:interests-changed"))}
 function read(key,fallback){try{const d=JSON.parse(localStorage.getItem(key)||"null");return d??fallback}catch{return fallback}}
 function store(key,value){try{localStorage.setItem(key,JSON.stringify(value))}catch{}}
 let state=read(KEY,{field:"general",topic:"Explore all research",subtopic:"",query:"",sort:"publication_date:desc",from:"",to:"",areaSelected:false});
@@ -60,7 +60,7 @@ function link(parent,label,url){
 function recordID(w){return w.id||w.doi||w.display_name}
 function mirrorArxivBookmark(work,add){
  const selected=Arxiv?.candidates(work)[0];if(!selected)return;
- const key="researchlens-reading-list";
+ const key="axiovo-reading-list";
  let ids=[];try{ids=JSON.parse(localStorage.getItem(key)||"[]")}catch{}
  if(!Array.isArray(ids))ids=[];
  const id=selected.requested;
@@ -191,9 +191,9 @@ const originalDate=w.publication_date||"";if(originalDate)art.append(node("p",(w
 const venue=w.primary_location?.source?.display_name;if(venue)art.append(node("p",venue,"authors"));
 if(w.__abstract)art.append(node("p",w.__abstract.slice(0,820)+(w.__abstract.length>820?"…":""),"summary"));if(w.abstract_inverted_index){const entries=[];for(const [term,positions] of Object.entries(w.abstract_inverted_index)){for(const pos of positions)if(pos<140)entries[pos]=term}if(entries.length)art.append(node("p",entries.filter(Boolean).join(" ").slice(0,820)+(entries.length>140?"…":""),"summary"))}
 const row=node("div",undefined,"row actions rl-paper-actionbar");const original=Arxiv?.candidates(w)[0];if(original){const details=node("a","Paper details");details.href="./paper.html?id="+encodeURIComponent(original.base);details.className="axiovo-paper-detail-action";row.append(details)}if(original){link(row,"Read on arXiv",Arxiv.abs(original.base));link(row,"PDF",Arxiv.pdf(original.base));}else{link(row,"OpenAlex",w.id)}
-const isSaved=saved.some(p=>recordID(p)===recordID(w));const b=node("button",isSaved?"Saved":"Save paper","rl-save-button"+(isSaved?" is-saved":""));b.type="button";b.setAttribute("aria-pressed",String(isSaved));b.setAttribute("aria-label",(isSaved?"Remove from reading list: ":"Save to reading list: ")+(w.display_name||w.title||"Paper"));b.onclick=()=>{const wasSaved=saved.some(p=>recordID(p)===recordID(w));if(wasSaved)saved=saved.filter(p=>recordID(p)!==recordID(w));else saved.push(w);mirrorArxivBookmark(w,!wasSaved);drawSaved();window.dispatchEvent(new Event("researchlens-library-change"));render()};const icon=document.createElementNS("http://www.w3.org/2000/svg","svg");icon.setAttribute("viewBox","0 0 24 24");icon.setAttribute("width","16");icon.setAttribute("height","16");icon.setAttribute("fill",isSaved?"currentColor":"none");icon.setAttribute("stroke","currentColor");icon.setAttribute("stroke-width","1.8");icon.setAttribute("aria-hidden","true");const mark=document.createElementNS("http://www.w3.org/2000/svg","path");mark.setAttribute("d","M6 4.5A1.5 1.5 0 0 1 7.5 3h9A1.5 1.5 0 0 1 18 4.5V21l-6-4-6 4z");icon.append(mark);b.prepend(icon);row.append(b);
+const isSaved=saved.some(p=>recordID(p)===recordID(w));const b=node("button",isSaved?"Saved":"Save paper","rl-save-button"+(isSaved?" is-saved":""));b.type="button";b.setAttribute("aria-pressed",String(isSaved));b.setAttribute("aria-label",(isSaved?"Remove from reading list: ":"Save to reading list: ")+(w.display_name||w.title||"Paper"));b.onclick=()=>{const wasSaved=saved.some(p=>recordID(p)===recordID(w));if(wasSaved)saved=saved.filter(p=>recordID(p)!==recordID(w));else saved.push(w);mirrorArxivBookmark(w,!wasSaved);drawSaved();window.dispatchEvent(new Event("axiovo-library-change"));render()};const icon=document.createElementNS("http://www.w3.org/2000/svg","svg");icon.setAttribute("viewBox","0 0 24 24");icon.setAttribute("width","16");icon.setAttribute("height","16");icon.setAttribute("fill",isSaved?"currentColor":"none");icon.setAttribute("stroke","currentColor");icon.setAttribute("stroke-width","1.8");icon.setAttribute("aria-hidden","true");const mark=document.createElementNS("http://www.w3.org/2000/svg","path");mark.setAttribute("d","M6 4.5A1.5 1.5 0 0 1 7.5 3h9A1.5 1.5 0 0 1 18 4.5V21l-6-4-6 4z");icon.append(mark);b.prepend(icon);row.append(b);
 window.AxiovoAuthorFollow?.mount(row,(w.authorships||[]).map(x=>x.author?.display_name).filter(Boolean));
-const cite=node("button","Copy BibTeX");cite.type="button";cite.onclick=async()=>{try{await navigator.clipboard.writeText(bib(w));cite.textContent="Copied"}catch{download("researchlens-citation.bib",bib(w),"text/plain")}};row.append(cite);
+const cite=node("button","Copy BibTeX");cite.type="button";cite.onclick=async()=>{try{await navigator.clipboard.writeText(bib(w));cite.textContent="Copied"}catch{download("axiovo-citation.bib",bib(w),"text/plain")}};row.append(cite);
 const cop=node("a","✦ Research Assistant");const arxiv=arxivURL(w);const matched=arxiv?.match(/arxiv\.org\/(?:abs|pdf)\/([^?#]+)/i);const aid=matched?matched[1].replace(/\.pdf$/,"").replace(/v\d+$/,""):"";cop.href="./copilot.html?"+new URLSearchParams(aid?{id:aid}:{q:w.display_name||w.title||""});row.append(cop);
 if(original){
  const versions=node("div",undefined,"rl-paper-versions");
@@ -208,10 +208,10 @@ if(original){
    const n=Number(version.value),valid=version.value===""||Number.isInteger(n)&&n>=1&&n<=9999;
    if(!valid){saveExact.textContent="Enter a valid revision";return}
    const chosen=original.base+(version.value?"v"+version.value:"");
-   let list=[];try{list=JSON.parse(localStorage.getItem("researchlens-reading-list")||"[]")}catch{}
+   let list=[];try{list=JSON.parse(localStorage.getItem("axiovo-reading-list")||"[]")}catch{}
    if(!Array.isArray(list))list=[];
    if(!list.includes(chosen))list.push(chosen);
-   try{localStorage.setItem("researchlens-reading-list",JSON.stringify(list));saveExact.textContent="✓ Saved "+(version.value?"v"+version.value:"latest");window.dispatchEvent(new Event("researchlens-library-change"))}
+   try{localStorage.setItem("axiovo-reading-list",JSON.stringify(list));saveExact.textContent="✓ Saved "+(version.value?"v"+version.value:"latest");window.dispatchEvent(new Event("axiovo-library-change"))}
    catch{saveExact.textContent="Browser storage unavailable"}
  };
  versions.append(version,selected,saveExact);art.append(versions);
@@ -365,14 +365,14 @@ function directArxivPaper(raw){
  link(buttons,"Research Assistant","./copilot.html?id="+encodeURIComponent(request.requested));
  const save=node("button","☆ Save paper","rl-paper-action");
  save.type="button";save.onclick=()=>{
-  const key="researchlens-reading-list";let values=[];
+  const key="axiovo-reading-list";let values=[];
   try{values=JSON.parse(localStorage.getItem(key)||"[]")}catch{}
   if(!Array.isArray(values))values=[];
   const present=values.includes(request.requested);
   values=present?values.filter(x=>x!==request.requested):[...values,request.requested];
   try{localStorage.setItem(key,JSON.stringify(values));save.textContent=present?"☆ Save paper":"✓ Saved";
    save.setAttribute("aria-pressed",String(!present));
-   window.dispatchEvent(new Event("researchlens-library-change"))}
+   window.dispatchEvent(new Event("axiovo-library-change"))}
   catch{save.textContent="Browser storage unavailable"}
  };
  buttons.append(save);card.append(buttons);root.append(card);
@@ -402,12 +402,12 @@ for(const [id,f] of Object.entries(FIELDS)){
 $("field").value=state.field;$("query").value=state.query||"";
 document.addEventListener("pointerdown",e=>{if(!$("field-details").contains(e.target))$("field-details").open=false});
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&$("field-details").open){$("field-details").open=false;$("field-trigger").focus()}});$("sort").value=state.sort||"relevance";$("from").value=state.from||"";$("to").value=state.to||"";const dateRestore=normalizeSearchDates();drawField();drawSaved();if(dateRestore.changed)setStatus("Saved future publication dates were cleared. Research is available through "+dateRestore.until+".");
-$("field").onchange=()=>{state.field=$("field").value;state.topic=FIELDS[state.field].topics[0];state.subtopic="";state.customSubtopic=false;state.areaSelected=false;state.query="";$("query").value=state.query;persist();drawField();window.dispatchEvent(new CustomEvent("researchlens:field-changed",{detail:{field:state.field,topic:state.topic}}));page=1;search()};
+$("field").onchange=()=>{state.field=$("field").value;state.topic=FIELDS[state.field].topics[0];state.subtopic="";state.customSubtopic=false;state.areaSelected=false;state.query="";$("query").value=state.query;persist();drawField();window.dispatchEvent(new CustomEvent("axiovo:field-changed",{detail:{field:state.field,topic:state.topic}}));page=1;search()};
 $("use-custom").onclick=()=>{const t=$("custom").value.trim();if(t.length<3){setStatus("Enter at least three characters for a custom topic.");return}state.subtopic=t;state.customSubtopic=true;state.query=t;$("query").value=t;persist();drawSubtopics();page=1;search()};
 $("use-subtopic").onclick=()=>{
  const t=$("custom-subtopic").value.trim();
  if(t.length<3){setStatus("Enter at least three characters for a subtopic.");return}
- const result=window.ResearchLensCustomTaxonomy?.addInterest(state.field,state.topic,t,localStorage);
+ const result=window.AxiovoCustomTaxonomy?.addInterest(state.field,state.topic,t,localStorage);
  if(!result?.ok){setStatus(result?.reason||"Could not add subtopic");return}
  subtopicSelect(result.value);
  if(!followedInterests().some(x=>x.toLowerCase()===result.value.toLowerCase()))toggleInterest(result.value);
@@ -415,7 +415,7 @@ $("use-subtopic").onclick=()=>{
  setStatus("Added specialized subtopic: "+result.value);
  window.dispatchEvent(new Event("axiovo:taxonomy-changed"));
 };
-window.addEventListener("researchlens:interests-changed",()=>{drawTopics();drawSubtopics()});
+window.addEventListener("axiovo:interests-changed",()=>{drawTopics();drawSubtopics()});
 window.addEventListener("axiovo:taxonomy-changed",()=>{
  if(!FIELDS[state.field].topics.includes(state.topic)){
   state.topic=FIELDS[state.field].topics[0];state.subtopic="";state.query=state.topic;
@@ -425,7 +425,7 @@ window.addEventListener("axiovo:taxonomy-changed",()=>{
  $("query").value=state.query;
  persist();drawField();
 });
-window.addEventListener("researchlens:focus-change",e=>{
+window.addEventListener("axiovo:focus-change",e=>{
  const focus=e.detail||{};
  const newField=fieldKey(focus.field);
  const newTopic=FIELDS[newField].topics.includes(focus.topic)?focus.topic:FIELDS[newField].topics[0];
@@ -441,7 +441,7 @@ window.addEventListener("researchlens:focus-change",e=>{
  $("field").value=newField;$("query").value=state.query;
  persist();drawField();page=1;search();
 });
-window.addEventListener("researchlens:choose-field",e=>{
+window.addEventListener("axiovo:choose-field",e=>{
  const field=fieldKey(e.detail?.field);if(state.field===field)return;
  state.field=field;state.topic=FIELDS[field].topics[0];state.subtopic="";state.areaSelected=false;state.query="";
  $("query").value=state.query;persist();drawField();page=1;search()
@@ -463,9 +463,9 @@ $("latest").onclick=()=>{const dateParts=Object.fromEntries(new Intl.DateTimeFor
 $("clear-dates").onclick=()=>{$("from").value="";$("to").value="";persist();page=1;search()};
 $("show-saved").onclick=()=>{showingSaved=true;setStatus("This collection is stored only in your current browser.");render()};
 $("prev").onclick=()=>{if(page>1){page--;if(["arxiv-announcement","arxiv-oai"].includes(items[0]?.__source))render();else search()}};$("next").onclick=()=>{if(["arxiv-announcement","arxiv-oai"].includes(items[0]?.__source)){if(page*40<items.length){page++;render()}}else if(page*100<Math.min(total,10000)){page++;search()}};
-$("export-bib").onclick=()=>{if(!saved.length){setStatus("Save a paper before exporting citations.");return}download("researchlens-reading-list.bib",saved.map(bib).join("\n"),"text/plain;charset=utf-8")};
-$("export-json").onclick=()=>download("researchlens-field-reading-list.json",JSON.stringify(saved,null,2),"application/json");
+$("export-bib").onclick=()=>{if(!saved.length){setStatus("Save a paper before exporting citations.");return}download("axiovo-reading-list.bib",saved.map(bib).join("\n"),"text/plain;charset=utf-8")};
+$("export-json").onclick=()=>download("axiovo-field-reading-list.json",JSON.stringify(saved,null,2),"application/json");
 const u=new URLSearchParams(location.search);if(u.get("field")&&FIELDS[u.get("field")]){state.field=u.get("field");if(!FIELDS[state.field].topics.includes(state.topic)){state.topic=FIELDS[state.field].topics[0];state.subtopic=""}$("field").value=state.field;drawField()}if(u.get("q")){$("query").value=u.get("q").slice(0,250);state.query=$("query").value}if(u.get("from"))$("from").value=u.get("from").slice(0,10);if(u.get("to"))$("to").value=u.get("to").slice(0,10);if(["relevance","publication_date:desc","cited_by_count:desc"].includes(u.get("sort")))$("sort").value=u.get("sort");const dateLink=normalizeSearchDates();persist();if(dateLink.changed)setStatus("The requested future date range was removed; searching available papers.");if($("query").value.trim()||state.field!=="general")search();
 }
-window.addEventListener("researchlens:scholarly-open",init,{once:true});
+window.addEventListener("axiovo:scholarly-open",init,{once:true});
 })();
