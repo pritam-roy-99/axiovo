@@ -307,7 +307,28 @@ $("clear-draft").onclick=()=>{$("draft").value=""};
 $("question").onkeydown=evt=>{if(evt.key==="Enter"&&!evt.shiftKey){evt.preventDefault();submit(false)}};
 fetch("data/feed.json",{cache:"no-cache"}).then(r=>{if(!r.ok)throw Error("feed unavailable");return r.json()}).then(d=>{
  index=(d.papers||[]).filter(p=>p.id&&p.title);indexVersion=d.generated_at||"unknown";rstatus(index.length+" local indexed arXiv records ready. External OpenAlex search available.");pickerOptions();loadOai();const params=new URLSearchParams(location.search);
- const id=params.get("id");if(id&&arxivID.test(id)){$("question").value="Compare this paper with earlier literature: arXiv:"+id;selectedPaperId=window.ResearchLensArxiv?.base(id)||id;$("paper-search").value=selectedPaperId;pickerOptions(selectedPaperId);}
- else if(params.get("q"))$("question").value=params.get("q").slice(0,500);
+ const pair=(params.get("ids")||"").split(",").map(x=>x.trim()).filter(Boolean);
+ if(pair.length===2&&pair.every(x=>arxivID.test(x))){
+  const normalized=pair.map(x=>window.ResearchLensArxiv?.base(x)||x);
+  const selectors=[$("paper-picker"),$("comparison-paper")];
+  normalized.forEach((id,i)=>{
+   const paper=index.find(p=>p.id===id);
+   if(paper&&!Array.from(selectors[i].options).some(opt=>opt.value===id)){
+    const opt=document.createElement("option");opt.value=id;opt.textContent=paper.title.slice(0,90)+" · "+id;
+    selectors[i].append(opt);
+   }
+   if(paper)selectors[i].value=id;
+  });
+  selectedPaperId=normalized[0];
+  $("paper-compare-fields").hidden=false;
+  updateMode("compare");
+  $("question").value=(params.get("q")||("Compare the assumptions, methods and limitations of arXiv:"+normalized[0]+" and arXiv:"+normalized[1])).slice(0,500);
+  if(normalized.every(id=>index.some(p=>p.id===id)))comparePapers();
+  else $("paper-status").textContent="At least one requested paper is outside the local index. Open both originals before interpreting an AI comparison.";
+ }else{
+  const id=params.get("id");
+  if(id&&arxivID.test(id)){$("question").value="Compare this paper with earlier literature: arXiv:"+id;selectedPaperId=window.ResearchLensArxiv?.base(id)||id;$("paper-search").value=selectedPaperId;pickerOptions(selectedPaperId);}
+  else if(params.get("q"))$("question").value=params.get("q").slice(0,500);
+ }
 }).catch(()=>rstatus("Local feed unavailable. You can still search OpenAlex or inspect the original arXiv website."));
 engineChange();
