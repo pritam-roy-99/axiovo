@@ -73,6 +73,17 @@ def main():
                     page.wait_for_url(lambda url: urlsplit(url).path.endswith("/"+source+".html"))
                     page.locator("#archive-field").wait_for()
                     assert page.locator("#archive-topic").count()==1
+                    show = page.locator("#archive-show-results")
+                    assert show.count()==1,(source,"Results CTA missing")
+                    assert "Show matching papers" in show.inner_text(),(source,"Results CTA label missing")
+                    contrast = show.evaluate("""el=>({
+                        color:getComputedStyle(el).color,
+                        background:getComputedStyle(el).backgroundColor,
+                        readable:el.getBoundingClientRect().width>0
+                    })""")
+                    assert contrast["readable"] and contrast["color"]=="rgb(255, 255, 255)",(source,contrast)
+                    show.click()
+                    assert page.evaluate("document.activeElement?.id")=="archive-results-heading",(source,"Results not focused")
                     page.locator(".axiovo-home-link").click()
                     page.wait_for_url(lambda url: urlsplit(url).path.endswith("/"))
                 page.goto(base+"desk.html",wait_until="domcontentloaded")
