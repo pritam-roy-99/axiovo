@@ -154,6 +154,9 @@ jobs:
           python -m pip install --disable-pip-version-check Pillow playwright
           python -m playwright install --with-deps chromium
           sudo apt-get install -y -qq ffmpeg espeak-ng
+      - name: Exercise actual homepage, Discover and Library routing
+        if: steps.tour-cache.outputs.cache-hit != 'true'
+        run: python scripts/smoke_routes.py
       - name: Record current Axiovo UI and build homepage tour
         if: steps.tour-cache.outputs.cache-hit != 'true'
         run: python scripts/build_live_demo.py
