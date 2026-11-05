@@ -202,6 +202,37 @@ def read_verified_daily_records(today=None, lookback=7):
     return list(verified.values())
 
 
+
+def read_oai_recent_records(today=None, lookback=7):
+    """Use recent OAI record updates only as a partial recovery feed."""
+    today = today or dt.datetime.now(dt.timezone.utc).date()
+    base = ROOT / "docs" / "data" / "arxiv-oai"
+    try:
+        manifest = json.loads((base / "manifest.json").read_text(encoding="utf8"))
+    except (OSError, ValueError):
+        return []
+    verified = {}
+    for age in range(lookback):
+        day = (today - dt.timedelta(days=age)).isoformat()
+        indexed = manifest.get("days", {}).get(day)
+        if not isinstance(indexed, dict) or indexed.get("complete") is True:
+            continue
+        try:
+            shard = json.loads((base / (day + ".json")).read_text(encoding="utf8"))
+        except (OSError, ValueError):
+            continue
+        papers = shard.get("papers")
+        if (shard.get("complete") is not False or shard.get("date") != day
+                or not isinstance(papers, list) or len(papers) != shard.get("paper_count")
+                or len(papers) != indexed.get("count")):
+            continue
+        for p in papers:
+            if str(p.get("published", ""))[:10] != day or not p.get("id") or not p.get("title"):
+                continue
+            verified[p["id"]] = p
+    return list(verified.values())
+
+
 def main():
     try:
         old = json.loads(TARGET.read_text(encoding="utf-8")) if TARGET.exists() else {}
@@ -211,8 +242,12 @@ def main():
     if fresh:
         print("Using",len(fresh),"complete-date submissions instead of sampled category batches")
     else:
-        print("No complete recent daily archive available; falling back to category sampling")
-        fresh = fetch_recent()
+        fresh = read_oai_recent_records()
+        if fresh:
+            print("Using",len(fresh),"OAI-PMH incremental records (partial first-submission coverage)")
+        else:
+            print("No official recent metadata source available; falling back to legacy category samples")
+            fresh = fetch_recent()
     pinned = read_pinned_ids()
     historical = fetch_by_ids(pinned)
     if pinned:
@@ -227,7 +262,7 @@ def main():
     papers = merge(papers, pinned_records, limit=3500)
     payload = {
         "generated_at": dt.datetime.now(dt.timezone.utc).isoformat(),
-        "source": "arXiv Atom API (submittedDate + lastUpdatedDate)",
+        "source": "arXiv Atom API and verified daily/OAI incremental snapshots",
         "index_scope": "limited rolling snapshots from representative arXiv categories; not the full archive",
         "refresh_methods": ["submittedDate", "lastUpdatedDate"],
         "paper_count": len(papers), "pinned_ids": pinned, "topic_catalog": topic_catalog(), "papers": papers
