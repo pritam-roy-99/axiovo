@@ -168,9 +168,9 @@ def main():
                     voices_used.add(voice)
                     # Convert every clip to one PCM format before ffmpeg concatenation.
                     pcm=work/f"{index:02d}-pcm.wav"
-                    subprocess.run(["ffmpeg","-y","-v","error","-i",str(sound),"-ar","24000","-ac","1","-c:a","pcm_s16le",str(pcm)],check=True)
+                    subprocess.run(["ffmpeg","-y","-v","error","-i",str(sound),"-ar","24000","-ac","1","-af","apad=pad_dur=1.2","-c:a","pcm_s16le",str(pcm)],check=True)
                     sound=pcm
-                    duration=media_duration(sound)+1.2
+                    duration=media_duration(sound)
                     video_entries.extend([f"file '{shot.as_posix()}'",f"duration {duration:.3f}"])
                     audio_entries.append(f"file '{sound.as_posix()}'")
                     captions.extend([f"{cue(elapsed)} --> {cue(elapsed+duration-0.2)}",narration,""])
