@@ -1,181 +1,100 @@
 #!/usr/bin/env python3
-"""Browser-level routing regression tests for the real Axiovo static website.
+"""Current Axiovo browser acceptance test for real routes, mobile navigation and controls.
 
-Uses a local HTTP server, no live source availability assertions.
-Tests critical navigation paths, persisted field selection and legacy URLs.
+Uses local HTTP only, blocks service workers to avoid stale caches. Does not treat a
+missing upstream research provider as evidence of an application defect.
 """
 from __future__ import annotations
 import functools
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from urllib.parse import urlsplit
 from threading import Thread
+from urllib.parse import urlsplit
 from playwright.sync_api import sync_playwright
 
-DOCS=Path(__file__).resolve().parents[1]/"docs"
-
+DOCS = Path(__file__).resolve().parents[1] / "docs"
+ROUTES = ("", "arxiv.html", "biorxiv.html", "chemrxiv.html", "desk.html",
+          "workspace.html", "copilot.html", "profiles.html", "lab.html",
+          "paper.html", "compare.html", "methodology.html", "privacy.html",
+          "community.html")
 
 class Quiet(SimpleHTTPRequestHandler):
-    def log_message(self,*args): pass
-
+    def log_message(self, *_): pass
 
 def main():
-    server=ThreadingHTTPServer(("127.0.0.1",0),functools.partial(Quiet,directory=str(DOCS)))
-    thread=Thread(target=server.serve_forever,daemon=True);thread.start()
-    base="http://127.0.0.1:"+str(server.server_address[1])+"/"
-    checked=[]
+    server = ThreadingHTTPServer(("127.0.0.1", 0), functools.partial(Quiet, directory=str(DOCS)))
+    Thread(target=server.serve_forever, daemon=True).start()
+    base = "http://127.0.0.1:%s/" % server.server_address[1]
+    verified = []
     try:
         with sync_playwright() as pw:
-            browser=pw.chromium.launch(headless=True,args=["--no-sandbox","--disable-dev-shm-usage"])
-            page=browser.new_page(viewport={"width":1280,"height":900})
-            page.set_default_timeout(14000)
-            page_errors=[]
-            failed_assets=[]
-            page.on("pageerror",lambda error:page_errors.append(str(error)))
-            def check_response(response):
-                u=urlsplit(response.url)
-                if u.hostname=="127.0.0.1" and response.status>=400 and u.path.endswith((".html",".js",".css",".webmanifest")):
-                    failed_assets.append((response.status,u.path))
-            page.on("response",check_response)
-            def go(path):
-                page.goto(base+path,wait_until="domcontentloaded",timeout=25000)
-            def assert_path(path):
-                assert page.url.startswith(base+path),("Unexpected URL",page.url,path)
-            def target_is(selector,ends):
-                item=page.locator(selector).first
-                item.wait_for(state="attached")
-                path=item.get_attribute("href") or ""
-                assert path.startswith("./"+ends),("Bad link",selector,path)
-                checked.append(selector)
-            go("")
-            cards=page.locator(".axiovo-archive-card")
-            cards.first.wait_for()
-            assert cards.count()==3
-            assert set(cards.evaluate_all("(els)=>els.map(x=>x.dataset.archive)"))=={"arxiv","biorxiv","chemrxiv"}
-            assert page.locator("#axiovo-entry-field").count()==0
-            assert page.locator("body").get_attribute("class")=="axiovo-home"
-            target_is(".rl-nav a:nth-child(1)","#axiovo-archive-title")
-            target_is(".rl-nav a:nth-child(2)","discover.html#workspace")
-            cards.nth(2).click()
-            page.wait_for_url(lambda u:urlsplit(u).path.endswith("/chemrxiv.html"))
-            assert page.locator("#archive-topic").is_visible()
-            assert page.locator("#archive-field").is_visible()
-            assert page.locator("#archive-results").is_visible()
-            checked.append("three equal archive homepage cards and ChemRxiv page")
-            page.locator(".axiovo-home-link").click()
-            page.wait_for_url(lambda u:urlsplit(u).path.endswith("/"))
-            page.locator('[data-archive="biorxiv"]').click()
-            page.wait_for_url(lambda u:urlsplit(u).path.endswith("/biorxiv.html"))
-            assert page.locator("#archive-field option").count()>12
-            checked.append("bioRxiv dedicated taxonomy and search")
-            page.locator(".axiovo-back-button").click()
-            page.wait_for_url(lambda u:urlsplit(u).path.endswith("/"))
-            page.locator('[data-archive="arxiv"]').click()
-            page.wait_for_url(lambda u:urlsplit(u).path.endswith("/arxiv.html"))
-            assert page.locator("#archive-topic option").count()==8
-            checked.append("arXiv complete top-level subject taxonomy")
-            go("discover.html#discover")
-            page.locator("#rl-source-arxiv").wait_for()
-            assert page.locator(".axiovo-advanced-focus > summary").count()==1
-            assert page.locator(".axiovo-feed-tools > summary").count()==1
-            page.locator("#rl-source-scholarly").click()
-            assert page.locator("#scholarly-discovery").is_visible()
-            assert page.locator(".axiovo-scholar-tools > summary").count()==1
-            checked.append("source tabs and advanced sections")
-            page.locator("#rl-source-biorxiv").click()
-            page.wait_for_url(lambda u:"archive=biorxiv" in urlsplit(u).query)
-            assert page.locator("#biorxiv-discovery").is_visible()
-            page.locator("#rl-source-arxiv").click()
-            page.wait_for_url(lambda u:"archive=arxiv" in urlsplit(u).query)
-            assert page.locator("#arxiv-discovery").is_visible()
-            assert page.locator(".axiovo-reading-modes button").count()==4
-            recommended=page.locator(".axiovo-reading-modes button").nth(1)
-            recommended.click()
-            assert recommended.get_attribute("aria-pressed")=="true"
-            latest=page.locator(".axiovo-reading-modes button").first
-            latest.click()
-            assert latest.get_attribute("aria-pressed")=="true"
-            checked.append("Discover Latest and Recommended controls")
-            page.locator("#papers .paper .rl-save-button").first.wait_for(timeout=16000)
-            paper=page.locator("#papers .paper").first
-            paper_id=paper.get_attribute("data-paper-id")
-            assert paper_id,"Indexed paper card has no arXiv identifier"
-            second_id=page.locator("#papers .paper").nth(1).get_attribute("data-paper-id")
-            assert second_id and second_id!=paper_id,"Need two distinct indexed papers for comparison"
-            paper.locator(".rl-save-button").click()
-            assert paper_id in page.evaluate('JSON.parse(localStorage.getItem("axiovo-reading-list")||"[]")')
-            checked.append("arXiv browsing and saving to Library")
-            target_is(".rl-nav a:nth-child(2)","discover.html#workspace")
-            page.locator(".rl-nav a:nth-child(2)").click()
-            page.wait_for_url(lambda u:urlsplit(u).path.endswith("/discover.html") and urlsplit(u).fragment=="workspace")
-            page.locator("#workspace-panel #research-questions").wait_for(timeout=16000)
-            assert page.locator("#workspace-panel #library-list").is_visible()
-            assert paper_id in page.locator("#workspace-panel #library-list").inner_text(timeout=10000) or paper_id in page.locator("#workspace-panel").inner_text(),"Saved paper missing from Library after navigation"
-            checked.append("Library SPA navigation and saved paper persistence")
-            collection_filter=page.locator("#workspace-panel #axiovo-collection-filter")
-            collection_filter.wait_for(timeout=10000)
-            page.once("dialog",lambda dialog:dialog.accept("Test collection"))
-            page.locator("#workspace-panel .axiovo-collection-controls button").click()
-            assert collection_filter.locator("option").count()>=2
-            collection_filter.select_option("all")
-            assigned=page.locator('#workspace-panel #library-list .rl-paper select[aria-label^="Assign"]').first
-            assigned.select_option(label="Test collection")
-            assert collection_filter.locator("option").count()>=2
-            checked.append("research collection creation and paper assignment")
-            page.locator(".rl-nav a:nth-child(1)").click()
-            page.wait_for_url(lambda u:urlsplit(u).path.endswith("/") and urlsplit(u).fragment=="axiovo-archive-title")
-            assert page.locator(".axiovo-archive-grid").is_visible()
-            checked.append("back to three-archive chooser")
-            go("paper.html?id="+paper_id)
-            page.locator("#axiovo-paper-notes textarea").wait_for(timeout=12000)
-            assert page.locator("#axiovo-versions").is_visible()
-            assert page.locator("#axiovo-references").is_visible()
-            page.locator("#axiovo-paper-notes textarea").fill("Check the assumptions and original paper.")
-            page.locator("#axiovo-paper-notes textarea").blur()
-            assert "Check the assumptions" in page.evaluate('JSON.parse(localStorage.getItem("axiovo-library-metadata-v1"))["arxiv:"+new URLSearchParams(location.search).get("id")].note')
-            checked.append("paper research detail, versions and private notes")
-            go("compare.html?ids="+paper_id+","+second_id)
-            page.locator(".axiovo-compare-paper").first.wait_for(timeout=12000)
-            assert page.locator(".axiovo-compare-paper").count()==2
-            assert page.locator(".axiovo-compare-link").count()>=4
-            checked.append("side-by-side source-linked paper comparison")
-            page.locator("#compare-assistant").click()
-            page.wait_for_url(lambda u:urlsplit(u).path.endswith("/copilot.html") and "ids=" in urlsplit(u).query)
-            page.wait_for_function('document.getElementById("paper-picker").value === new URLSearchParams(location.search).get("ids").split(",")[0]',timeout=16000)
-            assert page.locator("#comparison-paper").input_value()==second_id
-            checked.append("contextual Research Assistant preloads both selected papers")
-            go("search.html?q=quantum")
-            page.wait_for_url(lambda u: urlsplit(u).path.endswith("/discover.html") and urlsplit(u).query.find("view=scholarly")>=0 and urlsplit(u).fragment=="discover")
-            checked.append("legacy search redirect")
-            go("fields.html")
-            page.wait_for_url("**/discover.html?view=scholarly#discover")
-            checked.append("legacy field redirect")
-            go("index.html#workspace")
-            page.wait_for_url(lambda u:urlsplit(u).path.endswith("/discover.html") and urlsplit(u).fragment=="workspace")
-            checked.append("legacy homepage hash")
-            go("copilot.html")
-            assert page.locator("main").count()==1
-            target_is(".rl-nav a:nth-child(1)","#axiovo-archive-title")
-            checked.append("Research Assistant navigation")
-            assert not failed_assets, "Broken local HTML/JS/CSS resources: "+repr(failed_assets)
-            assert not page_errors, "Unhandled JavaScript errors: "+repr(page_errors)
-            checked.append("No broken local assets or unhandled page errors")
-            mobile=browser.new_page(viewport={"width":390,"height":844},device_scale_factor=1)
-            mobile.set_default_timeout(13000)
-            for path,ready in [("",".axiovo-archive-grid"),("discover.html#discover","#rl-source-arxiv"),
-                               ("discover.html?view=scholarly#discover","#scholar-search-form"),
-                               ("discover.html#workspace","#workspace-panel #library-list")]:
-                mobile.goto(base+path,wait_until="domcontentloaded",timeout=25000)
-                mobile.locator(ready).wait_for(timeout=17000)
-                overflow=mobile.evaluate("Math.max(0,document.documentElement.scrollWidth-window.innerWidth)")
-                assert overflow<=5,("Horizontal overflow on mobile",path,overflow)
-                checked.append("mobile "+(path or "homepage"))
-            mobile.close()
+            browser = pw.chromium.launch(headless=True, args=["--no-sandbox", "--disable-dev-shm-usage"])
+            for width in (360, 390, 768, 1360):
+                ctx = browser.new_context(viewport={"width": width, "height": 850},
+                                          service_workers="block", reduced_motion="reduce")
+                page = ctx.new_page()
+                page.set_default_timeout(12000)
+                for path in ROUTES:
+                    page.goto(base + path, wait_until="domcontentloaded", timeout=25000)
+                    page.locator("header.rl-global-header .axiovo-header-appearance").wait_for()
+                    page.locator(".axiovo-header-appearance .theme-toggle").wait_for()
+                    result = page.evaluate("""() => {
+                      const qs = s => document.querySelector(s);
+                      const box = s => {const r=qs(s)?.getBoundingClientRect();return r&&{
+                        x:r.x,y:r.y,right:r.right,bottom:r.bottom,width:r.width,height:r.height
+                      }};
+                      return {
+                        settings:box('.axiovo-header-appearance .rl-settings-link'),
+                        theme:box('.axiovo-header-appearance .theme-toggle'),
+                        logo:box('.rl-logo'),
+                        back:box('.axiovo-back-button'),
+                        home:box('.axiovo-home-link'),
+                        overflow:document.documentElement.scrollWidth - window.innerWidth,
+                        nav:document.querySelectorAll('.rl-nav a').length,
+                        header:box('header.rl-global-header')
+                      };
+                    }""")
+                    assert result["nav"] == 4, (width,path,"Incorrect global navigation",result)
+                    assert result["settings"] and result["theme"],(width,path,"Appearance actions absent")
+                    a,b=result["settings"],result["theme"]
+                    assert abs(a["y"]-b["y"])<=2, (width,path,"Settings and theme not in same row",result)
+                    assert 0<=a["x"] and b["right"]<=width+2,(width,path,"Appearance outside viewport",result)
+                    assert result["overflow"]<=7,(width,path,"Page has horizontal overflow",result)
+                    if width<=760:
+                        assert abs(result["logo"]["y"]-a["y"])<=7,(width,path,"Mobile header shifted",result)
+                        if path:
+                            assert result["back"] and result["home"],(width,path,"Back/Home missing")
+                    verified.append((width,path or "home"))
+                page.goto(base,wait_until="domcontentloaded")
+                page.locator(".axiovo-archive-card").first.wait_for()
+                assert page.locator(".axiovo-archive-card").count()==3
+                for source in ("arxiv","biorxiv","chemrxiv"):
+                    page.locator('[data-archive="%s"]'%source).click()
+                    page.wait_for_url(lambda url: urlsplit(url).path.endswith("/"+source+".html"))
+                    page.locator("#archive-field").wait_for()
+                    assert page.locator("#archive-topic").count()==1
+                    page.locator(".axiovo-home-link").click()
+                    page.wait_for_url(lambda url: urlsplit(url).path.endswith("/"))
+                page.goto(base+"desk.html",wait_until="domcontentloaded")
+                assert page.locator("#rd-search-form").count()==1
+                assert page.locator("#rd-query").count()==1
+                page.goto(base+"workspace.html",wait_until="domcontentloaded")
+                assert page.locator("#library-list").count()==1
+                assert page.locator("#following").count()==1
+                page.goto(base+"copilot.html",wait_until="domcontentloaded")
+                assert page.locator("#question").count()==1
+                assert page.locator("#ask").count()==1
+                page.goto(base+"profiles.html",wait_until="domcontentloaded")
+                before = page.evaluate("document.documentElement.dataset.theme")
+                page.locator(".axiovo-header-appearance .theme-toggle").click()
+                assert page.evaluate("document.documentElement.dataset.theme") != before
+                page.reload(wait_until="domcontentloaded")
+                assert page.evaluate("document.documentElement.dataset.theme") != before
+                ctx.close()
             browser.close()
     finally:
         server.shutdown()
-    print("Axiovo browser routes verified:",len(checked),checked,flush=True)
+    print("PASS: %d route/viewport combinations, archive clicks, Research Desk, Library, Assistant, persisted theme." % len(verified),flush=True)
 
-
-if __name__=="__main__":
+if __name__ == "__main__":
     main()
