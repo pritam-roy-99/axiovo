@@ -3,10 +3,10 @@
  */
 (function(){
 "use strict";
-const R=window.ResearchLensRelevance,$=id=>document.getElementById(id);
-const PROJECTS="researchlens-research-projects-v1";
-const OLD_SAVED="researchlens-reading-list";
-const META="researchlens-research-interest-settings-v1";
+const R=window.AxiovoRelevance,$=id=>document.getElementById(id);
+const PROJECTS="axiovo-research-projects-v1";
+const OLD_SAVED="axiovo-reading-list";
+const META="axiovo-research-interest-settings-v1";
 function read(key,fallback){try{return JSON.parse(localStorage.getItem(key)||"null")??fallback}catch{return fallback}}
 function write(key,val){try{localStorage.setItem(key,JSON.stringify(val));return true}catch{return false}}
 const texts=(o,k,v)=>{const n=document.createElement(k);n.textContent=String(v||"");o.append(n);return n};
@@ -17,14 +17,14 @@ if(!settings||typeof settings!=="object")settings={interests:[],authors:[]};
 settings.interests=Array.isArray(settings.interests)?settings.interests.slice(0,15):[];
 settings.authors=Array.isArray(settings.authors)?settings.authors.slice(0,20):[];
 let feed=[],filtered=[],pickedProject="";
-const Arxiv=window.ResearchLensArxiv;
+const Arxiv=window.AxiovoArxiv;
 function persistProjects(){if(write(PROJECTS,projects))window.dispatchEvent(new Event("axiovo:projects-updated"))}
 function persistSettings(){write(META,settings)}
 function link(parent,url,label){if(!/^https:\/\//.test(url||""))return;const a=texts(parent,"a",label);a.href=url;a.target="_blank";a.rel="noopener noreferrer"}
 function projectName(p){return p.title+(p.status==="completed"?" (completed)":"")}
-function allInterests(){const p=read("researchlens-field-explorer-v1",{});const topics=read("researchlens-followed-topics",[]);const API=window.ResearchLensInterests;const specialized=API?.get(read(API.KEY,{}),p.field||"quantum",p.topic||"")||[];return [...new Set([...settings.interests,...specialized,...(Array.isArray(topics)?topics:[]),p.topic,p.subtopic].filter(x=>typeof x==="string"&&x.trim()))].slice(0,20)}
+function allInterests(){const p=read("axiovo-field-explorer-v1",{});const topics=read("axiovo-followed-topics",[]);const API=window.AxiovoInterests;const specialized=API?.get(read(API.KEY,{}),p.field||"quantum",p.topic||"")||[];return [...new Set([...settings.interests,...specialized,...(Array.isArray(topics)?topics:[]),p.topic,p.subtopic].filter(x=>typeof x==="string"&&x.trim()))].slice(0,20)}
 function drawSettings(){
- const p=read("researchlens-field-explorer-v1",{});
+ const p=read("axiovo-field-explorer-v1",{});
  $("research-interest").value=settings.interests.join(", ");
  $("research-authors").value=settings.authors.join(", ");
  message($("interest-summary"),"Using "+allInterests().length+" interests. "+
@@ -77,8 +77,8 @@ function renderRecommendations(){
  const root=$("research-recommendations");root.replaceChildren();
  const p=projects.find(x=>x.id===$("research-project-filter").value);
  const selected=p?[p]:projects.filter(x=>x.status!=="completed");
- const saved=read(OLD_SAVED,[]),hidden=read("researchlens-hidden",[]);
- const authorFollowing=read("researchlens-author-follows",[]);
+ const saved=read(OLD_SAVED,[]),hidden=read("axiovo-hidden",[]);
+ const authorFollowing=read("axiovo-author-follows",[]);
  const scored=R.rank(feed,{interests:allInterests(),projects:selected,authors:[
    ...settings.authors,...(Array.isArray(authorFollowing)?authorFollowing:[])
  ],saved:Array.isArray(saved)?saved:[],hidden:Array.isArray(hidden)?hidden:[],now:new Date().toISOString()});
@@ -109,7 +109,7 @@ function renderRecommendations(){
     const present=ids.includes(sourceId);
     const next=present?ids.filter(x=>x!==sourceId):[...ids,sourceId];
     if(write(OLD_SAVED,next)){
-      window.dispatchEvent(new CustomEvent("researchlens-library-change"));
+      window.dispatchEvent(new CustomEvent("axiovo-library-change"));
       message($("research-rec-status"),(present?"Removed ":"Saved ")+"arXiv:"+sourceId+(present?" from":" to")+" your reading list.");
       renderRecommendations()
     }else message($("research-rec-status"),"Could not save. Browser storage may be unavailable.")
@@ -134,7 +134,7 @@ function abstractFromInverted(index){
  return words.filter(Boolean).join(" ").slice(0,2000)
 }
 async function loadLiveArxiv(){
- const prefs=read("researchlens-field-explorer-v1",{});
+ const prefs=read("axiovo-field-explorer-v1",{});
  const interest=String(prefs.subtopic||prefs.topic||settings.interests[0]||"quantum information").trim();
  if(!interest)return;
  const params=new URLSearchParams({search:interest,filter:"locations.source.id:S4306400194",per_page:"40",
@@ -192,7 +192,7 @@ function startup(){
  $("research-project-filter").onchange=()=>{pickedProject=$("research-project-filter").value;renderRecommendations()};
  $("research-project-export").onclick=()=>{
    const blob=new Blob([JSON.stringify({schema:1,projects,settings},null,2)],{type:"application/json"});
-   const url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="researchlens-questions.json";document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000)
+   const url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="axiovo-questions.json";document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000)
  };
  $("research-project-import").onchange=async e=>{
    const file=e.target.files?.[0];if(!file)return;
@@ -205,7 +205,7 @@ function startup(){
      projects=[...map.values()].slice(0,30);persistProjects();render();message($("project-status"),"Imported "+incoming.length+" research questions.")
    }catch(err){message($("project-status"),"Import failed: "+err.message)}finally{e.target.value=""}
  };
- window.addEventListener("researchlens:workspace-activated",()=>{drawSettings();renderRecommendations()});
+ window.addEventListener("axiovo:workspace-activated",()=>{drawSettings();renderRecommendations()});
  window.addEventListener("axiovo:projects-updated",()=>{projects=(Array.isArray(read(PROJECTS,[]))?read(PROJECTS,[]):[]).map(R.cleanProject).filter(Boolean);render()});
  window.addEventListener("storage",e=>{
    if(e.key===PROJECTS){projects=(Array.isArray(read(PROJECTS,[]))?read(PROJECTS,[]):[]).map(R.cleanProject).filter(Boolean);render()}
