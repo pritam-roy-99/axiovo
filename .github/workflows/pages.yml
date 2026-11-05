@@ -228,9 +228,17 @@ jobs:
         run: |
           sudo apt-get install -y -qq espeak-ng
           python -m pip install --disable-pip-version-check edge-tts || echo 'Neural voice unavailable; local feminine narration fallback will be used.'
-      - name: Record current Axiovo UI and build homepage tour
+      - name: Build Axiovo homepage video with verified fallback
         if: steps.tour-cache.outputs.cache-hit != 'true'
-        run: python scripts/build_live_demo.py
+        run: |
+          if python scripts/build_live_demo.py; then
+            echo 'Video: recorded current Axiovo interface.' >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo '::warning::Live website recording failed. Building the clearly labeled illustrated fallback.'
+            rm -f docs/assets/axiovo-tour.mp4 docs/assets/axiovo-tour-poster.jpg docs/assets/axiovo-tour.vtt
+            python scripts/build_intro_video.py
+            echo 'Video: illustrated Axiovo archive walkthrough (browser recording unavailable).' >> "$GITHUB_STEP_SUMMARY"
+          fi
       - name: Verify homepage video plays and has valid streams
         run: |
           test -s docs/assets/axiovo-tour.mp4
