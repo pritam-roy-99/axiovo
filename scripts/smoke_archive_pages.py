@@ -68,7 +68,11 @@ def main():
         with sync_playwright() as pw:
             browser = pw.chromium.launch(headless=True, args=["--no-sandbox"])
             desktop = browser.new_page(viewport={"width": 1360, "height": 900}, service_workers="block")
-            desktop.route("https://**", metadata)
+            provider_requests = []
+            def trace_metadata(route):
+                provider_requests.append(route.request.url)
+                metadata(route)
+            desktop.route("https://**", trace_metadata)
             desktop.set_default_timeout(12000)
             errors = []
             desktop.on("pageerror", lambda error: errors.append(str(error)))
@@ -76,7 +80,19 @@ def main():
             assert desktop.locator(".axiovo-archive-card").count() == 3
             for path, selected in paths:
                 desktop.goto(base + path, wait_until="domcontentloaded")
-                desktop.get_by_text("Test metadata:", exact=False).first.wait_for()
+                try:
+                    desktop.get_by_text("Test metadata:", exact=False).first.wait_for()
+                except Exception as exc:
+                    diagnostics = {
+                        "path": path,
+                        "status": desktop.locator("#archive-sync-status").inner_text(),
+                        "results": desktop.locator("#archive-results").inner_text()[:500],
+                        "field": desktop.locator("#archive-field").input_value(),
+                        "topic": desktop.locator("#archive-topic").input_value(),
+                        "subtopic": desktop.locator("#archive-subfield").input_value(),
+                        "requests": provider_requests[-8:],
+                    }
+                    raise AssertionError("Archive search fixture missing: "+repr(diagnostics)) from exc
                 assert desktop.locator("#archive-subfield").input_value() == selected
                 assert desktop.locator("#archive-topic-options button").count() > 0
                 assert desktop.locator("#archive-subtopic-options button").count() > 0
