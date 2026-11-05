@@ -7,6 +7,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 import urllib.parse
+import urllib.error
 
 from scripts import arxiv_daily_archive as ar
 
@@ -54,6 +55,26 @@ class DailyArchiveTests(unittest.TestCase):
         self.assertEqual(urls,[0,2])
         self.assertEqual(len(result["papers"]),3)
         self.assertEqual({x["id"] for x in result["papers"]},{"2611.00001","2611.00002","2611.00003"})
+    def test_429_retries_with_retry_after_before_certifying(self):
+        attempts=[]; waits=[]
+        def throttled(req,timeout):
+            attempts.append(req.full_url)
+            if len(attempts)==1:
+                raise urllib.error.HTTPError(req.full_url,429,"Too Many Requests",{"Retry-After":"4"},None)
+            return Response(page(1,[item(1,day="2026-11-04")]))
+        result=ar.fetch_day(dt.date(2026,11,4),opener=throttled,sleep=waits.append)
+        self.assertEqual(result["paper_count"],1)
+        self.assertEqual(len(attempts),2)
+        self.assertEqual(waits,[4])
+    def test_current_utc_day_is_never_certified(self):
+        with tempfile.TemporaryDirectory() as path:
+            folder=Path(path)
+            with patch.object(ar,"ARCHIVE",folder),patch.object(ar,"MANIFEST",folder/"manifest.json"),patch.object(ar.time,"sleep",lambda *_:None):
+                results=ar.run(today=dt.date(2026,11,5),days=[dt.date(2026,11,5)],
+                   fetcher=lambda day: {"date":day.isoformat(),"complete":True,"source_total":0,
+                                        "paper_count":0,"papers":[],"fetched_at":"2026-11-05T02:00:00Z"})
+                self.assertEqual(results["complete_days"],0)
+                self.assertFalse(results["manifest"]["days"])
     def test_partial_page_must_not_claim_complete(self):
         def opener(req,timeout):
             return Response(page(3,[item(1)]) if "start=0" in req.full_url else page(3,[]))
@@ -72,8 +93,8 @@ class DailyArchiveTests(unittest.TestCase):
                 r=ar.run(today=dt.date(2026,11,5),count=4,fetcher=sometimes)
                 self.assertEqual(r["complete_days"],3)
                 self.assertNotIn("2026-11-04",r["manifest"]["days"])
-                self.assertEqual(r["manifest"]["days"]["2026-11-05"]["count"],0)
-                self.assertTrue((folder/"2026-11-05.json").exists())
+                self.assertEqual(r["manifest"]["days"]["2026-11-03"]["count"],0)
+                self.assertTrue((folder/"2026-11-03.json").exists())
     def test_feed_sync_uses_all_verified_recent_day_papers(self):
         from scripts import sync
         with tempfile.TemporaryDirectory() as tmp:
@@ -102,10 +123,12 @@ class DailyArchiveTests(unittest.TestCase):
             ar.manual_days("2024-11-07","2024-11-05")
         with self.assertRaises(ValueError):
             ar.manual_days("2027-01-01","2027-01-02")
+        with self.assertRaises(ValueError):
+            ar.manual_days(dt.datetime.now(dt.timezone.utc).date().isoformat(), dt.datetime.now(dt.timezone.utc).date().isoformat())
 
     def test_next_missing_days_backfilled(self):
         days=ar.select_days(dt.date(2026,11,5),{"days":{"2026-11-02":{"complete":True}}},count=5)
-        self.assertEqual(days[:3],[dt.date(2026,11,5),dt.date(2026,11,4),dt.date(2026,11,3)])
+        self.assertEqual(days[:3],[dt.date(2026,11,4),dt.date(2026,11,3),dt.date(2026,11,1)])
         self.assertNotIn(dt.date(2026,11,2),days)
 
 if __name__=="__main__": unittest.main()
