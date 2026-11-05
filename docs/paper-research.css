@@ -1,0 +1,27 @@
+/* Cohesive source-linked research detail and comparison surfaces */
+.axiovo-detail-tabs{display:flex;flex-wrap:wrap;gap:7px;align-items:center;padding:0 0 16px;margin:0 0 18px;border-bottom:1px solid var(--rl-border,#d6e5ef)}
+.axiovo-detail-tabs a,.axiovo-compare-link{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:9px 12px;border:1px solid var(--rl-border,#bcd6e6);border-radius:8px;font-size:12px;font-weight:700;color:var(--rl-text,#19354b);text-decoration:none}
+.axiovo-detail-tabs a:hover,.axiovo-compare-link:hover{background:var(--rl-soft,#e8f3fa);text-decoration:none}
+.axiovo-paper-section{scroll-margin-top:18px}
+.axiovo-paper-section h2{font-size:19px;margin:0 0 10px}
+.axiovo-paper-inline{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin:12px 0}
+.axiovo-paper-inline input{width:125px;min-height:39px;padding:9px;border:1px solid var(--rl-border,#c4d9e7);border-radius:8px;background:var(--rl-panel,#fff);color:var(--rl-text,#19354b)}
+#axiovo-paper-notes textarea{width:100%;min-height:150px;display:block;margin:12px 0;border-radius:9px;padding:11px;background:var(--rl-panel,#fff);color:var(--rl-text,#19354b);border:1px solid var(--rl-border,#c4d9e7)}
+#axiovo-paper-notes select,#axiovo-comparison select{width:100%;max-width:330px;min-height:40px;padding:9px;border:1px solid var(--rl-border,#c4d9e7);border-radius:8px;background:var(--rl-panel,#fff);color:var(--rl-text,#19354b);margin:8px 0}
+.axiovo-compare-page{max-width:1130px;margin:26px auto;padding:0 19px 45px;color:var(--rl-text,#19354b)}
+.axiovo-compare-page h1{font-size:clamp(26px,3vw,35px);line-height:1.2}
+.axiovo-breadcrumb{font-size:12px;margin-bottom:22px;color:var(--rl-muted,#678094)}
+.axiovo-compare-form{display:flex;align-items:end;gap:12px;flex-wrap:wrap;padding:16px;border:1px solid var(--rl-border,#ccdfeb);border-radius:12px;background:var(--rl-panel,#fff);margin:17px 0}
+.axiovo-compare-form label{display:grid;gap:7px;flex:1 1 210px;font-size:12px;font-weight:700}
+.axiovo-compare-form input{width:100%;padding:11px;font-size:14px;border-radius:8px;background:var(--rl-panel,#fff);color:var(--rl-text,#19354b);border:1px solid var(--rl-border,#ccdfeb)}
+.axiovo-compare-form button{background:var(--axiovo-accent,#126f9c);color:white;border:0;border-radius:8px;padding:12px 18px;min-height:44px;cursor:pointer}
+.axiovo-compare-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:17px}
+.axiovo-compare-paper{background:var(--rl-panel,#fff);padding:20px;border:1px solid var(--rl-border,#ccdfeb);border-radius:13px;min-width:0;overflow-wrap:anywhere}
+.axiovo-compare-paper h2{font-size:20px;line-height:1.35;margin:10px 0}
+.axiovo-compare-paper h3{font-size:14px;margin-top:21px}
+.axiovo-compare-paper .axiovo-compare-id{font-size:12px;color:var(--axiovo-accent,#126f9c);font-weight:800}
+.axiovo-compare-abstract{font-size:13px;line-height:1.7;white-space:pre-line}
+.axiovo-compare-note{background:var(--rl-soft,#edf4f8);border-radius:8px;padding:12px;font-size:13px;white-space:pre-wrap}
+.axiovo-compare-links{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.axiovo-compare-method{padding:14px;margin:20px 0;color:var(--rl-muted,#678094);font-size:13px}
+@media(max-width:740px){.axiovo-compare-grid{grid-template-columns:minmax(0,1fr)}.axiovo-compare-paper{padding:16px}}
