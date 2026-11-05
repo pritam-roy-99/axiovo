@@ -9,6 +9,7 @@ stays unavailable in the recording. No login, uploads or user secrets.
 from __future__ import annotations
 
 import array
+import asyncio
 import functools
 import http.server
 import io
@@ -28,20 +29,24 @@ OUT = DOCS / "assets"
 W, H, FPS, DURATION = 960, 540, 8, 7
 
 SCENES = [
-    ("Axiovo today", "Discover original research and keep it organized.",
-     "This is Axiovo's current homepage, captured directly from the running website."),
-    ("Latest arXiv", "Browse and filter the real indexed research feed.",
-     "Browse the latest available arXiv records, choose categories and verify papers at their source."),
-    ("Explore literature", "Select a field, search articles, and filter by date.",
-     "Use Explore Literature for field-aware discovery, publication filters and in-page results."),
-    ("Paper actions", "Read the source, save a paper, and open research tools.",
-     "Paper cards provide direct arXiv links, reading-list controls and a research assistant."),
-    ("My Library & questions", "Organize reading and research questions in one workspace.",
-     "Switch to your library, manage saved references and develop research questions."),
-    ("Research Assistant", "Inspect research evidence and work with paper identifiers.",
-     "The Research Assistant opens a dedicated workspace for source-linked paper analysis."),
-    ("Research Tools", "Explore PDF reading, comparisons, citations and alerts.",
-     "Research Tools brings together archive search, document reading, comparisons and alerts."),
+    ("Welcome to Axiovo", "A clear, focused home for scientific discovery.",
+     "Welcome to Axiovo, a focused research discovery and reading workspace."),
+    ("Choose your discipline", "Start with one broad field; refine after entering Discover.",
+     "Begin by choosing your broad research field, without distracting filters."),
+    ("Refine in Discover", "Choose a research area and specific subtopics.",
+     "Inside Discover, narrow your field to research areas and specific interests."),
+    ("Explore current arXiv", "Browse paper cards, categories and original sources.",
+     "Browse indexed arXiv papers, inspect abstracts, and verify original sources."),
+    ("Search wider literature", "Use field-aware search and optional date filters.",
+     "Search wider arXiv linked literature, and refine sources and dates."),
+    ("Read and save", "Keep useful papers in your own reading collection.",
+     "Read the source or save a paper for your personal library."),
+    ("My research Library", "Revisit saved papers and develop research questions.",
+     "Return to your library to review saved papers and research questions."),
+    ("Research Assistant", "Investigate claims with links to underlying evidence.",
+     "Open Research Assistant for source linked paper analysis and questions."),
+    ("Research Tools", "PDF reading, comparison and further research utilities.",
+     "Use Research Tools for PDFs, comparisons, citations and focused analysis."),
 ]
 BG = (9, 30, 52)
 FOREGROUND = (243, 248, 253)
@@ -100,58 +105,65 @@ def open_page(page, url):
 
 
 def capture(browser, base):
-    page = browser.new_page(viewport={"width": 1280, "height": 720}, device_scale_factor=1)
-    page.set_default_timeout(6000)
-    screenshots = []
+    page = browser.new_page(viewport={"width":1280,"height":720},device_scale_factor=1)
+    page.set_default_timeout(9000)
+    screenshots=[]
     def snap(name):
-        # Render the actual page; the only additions to the video happen later.
-        image = Image.open(io.BytesIO(page.screenshot(type="png", animations="disabled")))
-        screenshots.append(image.convert("RGB").resize((W, H), Image.Resampling.LANCZOS))
-        print("Captured Axiovo:", name, "|", page.url, flush=True)
+        image=Image.open(io.BytesIO(page.screenshot(type="png",animations="disabled")))
+        screenshots.append(image.convert("RGB").resize((W,H),Image.Resampling.LANCZOS))
+        print("Captured Axiovo:",name,"|",page.url,flush=True)
 
-    open_page(page, base)
-    snap("homepage")
+    # Follow the exact live-user journey; never show a hidden legacy homepage
+    # or claim a card exists without actually waiting for the browser to render it.
+    open_page(page,base)
+    page.locator("#axiovo-entry-form").wait_for(state="visible")
+    snap("new minimal homepage")
 
-    open_page(page, base + "#discover")
-    safe_click(page, "#rl-source-arxiv")
-    safe_scroll(page, "#local-feed-view")
+    page.select_option("#axiovo-entry-field","quantum")
+    snap("choose broad discipline")
+    page.locator("#axiovo-entry-form button[type=submit]").click()
+    page.wait_for_url("**/discover.html#discover",timeout=14000)
+    safe_click(page,"#rl-focus-field-details > summary")
+    safe_scroll(page,"#rl-focus-bar")
+    snap("choose subfields in Discover")
+
+    safe_click(page,"#rl-source-arxiv")
+    safe_scroll(page,"#local-feed-view")
     snap("latest arXiv")
 
-    safe_click(page, "#rl-source-scholarly")
-    safe_scroll(page, "#scholarly-discovery")
-    snap("explore literature")
+    safe_click(page,"#rl-source-scholarly")
+    safe_scroll(page,"#scholarly-discovery")
+    snap("wider literature search")
 
-    # Capture the real cards and action buttons, without inventing results.
-    safe_click(page, "#rl-source-arxiv")
-    safe_scroll(page, "#papers .paper")
-    if not page.locator("#papers .paper").count():
-        safe_scroll(page, "#local-feed-view")
-    # Save a real indexed paper in this isolated recording browser, when available.
-    # This is the site's own click handler, never a forged storage entry.
-    safe_click(page, "#papers .paper .rl-save-button")
-    snap("paper actions")
-
-    open_page(page, base + "#workspace")
+    safe_click(page,"#rl-source-arxiv")
     try:
-        page.locator("#workspace-panel .rl-workspace").first.wait_for(timeout=9000)
+        page.locator("#papers .paper .rl-save-button").first.wait_for(timeout=12000)
+        safe_scroll(page,"#papers .paper")
+        safe_click(page,"#papers .paper .rl-save-button")
     except Exception:
-        pass
-    safe_scroll(page, "#workspace-panel")
+        safe_scroll(page,"#local-feed-view")
+    snap("read and save a real indexed paper")
+
+    # Use the actual navigation instead of linking back to hidden homepage.
+    safe_click(page,'.rl-nav a[href*="#workspace"]')
+    try:page.locator("#workspace-panel #library-list").wait_for(timeout=14000)
+    except Exception:pass
+    safe_scroll(page,"#workspace-panel")
     snap("library and questions")
 
-    open_page(page, base + "copilot.html")
-    safe_scroll(page, "main")
+    open_page(page,base+"copilot.html")
+    safe_scroll(page,"main")
     snap("research assistant")
 
-    open_page(page, base + "lab.html")
-    safe_scroll(page, ".lab-tabs")
+    open_page(page,base+"lab.html")
+    safe_scroll(page,"main")
     snap("research tools")
 
     page.close()
-    if len(screenshots) != len(SCENES):
-        raise RuntimeError("Incomplete live-page capture")
+    if len(screenshots)!=len(SCENES):
+        raise RuntimeError("Incomplete tour: captured "+str(len(screenshots))+
+                           " of "+str(len(SCENES))+" actual pages")
     return screenshots
-
 
 def timecode(seconds):
     ms = round(seconds * 1000)
@@ -172,33 +184,65 @@ def compose(image, index, progress):
 
 
 def audio_narration(folder):
-    exe = shutil.which("espeak-ng") or shutil.which("espeak")
-    if not exe:
-        return None
-    samplerate = 22050
-    total = len(SCENES) * DURATION
-    mix = array.array("h", [0]) * (total * samplerate)
-    for i, (_, _, words) in enumerate(SCENES):
-        path = Path(folder) / f"speech{i}.wav"
-        subprocess.run([exe, "-v", "en-us", "-s", "155", "-a", "115", "-w", str(path), words],
-                       check=True, stdout=subprocess.DEVNULL)
-        with wave.open(str(path), "rb") as wav:
-            if (wav.getnchannels(), wav.getsampwidth(), wav.getframerate()) != (1, 2, samplerate):
-                raise RuntimeError("Unexpected narration format")
-            samples = array.array("h")
-            samples.frombytes(wav.readframes(wav.getnframes()))
-        begin = int((i * DURATION + 0.3) * samplerate)
-        end = min(int(((i + 1) * DURATION - 0.12) * samplerate), len(mix))
-        for j, val in enumerate(samples[:max(0, end - begin)]):
-            mix[begin + j] = val
-    path = Path(folder) / "narration.wav"
-    with wave.open(str(path), "wb") as wav:
-        wav.setnchannels(1)
-        wav.setsampwidth(2)
-        wav.setframerate(samplerate)
-        wav.writeframes(mix.tobytes())
-    return path
+    """Prefer a warm, expressive adult female neural voice.
 
+    If an external synthesis provider is unavailable during the build,
+    synthesize a female-variant local voice instead. Never create silent
+    videos or mislabel the local fallback as a neural voice.
+    """
+    exe=shutil.which("espeak-ng") or shutil.which("espeak")
+    ffmpeg=shutil.which("ffmpeg")
+    if not ffmpeg:
+        raise RuntimeError("ffmpeg required for narrated Axiovo video")
+    samplerate=22050
+    outputs=[]
+    engine="local feminine voice"
+    try:
+        import edge_tts
+        async def synthesize_all():
+            for i,(_,_,words) in enumerate(SCENES):
+                path=Path(folder)/f"neural{i}.mp3"
+                voice=edge_tts.Communicate(words,voice="en-US-JennyNeural",
+                                           rate="-8%",pitch="-3Hz")
+                await asyncio.wait_for(voice.save(str(path)),timeout=27)
+                if not path.exists() or path.stat().st_size<500:
+                    raise RuntimeError("Empty neural narration")
+                outputs.append(path)
+        asyncio.run(synthesize_all())
+        engine="Jenny neural voice"
+    except Exception as exc:
+        print("Neural voice not available; using local feminine voice:",str(exc)[:180],flush=True)
+        outputs.clear()
+        if not exe:
+            raise RuntimeError("No audio narration engine available") from exc
+        for i,(_,_,words) in enumerate(SCENES):
+            path=Path(folder)/f"speech{i}.wav"
+            subprocess.run([exe,"-v","en-us+f3","-s","145","-p","57",
+                            "-a","120","-w",str(path),words],check=True,
+                            stdout=subprocess.DEVNULL)
+            outputs.append(path)
+    total=len(SCENES)*DURATION
+    mix=array.array("h",[0])*(total*samplerate)
+    for i,source in enumerate(outputs):
+        wav_path=Path(folder)/f"standard{i}.wav"
+        subprocess.run([ffmpeg,"-y","-hide_banner","-loglevel","error",
+                        "-i",str(source),"-ac","1","-ar",str(samplerate),
+                        "-c:a","pcm_s16le",str(wav_path)],check=True)
+        with wave.open(str(wav_path),"rb") as wav:
+            if (wav.getnchannels(),wav.getsampwidth(),wav.getframerate())!=(1,2,samplerate):
+                raise RuntimeError("Unexpected voice sample format")
+            samples=array.array("h")
+            samples.frombytes(wav.readframes(wav.getnframes()))
+        begin=int((i*DURATION+.25)*samplerate)
+        end=min(int(((i+1)*DURATION-.08)*samplerate),len(mix))
+        for j,value in enumerate(samples[:max(0,end-begin)]):
+            mix[begin+j]=value
+    target=Path(folder)/"narration.wav"
+    with wave.open(str(target),"wb") as wav:
+        wav.setnchannels(1);wav.setsampwidth(2);wav.setframerate(samplerate)
+        wav.writeframes(mix.tobytes())
+    print("Narration engine:",engine,flush=True)
+    return target
 
 def build_video(images):
     OUT.mkdir(parents=True, exist_ok=True)
