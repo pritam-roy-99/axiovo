@@ -6,6 +6,36 @@ const META_KEY="researchlens-library-metadata-v1";
 const OLD_KEY="researchlens-reading-list";
 const FIELD_KEY="researchlens-field-saved-v1";
 const PROJECT_KEY="researchlens-research-projects-v1";
+const COLLECTION_KEY="axiovo-paper-collections-v1";
+let activeCollection="all";
+function collections(){const val=read(COLLECTION_KEY,[]);return Array.isArray(val)?val.filter(x=>x&&typeof x.name==="string"&&Array.isArray(x.paper_keys)):[]}
+function saveCollections(items){write(COLLECTION_KEY,items)}
+function collectionUI(){
+ const controls=$("library-search")?.parentElement;
+ if(!controls||$("axiovo-collection-filter"))return;
+ const wrap=document.createElement("div");wrap.className="axiovo-collection-controls";
+ const select=document.createElement("select");select.id="axiovo-collection-filter";select.setAttribute("aria-label","Filter research collection");
+ const create=document.createElement("button");create.type="button";create.className="rl-button secondary";create.textContent="+ New collection";
+ create.onclick=()=>{
+  const name=prompt("Name your paper collection (for example, Quantum foundations)");
+  if(!name||!name.trim())return;
+  const n=name.trim().slice(0,90);const items=collections();
+  if(items.some(x=>x.name.toLowerCase()===n.toLowerCase()))return;
+  const id="collection-"+Date.now().toString(36);
+  items.push({id,name:n,paper_keys:[]});saveCollections(items);activeCollection=id;updateCollectionFilter();renderLibrary();
+ };
+ select.onchange=()=>{activeCollection=select.value;renderLibrary()};
+ wrap.append(select,create);controls.append(wrap);updateCollectionFilter();
+}
+function updateCollectionFilter(){
+ const select=$("axiovo-collection-filter");if(!select)return;
+ select.replaceChildren();
+ const a=document.createElement("option");a.value="all";a.textContent="All collections";select.append(a);
+ for(const c of collections()){const o=document.createElement("option");o.value=c.id;o.textContent=c.name+" ("+c.paper_keys.length+")";select.append(o)}
+ if(activeCollection!=="all"&&!collections().some(x=>x.id===activeCollection))activeCollection="all";
+ select.value=activeCollection;
+}
+
 const fieldPrefs=()=>{
  try{const p=JSON.parse(localStorage.getItem("researchlens-field-explorer-v1")||"{}");return p&&typeof p==="object"?p:{}}catch{return{}}};
 function read(key,fallback){try{return JSON.parse(localStorage.getItem(key)||"null")??fallback}catch{return fallback}}
@@ -43,10 +73,21 @@ for(const p of recent)root.append(paperCard(p))
 }
 function saveMeta(key,value){metadata[key]={...(metadata[key]||{status:"to-read",note:""}),...value};write(META_KEY,metadata)}
 function renderLibrary(){const root=$("library-list");root.replaceChildren();const q=$("library-search").value.trim().toLowerCase(),status=$("library-filter").value;const papers=library();lookup=new Map(papers.map(p=>[p.key,p]));$("library-count").textContent=papers.length+" papers";
-const filtered=papers.filter(p=>(status==="all"||(metadata[p.key]?.status||"to-read")===status)&&(!q||[p.title,(p.authors||[]).join(" "),p.arxiv_id||""].join(" ").toLowerCase().includes(q)));
+const selectedCollection=collections().find(x=>x.id===activeCollection);const filtered=papers.filter(p=>(!selectedCollection||selectedCollection.paper_keys.includes(p.key))&&(status==="all"||(metadata[p.key]?.status||"to-read")===status)&&(!q||[p.title,(p.authors||[]).join(" "),p.arxiv_id||""].join(" ").toLowerCase().includes(q)));
 if(!filtered.length){text(root,"div",papers.length?"No saved papers match these filters.":"No saved papers yet. Discover a paper and save it to your Library.","rl-empty");return}
 for(const p of filtered.slice(0,50)){
  const art=paperCard(p);const row=text(art,"div","","rl-entry-tools");
+ const collectionsSelect=document.createElement("select");collectionsSelect.setAttribute("aria-label","Assign "+p.title+" to a collection");
+ const first=document.createElement("option");first.value="";first.textContent="Add to collection…";collectionsSelect.append(first);
+ for(const c of collections()){const opt=document.createElement("option");opt.value=c.id;opt.textContent=(c.paper_keys.includes(p.key)?"✓ ":"")+c.name;collectionsSelect.append(opt)}
+ collectionsSelect.onchange=()=>{
+  const items=collections(),c=items.find(x=>x.id===collectionsSelect.value);if(!c)return;
+  if(c.paper_keys.includes(p.key))c.paper_keys=c.paper_keys.filter(x=>x!==p.key);
+  else c.paper_keys.push(p.key);
+  saveCollections(items);updateCollectionFilter();renderLibrary();
+ };
+ row.append(collectionsSelect);
+
  const select=document.createElement("select");select.setAttribute("aria-label","Reading status for "+p.title);
  for(const [v,t] of [["to-read","To read"],["reading","Reading"],["done","Reviewed"]]){const opt=document.createElement("option");opt.value=v;opt.textContent=t;select.append(opt)}
  select.value=statuses.has(metadata[p.key]?.status)?metadata[p.key].status:"to-read";
@@ -87,7 +128,7 @@ for(const p of filtered.slice(0,50)){
 if(filtered.length>50)text(root,"p","Showing the first 50 matching saved papers. Narrow the search to find more.","rl-subtext")
 }
 function init(){
- fillFocus();$("library-search").addEventListener("input",renderLibrary);$("library-filter").addEventListener("change",renderLibrary);
+ fillFocus();collectionUI();$("library-search").addEventListener("input",renderLibrary);$("library-filter").addEventListener("change",renderLibrary);
  $("quick-search").addEventListener("submit",e=>{
  e.preventDefault();const q=$("research-query").value.trim();if(!q)return;
  const input=document.getElementById("scholar-query"),form=document.getElementById("scholar-search-form"),source=document.getElementById("rl-source-scholarly");
