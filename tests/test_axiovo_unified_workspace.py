@@ -16,19 +16,19 @@ class Nodes(HTMLParser):
             self.ids.setdefault(attrs["id"], []).append(tag)
 
 class UnifiedWorkspaceTests(unittest.TestCase):
-    def test_single_homepage_has_discover_and_workspace(self):
-        html = (DOCS / "index.html").read_text()
+    def test_dedicated_discover_has_discover_and_workspace(self):
+        html = (DOCS / "discover.html").read_text()
         parser = Nodes()
         parser.feed(html)
         for required in ("discover-shell", "workspace-panel", "workflow-discover",
                          "workflow-workspace", "scholar-results", "rl-focus-bar"):
             self.assertEqual(len(parser.ids.get(required, [])), 1, required)
         self.assertIn('src="./unified-workspace.js"', html)
-        self.assertIn('href="./#workspace"', html)
+        self.assertIn('href="./discover.html#workspace"', html)
 
     def test_legacy_workspace_still_supplies_markup_and_redirects(self):
         legacy = (DOCS / "workspace.html").read_text()
-        self.assertIn('location.replace("./#workspace")', legacy)
+        self.assertIn('location.replace("./discover.html#workspace")', legacy)
         for elem in ("library-list", "library-search", "research-project-form",
                      "research-recommendations", "research-project-list"):
             self.assertIn(f'id="{elem}"', legacy)
