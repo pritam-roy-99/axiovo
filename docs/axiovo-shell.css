@@ -255,3 +255,107 @@ html body header.rl-global-header > a.rl-logo > span.rl-logo-mark{
 .axiovo-follow-details .axiovo-author-follow :is(select,button) {max-width:100%;min-height:36px;border:1px solid var(--rd-border,#bcd2e3);border-radius:7px;padding:5px 8px;color:var(--rd-ink,#15344c);background:var(--rd-surface,#fff);font:inherit}
 .axiovo-follow-details .axiovo-author-follow [hidden] {display:none}
 .axiovo-follow-details>a {display:inline-block;font-size:.79rem}
+
+/* Shared header layout v3: never let Settings and Night/Day separate.
+   All pages use the same two-control group, independent of page-specific CSS. */
+html body header.rl-global-header .axiovo-header-appearance {
+  display:flex!important;
+  flex:0 0 auto!important;
+  align-items:center!important;
+  justify-content:flex-end!important;
+  flex-wrap:nowrap!important;
+  gap:8px!important;
+  min-width:0!important;
+  margin-left:auto!important;
+  order:5!important;
+}
+html body header.rl-global-header .axiovo-header-appearance > :is(.rl-settings-link,.theme-toggle) {
+  box-sizing:border-box!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  flex:0 0 auto!important;
+  width:auto!important;
+  min-width:0!important;
+  height:42px!important;
+  min-height:42px!important;
+  margin:0!important;
+  padding:0 14px!important;
+  border:1px solid #4f7797!important;
+  border-radius:10px!important;
+  background:#163a57!important;
+  color:#eef7ff!important;
+  font:600 14px/1 Inter,system-ui,sans-serif!important;
+  text-decoration:none!important;
+  white-space:nowrap!important;
+  cursor:pointer!important;
+}
+html body header.rl-global-header .axiovo-header-appearance > .rl-settings-link[aria-current="page"] {
+  background:#187daa!important;
+}
+html body header.rl-global-header .axiovo-header-appearance > :is(.rl-settings-link,.theme-toggle):hover {
+  background:#245879!important;
+  border-color:#89b2d3!important;
+}
+html body header.rl-global-header .axiovo-header-appearance > :is(.rl-settings-link,.theme-toggle):focus-visible {
+  outline:3px solid #75d7ea!important;
+  outline-offset:3px!important;
+}
+@media (max-width:760px) {
+  html body header.rl-global-header {
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) auto!important;
+    align-items:center!important;
+    justify-items:stretch!important;
+    gap:10px 8px!important;
+    padding:12px 14px!important;
+    min-width:0!important;
+  }
+  html body header.rl-global-header > .rl-logo {
+    grid-column:1!important;
+    grid-row:1!important;
+    justify-self:start!important;
+    min-width:0!important;
+    font-size:18px!important;
+  }
+  html body header.rl-global-header > .axiovo-header-appearance {
+    grid-column:2!important;
+    grid-row:1!important;
+    justify-self:end!important;
+    margin:0!important;
+    order:0!important;
+    gap:6px!important;
+  }
+  html body header.rl-global-header .axiovo-header-appearance > :is(.rl-settings-link,.theme-toggle) {
+    min-height:38px!important;
+    height:38px!important;
+    padding:0 10px!important;
+    font-size:12px!important;
+  }
+  html body header.rl-global-header > .axiovo-nav-return {
+    grid-column:1 / -1!important;
+    grid-row:2!important;
+    width:100%!important;
+    margin:0!important;
+    order:0!important;
+  }
+  html body.axiovo-home header.rl-global-header > .axiovo-nav-return {display:none!important}
+  html body header.rl-global-header > .rl-nav {
+    grid-column:1 / -1!important;
+    grid-row:3!important;
+    width:100%!important;
+    margin:0!important;
+    order:0!important;
+    flex:initial!important;
+  }
+  html body.axiovo-home header.rl-global-header > .rl-nav {grid-row:2!important}
+}
+@media (max-width:360px) {
+  html body header.rl-global-header > .rl-logo {font-size:16px!important;gap:5px!important}
+  html body header.rl-global-header .rl-logo .rl-logo-mark {
+    width:29px!important;height:29px!important;min-width:29px!important;font-size:19px!important;
+  }
+  html body header.rl-global-header .axiovo-header-appearance > :is(.rl-settings-link,.theme-toggle) {
+    padding:0 7px!important;font-size:11px!important;
+  }
+}
