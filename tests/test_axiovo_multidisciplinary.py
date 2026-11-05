@@ -25,7 +25,7 @@ class SourceAndPaletteTests(unittest.TestCase):
   page=(DOCS/"index.html").read_text()
   for value in ('id="biorxiv-discovery"','id="rl-source-biorxiv"','id="axiovo-biorxiv-query"'):
    self.assertIn(value,page)
-  self.assertIn('const biology=',(DOCS/"discover.js").read_text())
+  self.assertIn('biorxiv:document.getElementById("biorxiv-discovery")',(DOCS/"discover.js").read_text())
   self.assertIn('fetch("./data/biorxiv.json"',(DOCS/"biorxiv.js").read_text())
   lib=(DOCS/"workspace.html").read_text()
   self.assertIn('id="axiovo-biorxiv-library"',lib)
