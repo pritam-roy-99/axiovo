@@ -19,6 +19,23 @@
   settings.textContent="Settings";settings.setAttribute("aria-label","Researcher settings and account options");
   if(file==="profiles.html")settings.setAttribute("aria-current","page");
   header.classList.add("rl-global-header");header.replaceChildren(logo,nav,settings);
+  // Explicit, reliable home/back controls. Back returns to the immediately
+  // previous same-origin page; a direct visit falls back to the homepage.
+  if(file!=="index.html"){
+   const home=document.createElement("a");home.href="./";home.className="axiovo-home-link";
+   home.textContent="⌂ Home";home.setAttribute("aria-label","Back to Axiovo homepage");
+   const back=document.createElement("button");back.type="button";back.className="axiovo-back-button";
+   back.textContent="← Back";back.setAttribute("aria-label","Go to previous page, or Axiovo homepage");
+   back.onclick=()=>{
+    let sameOrigin=false;
+    try{sameOrigin=Boolean(document.referrer)&&new URL(document.referrer).origin===location.origin}catch{}
+    if(sameOrigin&&history.length>1)history.back();
+    else location.assign(new URL("./",location.href).href);
+   };
+   const actions=document.createElement("div");actions.className="axiovo-nav-return";
+   actions.append(back,home);
+   header.insertBefore(actions,nav);
+  }
   if(toggle)header.append(toggle);
   const footer=document.createElement("div");footer.className="axiovo-credit";
   const stamp=document.createElement("span");stamp.textContent="Built with ChatGPT by OpenAI ❤️";
