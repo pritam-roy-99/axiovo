@@ -6,6 +6,13 @@ const Archive=require("../docs/arxiv-daily-archive.js");
  assert.deepEqual(days,["2026-11-03","2026-11-04","2026-11-05"]);
  assert.throws(()=>Archive.dates("2026-11-05","2026-11-03"),/Invalid/);
  assert.throws(()=>Archive.dates("2026-01-01","2026-11-01"),/exceeds/);
+ const official=new URL(Archive.officialDateSearchUrl({from:"2024-11-05",to:"2024-11-08",query:"quantum key distribution"}));
+ assert.equal(official.hostname,"arxiv.org");
+ assert.equal(official.searchParams.get("date-filter_by"),"date_range");
+ assert.equal(official.searchParams.get("date-from_date"),"2024-11-05");
+ assert.equal(official.searchParams.get("date-to_date"),"2024-11-08");
+ assert.equal(official.searchParams.get("date-date_type"),"submitted_date_first");
+ assert.equal(official.searchParams.get("terms-0-term"),"quantum key distribution");
  const papers=Array.from({length:150},(_,i)=>({
   id:"2611."+String(i+1).padStart(5,"0"),title:"Study "+i,
   abstract:"Research across quantum mathematics biology",
