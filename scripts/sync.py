@@ -261,9 +261,13 @@ def main():
         print("No verified date shards or OAI metadata available; falling back to sampled categories")
         fresh = fetch_recent()
     pinned = read_pinned_ids()
-    historical = fetch_by_ids(pinned)
+    # Do not repeatedly request already-cached historical IDs every hour;
+    # this previously amplified arXiv HTTP 429 responses.
+    covered_ids = {p["id"] for p in old.get("papers", []) + fresh if p.get("id")}
+    pending = [id for id in pinned if re.sub(r"v\\d+$", "", id) not in covered_ids]
+    historical = fetch_by_ids(pending)
     if pinned:
-        print("Pinned ID lookup:", len(historical), "resolved of", len(pinned))
+        print("Pinned ID lookup:", len(historical), "newly resolved of", len(pending), "missing IDs (", len(pinned), "total pins)")
     fresh.extend(historical)
     if not fresh:
         raise RuntimeError("Empty response; retaining existing data")
