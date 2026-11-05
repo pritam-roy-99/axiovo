@@ -167,14 +167,27 @@ async function announcementDateSearch(query,from,to,field,signal){
    " These dates are arXiv announcement dates, not OpenAlex publication or original-submission dates."};
  }catch(error){
   if(error.name==="AbortError")throw error;
-  return {items:[],message:"arXiv announcement records are not yet available in Axiovo ("+String(error.message||error)+"). Today's empty OpenAlex publication-date results are not authoritative. Browse arXiv's official new-paper list while this source is being synchronized."};
+  try{
+   const response=await fetch("./data/oai-recent.json?fresh="+Date.now(),{cache:"no-store",signal});
+   if(!response.ok)throw Error("OAI snapshot HTTP "+response.status);
+   const oai=await response.json();
+   if(!Array.isArray(oai.papers)||!oai.papers.length)throw Error("OAI snapshot has no records");
+   const records=oai.papers.filter(p=>announcementMatches({...p,primary_category:p.categories?.[0]},query,field)&&
+      (p.created===from||p.oai_datestamp===from));
+   return {items:records.map(p=>announcementWork({...p,announcement_date:from})).map(w=>({...w,__source:"arxiv-oai",__announcement_date:null})),
+    message:"arXiv OAI metadata: "+records.length+" papers with initial submission or metadata modification dated "+from+
+      ". Announcement date is not verified. Official RSS snapshot is unavailable; this is a provisional same-page listing."};
+  }catch(oaiError){
+   if(oaiError.name==="AbortError")throw oaiError;
+   return {items:[],message:"Latest arXiv sources are not yet synchronized in Axiovo (RSS: "+String(error.message||error)+"; OAI: "+String(oaiError.message||oaiError)+"). No zero-paper claim is made."};
+  }
  }
 }
 function renderPaper(w){const art=node("article",undefined,"paper");const header=node("div",undefined,"row");header.append(node("span",String(w.publication_year||"Year unknown"),"pill"));if(w.cited_by_count!==null&&w.cited_by_count!==undefined)header.append(node("span",w.cited_by_count+" citations","pill"));if(w.__source==="local-arxiv")header.append(node("span","Cached arXiv · offline fallback","pill"));
-if(w.__source==="arxiv-announcement")header.append(node("span","Official arXiv announcement","pill"));const access=w.open_access?.is_oa;if(access)header.append(node("span","Open access","pill"));if(w.__source==="semantic")header.append(node("span","AI semantic match · verify topic","pill rl-semantic-badge"));art.append(header);
+if(w.__source==="arxiv-oai")header.append(node("span","arXiv OAI · provisional date","pill"));if(w.__source==="arxiv-announcement")header.append(node("span","Official arXiv announcement","pill"));const access=w.open_access?.is_oa;if(access)header.append(node("span","Open access","pill"));if(w.__source==="semantic")header.append(node("span","AI semantic match · verify topic","pill rl-semantic-badge"));art.append(header);
 const h=node("h3",w.display_name||w.title||"Untitled research");art.append(h);
 const authors=(w.authorships||[]).slice(0,6).map(x=>x.author?.display_name).filter(Boolean);art.append(node("p",authors.join(", ")+(w.authorships?.length>6?" et al.":""),"authors"));
-const originalDate=w.publication_date||"";if(originalDate)art.append(node("p",(w.__source==="arxiv-announcement"?"arXiv announced: ":w.__source==="local-arxiv"?"arXiv first submitted: ":"Publication date in scholarly index (not verified arXiv v1): ")+originalDate,"meta"));
+const originalDate=w.publication_date||"";if(originalDate)art.append(node("p",(w.__source==="arxiv-announcement"?"arXiv announced: ":w.__source==="arxiv-oai"?"arXiv OAI matched date (not verified announcement): ":w.__source==="local-arxiv"?"arXiv first submitted: ":"Publication date in scholarly index (not verified arXiv v1): ")+originalDate,"meta"));
 const venue=w.primary_location?.source?.display_name;if(venue)art.append(node("p",venue,"authors"));
 if(w.__abstract)art.append(node("p",w.__abstract.slice(0,820)+(w.__abstract.length>820?"…":""),"summary"));if(w.abstract_inverted_index){const entries=[];for(const [term,positions] of Object.entries(w.abstract_inverted_index)){for(const pos of positions)if(pos<140)entries[pos]=term}if(entries.length)art.append(node("p",entries.filter(Boolean).join(" ").slice(0,820)+(entries.length>140?"…":""),"summary"))}
 const row=node("div",undefined,"row actions rl-paper-actionbar");const original=Arxiv?.candidates(w)[0];if(original){link(row,"Read on arXiv",Arxiv.abs(original.base));link(row,"PDF",Arxiv.pdf(original.base));}else{link(row,"OpenAlex",w.id)}
@@ -204,7 +217,7 @@ if(original){
  versions.append(version,selected,saveExact);art.append(versions);
 }
 art.append(row);return art}
-function render(){const root=$("results");root.replaceChildren();const isAnnouncement=!showingSaved&&items[0]?.__source==="arxiv-announcement";const perPage=40;const display=showingSaved?saved.slice().reverse():isAnnouncement?items.slice((page-1)*perPage,page*perPage):items;$("result-heading").textContent=showingSaved?"Your saved papers":"Literature results";if(!display.length){root.append(node("div",showingSaved?"No papers saved yet. Save papers from your search results.":"No matching records to display.","empty"))}else for(const w of display)root.append(renderPaper(w));
+function render(){const root=$("results");root.replaceChildren();const isAnnouncement=!showingSaved&&["arxiv-announcement","arxiv-oai"].includes(items[0]?.__source);const perPage=40;const display=showingSaved?saved.slice().reverse():isAnnouncement?items.slice((page-1)*perPage,page*perPage):items;$("result-heading").textContent=showingSaved?"Your saved papers":"Literature results";if(!display.length){root.append(node("div",showingSaved?"No papers saved yet. Save papers from your search results.":"No matching records to display.","empty"))}else for(const w of display)root.append(renderPaper(w));
 $("pagination").textContent=showingSaved?saved.length+" locally saved":isAnnouncement?("Announcement papers "+(display.length?(page-1)*perPage+1:0)+"–"+Math.min(page*perPage,items.length)+" of "+items.length):("Search batch "+page+" · "+items.length+" relevant papers shown");$("prev").disabled=showingSaved||busy||page===1;$("next").disabled=showingSaved||busy||(isAnnouncement?page*perPage>=items.length:page*100>=Math.min(total,10000))}
 async function search(){
  if(requestController)requestController.abort();
@@ -441,7 +454,7 @@ $("sort").onchange=()=>{page=1;search()};
 $("latest").onclick=()=>{const dateParts=Object.fromEntries(new Intl.DateTimeFormat("en-US",{timeZone:"Asia/Kolkata",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date()).map(p=>[p.type,p.value]));const day=dateParts.year+"-"+dateParts.month+"-"+dateParts.day;$("sort").value="publication_date:desc";$("from").value=day;$("to").value=day;page=1;search()};
 $("clear-dates").onclick=()=>{$("from").value="";$("to").value="";persist();page=1;search()};
 $("show-saved").onclick=()=>{showingSaved=true;setStatus("This collection is stored only in your current browser.");render()};
-$("prev").onclick=()=>{if(page>1){page--;if(items[0]?.__source==="arxiv-announcement")render();else search()}};$("next").onclick=()=>{if(items[0]?.__source==="arxiv-announcement"){if(page*40<items.length){page++;render()}}else if(page*100<Math.min(total,10000)){page++;search()}};
+$("prev").onclick=()=>{if(page>1){page--;if(["arxiv-announcement","arxiv-oai"].includes(items[0]?.__source))render();else search()}};$("next").onclick=()=>{if(["arxiv-announcement","arxiv-oai"].includes(items[0]?.__source)){if(page*40<items.length){page++;render()}}else if(page*100<Math.min(total,10000)){page++;search()}};
 $("export-bib").onclick=()=>{if(!saved.length){setStatus("Save a paper before exporting citations.");return}download("researchlens-reading-list.bib",saved.map(bib).join("\n"),"text/plain;charset=utf-8")};
 $("export-json").onclick=()=>download("researchlens-field-reading-list.json",JSON.stringify(saved,null,2),"application/json");
 const u=new URLSearchParams(location.search);if(u.get("field")&&FIELDS[u.get("field")]){state.field=u.get("field");if(!FIELDS[state.field].topics.includes(state.topic)){state.topic=FIELDS[state.field].topics[0];state.subtopic=""}$("field").value=state.field;drawField()}if(u.get("q")){$("query").value=u.get("q").slice(0,250);state.query=$("query").value}if(u.get("from"))$("from").value=u.get("from").slice(0,10);if(u.get("to"))$("to").value=u.get("to").slice(0,10);if(["relevance","publication_date:desc","cited_by_count:desc"].includes(u.get("sort")))$("sort").value=u.get("sort");const dateLink=normalizeSearchDates();persist();if(dateLink.changed)setStatus("The requested future date range was removed; searching available papers.");if($("query").value.trim()||state.field!=="general")search();
