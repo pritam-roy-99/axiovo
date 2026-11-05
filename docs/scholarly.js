@@ -438,7 +438,7 @@ $("search-author").onclick=()=>{
 };
 $("search-form").onsubmit=e=>{e.preventDefault();page=1;search()};
 $("sort").onchange=()=>{page=1;search()};
-$("latest").onclick=()=>{$("sort").value="publication_date:desc";$("from").value="";$("to").value="";page=1;search()};
+$("latest").onclick=()=>{const dateParts=Object.fromEntries(new Intl.DateTimeFormat("en-US",{timeZone:"Asia/Kolkata",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date()).map(p=>[p.type,p.value]));const day=dateParts.year+"-"+dateParts.month+"-"+dateParts.day;$("sort").value="publication_date:desc";$("from").value=day;$("to").value=day;page=1;search()};
 $("clear-dates").onclick=()=>{$("from").value="";$("to").value="";persist();page=1;search()};
 $("show-saved").onclick=()=>{showingSaved=true;setStatus("This collection is stored only in your current browser.");render()};
 $("prev").onclick=()=>{if(page>1){page--;if(items[0]?.__source==="arxiv-announcement")render();else search()}};$("next").onclick=()=>{if(items[0]?.__source==="arxiv-announcement"){if(page*40<items.length){page++;render()}}else if(page*100<Math.min(total,10000)){page++;search()}};
