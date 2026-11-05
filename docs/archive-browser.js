@@ -89,7 +89,8 @@ function atom(xml){
 }
 function chosenTerm(){return state.query||((state.scope==="subfield")?(state.subfield||field().name):"")}
 async function remote(){
- const term=(source==="arxiv"?(state.query||state.subfield):chosenTerm()).slice(0,150);
+ const isCategoryCode=/^[a-z-]+(?:\.[A-Za-z-]+)?$/.test(state.subfield||"");
+ const term=(source==="arxiv"?(state.query||(!isCategoryCode&&state.scope==="subfield"?state.subfield:"")):chosenTerm()).slice(0,150);
  if(source==="arxiv"){
   const chosen=state.scope==="subfield"?(state.subfield||field().code):"";
   const code=/^[a-z-]+(?:\.[A-Za-z-]+)?$/.test(chosen)?chosen:field().code;
