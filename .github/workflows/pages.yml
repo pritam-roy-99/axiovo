@@ -44,6 +44,10 @@ jobs:
       - name: Validate website scripts (deployment required)
         id: validate_website_scripts
         run: python -m scripts.validate_site
+      - name: Test source identity, announcement freshness and precision ranking
+        run: |
+          node tests/archive-data.test.js
+          node tests/search-accuracy.test.js
       - name: Test research relevance ranking
         id: test_research_relevance_ranking
         continue-on-error: true
