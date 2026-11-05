@@ -87,6 +87,14 @@ def main():
             assert page.locator("#biorxiv-discovery").is_visible()
             page.locator("#rl-source-arxiv").click()
             assert page.locator("#arxiv-discovery").is_visible()
+            assert page.locator(".axiovo-reading-modes button").count()==4
+            recommended=page.locator(".axiovo-reading-modes button").nth(1)
+            recommended.click()
+            assert recommended.get_attribute("aria-pressed")=="true"
+            latest=page.locator(".axiovo-reading-modes button").first
+            latest.click()
+            assert latest.get_attribute("aria-pressed")=="true"
+            checked.append("Discover Latest and Recommended controls")
             page.locator("#papers .paper .rl-save-button").first.wait_for(timeout=16000)
             paper=page.locator("#papers .paper").first
             paper_id=paper.get_attribute("data-paper-id")
@@ -101,6 +109,16 @@ def main():
             assert page.locator("#workspace-panel #library-list").is_visible()
             assert paper_id in page.locator("#workspace-panel #library-list").inner_text(timeout=10000) or paper_id in page.locator("#workspace-panel").inner_text(),"Saved paper missing from Library after navigation"
             checked.append("Library SPA navigation and saved paper persistence")
+            collection_filter=page.locator("#workspace-panel #axiovo-collection-filter")
+            collection_filter.wait_for(timeout=10000)
+            page.once("dialog",lambda dialog:dialog.accept("Test collection"))
+            page.locator("#workspace-panel .axiovo-collection-controls button").click()
+            assert collection_filter.locator("option").count()>=2
+            collection_filter.select_option("all")
+            assigned=page.locator('#workspace-panel #library-list .rl-paper select[aria-label^="Assign"]').first
+            assigned.select_option(label="Test collection")
+            assert collection_filter.locator("option").count()>=2
+            checked.append("research collection creation and paper assignment")
             page.locator(".rl-nav a:nth-child(1)").click()
             page.wait_for_url(lambda u:urlsplit(u).path.endswith("/discover.html") and urlsplit(u).fragment=="discover")
             assert page.locator("#discover-shell").is_visible()
