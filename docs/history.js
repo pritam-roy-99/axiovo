@@ -143,9 +143,9 @@ function showDaily(p){
  const start=(page-1)*PAGE_SIZE;
  const selected=results.slice(start,start+PAGE_SIZE);
  for(const paper of selected){const card=paperCard(Cache.toWork(paper));if(card)root.append(card)}
- if(!selected.length)root.append(el("div","No arXiv first submissions match these filters in the fully harvested dates.","empty"));
- $("history-count").textContent=found.toLocaleString()+" matching papers across "+dailyResult.coveredDays+" complete arXiv submission date(s)";
- historyInfo("Complete dated archive for these UTC days ("+dailyResult.totalHarvested.toLocaleString()+" source records). Showing every matching first submission through pagination, not a limited sample.",p.q);
+ if(!selected.length)root.append(el("div",dailyResult.complete?"No first submissions match the chosen filters in the verified date archive.":"No matching papers were found among the available OAI-PMH updated records. This partial index does not cover the whole archive.","empty"));
+ $("history-count").textContent=found.toLocaleString()+(dailyResult.complete?" matching papers across "+dailyResult.coveredDays+" complete UTC date(s)":" OAI-PMH updated-record matches (partial first-submission coverage)");
+ historyInfo(dailyResult.complete?"Complete dated archive for these UTC days ("+dailyResult.totalHarvested.toLocaleString()+" source records). Showing every matching first submission through pagination, not a limited sample.":"PARTIAL OAI-PMH update-window metadata ("+dailyResult.totalHarvested.toLocaleString()+" records). Modification dates are not first-submission dates. Other papers may be absent: verify on official arXiv.",p.q);
  pager();
 }
 function pager(){
@@ -182,6 +182,15 @@ async function search(n=1,fromUrl=false){
     dailyResult=archived;dailySignature=signature;
     showDaily(p);
     return;
+   }
+   // OAI-PMH is a separate authoritative update stream, but has *partial*
+   // first-submission-date coverage unless a full historical harvest exists.
+   const partial=await Daily.partialSearch({
+    from,to,query:p.q,category:p.category,sort:p.sort,signal:controller.signal
+   });
+   if(controller.signal.aborted)return;
+   if(partial.available){
+    dailyResult=partial;dailySignature=signature;showDaily(p);return;
    }
    historyInfo("Incomplete date coverage: "+archived.missing.slice(0,6).join(", ")+
     (archived.missing.length>6?" and "+(archived.missing.length-6)+" more":"")+
