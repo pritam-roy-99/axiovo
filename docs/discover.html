@@ -7,9 +7,8 @@
  const archive=p.get("archive")||({"biorxiv":"biorxiv","arxiv":"arxiv","chemrxiv":"chemrxiv"}[p.get("view")]);
  const source=["arxiv","biorxiv","chemrxiv"].includes(archive)?archive:null;
  const target=new URL(source?"./"+source+".html":"./",location.href);
- if(source){
-   const query=p.get("q")||p.get("query");if(query)target.searchParams.set("q",query);
- }
+ const query=p.get("q")||p.get("query");
+ if(query)target.searchParams.set("q",query.slice(0,300));
  location.replace(target.href);
 })();
 </script><script defer src="./theme.js"></script><link rel="stylesheet" href="./workspace.css"><link rel="stylesheet" href="./paper-actions.css"><link rel="stylesheet" href="./discover.css"><link rel="stylesheet" href="./paper-card-polish.css"><link rel="stylesheet" href="./research-workflow.css"><link rel="stylesheet" href="./research-entry.css"><link rel="stylesheet" href="./discover-layout.css"><link rel="stylesheet" href="./archive-selection.css"><script defer src="./discover-layout.js"></script><script defer src="./discover-modes.js"></script><script defer src="./arxiv-versions.js"></script><script defer src="./navigation.js"></script><script defer src="./research-fields.js"></script><script defer src="./author-follow.js"></script><script defer src="./zotero-ris.js"></script><script defer src="./library-outside-cache.js"></script><script defer src="./local-feedback.js"></script><script defer src="./custom-taxonomy.js"></script><script defer src="./archive-focus.js"></script><script defer src="./focus-bar.js"></script><script defer src="./scholar-search.js"></script><script defer src="./cached-arxiv-search.js"></script><script defer src="./semantic-search.js"></script><script defer src="./multisource-search.js"></script><script defer src="./interests.js"></script><script defer src="./scholarly.js"></script><script defer src="./biorxiv.js"></script><script defer src="./chemrxiv.js"></script><script defer src="./inspire-author.js"></script><script defer src="./author-search.js"></script><script defer src="./discover.js"></script><script defer src="./unified-workspace.js"></script><script defer src="./onboarding.js"></script><link rel="alternate" type="application/atom+xml" title="Axiovo all research" href="./feeds/all.xml">
