@@ -37,6 +37,25 @@ def check(page,path):
         if page.locator("body").count()==0:failures.append(f"Missing body {url}")
         width=page.evaluate("document.documentElement.scrollWidth-window.innerWidth")
         if width>8:failures.append(f"Horizontal overflow {path}: {width}px")
+        if path in ("","arxiv.html","biorxiv.html","chemrxiv.html","workspace.html","copilot.html"):
+            shell=page.evaluate("""() => {
+              const logo=document.querySelector("header.rl-global-header .rl-logo-mark");
+              const back=document.querySelector("header.rl-global-header .axiovo-back-button");
+              const home=document.querySelector("header.rl-global-header .axiovo-home-link");
+              const style=e=>e?getComputedStyle(e):null;
+              return {
+                logoBackground:style(logo)?.backgroundColor||"",
+                logoSize:logo?.getBoundingClientRect().width||0,
+                backBackground:style(back)?.backgroundColor||"",
+                homeBackground:style(home)?.backgroundColor||"",
+                backRadius:style(back)?.borderRadius||"",
+                homeRadius:style(home)?.borderRadius||""
+              }
+            }""")
+            if shell["logoSize"]<30 or shell["logoBackground"] in ("","rgba(0, 0, 0, 0)","transparent"):
+                failures.append(f"Unstyled Axiovo logo {path}: {shell}")
+            if path and (shell["backBackground"]!=shell["homeBackground"] or shell["backRadius"]!=shell["homeRadius"]):
+                failures.append(f"Back and Home have inconsistent styles on {path}: {shell}")
         if path in ("arxiv.html","biorxiv.html","chemrxiv.html"):
             css=page.evaluate("""() => ({
                 font:getComputedStyle(document.body).fontFamily,
