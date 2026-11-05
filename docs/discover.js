@@ -1,56 +1,63 @@
-/* Unified Discover mode selection, preserving deep links and existing arXiv state. */
+/* Three archive-first Discover pathways. OpenAlex is an optional
+ * cross-source research tool, never presented as a fourth preprint server.
+ * The archive choice is URL-addressable and survives navigation.
+ */
 (function(){
 "use strict";
 function init(){
  if(document.body.classList.contains("axiovo-home"))return;
- const arxiv=document.getElementById("arxiv-discovery");
- const scholar=document.getElementById("scholarly-discovery");
- const biology=document.getElementById("biorxiv-discovery"),c=document.getElementById("rl-source-biorxiv");
- const a=document.getElementById("rl-source-arxiv");
- const b=document.getElementById("rl-source-scholarly");
- if(!arxiv||!scholar||!a||!b)return;
- let started=false;
- function show(mode,updateUrl=true){
-  const wider=mode==="scholarly",bio=mode==="biorxiv";
-  arxiv.hidden=wider||bio;
-  scholar.hidden=!wider;
-  if(biology)biology.hidden=!bio;
-  a.setAttribute("aria-pressed",String(!wider&&!bio));
-  if(c)c.setAttribute("aria-pressed",String(bio));
-  b.setAttribute("aria-pressed",String(wider));
-  if(wider&&!started){started=true;window.dispatchEvent(new Event("researchlens:scholarly-open"))}
-  if(updateUrl){
-   const u=new URL(location.href);
-   if(wider)u.searchParams.set("view","scholarly");
-   else if(bio)u.searchParams.set("view","biorxiv");
-   else u.searchParams.delete("view");
-   window.history.replaceState({source:bio?"biorxiv":wider?"scholarly":"arxiv"},"",u.pathname+u.search+"#discover");
-   window.dispatchEvent(new Event("axiovo:navigate"));
+ const panels={arxiv:document.getElementById("arxiv-discovery"),
+   biorxiv:document.getElementById("biorxiv-discovery"),
+   chemrxiv:document.getElementById("chemrxiv-discovery"),
+   scholarly:document.getElementById("scholarly-discovery")};
+ const buttons={arxiv:document.getElementById("rl-source-arxiv"),
+  biorxiv:document.getElementById("rl-source-biorxiv"),
+  chemrxiv:document.getElementById("rl-source-chemrxiv")};
+ const wider=document.getElementById("rl-source-scholarly");
+ const indicator=document.getElementById("axiovo-archive-indicator");
+ if(Object.values(panels).some(x=>!x)||Object.values(buttons).some(x=>!x))return;
+ let activeArchive="arxiv",isWide=false,scholarlyStarted=false;
+ const valid=name=>Object.hasOwn(buttons,name)?name:"arxiv";
+ function show(archive,wide=false,updateUrl=true){
+  activeArchive=valid(archive);isWide=Boolean(wide);
+  for(const [name,panel] of Object.entries(panels)){
+   panel.hidden=(isWide?name!=="scholarly":name!==activeArchive);
   }
+  for(const [name,button] of Object.entries(buttons))
+    button.setAttribute("aria-pressed",String(name===activeArchive));
+  if(wider)wider.setAttribute("aria-pressed",String(isWide));
+  if(indicator)indicator.textContent=isWide?
+    "Wider literature search uses OpenAlex metadata, not a preprint archive. Return to "+activeArchive+" using its source tab.":
+    "Browsing "+({arxiv:"arXiv",biorxiv:"bioRxiv",chemrxiv:"ChemRxiv"}[activeArchive])+". Refine field → research area → subtopic. Source metadata coverage may be partial.";
+  if(isWide&&!scholarlyStarted){scholarlyStarted=true;window.dispatchEvent(new Event("researchlens:scholarly-open"))}
+  if(updateUrl){
+    const url=new URL(location.href);
+    url.searchParams.set("archive",activeArchive);
+    if(isWide)url.searchParams.set("view","scholarly");else url.searchParams.delete("view");
+    window.history.replaceState({archive:activeArchive,wider:isWide},"",url.pathname+url.search+"#discover");
+    window.dispatchEvent(new Event("axiovo:navigate"));
+  }
+  window.dispatchEvent(new CustomEvent("axiovo:archive-changed",{detail:{archive:activeArchive,wider:isWide}}));
  }
- window.addEventListener("researchlens:focus-change",e=>{
-  const detail=e.detail||{};
-  // A chosen field/topic/subtopic searches all arXiv-hosted literature
-  // instead of restricting the researcher to the limited latest JSON feed.
-  if(detail.reason!=="external")show("scholarly");
+ for(const [name,button] of Object.entries(buttons))button.addEventListener("click",()=>show(name));
+ wider?.addEventListener("click",()=>show(activeArchive,true));
+ window.addEventListener("popstate",()=>{
+  const p=new URLSearchParams(location.search);
+  const source=valid(p.get("archive")||(p.get("view")==="biorxiv"?"biorxiv":"arxiv"));
+  show(source,p.get("view")==="scholarly",false);
  });
- a.addEventListener("click",()=>show("arxiv"));
- b.addEventListener("click",()=>show("scholarly"));
- c?.addEventListener("click",()=>show("biorxiv"));
- window.addEventListener("popstate",()=>{const mode=new URLSearchParams(location.search).get("view");show(mode==="scholarly"||mode==="biorxiv"?mode:"arxiv",false)});
- const params=new URLSearchParams(location.search);
- let primary="general";try{primary=JSON.parse(localStorage.getItem("researchlens-field-explorer-v1")||"{}").field||"general"}catch{}
- function updateFieldLabel(){
-  let field="general";try{field=JSON.parse(localStorage.getItem("researchlens-field-explorer-v1")||"{}").field||"general"}catch{}
-  const config=window.ResearchLensFields;
-  const name=config?.FIELDS?.[field]?.name||"all research";
-  if(b.firstChild?.nodeType===Node.TEXT_NODE)b.firstChild.textContent="Explore "+name+" ";
- }
- window.addEventListener("researchlens:field-changed",updateFieldLabel);
- window.addEventListener("researchlens:choose-field",updateFieldLabel);
- updateFieldLabel();
- const requested=params.get("view");
- show(requested==="biorxiv"?"biorxiv":requested==="scholarly"||(!requested&&primary!=="general")?"scholarly":"arxiv",false);
+ window.addEventListener("researchlens:focus-change",event=>{
+  const data=event.detail||{};
+  const desired=data.areaSelected?(data.subtopic||data.topic||""):"";
+  if(!isWide&&activeArchive!=="arxiv"&&desired){
+   const el=document.getElementById(activeArchive==="biorxiv"?"axiovo-biorxiv-query":"axiovo-chemrxiv-query");
+   if(el){el.value=desired;el.dispatchEvent(new Event("input",{bubbles:true}))}
+  }
+  // Crucially, changing a field never switches archives or opens OpenAlex.
+ });
+ const p=new URLSearchParams(location.search);
+ const initial=p.get("archive")||(p.get("view")==="biorxiv"?"biorxiv":"arxiv");
+ show(initial,p.get("view")==="scholarly",false);
 }
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
 })();
