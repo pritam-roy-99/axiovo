@@ -5,7 +5,7 @@ Docker, a database, or an account to use the basic reading workspace.
 
 ## Option A: Install from GitHub Pages (phone, tablet, or desktop)
 
-1. Open https://pritam-roy-99.github.io/researchlens/ in a browser.
+1. Open https://pritam-roy-99.github.io/axiovo/ in a browser.
 2. In Chrome for Android, open the browser menu and choose **Install app** or
    **Add to Home screen**, if offered. On desktop Chrome/Edge, use the browser's
    install option if shown.
