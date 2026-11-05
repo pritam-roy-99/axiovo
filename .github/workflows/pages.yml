@@ -10,6 +10,7 @@ on:
     # 20:00 America/New_York is 00:00 UTC in EDT, 01:00 UTC in EST.
     # Dense post-release checks, including late upstream metadata propagation.
     - cron: '10,35 0,1,2,3 * * 1-5'
+    # RSS feeds refresh around 00:00 US Eastern, roughly 04:00/05:00 UTC.
     - cron: '5 4,5,6 * * 1-5'
 permissions:
   contents: write
@@ -98,6 +99,14 @@ jobs:
         run: |
           echo '::warning::arXiv OAI-PMH ingestion unavailable. Existing OAI snapshot preserved.'
           echo '### All-category OAI source unavailable' >> "$GITHUB_STEP_SUMMARY"
+      - name: Harvest official arXiv announcement-day RSS
+        if: github.event_name != 'push'
+        id: announcements
+        continue-on-error: true
+        run: python -m scripts.arxiv_announcements
+      - name: Report unavailable RSS announcements
+        if: steps.announcements.outcome == 'failure'
+        run: echo '::warning::Official daily announcement RSS unavailable; preserving last verified announcement snapshot.'
       - name: Refresh research metadata
         if: github.event_name != 'push'
         id: refresh
@@ -124,7 +133,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docs/data/feed.json docs/data/biorxiv.json docs/data/arxiv-days/ docs/data/oai-recent.json
+          git add docs/data/feed.json docs/data/biorxiv.json docs/data/arxiv-days/ docs/data/oai-recent.json docs/data/announcements.json
           if ! git diff --cached --quiet; then
             git commit -m "data: refresh arXiv index [skip ci]"
             git fetch origin main
