@@ -78,7 +78,7 @@
   const form=document.getElementById("axiovo-author-form"),input=document.getElementById("axiovo-author-query");
   const candidates=document.getElementById("axiovo-author-candidates"),papers=document.getElementById("axiovo-author-papers");
   const status=document.getElementById("axiovo-author-status");if(!form||!input||!candidates||!papers||!status)return;
-  const arxiv=window.ResearchLensArxiv;
+  const arxiv=window.AxiovoArxiv;
   let controller=null;
   function abort(){if(controller)controller.abort();controller=new AbortController();return controller}
   function element(tag,text,cls){const e=document.createElement(tag);if(text!==undefined)e.textContent=text;if(cls)e.className=cls;return e}
