@@ -245,5 +245,21 @@ const urlParams=new URLSearchParams(location.search);
 if(urlParams.get("from"))$("date-from").value=urlParams.get("from").slice(0,10);
 if(urlParams.get("to"))$("date-to").value=urlParams.get("to").slice(0,10);
 if(urlParams.get("history")==="1"){const target=Number(urlParams.get("page"));search(Number.isInteger(target)&&target>0&&target<=400?target:1,true)}
+const coverage=$("arxiv-date-coverage");
+if(coverage){
+ fetch("./data/arxiv-days/manifest.json",{cache:"no-store"})
+  .then(response=>{if(!response.ok)throw Error("Manifest unavailable");return response.json()})
+  .then(data=>{
+   const completed=Object.entries(data.days||{}).filter(([date,value])=>
+    /^\d{4}-\d{2}-\d{2}$/.test(date)&&value?.complete===true&&
+    Number.isSafeInteger(value.count)&&value.count>=0);
+   if(!completed.length){coverage.textContent="No complete arXiv submission dates indexed yet.";return}
+   const count=completed.reduce((sum,[,day])=>sum+day.count,0);
+   const latest=completed.map(([date])=>date).sort().at(-1);
+   coverage.textContent="Verified complete UTC dates: "+completed.length+
+     " · "+count.toLocaleString()+" papers · latest: "+latest;
+  })
+  .catch(()=>{coverage.textContent="Verified date coverage currently unavailable."});
+}
 window.ResearchLensHistorySearch={search};
 })();
