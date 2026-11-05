@@ -157,12 +157,12 @@ async function announcementDateSearch(query,from,to,field,signal){
   const response=await fetch("./data/announcements.json?ts="+Date.now(),{cache:"no-store",signal});
   if(!response.ok)throw Error("Announcement snapshot HTTP "+response.status);
   const batch=await response.json();
-  if(batch.announcement_date!==from||!Array.isArray(batch.papers)||!batch.papers.length){
+  if((batch.display_date_ist||batch.announcement_date)!==from||!Array.isArray(batch.papers)||!batch.papers.length){
    return {items:[],message:"Official arXiv announcement batch for "+from+" is not yet in Axiovo. This is an ingestion delay, not evidence of zero papers. Check arXiv's new-paper listing or retry once synchronization succeeds."};
   }
   const records=batch.papers.filter(p=>announcementMatches(p,query,field));
   return {items:records.map(announcementWork),
-   message:"Official arXiv announcement date "+from+": "+records.length+" matching papers from "+batch.count+" harvested entries"+
+   message:"Official arXiv release visible in India on "+from+": "+records.length+" matching papers from "+batch.count+" harvested entries"+
    (batch.complete?".":". PARTIAL coverage: some archive feeds were unavailable.")+
    " These dates are arXiv announcement dates, not OpenAlex publication or original-submission dates."};
  }catch(error){
