@@ -49,9 +49,38 @@ async function checkAnnouncement(){
   target.textContent="Latest announcement metadata is temporarily unavailable. Browse arXiv or check the official source.";
  }
 }
+async function renderTutorialChapters(){
+ const list=document.querySelector(".rl-home-transcript ol");
+ const video=document.querySelector(".rd-tour video");
+ if(!list||!video)return;
+ try{
+  const res=await fetch("./assets/axiovo-tour-build.json",{cache:"no-cache",signal:AbortSignal.timeout(12000)});
+  if(!res.ok)return;
+  const data=await res.json();
+  if(!Array.isArray(data.chapters)||!data.chapters.length)return;
+  list.replaceChildren();
+  for(const chapter of data.chapters){
+   if(!Number.isFinite(chapter.start_seconds)||typeof chapter.title!=="string")continue;
+   const li=document.createElement("li"),button=document.createElement("button");
+   button.type="button";button.className="rd-text-link";
+   button.textContent=chapter.title+" · "+(chapter.instruction||"");
+   button.onclick=()=>{
+    video.currentTime=chapter.start_seconds;
+    video.scrollIntoView({block:"center",behavior:"smooth"});
+    video.play().catch(()=>{});
+   };
+   li.append(button);list.append(li);
+  }
+  const voices=document.getElementById("axiovo-tour-voice");
+  if(voices&&Array.isArray(data.voices)){
+   voices.textContent="Narration: "+data.voices.join(", ")+". "+data.chapters.length+" guided chapters.";
+  }
+ }catch{}
+}
 function init(){
  route();
  checkAnnouncement();
+ renderTutorialChapters();
  window.setInterval(()=>{if(!document.hidden)checkAnnouncement()},15*60*1000);
  for(const el of document.querySelectorAll("[data-count]")){
   const source=el.dataset.count,topics=window.AxiovoArchiveTaxonomy?.directory(source)||[];
