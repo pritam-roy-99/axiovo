@@ -137,3 +137,57 @@ body{min-width:0;max-width:100%}
 .axiovo-author-identity a{margin-left:7px;font-size:12px}
 .axiovo-author-paper>a{font-size:14px;font-weight:700}
 @media(max-width:540px){.axiovo-author-controls button{width:100%}}
+
+
+/* Shared baseline for standalone archive pages.
+   Without this, browsers show their default 8px body margin, Times font,
+   and purple visited links even though the archive cards are styled. */
+body.axiovo-archive-page {
+  margin:0;
+  min-width:0;
+  box-sizing:border-box;
+  font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  font-size:14px;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+body.axiovo-archive-page *,body.axiovo-archive-page *::before,body.axiovo-archive-page *::after{box-sizing:border-box}
+body.axiovo-archive-page a,
+body.axiovo-archive-page a:visited{color:var(--axiovo-accent,#126f9c);text-decoration:none}
+body.axiovo-archive-page a:hover{text-decoration:underline}
+body.axiovo-archive-page .rl-global-header {
+  width:100%;
+  min-height:78px;
+  background:var(--axiovo-hero,#0b2239);
+  color:#f4f9ff;
+  padding:12px max(20px,calc((100% - 1190px)/2));
+  box-sizing:border-box;
+}
+body.axiovo-archive-page .rl-global-header a,
+body.axiovo-archive-page .rl-global-header a:visited{color:#e5f3ff;text-decoration:none}
+body.axiovo-archive-page .rl-global-header .rl-logo{font-size:22px;letter-spacing:-.025em;color:#fff}
+body.axiovo-archive-page .rl-global-header .rl-logo-mark{
+  display:inline-flex;align-items:center;justify-content:center;
+  background:var(--axiovo-accent,#167fae);border-radius:7px;
+  width:31px;height:31px;margin-right:5px;color:#fff
+}
+body.axiovo-archive-page .rl-global-header .rl-nav a:hover,
+body.axiovo-archive-page .rl-global-header .axiovo-nav-return a:hover{background:rgba(255,255,255,.13)}
+body.axiovo-archive-page .rl-global-header .rl-settings-link:hover{background:rgba(255,255,255,.13)}
+body.axiovo-archive-page .axiovo-breadcrumb a,
+body.axiovo-archive-page .axiovo-breadcrumb a:visited{color:var(--axiovo-accent,#126f9c);font-weight:600}
+body.axiovo-archive-page button,
+body.axiovo-archive-page input,
+body.axiovo-archive-page select,
+body.axiovo-archive-page textarea{font:inherit}
+body.axiovo-archive-page button{cursor:pointer}
+body.axiovo-archive-page :is(a,button,input,select,textarea,summary):focus-visible{
+  outline:3px solid var(--axiovo-accent,#126f9c);outline-offset:3px
+}
+@media(max-width:700px){
+  body.axiovo-archive-page .rl-global-header{padding:10px 12px;gap:8px}
+  body.axiovo-archive-page .rl-global-header .rl-logo{font-size:19px}
+  body.axiovo-archive-page .rl-global-header .rl-nav{
+    background:var(--axiovo-hero,#0b2239);
+  }
+}
