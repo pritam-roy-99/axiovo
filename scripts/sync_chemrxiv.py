@@ -44,14 +44,27 @@ def normalize(item):
       "url":"https://doi.org/"+doi}
 
 def fetch():
-    query=urllib.parse.urlencode({"query.bibliographic":"chemrxiv",
-       "filter":"type:posted-content","sort":"published","order":"desc","rows":300})
-    request=urllib.request.Request("https://api.crossref.org/works?"+query,
-       headers={"User-Agent":"Axiovo/1.0 (research metadata; https://github.com/pritam-roy-99/axiovo)",
-                "Accept":"application/json"})
-    with urllib.request.urlopen(request,timeout=35) as response:
-       value=json.load(response)
-    return (value.get("message") or {}).get("items") or []
+    # DOI-prefix endpoint retrieves ChemRxiv's historic family reliably even
+    # when newer platform migration metadata lacks the word in title/publisher.
+    params=urllib.parse.urlencode({"sort":"published","order":"desc","rows":300})
+    urls=[
+      "https://api.crossref.org/prefixes/10.26434/works?"+params,
+      "https://api.crossref.org/works?"+urllib.parse.urlencode({
+       "query.bibliographic":"ChemRxiv","filter":"type:posted-content",
+       "sort":"published","order":"desc","rows":300})
+    ]
+    items=[]
+    for url in urls:
+      try:
+        request=urllib.request.Request(url,headers={
+          "User-Agent":"Axiovo/1.0 (research metadata; https://github.com/pritam-roy-99/axiovo)",
+          "Accept":"application/json"})
+        with urllib.request.urlopen(request,timeout=35) as response:
+          value=json.load(response)
+        items.extend((value.get("message") or {}).get("items") or [])
+      except (OSError,ValueError) as error:
+        print("WARNING: ChemRxiv discovery endpoint unavailable:",str(error)[:120])
+    return items
 
 def main():
     previous={}
