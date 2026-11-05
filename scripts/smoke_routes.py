@@ -84,6 +84,17 @@ def main():
                 page.goto(base+"copilot.html",wait_until="domcontentloaded")
                 assert page.locator("#question").count()==1
                 assert page.locator("#ask").count()==1
+                page.locator(".assistant-advanced").first.evaluate("el=>el.open=true")
+                page.locator("#engine").select_option("hosted")
+                assert page.locator("#hosted-settings").is_visible()
+                for provider in ("openrouter","openai","moonshot","gemini"):
+                    page.locator("#hosted-provider").select_option(provider)
+                    assert page.locator("#hosted-model").input_value(),provider
+                page.locator("#hosted-key").fill("test-key-not-real")
+                page.locator("#clear-hosted-key").click()
+                assert page.locator("#hosted-key").input_value()==""
+                page.locator("#engine").select_option("evidence")
+                assert not page.locator("#hosted-settings").is_visible()
                 page.goto(base+"profiles.html",wait_until="domcontentloaded")
                 before = page.evaluate("document.documentElement.dataset.theme")
                 page.locator(".axiovo-header-appearance .theme-toggle").click()
