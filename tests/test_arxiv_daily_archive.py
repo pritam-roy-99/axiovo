@@ -91,6 +91,18 @@ class DailyArchiveTests(unittest.TestCase):
             self.assertEqual(len(result),3)
             self.assertEqual({p["id"] for p in result},{"2611.00001","2611.00002","2611.00003"})
 
+    def test_manual_older_date_window_and_bounded_range(self):
+        days=ar.manual_days("2024-11-05","2024-11-07")
+        self.assertEqual(len(days),3)
+        self.assertEqual(days[0],dt.date(2024,11,5))
+        self.assertEqual(days[-1],dt.date(2024,11,7))
+        with self.assertRaises(ValueError):
+            ar.manual_days("2024-01-01","2024-03-01")
+        with self.assertRaises(ValueError):
+            ar.manual_days("2024-11-07","2024-11-05")
+        with self.assertRaises(ValueError):
+            ar.manual_days("2027-01-01","2027-01-02")
+
     def test_next_missing_days_backfilled(self):
         days=ar.select_days(dt.date(2026,11,5),{"days":{"2026-11-02":{"complete":True}}},count=5)
         self.assertEqual(days[:3],[dt.date(2026,11,5),dt.date(2026,11,4),dt.date(2026,11,3)])
