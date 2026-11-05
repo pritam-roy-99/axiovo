@@ -334,6 +334,9 @@ $("topic").onchange=()=>selectPath({category:selected.category,topic:$("topic").
 $("subfield").onchange=()=>selectPath({category:selected.category,topic:selected.topic,subtopic:$("subfield").value});
 $("clear-path").onclick=()=>selectPath({});
 $("show-results").onclick=()=>{
+ // This is a real search action, not a decorative anchor.
+ datePreset++;
+ runSearch();
  const heading=$("results-heading");
  if(!heading)return;
  heading.setAttribute("tabindex","-1");
