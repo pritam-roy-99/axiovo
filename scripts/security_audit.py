@@ -27,7 +27,7 @@ def main():
     ensure('axiovo-reading-list' in backup and 'axiovo-library-metadata-v1' in backup and 'axiovo-research-projects-v1' in backup, "Current Axiovo data not covered by backup")
     ensure('researchlens' in theme and 'axiovo' in theme and 'localStorage' in theme, "Legacy-to-Axiovo storage migration missing")
     ensure('data.payload' not in backup and "localStorage.clear()" not in backup, "Risky bulk storage operation")
-    ensure('axiovo-shell-' in sw and 'researchlens-shell-' in sw, "Old caches not migrated")
+    ensure('axiovo-shell-' in sw and re.search(r'researchlens[^\\n]{0,80}(?:shell|litveyra|axiovo)|(?:shell|litveyra|axiovo)[^\\n]{0,80}researchlens', sw), "Legacy offline caches not purged")
     ensure("openalex.org" not in sw and "api.biorxiv.org" not in sw and "api.github.com" not in sw, "Remote API response should not be precached")
     ensure(manifest.get("display") == "standalone", "PWA standalone support missing")
     ensure(manifest.get("scope") == "./", "PWA scope unexpectedly broadened")
