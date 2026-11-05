@@ -27,7 +27,7 @@ class AxiovoBrandingTests(unittest.TestCase):
 
     def test_pwa_cache_migrates_old_shell(self):
         worker = (DOCS / "sw.js").read_text()
-        self.assertIn("axiovo-shell-v22", worker)
+        self.assertIn("axiovo-shell-v23", worker)
         self.assertIn("researchlens-shell-", worker)
 
 
