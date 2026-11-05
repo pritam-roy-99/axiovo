@@ -126,6 +126,9 @@ def capture(browser, base):
     safe_scroll(page, "#papers .paper")
     if not page.locator("#papers .paper").count():
         safe_scroll(page, "#local-feed-view")
+    # Save a real indexed paper in this isolated recording browser, when available.
+    # This is the site's own click handler, never a forged storage entry.
+    safe_click(page, "#papers .paper .rl-save-button")
     snap("paper actions")
 
     open_page(page, base + "#workspace")
