@@ -90,8 +90,9 @@ function chosenTerm(){return state.query||((state.scope==="subfield")?(state.sub
 async function remote(){
  const term=chosenTerm().slice(0,150);
  if(source==="arxiv"){
-  const category=state.scope==="subfield"?(state.subfield||field().code):"";
-  const officialCode=/^[a-z-]+(?:\.[A-Za-z-]+)?$/.test(category)?category:"";
+  const chosen=state.scope==="subfield"?(state.subfield||field().code):"";
+  const code=/^[a-z-]+(?:\.[A-Za-z-]+)?$/.test(chosen)?chosen:field().code;
+  const officialCode=state.scope==="subfield"&&/^[a-z-]+(?:\.[A-Za-z-]+)?$/.test(code)?code:"";
   const q=[officialCode?"cat:"+officialCode:"",term?"all:"+term.replace(/[:()"\\]/g," "):""].filter(Boolean).join(" AND ")||"all:science";
   const url="https://export.arxiv.org/api/query?"+new URLSearchParams({search_query:q,start:"0",max_results:"100",sortBy:state.sort==="recent"?"submittedDate":"relevance",sortOrder:"descending"});
   const c=new AbortController(),timer=setTimeout(()=>c.abort(),15000);
@@ -112,6 +113,42 @@ async function remote(){
  abstract:clean(x.abstract).replace(/<[^>]*>/g," "),date:x.published?.["date-parts"]?.[0]?.map((n,i)=>String(n).padStart(i?2:4,"0")).join("-"),
  category:(x.subject||[]).join(", "),source:"ChemRxiv",citations:x["is-referenced-by-count"]})).filter(verified);
 }
+// Optional cross-corpus discovery is accepted ONLY after verifying the paper's
+// native archive identifier. This broadens title/abstract concept retrieval
+// without mixing in records hosted by other preprint servers.
+function abstractFromInverted(index){
+ if(!index||typeof index!=="object")return "";
+ const pairs=[];
+ for(const [word,positions] of Object.entries(index))
+  for(const pos of positions||[])if(Number.isInteger(pos)&&pos>=0&&pos<1800)pairs.push([pos,word]);
+ return pairs.sort((a,b)=>a[0]-b[0]).slice(0,1800).map(x=>x[1]).join(" ");
+}
+async function sourceVerifiedOpenAlex(){
+ const term=clean(state.query||state.author).slice(0,150);
+ if(!term)return [];
+ const url="https://api.openalex.org/works?"+new URLSearchParams({search:term,"per-page":"60"});
+ const data=await getJSON(url);
+ const out=[];
+ for(const x of data.results||[]){
+  const urls=(x.locations||[]).flatMap(loc=>[loc.landing_page_url,loc.pdf_url]).filter(Boolean);
+  const title=clean(x.title),abstract=abstractFromInverted(x.abstract_inverted_index);
+  const authors=(x.authorships||[]).map(a=>clean(a.author?.display_name)).filter(Boolean);
+  const date=clean(x.publication_date);
+  let item=null;
+  if(source==="arxiv"){
+   const ref=urls.map(u=>u.match(/arxiv\.org\/(?:abs|pdf)\/((?:\d{4}\.\d{4,5}|[a-z-]+\/\d{7})(?:v\d+)?)/i)).find(Boolean);
+   if(ref)item=normalArxiv({id:ref[1],title,abstract,published:date,authors,categories:(x.topics||[]).map(t=>t.subfield?.display_name).filter(Boolean)});
+  }else{
+   const doi=clean(x.doi).replace(/^https?:\/\/doi\.org\//i,"").toLowerCase();
+   const native=urls.some(u=>source==="biorxiv"?/biorxiv\.org/i.test(u):/chemrxiv\.org/i.test(u))||
+    (x.locations||[]).some(loc=>new RegExp(source,"i").test(clean(loc.source?.display_name)));
+   if(native&&((source==="biorxiv"&&doi.startsWith("10.1101/"))||(source==="chemrxiv"&&doi.startsWith("10.26434/"))))
+    item=normalDOI({doi,title,authors,abstract,date,source:source==="biorxiv"?"bioRxiv":"ChemRxiv"});
+  }
+  if(verified(item)){item.semanticMatch=true;item.citations=Number.isFinite(x.cited_by_count)?x.cited_by_count:null;out.push(item)}
+ }
+ return out;
+}
 function match(hay,needle){
  const h=simple(hay),q=simple(needle);if(!q)return 1;if(h.includes(q))return 5;
  let n=0;for(const w of q.split(" ").filter(Boolean))if(h.includes(w))n++;
@@ -129,7 +166,7 @@ function relevant(p){
  if(state.to&&p.date&&p.date>state.to)return false;
  if(state.author&&!match(p.authors.join(" "),state.author))return false;
  const combined=[p.title,p.abstract,p.category,p.categories.join(" "),p.id,p.authors.join(" ")].join(" ");
- if(state.query&&!match(combined,state.query))return false;
+ if(state.query&&!match(combined,state.query)&&!p.semanticMatch)return false;
  if(state.scope==="subfield"){
   const term=state.subfield||field().code;
   const exact=source==="arxiv"&&p.categories.some(cat=>cat===term||cat.startsWith(term+"."));
@@ -198,11 +235,14 @@ async function search(){
  state.query=$("archive-query").value.trim();state.author=$("archive-author").value.trim();
  state.scope=$("archive-scope").value;state.sort=$("archive-sort").value;state.from=$("archive-from").value;state.to=$("archive-to").value;remember();
  page=0;$("archive-result-count").textContent="Searching source metadata…";
- let fresh=[],error="";
- try{fresh=await remote()}catch(e){error=clean(e.message||"Remote unavailable").slice(0,90)}
- const unique=new Map();for(const p of [...localPapers,...fresh])if(verified(p))unique.set(p.id,p);
+ let fresh=[],extra=[],error="";
+ const settled=await Promise.allSettled([remote(),sourceVerifiedOpenAlex()]);
+ if(settled[0].status==="fulfilled")fresh=settled[0].value;
+ else error=clean(settled[0].reason?.message||"Remote unavailable").slice(0,90);
+ if(settled[1].status==="fulfilled")extra=settled[1].value;
+ const unique=new Map();for(const p of [...localPapers,...extra,...fresh])if(verified(p))unique.set(p.id,p);
  allResults=[...unique.values()];
- $("archive-sync-status").textContent=(error?"Live query unavailable ("+error+"); showing verified cached records. ":"Source query completed. ")+allResults.length+" verified records retrieved or cached"+(lastSync?" · cached snapshot "+lastSync:"")+". Not a complete historical archive.";
+ $("archive-sync-status").textContent=(error?"Live query unavailable ("+error+"); showing verified cached records. ":"Source query completed. ")+allResults.length+" verified records retrieved or cached"+(lastSync?" · cached snapshot "+lastSync:"")+". Optional OpenAlex matches were accepted only when native archive identity was verified. Not a complete historical archive.";
  render();
 }
 async function init(){
