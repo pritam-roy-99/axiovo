@@ -51,7 +51,7 @@
   });
   if(showLibrary)await mount();
   if(version!==renderVersion)return;
-  if(showLibrary)window.dispatchEvent(new Event("researchlens:workspace-activated"));
+  if(showLibrary)window.dispatchEvent(new Event("axiovo:workspace-activated"));
   if(showLibrary)window.scrollTo(0,0);
  }
  // Keep view switching on the same page, retaining the active search filters.
