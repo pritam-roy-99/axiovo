@@ -28,7 +28,7 @@ def main():
    assert p.locator(".axiovo-video-top").bounding_box()["y"]<cards.first.bounding_box()["y"]
    for source,expected in [("arxiv",8),("biorxiv",1),("chemrxiv",1)]:
     p.goto(base+source+".html",wait_until="domcontentloaded")
-    p.locator("#archive-field option").first.wait_for()
+    p.locator("#archive-field").wait_for(state="visible")
     assert p.locator("#archive-topic option").count()==expected
     assert p.locator("#archive-field option").count()>1
     assert p.locator("#archive-subfield").is_visible()
