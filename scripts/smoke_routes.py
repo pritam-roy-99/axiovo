@@ -66,6 +66,7 @@ def main():
             page.reload(wait_until="domcontentloaded")
             page.locator("#archive-subfield").wait_for(state="visible")
             assert page.locator("#archive-subfield").input_value()=="User-defined entanglement tests"
+            page.locator(".axiovo-edit-fields > summary").click()
             page.locator("#archive-reset").click()
             assert page.locator("#archive-subfield").input_value()==""
             checked.append("archive-specific editable subfield survives reload and reset")
