@@ -48,6 +48,6 @@ class SourceAndPaletteTests(unittest.TestCase):
   self.assertIn('./api/consensus?query=',client)
   self.assertNotIn("x-api-key",client)
   self.assertIn("consensus.app/search/",client)
-  self.assertIn("axiovo-shell-v24",(DOCS/"sw.js").read_text())
+  self.assertRegex((DOCS/"sw.js").read_text(), r'const CACHE = "axiovo-shell-v\\d+";')
 if __name__=="__main__":
  unittest.main()
