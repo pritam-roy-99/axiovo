@@ -1,4 +1,4 @@
-/* Regression tests for unified ResearchLens paper assistant. Run: node tests/assistant-core.test.js */
+/* Regression tests for unified Axiovo paper assistant. Run: node tests/assistant-core.test.js */
 "use strict";
 const assert=require("node:assert/strict");
 const C=require("../docs/assistant-core.js");
