@@ -19,7 +19,13 @@
   const settings=document.createElement("a");settings.href="./profiles.html";settings.className="rl-settings-link";
   settings.textContent="Settings";settings.setAttribute("aria-label","Researcher settings and account options");
   if(file==="profiles.html")settings.setAttribute("aria-current","page");
-  header.classList.add("rl-global-header");header.replaceChildren(logo,nav,settings);
+  const appearance=document.createElement("div");
+  appearance.className="axiovo-header-appearance";
+  appearance.setAttribute("role","group");
+  appearance.setAttribute("aria-label","Settings and appearance");
+  appearance.append(settings);
+  header.classList.add("rl-global-header");
+  header.replaceChildren(logo,nav,appearance);
   // Explicit, reliable home/back controls. Back returns to the immediately
   // previous same-origin page; a direct visit falls back to the homepage.
   if(file!=="index.html"){
@@ -37,7 +43,15 @@
    actions.append(back,home);
    header.insertBefore(actions,nav);
   }
-  if(toggle)header.append(toggle);
+  if(toggle)appearance.append(toggle);
+  else if(window.AxiovoAppearance){
+   const fallback=document.createElement("button");
+   fallback.type="button";fallback.className="theme-toggle";
+   fallback.addEventListener("click",()=>window.AxiovoAppearance.setTheme(
+    window.AxiovoAppearance.getTheme()==="dark"?"light":"dark"));
+   appearance.append(fallback);
+   window.AxiovoAppearance.setTheme(window.AxiovoAppearance.getTheme());
+  }
   const footer=document.createElement("div");footer.className="axiovo-credit";
   const stamp=document.createElement("span");stamp.textContent="Built with ChatGPT by OpenAI ❤️";
   const attribution=document.createElement("span");
