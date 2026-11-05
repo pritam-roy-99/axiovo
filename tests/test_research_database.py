@@ -40,7 +40,7 @@ class TestResearchDatabase(unittest.TestCase):
             self.assertEqual(outcome["accepted"],1)
         self.assertEqual(self.count("papers"),3)
         self.assertEqual(self.count("coverage"),3)
-        self.assertEqual(self.count("paper_identifiers"),4)
+        self.assertEqual(self.count("paper_identifiers"),6)
         self.assertEqual(self.count("citation_edges"),0)
         for source in ("arxiv","biorxiv","chemrxiv"):
             row=self.connection.execute("SELECT status FROM coverage WHERE source=?",(source,)).fetchone()
