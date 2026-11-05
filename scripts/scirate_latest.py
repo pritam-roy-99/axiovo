@@ -115,6 +115,10 @@ def harvest(now=None):
     if not by_date:
         raise RuntimeError("No arXiv publication timestamps")
     recent = sorted(by_date)[-1]
+    # The announcement occurs at 20:00 US Eastern, normally the next calendar day in India.
+    eastern_day = dt.date.fromisoformat(recent)
+    eastern_release = dt.datetime.combine(eastern_day, dt.time(20, 0), EASTERN)
+    india_day = eastern_release.astimezone(ZoneInfo("Asia/Kolkata")).date().isoformat()
     papers = []
     for p in sorted(by_date[recent], key=lambda x: x.get("published", ""), reverse=True):
         papers.append({
@@ -127,12 +131,14 @@ def harvest(now=None):
             "version": p.get("version", 1),
             "link": "https://arxiv.org/abs/" + p["id"],
             "announcement_date": recent,
+            "display_date_ist": india_day,
             "announce_type": "new",
             "metadata_source": "arXiv Atom first publication"
         })
     return {
         "source": URL, "date_type": "announcement",
         "announcement_date": recent,
+        "display_date_ist": india_day,
         "checked_at": now.isoformat(),
         "complete": complete,
         "archive_feeds_attempted": 0,
