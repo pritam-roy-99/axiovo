@@ -59,7 +59,8 @@ def main():
             page.goto(origin+"arxiv.html",wait_until="domcontentloaded")
             page.locator("#archive-field").select_option("12")
             assert page.locator("#archive-field").input_value()=="12"
-            page.locator("#archive-custom").fill("User-defined entanglement tests")
+            page.locator(".axiovo-edit-fields > summary").click()
+    page.locator("#archive-custom").fill("User-defined entanglement tests")
             page.locator("#archive-custom-form button[type=submit]").click()
             assert page.locator("#archive-subfield").input_value()=="User-defined entanglement tests"
             page.reload(wait_until="domcontentloaded")
