@@ -67,8 +67,8 @@ def audit():
     archives = re.findall(r'data-archive="(arxiv|biorxiv|chemrxiv)"\s+href="([^"]+)"', home)
     if archives != [("arxiv", "./arxiv.html"), ("biorxiv", "./biorxiv.html"), ("chemrxiv", "./chemrxiv.html")]:
         errors.append("Homepage must contain exactly three correctly linked archive choices")
-    if "<video" not in home or home.find("<video") > home.find('class="axiovo-archive-grid"'):
-        errors.append("Homepage video must precede the three archive choices")
+    if "<video" not in home or home.find("<video") < home.find('class="axiovo-archive-grid'):
+        errors.append("Homepage archive choices must precede the optional video")
     # Standalone archives must use the same designed application shell as Home.
     stylesheet = (DOCS / "theme.css").read_text(encoding="utf-8")
     required = [
@@ -99,8 +99,8 @@ def audit():
                      "stream=codec_name,codec_type", "-of", "csv=p=0", str(video)],
                     check=True, capture_output=True, text=True
                 ).stdout.lower()
-                if "h264" not in inspect or "video" not in inspect:
-                    errors.append("Homepage MP4 has no supported H.264 video stream")
+                if "h264" not in inspect or "video" not in inspect or "aac" not in inspect or "audio" not in inspect:
+                    errors.append("Homepage tour needs both H.264 video and AAC narration")
             except (OSError, subprocess.CalledProcessError) as exc:
                 errors.append(f"ffprobe failed: {exc}")
         if vtt.exists() and not vtt.read_text(encoding="utf-8").startswith("WEBVTT"):

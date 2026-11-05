@@ -9,8 +9,8 @@
   const nav=document.createElement("nav");nav.className="rl-nav";nav.setAttribute("aria-label","Main navigation");
   const file=location.pathname.split("/").pop()||"index.html";
   const archivePage=["arxiv.html","biorxiv.html","chemrxiv.html"].includes(file);
-  const defaultLinks=[["./#axiovo-archive-title","Discover"],["./workspace.html","Library"],["./copilot.html","Research AI"]];
-  const archiveLinks=[["./","Archives"],["./workspace.html","Library"],["./copilot.html","Research AI"]];
+  const defaultLinks=[["./#axiovo-archive-title","Discover"],["./workspace.html","Library"],["./copilot.html","Research AI"],["./desk.html","Research Desk"]];
+  const archiveLinks=[["./","Archives"],["./workspace.html","Library"],["./copilot.html","Research AI"],["./desk.html","Research Desk"]];
   const links=archivePage?archiveLinks:defaultLinks;
   for(const [href,label] of links){
    const a=document.createElement("a");a.href=href;a.textContent=label;

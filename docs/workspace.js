@@ -2,6 +2,7 @@
 /* This is a browser-local researcher dashboard; no private data is uploaded. */
 (()=>{
 const $=id=>document.getElementById(id);
+const archive=window.AxiovoArchiveData;
 const META_KEY="axiovo-library-metadata-v1";
 const OLD_KEY="axiovo-reading-list";
 const FIELD_KEY="axiovo-field-saved-v1";
@@ -45,13 +46,21 @@ let metadata=read(META_KEY,{});if(!metadata||typeof metadata!=="object"||Array.i
 let lookup=new Map(),recent=[],storedFeed=[];
 const paperKey=w=>w.key||w.arxiv_id&&"arxiv:"+w.arxiv_id||w.id&&"openalex:"+w.id||"";
 const arxivID=raw=>window.AxiovoArxiv?.parse(raw)?.requested||"";
-function normalizeArxiv(p,requestedId){const id=arxivID(requestedId||p.id)||arxivID(p.link);if(!id)return null;return{key:"arxiv:"+id,arxiv_id:id,title:p.title||("arXiv:"+id),authors:p.authors||[],date:p.published||"",url:window.AxiovoArxiv.abs(id),doi:p.doi||""}}
+function normalizeArxiv(p,requestedId){const id=arxivID(requestedId||p.id)||arxivID(p.link);if(!id)return null;return{key:"arxiv:"+id,arxiv_id:id,title:p.title||("arXiv:"+id),authors:p.authors||[],date:p.published||p.date||"",abstract:p.abstract||"",source:"arxiv",url:window.AxiovoArxiv.abs(id),doi:p.doi||""}}
 function normalizeOpenAlex(p){if(!p||typeof p!=="object")return null;const id=typeof p.id==="string"&&/^https:\/\/openalex.org\//.test(p.id)?p.id:null;if(!id)return null;
 const a=(p.authorships||[]).map(x=>x.author?.display_name).filter(Boolean);const link=(p.best_oa_location?.landing_page_url||p.doi||id);
-return {key:"openalex:"+id,title:p.display_name||p.title||"Untitled research",authors:a,date:String(p.publication_year||""),url:link,doi:p.doi||"",openalex_id:id}}
+return {key:"openalex:"+id,title:p.display_name||p.title||"Untitled research",authors:a,date:String(p.publication_year||""),source:"openalex",url:link,doi:p.doi||"",openalex_id:id}}
 function library(){
  const list=new Map();
- const local=read(OLD_KEY,[]);if(Array.isArray(local))for(const raw of local){const id=arxivID(raw);if(id)list.set("arxiv:"+id,normalizeArxiv(storedFeed.find(x=>window.AxiovoArxiv?.base(x.id)===window.AxiovoArxiv?.base(id))||{id},id))}
+ const cached=new Map((archive?.savedRecords("arxiv")||[]).map(p=>[p.recordId,p]));
+ const local=read(OLD_KEY,[]);
+ if(Array.isArray(local))for(const raw of local){
+  const id=arxivID(raw);
+  if(id)list.set("arxiv:"+id,normalizeArxiv(cached.get(id)||storedFeed.find(x=>window.AxiovoArxiv?.base(x.id)===window.AxiovoArxiv?.base(id))||{id},id));
+ }
+ for(const source of ["biorxiv","chemrxiv"])for(const p of archive?.savedRecords(source)||[]){
+  const key=archive.recordKey(p);list.set(key,{...p,key});
+ }
  const ext=read(FIELD_KEY,[]);if(Array.isArray(ext))for(const paper of ext){const p=normalizeOpenAlex(paper);if(p){const match=paper.locations?.map(x=>arxivID(x.landing_page_url||x.pdf_url)).find(Boolean);if(match&&list.has("arxiv:"+match))continue;list.set(p.key,p)}}
  return [...list.values()].filter(Boolean);
 }
@@ -62,7 +71,8 @@ function bib(p){const a=(p.authors||[]).join(" and ").replace(/[{}]/g,"");const 
 function fillFocus(){const p=fieldPrefs();const names={general:"All research disciplines",quantum:"Quantum information & physics",statmech:"Statistical mechanics",condmat:"Condensed matter physics",highenergy:"High-energy physics & particle physics",mathematics:"Mathematics",astrophysics:"Astronomy & astrophysics",computer:"Computer science & AI",biology:"Biology & bioinformatics",medicine:"Medicine & public health",chemistry:"Chemistry & materials",engineering:"Engineering & robotics",social:"Social sciences & economics"};const label=names[p.field]||"Choose your research field";$("focus-name").textContent=label;const API=window.AxiovoInterests;const followed=API?.get(read(API.KEY,{}),p.field||"general",p.topic||"")||[];$("focus-summary").textContent=(p.subtopic?"Current interest: "+p.topic+" / "+p.subtopic+". ":p.topic?"Current area: "+p.topic+". ":"Choose a field and area in Discover. ")+(followed.length?"Following: "+followed.slice(0,3).join(", ")+(followed.length>3?" and more.":"."):"Star specialized interests in Discover to personalize recommendations.");}
 function paperCard(p){const art=document.createElement("article");art.className="rl-paper";const h=document.createElement("h3");const a=document.createElement("a");a.href=p.url;a.textContent=p.title;a.target="_blank";a.rel="noopener noreferrer";h.append(a);art.append(h);
 text(art,"p",(p.authors||[]).slice(0,4).join(", ")+(p.authors?.length>4?" et al.":"")+(p.date?" · "+p.date.slice(0,10):""),"rl-paper-meta");
-const r=text(art,"div","","rl-paper-actions");if(p.arxiv_id){const detail=document.createElement("a");detail.href="./paper.html?id="+encodeURIComponent(p.arxiv_id);detail.textContent="Paper details";detail.className="rl-paper-primary";r.append(detail)}link(r,"Read on arXiv",p.url);
+const r=text(art,"div","","rl-paper-actions");if(p.arxiv_id){const detail=document.createElement("a");detail.href="./paper.html?id="+encodeURIComponent(p.arxiv_id);detail.textContent="Paper details";detail.className="rl-paper-primary";r.append(detail)}link(r,"Original "+(archive?.names[p.source]||"source")+" record",p.url);
+if(p.abstract&&window.AxiovoAbstractAudio){const listen=text(r,"button","Listen to abstract","rl-button secondary");listen.type="button";listen.onclick=()=>window.AxiovoAbstractAudio.play([p])}
 if(p.arxiv_id){const cop=document.createElement("a");cop.href="./copilot.html?id="+encodeURIComponent(p.arxiv_id);cop.textContent="Research Assistant";r.append(cop)}
 return art}
 function showRecent(){const root=$("recent-list");if(!root)return;root.replaceChildren();const p=fieldPrefs();const query=String(p.subtopic||p.topic||"").trim().toLowerCase();let pick=storedFeed.slice().sort((a,b)=>String(b.published||"").localeCompare(String(a.published||"")));
@@ -73,7 +83,9 @@ for(const p of recent)root.append(paperCard(p))
 }
 function saveMeta(key,value){metadata[key]={...(metadata[key]||{status:"to-read",note:""}),...value};write(META_KEY,metadata)}
 function renderLibrary(){const root=$("library-list");root.replaceChildren();const q=$("library-search").value.trim().toLowerCase(),status=$("library-filter").value;const papers=library();lookup=new Map(papers.map(p=>[p.key,p]));$("library-count").textContent=papers.length+" papers";
-const selectedCollection=collections().find(x=>x.id===activeCollection);const filtered=papers.filter(p=>(!selectedCollection||selectedCollection.paper_keys.includes(p.key))&&(status==="all"||(metadata[p.key]?.status||"to-read")===status)&&(!q||[p.title,(p.authors||[]).join(" "),p.arxiv_id||""].join(" ").toLowerCase().includes(q)));
+const source=$("library-source").value;
+const selectedCollection=collections().find(x=>x.id===activeCollection);const filtered=papers.filter(p=>(source==="all"||p.source===source)&&(!selectedCollection||selectedCollection.paper_keys.includes(p.key))&&(status==="all"||(metadata[p.key]?.status||"to-read")===status)&&(!q||[p.title,(p.authors||[]).join(" "),p.arxiv_id||p.doi||""].join(" ").toLowerCase().includes(q)));
+const listen=$("listen-library");listen.hidden=!window.AxiovoAbstractAudio||!filtered.some(p=>p.abstract);listen.onclick=()=>window.AxiovoAbstractAudio?.play(filtered.slice(0,50));
 if(!filtered.length){text(root,"div",papers.length?"No saved papers match these filters.":"No saved papers yet. Discover a paper and save it to your Library.","rl-empty");return}
 for(const p of filtered.slice(0,50)){
  const art=paperCard(p);const row=text(art,"div","","rl-entry-tools");
@@ -92,8 +104,12 @@ for(const p of filtered.slice(0,50)){
  for(const [v,t] of [["to-read","To read"],["reading","Reading"],["done","Reviewed"],["cited","Cited"]]){const opt=document.createElement("option");opt.value=v;opt.textContent=t;select.append(opt)}
  select.value=statuses.has(metadata[p.key]?.status)?metadata[p.key].status:"to-read";
  select.onchange=()=>{saveMeta(p.key,{status:select.value});if(status!=="all")renderLibrary()};
- const note=document.createElement("textarea");note.rows=2;note.maxLength=2000;note.placeholder="Private reading note, e.g. check Theorem 2";note.setAttribute("aria-label","Private note for "+p.title);note.value=metadata[p.key]?.note||"";
+ const note=document.createElement("textarea");note.rows=2;note.maxLength=2000;note.placeholder="Private reading note, e.g. check Theorem 2";note.setAttribute("aria-label","Private note for "+p.title);note.value=metadata[p.key]?.note??(p.source==="biorxiv"?read("axiovo-biorxiv-notes-v1",{})[p.doi]||"":"");
  note.onchange=()=>saveMeta(p.key,{note:note.value});row.append(select,note);
+ if(archive?.names[p.source]){
+  const remove=text(row,"button","Remove from Library","rl-button secondary");remove.type="button";
+  remove.onclick=()=>{if(archive.unsave(p))renderLibrary()};
+ }
  if(p.arxiv_id){
   const projectOptions=read(PROJECT_KEY,[]);
   const projects=Array.isArray(projectOptions)?projectOptions.filter(x=>x&&x.id&&x.title):[];
@@ -128,11 +144,11 @@ for(const p of filtered.slice(0,50)){
 if(filtered.length>50)text(root,"p","Showing the first 50 matching saved papers. Narrow the search to find more.","rl-subtext")
 }
 function init(){
- fillFocus();collectionUI();$("library-search").addEventListener("input",renderLibrary);$("library-filter").addEventListener("change",renderLibrary);
+ fillFocus();collectionUI();$("library-search").addEventListener("input",renderLibrary);$("library-filter").addEventListener("change",renderLibrary);$("library-source").addEventListener("change",renderLibrary);
  $("quick-search").addEventListener("submit",e=>{
  e.preventDefault();const q=$("research-query").value.trim();if(!q)return;
  const input=document.getElementById("scholar-query"),form=document.getElementById("scholar-search-form"),source=document.getElementById("rl-source-scholarly");
- if(!input||!form||!source){location.href="./arxiv.html?q="+encodeURIComponent(q);return}
+ if(!input||!form||!source){location.href="./desk.html?q="+encodeURIComponent(q);return}
  source.click();input.value=q;
  const target=new URL(location.href);target.searchParams.set("view","scholarly");target.searchParams.set("q",q);target.hash="discover";
  history.replaceState({source:"scholarly"},"",target.href);window.dispatchEvent(new Event("axiovo:navigate"));

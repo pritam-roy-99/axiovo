@@ -140,13 +140,22 @@ Open [Research Tools](https://pritam-roy-99.github.io/axiovo/lab.html) from the 
 
 The OAI workflow can run daily and stores at most 4,000 recently modified metadata records. For requirements, operational limits, privacy and setup, see [RESEARCH_TOOLS_SETUP.md](RESEARCH_TOOLS_SETUP.md). These are functional foundations, not claims of complete full-corpus semantic retrieval, reliable PDF theorem comparison, production community moderation, or automated scientific alerts.
 
-## Homepage guided video
+## Research Desk and homepage tour
 
-The homepage starts with a narrated **54-second illustrated feature tour** and then three equally prominent links to the independent arXiv, bioRxiv and ChemRxiv Discover pages. The video explains current features: official archive subject categories, customizable subfields, source-specific paper searches, date/author filters, locally saved reading lists, PDF reading and comparison, and the optional Research Assistant. It illustrates the interface; it is **not** a browser recording or a claim of complete historical search coverage.
+The homepage starts with preprint search and three subject directories. The
+[Research Desk](https://pritam-roy-99.github.io/axiovo/desk.html) separates
+arXiv, bioRxiv and ChemRxiv results and coverage. It supports rerunnable
+browser-local searches, a three-paper comparison, library saving and RIS
+export. Abstract read-aloud uses installed English voices and a scientific
+pronunciation lexicon.
 
-GitHub Pages runs the single maintained generator `scripts/build_intro_video.py` to produce `docs/assets/axiovo-tour.mp4`, its poster and WebVTT captions. FFmpeg validation checks that a playable H.264 stream is present before publication. The source assets are generated during deployment rather than committed as large binaries. The HTML player does not autoplay and provides a transcript and a direct link if playback fails.
-
-The prior browser-recording and legacy homepage snapshot generators have been deleted. No personal research data is deleted by this cleanup.
+GitHub Pages generates the illustrated, captioned tour using
+`python scripts/build_intro_video.py` with Pillow and FFmpeg. It assembles
+the checked-in audio takes, which were generated with the Kokoro
+`af_heart` voice. To regenerate the takes, install `kokoro-onnx==0.6.1`
+and pass the [v1.1 release](https://github.com/thewh1teagle/kokoro-onnx/releases/tag/model-files-v1.1)
+English model and voice files to `--regenerate-narration MODEL VOICES`.
+The video remains optional, below the search and subject controls.
 
 ## Unified Discover (arXiv + field-aware scholarly search)
 

@@ -52,3 +52,16 @@
 .axiovo-article-details{padding:14px 16px;margin-top:13px;border:1px solid var(--rl-border,#ccdae5);background:var(--rl-soft,#f0f5f9);border-radius:10px;font-size:12px;line-height:1.6}
 .axiovo-article-details h4{font-size:13px;margin:12px 0 5px}
 .axiovo-article-details a{display:inline-block;margin:5px 10px 5px 0;font-weight:720;color:var(--archive)}
+
+.axiovo-category-directory {border-top:1px solid var(--rl-border,#cbdce8);padding:12px 0}
+.axiovo-category-directory summary,.axiovo-article-details summary {cursor:pointer;font-weight:750;color:var(--archive)}
+.axiovo-category-directory label {display:block;font-size:12px;font-weight:700;margin:12px 0 5px}
+.axiovo-category-directory #archive-category-matches {max-height:300px;overflow:auto;padding:2px 3px 5px}
+.axiovo-category-directory button {border-radius:7px}
+.axiovo-compare-link,#archive-result-actions a {font-size:13px;font-weight:750;color:var(--archive)}
+#archive-result-actions {flex-wrap:wrap;align-items:center}
+.axiovo-result-card button:disabled {cursor:default;opacity:.62}
+:root[data-theme="dark"] .axiovo-archive-page {--archive:#94d7f3}
+:root[data-theme="dark"] .axiovo-archive-page[data-archive=biorxiv] {--archive:#8adcc5}
+:root[data-theme="dark"] .axiovo-archive-page[data-archive=chemrxiv] {--archive:#eac28d}
+:root[data-theme="dark"] .axiovo-browser :is(button[type=submit],button[aria-pressed=true],.axiovo-primary) {color:#112b40}

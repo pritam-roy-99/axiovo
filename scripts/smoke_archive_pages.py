@@ -25,7 +25,7 @@ def main():
    assert cards.count()==3
    assert [x.get_attribute("data-archive") for x in cards.all()]==["arxiv","biorxiv","chemrxiv"]
    assert p.locator(".axiovo-video-top").count()==1
-   assert p.locator(".axiovo-video-top").bounding_box()["y"]<cards.first.bounding_box()["y"]
+   assert p.locator(".axiovo-video-top").bounding_box()["y"]>cards.first.bounding_box()["y"]
    for source,expected in [("arxiv",8),("biorxiv",1),("chemrxiv",1)]:
     p.goto(base+source+".html",wait_until="domcontentloaded")
     p.locator("#archive-field").wait_for(state="visible")

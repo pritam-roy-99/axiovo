@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0b2239">
+<meta name="description" content="Search three preprint archives, compare source-linked records, and save citations in the Axiovo Research Desk.">
+<title>Research Desk | Axiovo</title>
+<link rel="icon" type="image/svg+xml" href="./icons/axiovo.svg">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="stylesheet" href="./theme.css">
+<link rel="stylesheet" href="./research-entry.css">
+<link rel="stylesheet" href="./axiovo-shell.css?v=2">
+<link rel="stylesheet" href="./research-desk.css">
+<script defer src="./theme.js"></script>
+<script defer src="./navigation.js"></script>
+<script defer src="./arxiv-versions.js"></script>
+<script defer src="./arxiv-daily-archive.js"></script>
+<script defer src="./archive-data.js"></script><script defer src="./abstract-audio.js"></script>
+<script defer src="./zotero-ris.js"></script>
+<script defer src="./research-desk.js"></script>
+<script defer src="./pwa.js"></script>
+</head>
+<body class="axiovo-research axiovo-desk">
+<header></header>
+<main class="rd-page">
+ <div class="rd-desk-heading">
+  <p class="rd-kicker">PREPRINT DISCOVERY</p>
+  <h1>Research Desk</h1>
+  <p>Run one search across three archives. Check where each record came from, then compare or save the papers you want to read.</p>
+ </div>
+ <section class="rd-panel rd-filters" aria-labelledby="rd-search-heading">
+  <h2 class="rd-sr-only" id="rd-search-heading">Search preprints</h2>
+  <form id="rd-search-form" role="search">
+   <label class="rd-label" for="rd-query">Keyword, title, DOI or arXiv ID</label>
+   <div class="rd-searchbar">
+    <input id="rd-query" name="q" type="search" maxlength="220" placeholder="e.g. graph neural networks">
+    <button class="rd-button rd-primary" type="submit">Search preprints <span aria-hidden="true">→</span></button>
+   </div>
+   <fieldset class="rd-sources"><legend class="rd-sr-only">Select archives</legend>
+    <label><input type="checkbox" value="arxiv" checked><span class="rd-source-dot arxiv" aria-hidden="true"></span> arXiv</label>
+    <label><input type="checkbox" value="biorxiv" checked><span class="rd-source-dot biorxiv" aria-hidden="true"></span> bioRxiv</label>
+    <label><input type="checkbox" value="chemrxiv" checked><span class="rd-source-dot chemrxiv" aria-hidden="true"></span> ChemRxiv</label>
+   </fieldset>
+   <details class="rd-advanced" id="rd-advanced"><summary>Author, dates and sorting</summary>
+    <div class="rd-filter-grid">
+     <label>Author<input id="rd-author" type="search" maxlength="100" placeholder="Given name or surname"></label>
+     <label>Date range<select id="rd-range"><option value="any">Any indexed date</option><option value="week">Past 7 days</option><option value="custom">Specific dates</option></select></label>
+     <label>Sort<select id="rd-sort"><option value="relevance">Relevance</option><option value="recent">Newest first</option></select></label>
+    </div>
+    <div class="rd-filter-grid" id="rd-custom-dates" hidden>
+     <label>From<input id="rd-from" type="date"></label>
+     <label>To<input id="rd-to" type="date"></label>
+    </div>
+    <p class="rd-small">Dates refer to first submissions for verified arXiv batches and posting dates from the other providers.</p>
+   </details>
+  </form>
+  <p class="rd-small" id="rd-search-status" role="status" aria-live="polite">Enter a query or search without a query to see recent indexed work.</p>
+ </section>
+ <div class="rd-layout">
+  <section class="rd-results" aria-labelledby="rd-results-heading">
+   <div class="rd-section-heading"><div><p class="rd-kicker">SOURCE BY SOURCE</p><h2 id="rd-results-heading">Results</h2></div><a class="rd-text-link" href="./methodology.html">How coverage works ↗</a></div>
+   <div id="rd-source-jumps" class="rd-source-jumps"></div>
+   <div id="rd-results" class="rd-results-stack">
+    <div class="rd-panel rd-empty"><strong>Start with a research question</strong><p>Search across archives, or browse a subject directly.</p><div class="rd-source-jumps"><a href="./arxiv.html">arXiv</a><a href="./biorxiv.html">bioRxiv</a><a href="./chemrxiv.html">ChemRxiv</a></div></div>
+   </div>
+  </section>
+  <aside class="rd-sidebar" aria-label="Research tools">
+   <section class="rd-panel rd-side-panel" aria-labelledby="rd-watches-heading">
+    <p class="rd-kicker">REVISIT</p><h2 id="rd-watches-heading">Saved searches</h2>
+    <p>Keep a query and its filters ready to run again on this device.</p>
+    <button class="rd-button rd-secondary" id="rd-save-search" type="button" disabled>Save current search</button>
+    <div id="rd-watches" class="rd-side-list"></div>
+   </section>
+   <section class="rd-panel rd-side-panel" aria-labelledby="rd-queue-heading">
+    <p class="rd-kicker">SHORTLIST</p><h2 id="rd-queue-heading">Compare papers</h2>
+    <p id="rd-queue-summary">Add up to three papers from any archive.</p>
+    <div id="rd-queue" class="rd-side-list"></div>
+    <button class="rd-button rd-secondary" id="rd-open-comparison" type="button" disabled>Open comparison</button>
+    <button class="rd-button rd-secondary" id="rd-save-queue" type="button" disabled>Save shortlist to Library</button>
+    <button class="rd-button rd-secondary" id="rd-listen-queue" type="button" disabled hidden>Listen to shortlist</button>
+    <button class="rd-button rd-secondary" id="rd-export" type="button" disabled>Export shortlist · RIS</button>
+   </section>
+   <p id="rd-action-status" class="rd-small" role="status" aria-live="polite"></p>
+  </aside>
+ </div>
+ <dialog class="rd-dialog" id="rd-comparison" aria-labelledby="rd-comparison-heading">
+  <div class="rd-dialog-header"><div><p class="rd-kicker">SOURCE METADATA</p><h2 id="rd-comparison-heading">Side-by-side comparison</h2></div><form method="dialog"><button class="rd-button rd-secondary" type="submit" autofocus>Close</button></form></div>
+  <p class="rd-small">Read the original abstracts alongside each other. Compare methods, evidence, and scope in the linked papers.</p>
+  <div id="rd-comparison-columns" class="rd-comparison-columns"></div>
+ </dialog>
+</main>
+</body>
+</html>
