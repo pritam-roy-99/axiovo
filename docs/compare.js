@@ -20,6 +20,13 @@ function display(){
  if(!a||!b||a===b){$("compare-message").textContent="Enter two different valid arXiv identifiers.";return}
  const url=new URL(location.href);url.searchParams.set("ids",a+","+b);history.replaceState({}, "",url.href);
  const entries=[a,b].map(id=>({id,...info(id)}));
+ const assistant=$("compare-assistant");
+ if(assistant){
+   const question="Compare the assumptions, methods, contributions and limitations of arXiv:"+a+" and arXiv:"+b+". Verify both sources and distinguish evidence from inference.";
+   assistant.href="./copilot.html?q="+encodeURIComponent(question);
+   assistant.hidden=false;
+ }
+
  $("compare-message").textContent=entries.some(p=>!p.abstract)?"Some metadata is not in Axiovo's current local index. Original arXiv links remain available.":"Comparison assembled from the current local arXiv index and private notes.";
  for(const p of entries){
   const art=make("article",undefined,"axiovo-compare-paper");art.append(make("span","arXiv:"+p.id,"axiovo-compare-id"));art.append(make("h2",p.title));
