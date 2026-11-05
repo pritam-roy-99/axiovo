@@ -118,7 +118,7 @@
   entries.forEach(p=>root.append(paperCard(p,true)));
  }
  if(typeof window!=="undefined"){
-  document.addEventListener("DOMContentLoaded",()=>{start();drawLibrary()});
+  document.addEventListener("DOMContentLoaded",()=>{if(!document.body.classList.contains("axiovo-home")){start();drawLibrary()}});
   window.addEventListener("researchlens:workspace-activated",drawLibrary);
   window.addEventListener("axiovo:biorxiv-saved",drawLibrary);
   window.addEventListener("storage",e=>{if([KEY,META].includes(e.key))drawLibrary()});
