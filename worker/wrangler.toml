@@ -1,0 +1,17 @@
+# Optional deployment. DO NOT put credentials in this file.
+# Configure secrets with wrangler secret put:
+# API_KEY, TURNSTILE_SECRET_KEY, RATE_SALT.
+name = "axiovo-research-ai"
+main = "ai-gateway.js"
+compatibility_date = "2026-09-01"
+workers_dev = true
+
+[vars]
+PROVIDER = "openrouter"
+MODEL = "openrouter/free"
+DAILY_LIMIT_PER_IP = "8"
+# Paid-model providers are intentionally disabled.
+
+[[kv_namespaces]]
+binding = "RATE_LIMIT_KV"
+id = "REPLACE_WITH_YOUR_CREATED_KV_NAMESPACE_ID"
