@@ -68,6 +68,24 @@ def main():
         page.on("pageerror",on_error)
         for path in PAGES:
             check(page,path)
+        # The old combined Discover interface must never appear again.
+        for old,new_suffix in (
+            ("discover.html#discover","/axiovo/"),
+            ("discover.html#workspace","/axiovo/workspace.html"),
+            ("discover.html?archive=arxiv#discover","/axiovo/arxiv.html"),
+            ("discover.html?archive=biorxiv#discover","/axiovo/biorxiv.html"),
+            ("discover.html?archive=chemrxiv#discover","/axiovo/chemrxiv.html"),
+        ):
+            check(page,old)
+            if urlsplit(page.url).path != new_suffix:
+                failures.append(f"Legacy route {old} reached {page.url} instead of {new_suffix}")
+            if page.locator("#discover-shell").count():
+                failures.append(f"Legacy combined Discover UI still visible on {old}")
+        if check(page,"workspace.html"):
+            if page.locator("#library-list").count()!=1:
+                failures.append("Standalone Library missing saved-paper interface")
+            if page.locator("#quick-search").count()!=1:
+                failures.append("Standalone Library missing research question search")
         # Crawl every first-party anchor reachable from the main navigation pages.
         targets=set()
         for path in ("","arxiv.html","biorxiv.html","chemrxiv.html",
