@@ -188,3 +188,51 @@ body header.rl-global-header .rl-settings-link:visited{color:#fff!important}
 body header.rl-global-header .rl-logo .rl-logo-mark{
   background:#187fae!important;
 }
+
+
+/* Exact shared treatment for Back, Home and Settings.
+   High specificity defeats page-local .btn and legacy header rules. */
+html body header.rl-global-header div.axiovo-nav-return > button.axiovo-back-button,
+html body header.rl-global-header div.axiovo-nav-return > a.axiovo-home-link,
+html body header.rl-global-header > a.rl-settings-link,
+html body header.rl-global-header > button.theme-toggle,
+html body header.rl-global-header > .theme-toggle {
+  appearance:none!important;-webkit-appearance:none!important;
+  display:inline-flex!important;align-items:center!important;justify-content:center!important;
+  box-sizing:border-box!important;
+  height:42px!important;min-height:42px!important;
+  padding:0 15px!important;margin:0!important;
+  color:#eef7ff!important;background:#163a57!important;
+  border:1px solid #4f7797!important;border-radius:10px!important;
+  font:600 14px/1 Inter,system-ui,-apple-system,"Segoe UI",sans-serif!important;
+  white-space:nowrap!important;text-decoration:none!important;
+  box-shadow:none!important;vertical-align:middle!important;cursor:pointer!important;
+}
+html body header.rl-global-header div.axiovo-nav-return > button.axiovo-back-button:hover,
+html body header.rl-global-header div.axiovo-nav-return > a.axiovo-home-link:hover,
+html body header.rl-global-header > a.rl-settings-link:hover,
+html body header.rl-global-header > button.theme-toggle:hover{
+ background:#245879!important;border-color:#89b2d3!important;color:white!important;
+}
+html body header.rl-global-header div.axiovo-nav-return > button.axiovo-back-button:focus-visible,
+html body header.rl-global-header div.axiovo-nav-return > a.axiovo-home-link:focus-visible{
+ outline:3px solid #75d7ea!important;outline-offset:3px!important;
+}
+html body header.rl-global-header > a.rl-settings-link[aria-current="page"]{
+ background:#187daa!important;border-color:#187daa!important;
+}
+html body header.rl-global-header > a.rl-logo,
+html body header.rl-global-header > a.rl-logo:visited{
+ color:white!important;
+}
+html body header.rl-global-header > a.rl-logo > span.rl-logo-mark{
+ display:inline-flex!important;align-items:center!important;justify-content:center!important;
+ width:36px!important;height:36px!important;border-radius:10px!important;
+ background:#1784b5!important;color:white!important;text-align:center!important;
+}
+@media(max-width:760px){
+ html body header.rl-global-header div.axiovo-nav-return > button.axiovo-back-button,
+ html body header.rl-global-header div.axiovo-nav-return > a.axiovo-home-link{
+  height:38px!important;min-height:38px!important;padding:0 12px!important;font-size:13px!important;
+ }
+}
