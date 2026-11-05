@@ -1,0 +1,51 @@
+name: Seed and backfill complete arXiv submission dates
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/arxiv-archive-backfill.yml
+  workflow_dispatch:
+    inputs:
+      from_date:
+        description: "UTC first submission date (YYYY-MM-DD), optional"
+        required: false
+        type: string
+      to_date:
+        description: "UTC last submission date (YYYY-MM-DD), optional; maximum 31 days"
+        required: false
+        type: string
+permissions:
+  contents: write
+concurrency:
+  group: axiovo-date-archive-backfill
+  cancel-in-progress: false
+jobs:
+  backfill:
+    name: Harvest all arXiv first submissions for verified UTC dates
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Validate complete archive data logic
+        run: |
+          python -m unittest tests.test_arxiv_daily_archive -v
+          node tests/arxiv-daily-archive.test.js
+      - name: Harvest selected or latest arXiv dates
+        env:
+          AXIOVO_ARCHIVE_FROM: ${{ inputs.from_date }}
+          AXIOVO_ARCHIVE_TO: ${{ inputs.to_date }}
+          AXIOVO_DAILY_BACKFILL_COUNT: "5"
+        run: python -m scripts.arxiv_daily_archive
+      - name: Publish only complete source-verified date shards
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/data/arxiv-days/
+          if ! git diff --cached --quiet; then
+            git commit -m "data: complete arXiv submission-day archive"
+            git fetch origin main
+            git rebase -X theirs origin/main
+            git push origin HEAD:main
+          fi
