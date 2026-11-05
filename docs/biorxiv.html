@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>bioRxiv research discovery | Axiovo</title>
+<meta name="description" content="Browse bioRxiv subject areas and original preprints. Independent source-specific preprint search, saved research topics and articles.">
+<link rel="stylesheet" href="./theme.css"><link rel="stylesheet" href="./research-entry.css"><link rel="stylesheet" href="./archive-browser.css">
+<script defer src="./theme.js"></script><script defer src="./navigation.js"></script>
+<script defer src="./archive-taxonomy.js"></script><script defer src="./archive-browser.js"></script>
+</head><body class="axiovo-archive-page" data-archive="biorxiv">
+<header></header>
+<main class="axiovo-browser">
+<nav class="axiovo-breadcrumb"><a href="./">Home</a><span aria-hidden="true">/</span><strong>bioRxiv</strong></nav>
+<section class="axiovo-browser-hero" aria-labelledby="archive-title">
+ <span class="axiovo-browser-kicker">AXIOVO · SOURCE-SPECIFIC DISCOVERY</span>
+ <h1 id="archive-title">bioRxiv</h1><p>Biology and life sciences</p>
+ <p class="axiovo-browser-description">Browse bioRxiv subject areas and original preprints. Search results stay tied to the selected preprint server.</p>
+ <div class="axiovo-browser-status" id="archive-sync-status" role="status">Checking source coverage…</div>
+</section>
+<section class="axiovo-browser-fields" aria-labelledby="browse-heading">
+ <div class="axiovo-browser-heading"><h2 id="browse-heading">Explore bioRxiv subjects</h2><p>Select a topic, a field and a subfield. Modify your saved subfields at any time.</p></div>
+ <div class="axiovo-browser-steps">
+  <div class="axiovo-browser-step"><span>01 · Topic</span><label for="archive-topic">Select primary topic</label><select id="archive-topic"></select></div>
+  <div class="axiovo-browser-step"><span>02 · Field</span><label for="archive-field">Research field</label><select id="archive-field"></select></div>
+  <div class="axiovo-browser-step"><span>03 · Subfield</span><label for="archive-subfield">Specific research area</label><select id="archive-subfield"></select></div>
+ </div>
+ <div class="axiovo-browser-taxonomy" id="archive-category-list" aria-label="Available subject categories"></div>
+ <details class="axiovo-edit-fields"><summary>Customize my subfields</summary>
+  <form id="archive-custom-form" class="axiovo-custom-form">
+   <label for="archive-custom">Add a research subfield<input id="archive-custom" type="text" maxlength="90" placeholder="Specific method or research topic"></label>
+   <button type="submit">Add subfield</button><button type="button" id="archive-reset" class="axiovo-secondary">Reset to default</button>
+  </form><div id="archive-custom-list" class="axiovo-browser-chips"></div>
+  <p>These are personal search preferences, not official archive classifications. Stored in this browser.</p>
+ </details>
+</section>
+<section class="axiovo-browser-search" aria-labelledby="archive-search-heading">
+ <div class="axiovo-browser-heading"><h2 id="archive-search-heading">Search bioRxiv papers</h2><p>Search the selected subfield or the full archive, keeping each source separate.</p></div>
+ <form id="archive-search-form" role="search">
+  <label for="archive-query">Title, author, abstract, keyword, DOI or ID</label>
+  <div class="axiovo-searchline"><input id="archive-query" type="search" placeholder="Search within bioRxiv…" autocomplete="off" maxlength="300" list="archive-suggestions" aria-describedby="archive-search-help"><datalist id="archive-suggestions"></datalist><button type="submit">Search papers</button></div>
+  <p id="archive-search-help" class="axiovo-hint">Autocomplete from available subject names and indexed paper titles.</p>
+  <div class="axiovo-browser-filters">
+   <label>Scope<select id="archive-scope"><option value="subfield">Selected subfield</option><option value="all">Whole archive</option></select></label>
+   <label>Sort<select id="archive-sort"><option value="relevance">Most relevant</option><option value="recent">Newest</option><option value="cited">Most cited (when available)</option></select></label>
+   <label>From<input id="archive-from" type="date"></label><label>To<input id="archive-to" type="date"></label>
+   <label>Author<input id="archive-author" type="search" maxlength="100" placeholder="Author or initials"></label>
+  </div>
+ </form>
+</section>
+<section class="axiovo-browser-results" aria-labelledby="archive-results-heading">
+ <div class="axiovo-results-head"><h2 id="archive-results-heading">Research papers</h2><p id="archive-result-count" role="status" aria-live="polite">Choose a subject or enter a search.</p></div>
+ <div id="archive-results"></div><div id="archive-result-actions"></div>
+</section>
+<footer class="axiovo-browser-disclaimer">Axiovo is independent of bioRxiv. Archive classification menus can be complete even when the searchable paper index is not. Source availability, publication dates, metadata and citation links are verified separately.</footer>
+</main>
+<script defer src="./pwa.js"></script>
+</body></html>
