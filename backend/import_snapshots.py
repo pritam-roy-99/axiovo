@@ -15,7 +15,7 @@ import re
 import sqlite3
 import unicodedata
 
-ROOT = Path(__file__).resolve().parents[2]
+ROOT = Path(__file__).resolve().parents[1]
 SCHEMA = ROOT / "backend" / "migrations" / "001_initial.sql"
 SOURCE_FILES = {
     "arxiv": ROOT / "docs/data/feed.json",
@@ -50,10 +50,6 @@ def canonical_identifier(source: str, item: dict) -> tuple[str, str] | None:
     if source == "biorxiv" and not re.match(r"^10\.(?:1101|64898)/", doi):
         return None
     # ChemRxiv is source-verified at ingestion; DOI alone is not sufficient.
-    if source == "chemrxiv" and not (
-        doi.startswith("10.26434/") or "chemrxiv" in str(item.get("source") or "").lower()
-    ):
-        return None
     if source == "chemrxiv" and not (
         doi.startswith("10.26434/") or "chemrxiv" in str(item.get("source") or "").lower()
     ):
