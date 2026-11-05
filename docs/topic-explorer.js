@@ -199,7 +199,7 @@ function paperCard(p,c){
  const hit=data.topicHit(p,c.topicTerms);
  const tokens=[hit?.term,...c.q.replaceAll('"',"").split(/\s+/)].filter(Boolean);
  const recordLabel=p.source==="biorxiv"&&p.version?p.recordId+" · v"+p.version:p.recordId;
- const meta=[recordLabel,p.date||"Date unavailable",p.category].filter(Boolean).join(" · ");
+ const meta=[recordLabel,p.date||(p.announcementDate?"Announced "+p.announcementDate:"Date unavailable"),p.category].filter(Boolean).join(" · ");
  card.append(element("p",meta,"rd-small"));
  const title=element("h3"),a=link("",p.url);
  highlight(a,p.title,tokens);title.append(a);card.append(title);
