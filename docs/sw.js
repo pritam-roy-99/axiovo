@@ -1,6 +1,6 @@
-/* ResearchLens offline shell. Do not cache remote APIs, PDFs or the live feed. */
+/* Axiovo offline shell. Do not cache remote APIs, PDFs or the live feed. */
 "use strict";
-const CACHE = "axiovo-shell-v33";
+const CACHE = "axiovo-shell-v34";
 const SHELL = [
   "./", "./index.html", "./arxiv.html", "./biorxiv.html", "./chemrxiv.html", "./discover.html", "./workspace.html", "./copilot.html",
   "./lab.html", "./paper.html", "./compare.html", "./profiles.html", "./community.html", "./methodology.html", "./privacy.html",
@@ -12,7 +12,7 @@ const SHELL = [
   "./assistant-core.js", "./copilot.js", "./lab.js", "./workspace.js",
   "./paper.js", "./paper-research.js", "./compare.js", "./profiles.js", "./local-backup.js", "./profiles-social.js", "./social.js",
   "./social-config.js", "./cloud-sync.js", "./relevance.js",
-  "./research-intelligence.js", "./unified-workspace.js", "./onboarding.js", "./biorxiv.js", "./appearance-picker.js", "./data/biorxiv.json", "./data/feed.json", "./manifest.webmanifest", "./icons/researchlens.svg"
+  "./research-intelligence.js", "./unified-workspace.js", "./onboarding.js", "./biorxiv.js", "./appearance-picker.js", "./data/biorxiv.json", "./data/feed.json", "./manifest.webmanifest", "./icons/axiovo.svg"
 ];
 self.addEventListener("install", (event) => {
   event.waitUntil(
