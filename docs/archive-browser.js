@@ -178,6 +178,21 @@ function relevant(p){
  return true;
 }
 function rank(p){return 8*match(p.title,state.query)+3*match(p.abstract,state.query)+5*match(p.authors.join(" "),state.query)+2*match(p.category,state.subfield||field().code)}
+function highlight(node,text,query){
+ node.replaceChildren();
+ const value=String(text||""),terms=clean(query).split(/\s+/).filter(x=>x.length>=3).slice(0,7);
+ if(!terms.length){node.textContent=value;return}
+ const low=value.toLowerCase();let at=0,seen=0;
+ while(at<value.length&&seen<50){
+  let found=-1,len=0;
+  for(const word of terms){const pos=low.indexOf(word.toLowerCase(),at);if(pos>=0&&(found<0||pos<found)){found=pos;len=word.length}}
+  if(found<0)break;
+  if(found>at)node.append(document.createTextNode(value.slice(at,found)));
+  node.append(make("mark",null,value.slice(found,found+len)));
+  at=found+len;seen++;
+ }
+ node.append(document.createTextNode(value.slice(at)));
+}
 function outgoing(container,label,url,primary=false){
  const a=make("a",primary?"axiovo-primary":null,label);a.href=url;if(url.startsWith("https:")){a.target="_blank";a.rel="noopener noreferrer"}container.append(a);return a;
 }
@@ -191,14 +206,16 @@ function card(p){
  const root=make("article","axiovo-result-card");
  root.append(make("p","axiovo-paper-meta",(source==="arxiv"?"arXiv: ":"DOI: ")+p.id+" · "+(p.date||"Date unavailable")+" · "+(p.category||"Unclassified")));
  const title=make("h3");
- const titleButton=make("button","axiovo-paper-title-button",p.title);
+ const titleButton=make("button","axiovo-paper-title-button");highlight(titleButton,p.title,state.query);
  titleButton.type="button";titleButton.setAttribute("aria-label","View paper details for "+p.title);
  title.append(titleButton);root.append(title);
  const author=make("p","axiovo-paper-meta");
  p.authors.slice(0,25).forEach((name,i)=>{if(i)author.append(document.createTextNode(", "));const b=make("button","axiovo-author-link",name);b.type="button";b.onclick=()=>{$("archive-author").value=name;$("archive-query").value="";$("archive-scope").value="all";search()};author.append(b)});
  if(!p.authors.length)author.textContent="Author metadata unavailable";root.append(author);
  if(p.affiliations?.length)root.append(make("p","axiovo-paper-meta","Affiliations: "+p.affiliations.slice(0,5).join("; ")));
- root.append(make("p","axiovo-abstract",(p.abstract||"Abstract unavailable in this source").slice(0,460)+(p.abstract.length>460?"…":"")));
+ const preview=make("p","axiovo-abstract");
+ highlight(preview,(p.abstract||"Abstract unavailable in this source").slice(0,460)+(p.abstract.length>460?"…":""),state.query);
+ root.append(preview);
  const actions=make("div","axiovo-paper-actions");
  const details=make("div","axiovo-article-details");details.hidden=true;
  details.append(make("h4",null,"Full available abstract"),make("p",null,p.abstract||"No abstract provided by source."));
@@ -227,8 +244,11 @@ function render(){
  $("archive-result-count").textContent=shown.length+" matching verified "+source+" records in the current search. Coverage may be incomplete.";
  for(const p of shown.slice(0,max))list.append(card(p));
  if(!shown.length){
-  const none=make("div","axiovo-no-results","No matching records in the current verified index. Try broader keywords, reset filters or use the original archive. This does not mean no matching papers exist.");
-  outgoing(none,"Official archive ↗",official);list.append(none);
+  const none=make("div","axiovo-no-results","No matches in the available verified index. This does not establish that the archive has no relevant paper.");
+  const tips=make("p",null,"Try a shorter phrase, a different spelling, removing the date range, or searching the whole archive.");
+  const reset=make("button","axiovo-clear-filters","Clear filters");reset.type="button";
+  reset.onclick=()=>{$("archive-query").value="";$("archive-author").value="";$("archive-affiliation").value="";$("archive-from").value="";$("archive-to").value="";$("archive-scope").value="all";search()};
+  none.append(tips,reset);outgoing(none,"Search official archive ↗",official);list.append(none);
  }
  const bar=$("archive-result-actions");bar.replaceChildren();
  if(max<shown.length){const more=make("button",null,"Show 20 more");more.type="button";more.onclick=()=>{page++;render()};bar.append(more)}
