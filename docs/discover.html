@@ -71,12 +71,12 @@ Your browser cannot play this video. Read the transcript below to explore the fe
 <div><strong>Start with your research question</strong><p>Choose a research field, discover original papers, save useful references, and organize your work in Library. No account required.</p></div>
 <div class="axiovo-onboarding-actions"><button type="button" id="axiovo-pick-field">Choose my field</button><a href="./discover.html#workspace">Create a research question</a><button type="button" id="axiovo-dismiss" aria-label="Dismiss getting started tips">Dismiss</button></div></section>
 <div class="rl-unified-switch" role="group" aria-label="Research workflow"><a id="workflow-discover" href="./discover.html#discover" aria-current="page">Discover papers</a><a id="workflow-workspace" href="./discover.html#workspace">My Library &amp; questions</a></div><div id="discover-shell"><section class="rl-discover-switch" id="discover" aria-label="Literature discovery modes">
-<div><span class="rl-discover-eyebrow">ONE RESEARCH DISCOVERY SPACE</span><h2>Discover literature</h2><p>Switch between newly indexed arXiv papers and wider scholarly search without leaving Axiovo.</p></div>
-<div class="rl-discover-options" role="group" aria-label="Choose literature source">
-<button type="button" id="rl-source-arxiv" class="rl-source-button" aria-pressed="true">Latest arXiv <small>New papers, dates, followed topics</small></button>
-<button type="button" id="rl-source-biorxiv" class="rl-source-button" aria-pressed="false">bioRxiv <small>Life-science preprints, DOI and category</small></button>
-<button type="button" id="rl-source-scholarly" class="rl-source-button" aria-pressed="false">Explore my field <small>OpenAlex literature, authors and methods</small></button>
-</div></section>
+<div><span class="rl-discover-eyebrow">YOUR CHOSEN PREPRINT ARCHIVE</span><h2>Choose an archive and refine your research</h2><p>Each archive has equal navigation and its own search results. Set your field, research area and subtopic below.</p></div>
+<div class="rl-discover-options axiovo-source-three" role="group" aria-label="Choose preprint archive">
+<button type="button" id="rl-source-arxiv" class="rl-source-button" aria-pressed="true">arXiv <small>Physics, mathematics, computing and more</small></button>
+<button type="button" id="rl-source-biorxiv" class="rl-source-button" aria-pressed="false">bioRxiv <small>Biology and life sciences</small></button>
+<button type="button" id="rl-source-chemrxiv" class="rl-source-button" aria-pressed="false">ChemRxiv <small>Chemistry and molecular research</small></button>
+</div><p id="axiovo-archive-indicator" role="status" class="axiovo-archive-indicator">Choose a field and subtopic to begin browsing.</p></section>
 <section class="rl-focus-bar" id="rl-focus-bar" aria-label="Research field, topic and subtopic selection">
 <div class="rl-focus-bar-header"><div><span class="rl-discover-eyebrow">YOUR RESEARCH FOCUS</span><h2 id="rl-focus-headline">Explore your field</h2><p id="rl-focus-hint">Select a main field. Research areas and subtopics are optional and help narrow papers.</p></div><div class="rl-focus-current" id="rl-focus-trail" aria-live="polite"></div></div>
 <div class="rl-focus-fields">
@@ -114,6 +114,16 @@ Your browser cannot play this video. Read the transcript below to explore the fe
 <p id="axiovo-biorxiv-status" role="status">Loading bioRxiv snapshot…</p>
 <p><a id="axiovo-biorxiv-official" href="https://www.biorxiv.org/search/" target="_blank" rel="noopener noreferrer">Search the full bioRxiv website ↗</a></p>
 <div id="axiovo-biorxiv-results" class="axiovo-biorxiv-results"></div></section>
+<section id="chemrxiv-discovery" class="axiovo-chemrxiv" hidden aria-label="ChemRxiv recent preprints">
+ <div class="axiovo-biorxiv-intro"><span class="rl-discover-eyebrow">CHEMISTRY · DOI-VERIFIED CHEMRXIV METADATA</span>
+ <h2>ChemRxiv literature</h2><p>Browse source-verified ChemRxiv DOI records. The local snapshot is partial. ChemRxiv's 2026 hosting migration affects metadata access; no unrelated results are substituted.</p></div>
+ <div class="axiovo-biorxiv-controls">
+ <label for="axiovo-chemrxiv-query">Search ChemRxiv papers<input id="axiovo-chemrxiv-query" type="search" placeholder="Catalysis, polymers, computational chemistry…" maxlength="180"></label>
+ <label for="axiovo-chemrxiv-category">Chemistry category<select id="axiovo-chemrxiv-category"><option value="">All indexed categories</option></select></label>
+ </div><p id="axiovo-chemrxiv-status" role="status">Checking verified ChemRxiv metadata…</p>
+ <p><a id="axiovo-chemrxiv-official" href="https://chemrxiv.org/" target="_blank" rel="noopener noreferrer">Open official ChemRxiv search ↗</a></p>
+ <div id="axiovo-chemrxiv-results" class="axiovo-biorxiv-results"></div></section>
+<div class="axiovo-wider-search-actions"><button type="button" id="rl-source-scholarly" class="axiovo-wider-search-button" aria-pressed="false">Search wider literature <span aria-hidden="true">→</span></button><span>Optional OpenAlex-assisted discovery, separate from the three preprint archives.</span></div>
 <section id="scholarly-discovery" class="rl-scholar" aria-label="Wider scholarly search" hidden>
 <div class="rl-scholar-intro"><span>ARXIV-HOSTED LITERATURE SEARCH</span><h2 id="scholar-field-heading">Explore research across disciplines</h2><p>Main fields, research areas and subtopics are optional discovery filters. Search author identities separately to avoid hiding legitimate arXiv papers under incorrect topics. OpenAlex dates may differ from original arXiv submission dates.</p></div>
 <div class="rl-scholar-layout">
