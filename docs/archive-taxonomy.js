@@ -1,0 +1,48 @@
+/* Source-specific subject taxonomies; all top-level subject areas included.
+ * Subfields are editable browser-local suggestions, never fabricated archive
+ * classification codes. arXiv categories use authoritative arXiv codes.
+ */
+(function(root){
+"use strict";
+const A=[
+["Physics",[["Astrophysics","astro-ph"],["Condensed Matter","cond-mat"],["General Relativity and Quantum Cosmology","gr-qc"],["High Energy Physics – Experiment","hep-ex"],["High Energy Physics – Lattice","hep-lat"],["High Energy Physics – Phenomenology","hep-ph"],["High Energy Physics – Theory","hep-th"],["Mathematical Physics","math-ph"],["Nonlinear Sciences","nlin"],["Nuclear Experiment","nucl-ex"],["Nuclear Theory","nucl-th"],["Physics","physics"],["Quantum Physics","quant-ph"]]],
+["Mathematics",[["Mathematics","math"]]],
+["Computer Science",[["Computer Science","cs"]]],
+["Quantitative Biology",[["Quantitative Biology","q-bio"]]],
+["Quantitative Finance",[["Quantitative Finance","q-fin"]]],
+["Statistics",[["Statistics","stat"]]],
+["Electrical Engineering and Systems Science",[["Electrical Engineering and Systems Science","eess"]]],
+["Economics",[["Economics","econ"]]]
+];
+const ARXIV=[
+["astro-ph","Astrophysics of Galaxies","astro-ph.GA"],["astro-ph","Cosmology and Nongalactic Astrophysics","astro-ph.CO"],["astro-ph","Earth and Planetary Astrophysics","astro-ph.EP"],["astro-ph","High Energy Astrophysical Phenomena","astro-ph.HE"],["astro-ph","Instrumentation and Methods for Astrophysics","astro-ph.IM"],["astro-ph","Solar and Stellar Astrophysics","astro-ph.SR"],
+["cond-mat","Disordered Systems and Neural Networks","cond-mat.dis-nn"],["cond-mat","Materials Science","cond-mat.mtrl-sci"],["cond-mat","Mesoscale and Nanoscale Physics","cond-mat.mes-hall"],["cond-mat","Other Condensed Matter","cond-mat.other"],["cond-mat","Quantum Gases","cond-mat.quant-gas"],["cond-mat","Soft Condensed Matter","cond-mat.soft"],["cond-mat","Statistical Mechanics","cond-mat.stat-mech"],["cond-mat","Strongly Correlated Electrons","cond-mat.str-el"],["cond-mat","Superconductivity","cond-mat.supr-con"],
+["physics","Accelerator Physics","physics.acc-ph"],["physics","Applied Physics","physics.app-ph"],["physics","Atmospheric and Oceanic Physics","physics.ao-ph"],["physics","Atomic and Molecular Clusters","physics.atm-clus"],["physics","Atomic Physics","physics.atom-ph"],["physics","Biological Physics","physics.bio-ph"],["physics","Chemical Physics","physics.chem-ph"],["physics","Classical Physics","physics.class-ph"],["physics","Computational Physics","physics.comp-ph"],["physics","Data Analysis, Statistics and Probability","physics.data-an"],["physics","Fluid Dynamics","physics.flu-dyn"],["physics","General Physics","physics.gen-ph"],["physics","Geophysics","physics.geo-ph"],["physics","History and Philosophy of Physics","physics.hist-ph"],["physics","Instrumentation and Detectors","physics.ins-det"],["physics","Medical Physics","physics.med-ph"],["physics","Optics","physics.optics"],["physics","Physics and Society","physics.soc-ph"],["physics","Physics Education","physics.ed-ph"],["physics","Plasma Physics","physics.plasm-ph"],["physics","Popular Physics","physics.pop-ph"],["physics","Space Physics","physics.space-ph"],
+["nlin","Adaptation and Self-Organizing Systems","nlin.AO"],["nlin","Cellular Automata and Lattice Gases","nlin.CG"],["nlin","Chaotic Dynamics","nlin.CD"],["nlin","Exactly Solvable and Integrable Systems","nlin.SI"],["nlin","Pattern Formation and Solitons","nlin.PS"],
+["math","Algebraic Geometry","math.AG"],["math","Algebraic Topology","math.AT"],["math","Analysis of PDEs","math.AP"],["math","Category Theory","math.CT"],["math","Classical Analysis and ODEs","math.CA"],["math","Combinatorics","math.CO"],["math","Complex Variables","math.CV"],["math","Differential Geometry","math.DG"],["math","Functional Analysis","math.FA"],["math","General Topology","math.GN"],["math","Group Theory","math.GR"],["math","Information Theory","math.IT"],["math","Logic","math.LO"],["math","Mathematical Physics","math.MP"],["math","Number Theory","math.NT"],["math","Numerical Analysis","math.NA"],["math","Operator Algebras","math.OA"],["math","Optimization and Control","math.OC"],["math","Probability","math.PR"],["math","Quantum Algebra","math.QA"],["math","Representation Theory","math.RT"],["math","Statistics Theory","math.ST"],
+["cs","Artificial Intelligence","cs.AI"],["cs","Computation and Language","cs.CL"],["cs","Computational Complexity","cs.CC"],["cs","Computer Vision and Pattern Recognition","cs.CV"],["cs","Cryptography and Security","cs.CR"],["cs","Data Structures and Algorithms","cs.DS"],["cs","Databases","cs.DB"],["cs","Distributed, Parallel, and Cluster Computing","cs.DC"],["cs","Human-Computer Interaction","cs.HC"],["cs","Information Retrieval","cs.IR"],["cs","Machine Learning","cs.LG"],["cs","Networking and Internet Architecture","cs.NI"],["cs","Robotics","cs.RO"],["cs","Software Engineering","cs.SE"],["cs","Systems and Control","cs.SY"],
+["q-bio","Biomolecules","q-bio.BM"],["q-bio","Cell Behavior","q-bio.CB"],["q-bio","Genomics","q-bio.GN"],["q-bio","Molecular Networks","q-bio.MN"],["q-bio","Neurons and Cognition","q-bio.NC"],["q-bio","Populations and Evolution","q-bio.PE"],["q-bio","Quantitative Methods","q-bio.QM"],["q-bio","Subcellular Processes","q-bio.SC"],["q-bio","Tissues and Organs","q-bio.TO"],
+["q-fin","Computational Finance","q-fin.CP"],["q-fin","Economics","q-fin.EC"],["q-fin","General Finance","q-fin.GN"],["q-fin","Mathematical Finance","q-fin.MF"],["q-fin","Portfolio Management","q-fin.PM"],["q-fin","Pricing of Securities","q-fin.PR"],["q-fin","Risk Management","q-fin.RM"],["q-fin","Statistical Finance","q-fin.ST"],["q-fin","Trading and Market Microstructure","q-fin.TR"],
+["stat","Applications","stat.AP"],["stat","Computation","stat.CO"],["stat","Machine Learning","stat.ML"],["stat","Methodology","stat.ME"],["stat","Other Statistics","stat.OT"],["stat","Statistics Theory","stat.TH"],
+["eess","Audio and Speech Processing","eess.AS"],["eess","Image and Video Processing","eess.IV"],["eess","Signal Processing","eess.SP"],["eess","Systems and Control","eess.SY"],
+["econ","Econometrics","econ.EM"],["econ","General Economics","econ.GN"],["econ","Theoretical Economics","econ.TH"]
+];
+const BIO=["Animal Behavior and Cognition","Biochemistry","Bioengineering","Bioinformatics","Biophysics","Cancer Biology","Cell Biology","Clinical Trials","Developmental Biology","Ecology","Epidemiology","Evolutionary Biology","Genetics","Genomics","Immunology","Microbiology","Molecular Biology","Neuroscience","Paleontology","Pathology","Pharmacology and Toxicology","Physiology","Plant Biology","Scientific Communication and Education","Synthetic Biology","Systems Biology","Zoology"];
+const CHEM=["Agriculture and Food Chemistry","Analytical Chemistry","Biological and Medicinal Chemistry","Catalysis","Chemical Education","Chemical Engineering and Industrial Chemistry","Earth, Space, and Environmental Chemistry","Energy","Inorganic Chemistry","Materials Chemistry","Materials Science","Nanoscience","Organic Chemistry","Organometallic Chemistry","Physical Chemistry","Polymer Science","Theoretical and Computational Chemistry"];
+const SUGGESTIONS={
+"Quantum Physics":["Quantum cryptography","Quantum foundations","Quantum computing","Quantum sensing","Entanglement theory","Quantum networks"],
+"Genomics":["Single-cell genomics","Population genetics","Genome assembly","Transcriptomics","Epigenomics"],
+"Neuroscience":["Neural circuits","Synaptic plasticity","Neuroimaging","Computational neuroscience"],
+"Bioinformatics":["Sequence analysis","Multi-omics integration","Protein prediction","Biological networks"],
+"Catalysis":["Electrocatalysis","Photocatalysis","Heterogeneous catalysis","Reaction mechanisms"],
+"Materials Science":["Battery materials","Electronic structure","Two-dimensional materials","Nanocomposites"],
+"Organic Chemistry":["Synthesis","Asymmetric catalysis","Medicinal chemistry","Reaction optimization"],
+"Physical Chemistry":["Molecular dynamics","Spectroscopy","Chemical kinetics","Quantum chemistry"],
+"Theoretical and Computational Chemistry":["Density functional theory","Machine learning potentials","Molecular simulation","Electronic structure"],
+"Computer Science":["Machine learning","Algorithms","Large language models","Cybersecurity"]
+};
+const mapArxivGroup=A.map(([label,arr])=>({label,id:arr[0]?.[1]||label.toLowerCase(),areas:arr.map(([name,code])=>({name,code,subfields:ARXIV.filter(x=>x[0]===code).map(([_,n,c])=>({name:n,code:c}))}))}));
+const bio={groups:[{label:"Biology and Life Sciences",id:"biology",areas:BIO.map(name=>({name,code:name,subfields:(SUGGESTIONS[name]||[]).map(t=>({name:t,code:t}))}))}]};
+const chem={groups:[{label:"Chemistry and Molecular Sciences",id:"chemistry",areas:CHEM.map(name=>({name,code:name,subfields:(SUGGESTIONS[name]||[]).map(t=>({name:t,code:t}))}))}]};
+root.AxiovoArchiveTaxonomy={arxiv:{groups:mapArxivGroup},biorxiv:bio,chemrxiv:chem,suggestions:SUGGESTIONS};
+})(window);
