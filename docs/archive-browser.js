@@ -109,10 +109,19 @@ async function remote(){
  const params={rows:"100",sort:state.sort==="recent"?"published":"score",order:"desc"};
  if(term)params["query.bibliographic"]=term;
  const url="https://api.crossref.org/prefixes/10.26434/works?"+new URLSearchParams(params);
- const d=await getJSON(url);
- return (d.message?.items||[]).map(x=>normalDOI({doi:x.DOI,title:x.title?.[0],authors:(x.author||[]).map(a=>[a.given,a.family].filter(Boolean).join(" ")),
+ const pmcQuery='SRC:PPR AND JOURNAL:"ChemRxiv"'+(term?" AND ("+term.replace(/[():"]/g," ")+")":"");
+ const pmcURL="https://www.ebi.ac.uk/europepmc/webservices/rest/search?"+new URLSearchParams({query:pmcQuery,format:"json",pageSize:"100",resultType:"core"});
+ const calls=await Promise.allSettled([getJSON(url),getJSON(pmcURL)]);
+ const cross=calls[0].status==="fulfilled"?calls[0].value.message?.items||[]:[];
+ const pmc=calls[1].status==="fulfilled"?calls[1].value.resultList?.result||[]:[];
+ if(!cross.length&&!pmc.length&&calls.every(x=>x.status==="rejected"))throw Error("Crossref and Europe PMC unavailable");
+ const works=cross.map(x=>normalDOI({doi:x.DOI,title:x.title?.[0],authors:(x.author||[]).map(a=>[a.given,a.family].filter(Boolean).join(" ")),
  abstract:clean(x.abstract).replace(/<[^>]*>/g," "),date:x.published?.["date-parts"]?.[0]?.map((n,i)=>String(n).padStart(i?2:4,"0")).join("-"),
  category:(x.subject||[]).join(", "),source:"ChemRxiv",citations:x["is-referenced-by-count"]})).filter(verified);
+ const epmc=pmc.filter(x=>/chemrxiv/i.test(clean(x.journalTitle||x.journalInfo?.journal?.title)))
+ .map(x=>normalDOI({doi:x.doi,title:x.title,authors:x.authorString,abstract:x.abstractText,date:x.firstPublicationDate,category:x.journalTitle,source:"ChemRxiv"})).filter(verified);
+ const byDOI=new Map();for(const x of [...epmc,...works])byDOI.set(x.doi,x);
+ return [...byDOI.values()];
 }
 // Optional cross-corpus discovery is accepted ONLY after verifying the paper's
 // native archive identifier. This broadens title/abstract concept retrieval
