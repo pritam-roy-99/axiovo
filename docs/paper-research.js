@@ -35,8 +35,8 @@ function mount(){
  const sources=panel("Research connections");sources.id="axiovo-references";
  sources.append(make("p","These searches locate possible references and follow-ups. Axiovo does not automatically certify a citation relationship.","muted"));
  const sourceRow=make("div",undefined,"axiovo-paper-inline");
- link(sourceRow,"Semantic Scholar citations","https://www.semanticscholar.org/search?q="+encodeURIComponent(id),"btn");
- link(sourceRow,"OpenAlex literature search","https://openalex.org/works?filter=locations.source.id%3AS4306400194&search="+encodeURIComponent(id),"btn");
+ link(sourceRow,"Find on Semantic Scholar","https://www.semanticscholar.org/search?q="+encodeURIComponent(id),"btn");
+ link(sourceRow,"Search OpenAlex literature","https://openalex.org/works?filter=locations.source.id%3AS4306400194&search="+encodeURIComponent(id),"btn");
  link(sourceRow,"arXiv search","https://arxiv.org/search/?query="+encodeURIComponent(id)+"&searchtype=all","btn");
  sources.append(sourceRow);
  versions.after(sources);
