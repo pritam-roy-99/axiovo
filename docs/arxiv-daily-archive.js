@@ -101,5 +101,39 @@
   return {complete:true,missing:[],papers:filterAndSort(records,query,category,sort),
    totalHarvested:records.length,coveredDays:requested.length,from,to};
  }
- return {dates,matches,filterAndSort,search,officialDateSearchUrl};
+ async function partialSearch({from,to,query="",category="",sort="new",signal,fetcher=fetch,
+     base="./data/arxiv-oai/",maxDays=31}={}){
+  const requested=dates(from,to,maxDays);
+  let manifest;
+  try{
+   const response=await fetcher(base+"manifest.json",{signal,cache:"no-store"});
+   if(!response.ok)throw Error("OAI manifest unavailable");
+   manifest=await response.json();
+  }catch(e){
+   if(e.name==="AbortError")throw e;
+   return {partial:true,complete:false,available:false,papers:[],missing:requested,reason:"No OAI metadata snapshot"};
+  }
+  const available=requested.filter(day=>manifest.days?.[day]?.complete===false);
+  const missing=requested.filter(day=>!available.includes(day));
+  const papers=[];
+  for(let start=0;start<available.length;start+=4){
+   const batch=await Promise.all(available.slice(start,start+4).map(async day=>{
+    try{
+     const r=await fetcher(base+day+".json",{signal,cache:"no-store"});
+     if(!r.ok)return [];
+     const data=await r.json();
+     if(data.complete!==false||data.date!==day||!Array.isArray(data.papers)
+         ||data.papers.length!==data.paper_count||data.paper_count!==manifest.days[day].count)
+       return [];
+     return data.papers;
+    }catch(e){if(e.name==="AbortError")throw e;return []}
+   }));
+   batch.forEach(rows=>papers.push(...rows));
+  }
+  return {partial:true,complete:false,available:papers.length>0,
+   papers:filterAndSort(papers,query,category,sort),
+   missing,coveredDays:available.length,totalHarvested:papers.length,
+   reason:"Official OAI-PMH update-window records are partial by first-submission date"};
+ }
+ return {dates,matches,filterAndSort,search,partialSearch,officialDateSearchUrl};
 });
