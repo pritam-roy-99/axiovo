@@ -192,7 +192,6 @@ def narration(folder):
 def main():
     OUT.mkdir(parents=True,exist_ok=True)
     images=[frame(i) for i in range(len(SCENES))]
-    images[0].save(OUT/"axiovo-tour-poster.jpg",quality=87,optimize=True)
     captions=["WEBVTT",""]
     for i,(_,_,sentence) in enumerate(SCENES):
         captions.extend([timestamp(i*SECONDS)+" --> "+timestamp((i+1)*SECONDS-.1),sentence,""])
