@@ -20,11 +20,11 @@
   "shortcuts": [
     {
       "name": "Discover papers",
-      "url": "./#discover"
+      "url": "./discover.html#discover"
     },
     {
       "name": "My Library",
-      "url": "./#workspace"
+      "url": "./discover.html#workspace"
     },
     {
       "name": "Research AI",
