@@ -3,9 +3,9 @@
  * Storage keys and the immutable main-field identifiers stay unchanged.
  */
 (function(root,factory){
- const api=factory(typeof module==="object"&&module.exports?require("./research-fields.js"):root?.ResearchLensFields);
+ const api=factory(typeof module==="object"&&module.exports?require("./research-fields.js"):root?.AxiovoFields);
  if(typeof module==="object"&&module.exports)module.exports=api;
- if(root)root.ResearchLensCustomTaxonomy=api;
+ if(root)root.AxiovoCustomTaxonomy=api;
 })(typeof window!=="undefined"?window:null,function(Fields){
  "use strict";
  const KEY="axiovo-custom-taxonomy-v1";
