@@ -190,6 +190,13 @@ def build():
                                     for source in sources},
                 "needs_review": len(selected), "tagged": 0, "total_indexed": len(selected)}
     (DATA / "coverage.json").write_text(json.dumps(coverage, indent=2) + "\n", encoding="utf-8")
+    review = {"schema_version": 1,
+              "note": "Unreviewed paper metadata. No machine topic labels are claimed as verified.",
+              "count": len(selected),
+              "items": [{"source": p["source"], "id": p["id"], "reason": "Topic confidence has not been established"}
+                        for p in selected.values()]}
+    (DATA / "needs_review.json").write_text(
+        json.dumps(review, ensure_ascii=False, separators=(",", ":")) + "\n", encoding="utf-8")
     print("Validated", len(selected), "source-linked records across", len(buckets), "monthly shards")
 
 
