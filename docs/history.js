@@ -61,7 +61,7 @@ function paperCard(w){
  if(!linked)return null;
  const card=el("article",undefined,"paper");
  const meta=el("div",undefined,"row");
- meta.append(el("span","arXiv-hosted preprint · OpenAlex metadata","category"));
+ meta.append(el("span","arXiv-hosted preprint · "+(w.__source==="local-arxiv"?"Axiovo local arXiv metadata":w.__source==="semantic-scholar"?"Semantic Scholar metadata":"OpenAlex metadata"),"category"));
  if(w.publication_date)meta.append(el("span","Index date: "+w.publication_date,"small"));
  card.append(meta,el("h2",w.display_name||w.title||"Untitled work"));
  const authors=(w.authorships||[]).slice(0,8).map(x=>x.author?.display_name||"").filter(Boolean);
@@ -95,7 +95,7 @@ function paperCard(w){
  save.addEventListener("click",()=>saveVersion(save,selected()));row.append(save);
  window.AxiovoAuthorFollow?.mount(row,authors);
  action(row,"Discussion","./paper.html?id="+encodeURIComponent(linked.base));
- action(row,"OpenAlex record",w.id);
+ if(w.__source!=="local-arxiv"&&w.__source!=="semantic-scholar"&&/^https:\/\/openalex\.org\//.test(String(w.id||"")))action(row,"OpenAlex record",w.id);
  const copy=el("button","Copy BibTeX","rl-paper-action");
  copy.onclick=async()=>{
   const citation=bibtex({id:w.id,title:w.display_name||w.title||"",authors,date:w.publication_date||"",url:Arxiv.abs(selected()),arxiv:selected()});
@@ -123,6 +123,8 @@ async function recover(p,signal,reason){
 }
 function showRecovered(result,p){
  const root=$("history-cards");root.replaceChildren();
+ const requested=Arxiv?.parse(p.q);
+ if(requested){const notice=el("p","Exact arXiv identifier supplied: "+requested.requested+". The original record is available even when all search indexes are unavailable.","rl-source-notice");addLink(notice,"Open original arXiv record ↗",Arxiv.abs(requested.requested),"rl-paper-action primary");root.append(notice)}
  historyInfo(result.reason,p.q);
  let shown=0;
  for(const w of result.works){const card=paperCard(w);if(card){root.append(card);shown++}}
