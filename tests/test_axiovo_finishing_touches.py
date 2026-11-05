@@ -29,7 +29,7 @@ class FinishingTouchesTests(unittest.TestCase):
   self.assertIn('tour.open=false',onboard)
  def test_offline_app_caches_community(self):
   worker=(ROOT/"sw.js").read_text()
-  self.assertIn("axiovo-shell-v24",worker)
+  self.assertRegex(worker, r'const CACHE = "axiovo-shell-v\\d+";')
   self.assertIn("community.html",worker)
 if __name__=="__main__":
  unittest.main()
