@@ -40,3 +40,34 @@ body.axiovo-home{background:var(--rl-bg,#f3f7fb)}
 @media(max-width:770px){.axiovo-entry-fields{grid-template-columns:1fr}.axiovo-entry{padding:26px 14px}.axiovo-entry-card{padding:18px}.axiovo-entry-actions>*{flex:1 1 170px}.axiovo-entry-lead{font-size:14px}}
 @media(max-width:440px){.axiovo-entry-card-header{display:block}.axiovo-entry-card-header span{display:block;margin-top:5px}.axiovo-entry-actions>*{flex:1 1 100%}}
 :root[data-theme="dark"] .axiovo-entry-card,:root[data-theme="dark"] .axiovo-entry-demo{box-shadow:none}
+
+/* Home is intentionally a single broad-discipline decision.
+   Subfields, interests, and date filters belong on Discover. */
+body.axiovo-home .axiovo-entry-fields{
+  grid-template-columns:minmax(220px,520px)!important;
+  justify-content:start;
+}
+body.axiovo-home .axiovo-entry-card{max-width:930px}
+body.axiovo-home .axiovo-entry-intro{max-width:810px}
+.axiovo-nav-return{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.axiovo-nav-return :is(a,button){
+  font:inherit;font-size:12px;font-weight:720;
+  min-height:36px;display:inline-flex;align-items:center;justify-content:center;
+  border:1px solid #4b7696;border-radius:8px;
+  padding:8px 11px;color:#f3f9ff;background:rgba(255,255,255,.09);
+  text-decoration:none;cursor:pointer;white-space:nowrap;
+}
+.axiovo-nav-return :is(a,button):hover{
+  background:rgba(255,255,255,.2);text-decoration:none;
+}
+.axiovo-nav-return :is(a,button):focus-visible{
+  outline:3px solid #91d9ef;outline-offset:2px
+}
+@media(max-width:900px){
+ .rl-global-header{gap:8px;flex-wrap:wrap}
+ .axiovo-nav-return{order:3;width:100%;margin-top:3px}
+ .axiovo-nav-return :is(a,button){flex:1 1 120px}
+}
+@media(max-width:770px){
+ body.axiovo-home .axiovo-entry-fields{grid-template-columns:minmax(0,1fr)!important}
+}
