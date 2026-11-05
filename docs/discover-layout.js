@@ -25,9 +25,9 @@ function init(){
  if(focus&&subrow){
   const advanced=disclosure(focus,[subrow],"Refine subtopics and add interests","axiovo-advanced-focus");
   let saved={};
-  try{saved=JSON.parse(localStorage.getItem("researchlens-field-explorer-v1")||"{}")||{}}catch{}
+  try{saved=JSON.parse(localStorage.getItem("axiovo-field-explorer-v1")||"{}")||{}}catch{}
   if(advanced&&(saved.subtopic||saved.areaSelected))advanced.open=true;
-  window.addEventListener("researchlens:focus-change",event=>{
+  window.addEventListener("axiovo:focus-change",event=>{
    if(advanced&&["topic","subtopic","area-added","subtopic-added"].includes(event.detail?.reason))
     advanced.open=true;
   });
