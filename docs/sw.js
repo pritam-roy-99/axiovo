@@ -1,12 +1,13 @@
 /* Axiovo v40: small, verified offline shell. Remote search and PDFs stay network-only. */
 "use strict";
-const CACHE = "axiovo-shell-v46";
+const CACHE = "axiovo-shell-v47";
 const SHELL = [
   "./", "./index.html", "./desk.html", "./arxiv.html", "./biorxiv.html", "./chemrxiv.html",
   "./theme.css", "./axiovo-shell.css", "./theme.js", "./research-entry.css", "./research-entry.js",
-  "./navigation.js", "./pwa.js", "./archive-browser.css", "./archive-browser.js",
+  "./navigation.js", "./pwa.js", "./topic-explorer.css", "./topic-explorer.js", "./topic-atlas.js",
   "./archive-taxonomy.js", "./archive-data.js", "./arxiv-daily-archive.js", "./arxiv-versions.js",
-  "./abstract-audio.js", "./research-desk.js", "./research-desk.css", "./zotero-ris.js", "./manifest.webmanifest", "./icons/axiovo.svg"
+  "./data/topics/arxiv.tsv", "./data/topics/biorxiv.tsv", "./data/topics/chemrxiv.tsv",
+  "./abstract-audio.js", "./author-follow.js", "./following-authors.js", "./research-workspace.css", "./research-desk.js", "./research-desk.css", "./zotero-ris.js", "./manifest.webmanifest", "./icons/axiovo.svg"
 ];
 const LEGACY = /^(?:researchlens|litveyra|axiovo)-shell-/;
 self.addEventListener("install", event => {
@@ -27,7 +28,7 @@ self.addEventListener("activate", event => {
 });
 function isShell(url) {
   if (url.origin !== self.location.origin || url.search) return false;
-  return url.pathname.endsWith("/") || /\.(?:html|js|css|svg|webmanifest)$/.test(url.pathname);
+  return /\/data\/topics\/(arxiv|biorxiv|chemrxiv)\.tsv$/.test(url.pathname) || url.pathname.endsWith("/") || /\.(?:html|js|css|svg|webmanifest)$/.test(url.pathname);
 }
 self.addEventListener("fetch", event => {
   const req = event.request;

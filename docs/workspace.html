@@ -1,20 +1,32 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>My workspace | Axiovo</title><meta name="description" content="Your personal research reading workspace, recent arXiv papers, saved literature and next research actions.">
+<title>My Library | Axiovo</title><meta name="description" content="Your personal research reading workspace, recent arXiv papers, saved literature and next research actions.">
 <link rel="stylesheet" href="./theme.css"><script defer src="./theme.js"></script><link rel="stylesheet" href="./workspace.css"><link rel="stylesheet" href="./paper-actions.css"><link rel="stylesheet" href="./paper-card-polish.css"><link rel="stylesheet" href="./research-workflow.css"><script defer src="./navigation.js"></script><script defer src="./arxiv-versions.js"></script><script defer src="./archive-data.js"></script><script defer src="./abstract-audio.js"></script><script defer src="./workspace.js"></script><script defer src="./interests.js"></script><script defer src="./relevance.js"></script><script defer src="./research-intelligence.js"></script>
-<link rel="manifest" href="./manifest.webmanifest"><meta name="theme-color" content="#0b2239"><link rel="icon" type="image/svg+xml" href="./icons/axiovo.svg"><script defer src="./pwa.js"></script><link rel="stylesheet" href="./axiovo-shell.css?v=2"></head><body class="axiovo-workspace-page"><header></header>
-<main class="rl-workspace">
-<section class="rl-welcome"><div><span class="rl-eyebrow">AXIOVO / RESEARCH WORKSPACE</span><h1>Continue from your research question.</h1><p>Keep research questions, saved papers and reading notes together on this device. Start a question below, then discover literature and link relevant papers.</p></div><div class="rl-welcome-actions"><a class="rl-button primary" href="./desk.html">Discover papers</a><a class="rl-button secondary" href="./lab.html">Research tools</a><a class="rl-button secondary" href="./copilot.html">Research Assistant</a></div></section>
-<div class="rl-focusbar"><div><span class="rl-eyebrow">CURRENT FOCUS</span><strong id="focus-name">Loading your field…</strong><p id="focus-summary">Your selected discipline and topics can be changed in Discover.</p></div><a class="rl-button secondary" href="./arxiv.html">Change research field</a></div>
-<div class="rl-shortcuts" aria-label="Common researcher tasks">
-<a href="./"><span class="rl-shortcut-icon">01</span><strong>Discover papers</strong><small>Find evidence for your research questions</small></a>
-<a href="./profiles.html"><span class="rl-shortcut-icon">02</span><strong>Research settings</strong><small>Identity, imports and account options</small></a>
-<a href="./copilot.html"><span class="rl-shortcut-icon">03</span><strong>Research Assistant</strong><small>Evidence, literature and paper comparison</small></a>
-<a href="./lab.html"><span class="rl-shortcut-icon">04</span><strong>Read & compare</strong><small>PDFs, citations, alerts and optional sync</small></a>
-</div>
+<link rel="manifest" href="./manifest.webmanifest"><meta name="theme-color" content="#0b2239"><link rel="icon" type="image/svg+xml" href="./icons/axiovo.svg"><script defer src="./pwa.js"></script><link rel="stylesheet" href="./axiovo-shell.css?v=2"><link rel="stylesheet" href="./research-desk.css"><link rel="stylesheet" href="./research-workspace.css"><script defer src="./author-follow.js"></script><script defer src="./following-authors.js"></script></head><body class="axiovo-workspace-page axiovo-research"><header></header>
+<main class="rl-workspace rd-page library-page">
+ <div class="rd-desk-heading">
+  <p class="rd-kicker">YOUR RESEARCH WORKSPACE</p>
+  <h1>My Library</h1>
+  <p>Keep the papers and authors you want to come back to.</p>
+ </div>
+ <nav class="library-tabs" aria-label="Library views">
+  <a id="library-tab-saved" href="#saved-papers" aria-current="true">Saved papers</a>
+  <a id="library-tab-following" href="#following">Following authors <span id="following-count">0</span></a>
+  <a class="library-explore" href="./#axiovo-archive-title">Explore papers →</a>
+ </nav>
+ <div id="library-saved">
+  <div id="saved-papers">
+<section class="rl-section" aria-labelledby="library-heading"><div class="rl-section-head"><div><span class="rl-eyebrow">YOUR LIBRARY</span><h2 id="library-heading">Saved papers</h2></div><span id="library-count" class="rl-counter">0 papers</span></div><p class="rl-subtext">Find a saved paper, then open Notes and organization to add a note or assign it to a collection.</p>
+<div class="rl-library-controls"><input type="search" id="library-search" placeholder="Filter saved papers" aria-label="Filter saved papers"><select id="library-source" aria-label="Filter by archive"><option value="all">All sources</option><option value="arxiv">arXiv</option><option value="biorxiv">bioRxiv</option><option value="chemrxiv">ChemRxiv</option><option value="openalex">OpenAlex</option></select><select id="library-filter" aria-label="Reading status"><option value="all">All papers</option><option value="to-read">To read</option><option value="reading">Reading</option><option value="done">Reviewed</option><option value="cited">Cited</option></select></div>
+<div id="library-list" class="rl-stack"></div><div class="rl-library-footer"><button type="button" id="listen-library" class="rl-button secondary" hidden>Listen to visible abstracts</button><button type="button" id="export-library" class="rl-button secondary">Download library backup</button><button type="button" id="export-citations" class="rl-button secondary">Export citations (BibTeX)</button></div>
+<p class="rl-note">Your reading statuses and notes stay in this browser. Export a backup before switching devices or clearing site data.</p></section>
+  </div>
+  <details class="rd-panel library-more" id="library-research-tools">
+   <summary>Research questions and suggested reading</summary>
+   <div class="rl-focusbar"><div><strong id="focus-name">Loading your field…</strong><p id="focus-summary"></p></div><a class="rd-button rd-secondary" href="./#axiovo-archive-title">Explore topics</a></div>
 <section class="rl-section rl-intelligence" id="research-questions" aria-labelledby="research-questions-heading">
-<div class="rl-section-head"><div><span class="rl-eyebrow">RESEARCH ORGANIZATION</span><h2 id="research-questions-heading">Start with a research question</h2></div><span id="research-project-count" class="rl-counter">0 questions</span></div>
+<div class="rl-section-head"><div><span class="rl-eyebrow">RESEARCH ORGANIZATION</span><h2 id="research-questions-heading">Research questions</h2></div><span id="research-project-count" class="rl-counter">0 questions</span></div>
 <p class="rl-subtext">Keep a structured research question, relevant keywords and links to papers. Everything stays in this browser, unless exported.</p>
-<details class="rl-preferences" open><summary>Add or edit a research question</summary>
+<details class="rl-preferences"><summary>Add or edit a research question</summary>
 <form id="research-project-form" class="rl-project-form">
 <input type="hidden" id="research-project-id">
 <div class="rl-project-form-grid"><div><label for="research-project-title">Project title</label><input id="research-project-title" type="text" maxlength="160" required placeholder="e.g. Contextuality-certified sensing"></div>
@@ -26,7 +38,7 @@
 <div class="rl-library-footer"><button type="button" id="research-project-export" class="rl-button secondary">Export research questions</button><label class="rl-button secondary" for="research-project-import">Import backup</label><input id="research-project-import" class="rl-visually-hidden" type="file" accept=".json,application/json"></div>
 <p class="rl-note">Research questions are not publicly indexed. Backups contain the entered questions and paper IDs. Do not include confidential unpublished results unless you are comfortable storing them on this device.</p></section>
 <section class="rl-section rl-intelligence" id="research-recs" aria-labelledby="research-recs-heading">
-<div class="rl-section-head"><div><span class="rl-eyebrow">PERSONALIZED DISCOVERY</span><h2 id="research-recs-heading">Relevant to your research</h2></div><span id="research-rec-count" class="rl-counter">Loading…</span></div>
+<div class="rl-section-head"><div><span class="rl-eyebrow">PERSONALIZED DISCOVERY</span><h2 id="research-recs-heading">Suggested papers</h2></div><span id="research-rec-count" class="rl-counter">Loading…</span></div>
 <p class="rl-subtext">Ranked from the existing local arXiv index using explicit topic, keyword and followed-author matches. Every recommendation shows its reason.</p>
 <details class="rl-preferences"><summary>Adjust my research interests</summary><form id="research-interest-form" class="rl-settings-form">
 <label for="research-interest">Specific interests (comma-separated)</label><textarea id="research-interest" rows="2" maxlength="1200" placeholder="e.g. machine learning, condensed matter, molecular biology"></textarea>
@@ -36,13 +48,34 @@
 <div class="rl-recommendation-controls"><label for="research-project-filter">Research question</label><select id="research-project-filter" aria-label="Filter recommendations by research question"><option value="">All research questions</option></select></div>
 <p id="research-rec-status" class="rl-subtext" role="status" aria-live="polite">Loading indexed papers…</p><div id="research-recommendations" class="rl-recs-grid"></div>
 <p class="rl-note">Relevance is a transparent lexical heuristic, not semantic equivalence, expert assessment, or proof of novelty. Broader literature is available via Field Explorer.</p></section>
-
-
-<div class="rl-workspace-columns" style="grid-template-columns:minmax(0,1fr)">
-<section class="rl-section" aria-labelledby="library-heading"><div class="rl-section-head"><div><span class="rl-eyebrow">YOUR LIBRARY</span><h2 id="library-heading">Saved reading</h2></div><span id="library-count" class="rl-counter">0 papers</span></div><p class="rl-subtext">Your papers saved in Discover appear here. Filter by reading status, add private notes and export references.</p>
-<div class="rl-library-controls"><input type="search" id="library-search" placeholder="Filter saved papers" aria-label="Filter saved papers"><select id="library-source" aria-label="Filter by archive"><option value="all">All sources</option><option value="arxiv">arXiv</option><option value="biorxiv">bioRxiv</option><option value="chemrxiv">ChemRxiv</option><option value="openalex">OpenAlex</option></select><select id="library-filter" aria-label="Reading status"><option value="all">All papers</option><option value="to-read">To read</option><option value="reading">Reading</option><option value="done">Reviewed</option><option value="cited">Cited</option></select></div>
-<div id="library-list" class="rl-stack"></div><div class="rl-library-footer"><button type="button" id="listen-library" class="rl-button secondary" hidden>Listen to visible abstracts</button><button type="button" id="export-library" class="rl-button secondary">Export library JSON</button><button type="button" id="export-citations" class="rl-button secondary">Export BibTeX</button></div>
-<p class="rl-note">Your reading statuses and notes stay in this browser. Export a backup before switching devices or clearing site data.</p></section>
-</div>
-<section class="rl-section rl-bottom"><div><span class="rl-eyebrow">FIND AN ANSWER</span><h2>Explore your next research question</h2><p class="rl-subtext">Search by concept, method, theorem, title, or author. Results stay inside Axiovo.</p></div><form id="quick-search" class="rl-quick-search"><label class="rl-visually-hidden" for="research-query">Research question</label><input type="search" id="research-query" maxlength="220" placeholder="e.g. statistical mechanics or computational biology" required><button class="rl-button primary" type="submit">Search papers</button></form></section>
-</main><footer class="rl-page-footer">Axiovo · Research assistance and metadata exploration, not automated scientific verification.</footer></body></html>
+  </details>
+  <form id="quick-search" class="rd-panel rd-searchbar library-quick-search" action="./desk.html" method="get">
+   <label class="rd-sr-only" for="research-query">Search for more papers</label>
+   <input name="q" type="search" id="research-query" maxlength="220" placeholder="Find more papers by topic, title or author" required>
+   <button class="rd-button rd-secondary" type="submit">Search preprints</button>
+  </form>
+ </div>
+ <section id="following" class="library-following" aria-labelledby="following-heading" hidden>
+  <div class="rd-panel library-following-controls">
+   <h2 id="following-heading">Following authors</h2>
+   <p class="rd-small">Follow from a paper’s author list or enter an author’s full name. Your following list stays on this device.</p>
+   <form id="following-form" class="rd-searchbar">
+    <label class="rd-sr-only" for="following-name">Author name</label>
+    <input type="search" id="following-name" maxlength="120" placeholder="Full author name as listed on their papers" required>
+    <button class="rd-button rd-primary" type="submit">Follow author</button>
+   </form>
+   <p id="following-empty" class="rd-small">No authors followed yet.</p>
+   <div id="following-filters" class="library-following-filters" hidden>
+    <div class="rd-filter-grid">
+     <label>Author<select id="following-author"></select></label>
+     <label>Archive<select id="following-source"><option value="all">All archives</option><option value="arxiv">arXiv</option><option value="biorxiv">bioRxiv</option><option value="chemrxiv">ChemRxiv</option></select></label>
+    </div>
+    <div class="rd-actions"><button id="following-refresh" class="rd-button rd-secondary" type="button">Refresh papers</button><button id="following-unfollow" class="rd-button rd-secondary" type="button">Unfollow this author</button></div>
+   </div>
+   <p id="following-status" class="rd-small" role="status" aria-live="polite"></p>
+  </div>
+  <div id="following-results" class="rd-results-stack"></div>
+ </section>
+</main>
+</body>
+</html>

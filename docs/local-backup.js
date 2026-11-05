@@ -21,7 +21,8 @@
   "axiovo-browser-state-arxiv","axiovo-browser-state-biorxiv","axiovo-browser-state-chemrxiv",
   "axiovo-custom-fields-arxiv","axiovo-custom-fields-biorxiv","axiovo-custom-fields-chemrxiv",
   "axiovo-onboarding-dismissed-v1","axiovo-alert-seen-v1",
-  "axiovo-archive-library-v1","axiovo-desk-searches-v1","axiovo-desk-comparison-v1","axiovo-abstract-audio-v1"
+  "axiovo-archive-library-v1","axiovo-desk-searches-v1","axiovo-desk-comparison-v1","axiovo-abstract-audio-v1",
+  "axiovo-topic-explorer-arxiv-v1","axiovo-topic-explorer-biorxiv-v1","axiovo-topic-explorer-chemrxiv-v1"
  ];
  const MAX_FILE=5*1024*1024, MAX_ENTRY=2*1024*1024;
  const RAW=new Set(["axiovo-theme","axiovo-palette-v1","axiovo-onboarding-dismissed-v1","axiovo-last-visit"]);
