@@ -251,7 +251,7 @@ if(coverage){
   .then(response=>{if(!response.ok)throw Error("Manifest unavailable");return response.json()})
   .then(data=>{
    const completed=Object.entries(data.days||{}).filter(([date,value])=>
-    /^\\d{4}-\\d{2}-\\d{2}$/.test(date)&&value?.complete===true&&
+    /^\d{4}-\d{2}-\d{2}$/.test(date)&&value?.complete===true&&
     Number.isSafeInteger(value.count)&&value.count>=0);
    if(!completed.length){coverage.textContent="No complete arXiv submission dates indexed yet.";return}
    const count=completed.reduce((sum,[,day])=>sum+day.count,0);
