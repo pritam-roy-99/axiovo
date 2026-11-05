@@ -4,7 +4,7 @@
 (function(root,factory){
  const api=factory();
  if(typeof module==="object"&&module.exports)module.exports=api;
- if(root)root.ResearchLensCachedArxiv=api;
+ if(root)root.AxiovoCachedArxiv=api;
 })(typeof globalThis!=="undefined"?globalThis:null,function(){
  "use strict";
  const STOP=new Set("a an the to of for with and from based use using quantum paper papers research study results approach approaches information".split(" "));
