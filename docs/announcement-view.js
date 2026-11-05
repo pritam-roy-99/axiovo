@@ -6,6 +6,7 @@
 const PAGE_SIZE=40;
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 function start(){
+ if(document.body.classList.contains("axiovo-home"))return;
  const main=document.getElementById("local-feed-view"),history=document.getElementById("history-view");
  const parent=main?.parentElement;
  if(!main||!parent)return;
