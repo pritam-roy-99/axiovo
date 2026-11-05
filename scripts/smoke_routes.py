@@ -69,7 +69,7 @@ def main():
             assert page.locator("#discover-shell").is_visible()
             checked.append("back to Discover")
             go("search.html?q=quantum")
-            page.wait_for_url("**/discover.html?*view=scholarly*#discover")
+            page.wait_for_url(lambda u: u.path.endswith("/discover.html") and u.query.find("view=scholarly")>=0 and u.fragment=="discover")
             checked.append("legacy search redirect")
             go("fields.html")
             page.wait_for_url("**/discover.html?view=scholarly#discover")
