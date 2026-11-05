@@ -6,7 +6,7 @@ if(!["arxiv","biorxiv","chemrxiv"].includes(source))return;
 const definition=window.AxiovoArchiveTaxonomy?.[source];if(!definition)return;
 const $=id=>document.getElementById(id);
 const memory="axiovo-browser-state-"+source,customKey="axiovo-custom-fields-"+source;
-const saveKey={arxiv:"researchlens-reading-list",biorxiv:"axiovo-biorxiv-reading-v1",chemrxiv:"axiovo-chemrxiv-reading-v1"}[source];
+const saveKey={arxiv:"axiovo-reading-list",biorxiv:"axiovo-biorxiv-reading-v1",chemrxiv:"axiovo-chemrxiv-reading-v1"}[source];
 const official={arxiv:"https://arxiv.org/search/",biorxiv:"https://www.biorxiv.org/search/",chemrxiv:"https://chemrxiv.org/"}[source];
 const read=(k,def)=>{try{return JSON.parse(localStorage.getItem(k)||"null")??def}catch{return def}};
 const write=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch{return false}};
