@@ -63,8 +63,14 @@ function merge(...groups){
   const newer=revision(p)>=revision(previous)?p:previous, older=newer===p?previous:p;
   // An abstract or date from another revision cannot describe the pinned record.
   if(revision(newer)&&revision(older)!==revision(newer)){results.set(key,newer);continue}
-  results.set(key,{...newer,category:newer.category||older.category,categories:[...new Set([...newer.categories,...older.categories])],
-   abstract:newer.abstract||older.abstract,affiliations:newer.affiliations.length?newer.affiliations:older.affiliations});
+  results.set(key,{...newer,
+   date:newer.date||older.date,
+   announcementDate:newer.announcementDate||older.announcementDate,
+   authors:newer.authors.length?newer.authors:older.authors,
+   category:newer.category||older.category,
+   categories:[...new Set([...newer.categories,...older.categories])],
+   abstract:newer.abstract||older.abstract,
+   affiliations:newer.affiliations.length?newer.affiliations:older.affiliations});
  }
  return [...results.values()];
 }
