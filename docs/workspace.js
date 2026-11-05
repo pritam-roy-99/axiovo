@@ -91,7 +91,7 @@ function init(){
  $("quick-search").addEventListener("submit",e=>{
  e.preventDefault();const q=$("research-query").value.trim();if(!q)return;
  const input=document.getElementById("scholar-query"),form=document.getElementById("scholar-search-form"),source=document.getElementById("rl-source-scholarly");
- if(!input||!form||!source){location.href="./?view=scholarly&q="+encodeURIComponent(q)+"#discover";return}
+ if(!input||!form||!source){location.href="./discover.html?view=scholarly&q="+encodeURIComponent(q)+"#discover";return}
  source.click();input.value=q;
  const target=new URL(location.href);target.searchParams.set("view","scholarly");target.searchParams.set("q",q);target.hash="discover";
  history.replaceState({source:"scholarly"},"",target.href);window.dispatchEvent(new Event("axiovo:navigate"));
