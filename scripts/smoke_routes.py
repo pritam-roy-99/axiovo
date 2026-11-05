@@ -99,6 +99,8 @@ def main():
             paper=page.locator("#papers .paper").first
             paper_id=paper.get_attribute("data-paper-id")
             assert paper_id,"Indexed paper card has no arXiv identifier"
+            second_id=page.locator("#papers .paper").nth(1).get_attribute("data-paper-id")
+            assert second_id and second_id!=paper_id,"Need two distinct indexed papers for comparison"
             paper.locator(".rl-save-button").click()
             assert paper_id in page.evaluate('JSON.parse(localStorage.getItem("researchlens-reading-list")||"[]")')
             checked.append("arXiv browsing and saving to Library")
@@ -131,11 +133,16 @@ def main():
             page.locator("#axiovo-paper-notes textarea").blur()
             assert "Check the assumptions" in page.evaluate('JSON.parse(localStorage.getItem("researchlens-library-metadata-v1"))["arxiv:"+new URLSearchParams(location.search).get("id")].note')
             checked.append("paper research detail, versions and private notes")
-            go("compare.html?ids="+paper_id+",2501.01234")
+            go("compare.html?ids="+paper_id+","+second_id)
             page.locator(".axiovo-compare-paper").first.wait_for(timeout=12000)
             assert page.locator(".axiovo-compare-paper").count()==2
             assert page.locator(".axiovo-compare-link").count()>=4
             checked.append("side-by-side source-linked paper comparison")
+            page.locator("#compare-assistant").click()
+            page.wait_for_url(lambda u:urlsplit(u).path.endswith("/copilot.html") and "ids=" in urlsplit(u).query)
+            page.wait_for_function('document.getElementById("paper-picker").value === new URLSearchParams(location.search).get("ids").split(",")[0]',timeout=16000)
+            assert page.locator("#comparison-paper").input_value()==second_id
+            checked.append("contextual Research Assistant preloads both selected papers")
             go("search.html?q=quantum")
             page.wait_for_url(lambda u: urlsplit(u).path.endswith("/discover.html") and urlsplit(u).query.find("view=scholarly")>=0 and urlsplit(u).fragment=="discover")
             checked.append("legacy search redirect")
