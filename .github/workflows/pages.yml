@@ -202,11 +202,12 @@ jobs:
           python scripts/build_intro_video.py
           echo 'Generated a fresh illustrated tour of current Axiovo features.' >> "$GITHUB_STEP_SUMMARY"
       - name: Install Chromium for independent interaction checks
-        continue-on-error: true
         id: chromium_deps
         run: |
           python -m pip install --disable-pip-version-check playwright
           python -m playwright install --with-deps chromium
+      - name: Record the actual Axiovo step-by-step tutorial
+        run: python scripts/build_tutorial_video.py
       - name: Exercise all current routes and mobile interactions (deployment gate)
         if: steps.chromium_deps.outcome == 'success'
         id: smoke_full
