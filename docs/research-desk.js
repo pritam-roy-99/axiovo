@@ -79,7 +79,7 @@ function addWatch(){
 }
 function renderQueue(){
  const papers=data.comparison(),root=$("rd-queue");root.replaceChildren();
- $("rd-queue-summary").textContent=papers.length?papers.length+" of 3 papers selected":"Add up to three papers from any archive.";
+ $("rd-queue-summary").textContent=papers.length?papers.length+" of 5 papers selected":"Add up to five papers from any archive.";
  for(const p of papers){
   const row=node("div",undefined,"rd-side-item");
   const title=link(p.title,p.url);
