@@ -1,0 +1,375 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Discover papers and research tools | Axiovo</title><meta name="description" content="An open-source workspace to discover arXiv research, follow topics, save papers, maintain reading notes and inspect source-linked evidence. Install or run locally, no account required for local features."><link rel="stylesheet" href="./theme.css"><script defer src="./theme.js"></script><link rel="stylesheet" href="./workspace.css"><link rel="stylesheet" href="./paper-actions.css"><link rel="stylesheet" href="./discover.css"><link rel="stylesheet" href="./paper-card-polish.css"><link rel="stylesheet" href="./research-entry.css"><script defer src="./arxiv-versions.js"></script><script defer src="./navigation.js"></script><script defer src="./research-fields.js"></script><script defer src="./author-follow.js"></script><script defer src="./zotero-ris.js"></script><script defer src="./library-outside-cache.js"></script><script defer src="./local-feedback.js"></script><script defer src="./custom-taxonomy.js"></script><script defer src="./focus-bar.js"></script><script defer src="./scholar-search.js"></script><script defer src="./cached-arxiv-search.js"></script><script defer src="./semantic-search.js"></script><script defer src="./multisource-search.js"></script><script defer src="./interests.js"></script><script defer src="./scholarly.js"></script><script defer src="./biorxiv.js"></script><script defer src="./inspire-author.js"></script><script defer src="./author-search.js"></script><script defer src="./discover.js"></script><script defer src="./unified-workspace.js"></script><script defer src="./onboarding.js"></script><link rel="alternate" type="application/atom+xml" title="Axiovo all research" href="./feeds/all.xml">
+<style>
+:root{font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;color:#17324b;background:#f3f7fb}*{box-sizing:border-box}body{margin:0}button,input,select{font:inherit}button{cursor:pointer}a{color:#096b9a;text-decoration:none}a:hover{text-decoration:underline}
+header{background:#0b2239;color:#fff;padding:16px max(20px,calc((100% - 1190px)/2));display:flex;justify-content:space-between;align-items:center}.brand{font-weight:800;font-size:23px;letter-spacing:-.7px}.brand span{background:#228ec3;padding:6px 11px;border-radius:8px;margin-right:8px}header a{color:#cbebfa;font-size:13px}.toolbar-link{display:inline-block;padding:8px 11px;border:1px solid #527d9c;border-radius:8px}.paper:focus-within{border-color:#6ca9ce}.paper.current{outline:2px solid #298dba;outline-offset:1px}.new-chip{background:#e2fbec;color:#22664a;padding:3px 7px;border-radius:6px;font-size:11px;font-weight:700}.read{opacity:.6}.coverage{background:#eef6fc;border-radius:9px;padding:10px 14px;margin:0 0 14px;color:#375972;font-size:12px;line-height:1.6}.ai-nav{background:#1684bc;border-radius:8px;padding:9px 13px;color:white;font-weight:750}.ai-nav:hover{background:#2199d3;text-decoration:none}
+.hero{background:linear-gradient(120deg,#0b2d50,#14669b);color:#fff;padding:34px 24px 39px}.hero>div{max-width:1190px;margin:auto}
+.hero .rl-home-hero-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.06fr);align-items:center;gap:27px}
+.rl-home-kicker{color:#80dbef;font-size:11px;font-weight:800;letter-spacing:.13em}
+.hero h1{max-width:620px;font-size:clamp(29px,3.4vw,44px);letter-spacing:-.04em;line-height:1.14;margin:11px 0 13px}
+.hero p{max-width:610px;line-height:1.65;color:#d6e9f7;font-size:14px}
+.rl-home-hero-actions{display:flex;gap:10px;flex-wrap:wrap;margin:22px 0 0}
+.rl-home-hero-actions a{display:inline-flex;align-items:center;justify-content:center;padding:12px 16px;border-radius:9px;text-decoration:none;font-weight:750;font-size:13px}
+.rl-home-start{background:#fff;color:#125780}.rl-home-explore{border:1px solid #a6d4eb;color:#fff}
+.rl-home-explainer-meta{font-size:11px!important;color:#abd2e8!important}
+.rl-home-demo{margin:0;background:#082139;border:1px solid #4980a3;border-radius:17px;padding:11px;box-shadow:0 17px 37px #061b3270;min-width:0}
+.rl-home-demo-head{display:flex;align-items:center;gap:9px;font-size:12px;padding:5px 6px 11px}
+.rl-home-demo-head strong{font-size:12px;font-weight:750}.rl-home-demo-head span:last-child{color:#a7cadf;margin-left:auto;font-size:10px;white-space:nowrap}
+.rl-home-live-dot{width:9px;height:9px;background:#51cfd4;border-radius:50%;display:inline-block;flex-shrink:0}
+.rl-home-demo video{display:block;width:100%;height:auto;aspect-ratio:16/9;object-fit:contain;border-radius:10px;background:#051b30}
+.rl-home-demo figcaption{font-size:11px;line-height:1.5;color:#bad7e9;padding:10px 6px 4px}
+.rl-home-transcript{font-size:12px;color:#d1e8f5;padding:7px 6px 3px}
+.rl-home-transcript summary{cursor:pointer;font-size:11px}
+.rl-home-transcript p{font-size:12px;line-height:1.6;color:#c8e1f1;max-width:none}
+@media(max-width:850px){.hero .rl-home-hero-grid{grid-template-columns:1fr}.hero{padding:28px 18px}.rl-home-demo{max-width:710px;width:100%;margin:0 auto}.hero h1{max-width:750px}}
+@media(prefers-reduced-motion:reduce){.rl-home-demo video{scroll-behavior:auto}}
+main{max-width:1190px;margin:auto;padding:25px 20px 60px}.filters{display:grid;grid-template-columns:minmax(0,1fr) 146px 180px 160px;gap:12px;margin-bottom:22px}input,select{padding:12px;border:1px solid #cbd9e6;border-radius:9px;background:#fff;width:100%;color:#204261}
+/* Compact, accessible in-page category menu: avoids Android's full-screen native picker. */
+.rl-category-picker{position:relative;min-width:0}
+.rl-category-trigger{width:100%;height:100%;min-height:44px;display:flex;align-items:center;justify-content:space-between;gap:12px;text-align:left;padding:11px 12px;border:1px solid #cbd9e6;border-radius:9px;background:#fff;color:#204261;font-size:14px;cursor:pointer}
+.rl-category-trigger:focus-visible,.rl-category-menu button:focus-visible{outline:3px solid #63b6df;outline-offset:2px}
+.rl-category-chevron{font-size:18px;line-height:1;color:#37627c;transition:transform .16s ease}
+.rl-category-trigger[aria-expanded=true] .rl-category-chevron{transform:rotate(180deg)}
+.rl-category-menu{position:absolute;z-index:50;left:0;top:calc(100% + 6px);width:100%;min-width:min(230px,88vw);max-width:min(88vw,330px);max-height:min(320px,48vh);overflow-y:auto;overscroll-behavior:contain;background:#fff;border:1px solid #cadce7;border-radius:12px;box-shadow:0 12px 34px #07263a36;padding:6px}
+.rl-category-menu[hidden]{display:none!important}
+.rl-category-menu button{display:block;width:100%;border:0;border-radius:8px;background:transparent;color:#23455d;text-align:left;padding:11px 12px;min-height:44px;font-size:14px;cursor:pointer}
+.rl-category-menu button:hover,.rl-category-menu button:focus-visible{background:#e8f3fb}
+.rl-category-menu button[aria-pressed=true]{background:#dcedf8;color:#105d8e;font-weight:750}
+.rl-category-menu button[aria-pressed=true]::after{content:" ✓";float:right}
+@media(max-width:540px){.rl-category-menu{width:100%;max-width:none;max-height:min(295px,48vh)}}
+
+.layout{display:grid;grid-template-columns:1fr 290px;gap:22px}
+.topics{display:flex;gap:8px;overflow-x:auto;padding:3px 0 14px;scrollbar-width:thin}.topic-btn{flex-shrink:0;background:#fff;border:1px solid #cbdbe7;border-radius:99px;padding:9px 14px;font-size:12px;font-weight:650;color:#235477}.topic-btn.active{color:#fff;background:#146c9f;border-color:#146c9f}.topic-btn:hover{background:#dceffa;color:#164868}.topic-btn.active:hover{background:#125d88;color:white}.topic-line{margin:12px 0 20px;display:flex;align-items:center;justify-content:space-between;gap:10px}.page-actions{display:flex;justify-content:center;margin:18px 0}.paper .topic-label{font-size:11px;background:#f0f6f2;border:1px solid #d4e8db;border-radius:6px;color:#286246;padding:4px 8px}.paper .abstract{font-size:14px}.paper,.panel{background:#fff;border:1px solid #dbe5ed;border-radius:12px;padding:19px;margin-bottom:13px;box-shadow:0 2px 9px #113c5810}.paper h2{font-size:19px;line-height:1.3;margin:9px 0}.meta,.small{font-size:12px;color:#6c8092;line-height:1.6}.paper p{font-size:14px;color:#445e72;line-height:1.6}.category{background:#eaf5fd;color:#176e9e;border-radius:6px;padding:4px 8px;font-size:11px;font-weight:700}.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.btn{background:white;border:1px solid #d0dce7;border-radius:8px;padding:8px 11px;color:#1e567a;font-size:13px}.btn.primary{background:#146c9f;border-color:#146c9f;color:#fff}.btn:hover{filter:brightness(.95)}.warning{background:#fff8e6;border:1px solid #ead597;border-radius:8px;padding:12px;color:#775818;line-height:1.6;font-size:12px}.panel h3{margin:0 0 12px;font-size:17px}.panel p{font-size:13px;color:#62788d;line-height:1.6}.stat{border-bottom:1px solid #ebf0f5;display:flex;justify-content:space-between;padding:9px 0;font-size:13px}.empty{padding:32px;border-radius:12px;background:#fff;color:#657f93;text-align:center}
+dialog{border:0;border-radius:13px;box-shadow:0 20px 90px #061e3977;width:min(740px,calc(100vw - 28px));padding:24px;color:#16344b}dialog::backdrop{background:#071e3088}.related{padding:12px 0;border-bottom:1px solid #e7edf2;font-size:14px}.related small{display:block;color:#7890a2;margin-top:5px}footer{padding:30px;text-align:center;color:#627789;font-size:12px}
+@media(max-width:850px){.layout{grid-template-columns:1fr}.filters{grid-template-columns:minmax(0,1fr) 146px}.filters input{grid-column:auto}}@media(max-width:540px){.filters{grid-template-columns:1fr}.filters input{grid-column:auto}.hero{padding:36px 18px}.paper{padding:15px}}
+.hero{padding:32px 24px}.hero h1{font-size:clamp(29px,3.8vw,42px)}@media(max-width:550px){.hero{padding:28px 18px}.hero a{margin:6px 4px 0 0!important}}
+
+.rl-unified-switch{max-width:1190px;margin:0 auto 18px;display:flex;gap:8px;flex-wrap:wrap}.rl-unified-switch a{display:inline-flex;padding:11px 17px;background:var(--rl-panel,#fff);color:var(--rl-text,#17324b);border:1px solid #97b8ce;border-radius:12px;font-weight:750;font-size:14px;text-decoration:none}.rl-unified-switch a[aria-current="page"]{background:#0f6090;color:#fff;border-color:#0f6090}#workspace-panel[hidden],#discover-shell[hidden]{display:none!important}#workspace-panel{max-width:1190px;margin:auto;padding:0}.rl-unified-switch a:focus-visible{outline:3px solid #49abdc;outline-offset:2px}
+</style><link rel="manifest" href="./manifest.webmanifest"><meta name="theme-color" content="#0b2239"><link rel="icon" type="image/svg+xml" href="./icons/researchlens.svg"><script defer src="./pwa.js"></script></head><body class="axiovo-discover">
+<header><div class="brand"><span>L</span>Axiovo</div><a href="https://github.com/pritam-roy-99/researchlens" target="_blank" rel="noopener noreferrer">Source on GitHub ↗</a><a class="ai-nav" href="./copilot.html">✦ Research Assistant</a><a class="toolbar-link" href="./copilot.html">AI Lab</a><a class="toolbar-link" href="./?view=scholarly#discover">Explore by field</a><a class="toolbar-link" href="./?view=scholarly#discover">Global search</a><a class="toolbar-link" href="./methodology.html">Methodology</a><a class="toolbar-link" href="./profiles.html">My profile</a></header>
+<div class="hero"><div class="rl-home-hero-grid">
+<section class="rl-home-hero-copy" aria-labelledby="rl-home-title">
+<span class="rl-home-kicker">OPEN-SOURCE RESEARCH DISCOVERY &amp; WORKSPACE</span>
+<h1 id="rl-home-title">From scientific foundations to new discoveries.</h1>
+<p><strong>Axiovo</strong> combines <em>axiom</em>, a foundation for reasoning, and <em>novo</em>, new. Discover original papers, follow research topics, build a reading library, and examine source-linked evidence in one place.</p>
+<p class="rl-home-hero-actions"><a class="rl-home-start" href="./#discover">Find papers</a><a class="rl-home-explore" href="./#workspace">My research library</a><button type="button" class="rl-home-start axiovo-install-action" data-axiovo-install>Install Axiovo app</button></p>
+<p class="rl-home-explainer-meta">Free and open source · Installable on your device · No account needed for local reading and notes</p>
+</section>
+<figure class="rl-home-demo">
+<div class="rl-home-demo-head"><span class="rl-home-live-dot" aria-hidden="true"></span><strong>See how Axiovo works</strong><span>Recorded from the current Axiovo interface</span></div>
+<details id="axiovo-video-details" class="axiovo-video-details" open><summary>Watch the real Axiovo website demo</summary>
+<video controls playsinline preload="none" width="960" height="540" poster="./assets/researchlens-tour-poster.jpg" aria-label="Axiovo real interface demo: arXiv discovery, literature search, saved papers, library, Research Assistant and Research Tools">
+<source src="./assets/researchlens-tour.mp4" type="video/mp4">
+<track kind="captions" src="./assets/researchlens-tour.vtt" srclang="en" label="English captions" default>
+Your browser cannot play this video. Read the transcript below to explore the features.
+</video></details>
+<figcaption>A guided capture of the current Axiovo interface, recorded from the site itself. The demo shows navigation, discovery, paper controls, the library, Research Assistant and Research Tools. Online sources can change after recording.</figcaption>
+<details class="rl-home-transcript"><summary>Read video transcript</summary>
+<p>This video captures the actual Axiovo website as it runs in a browser. First, open the homepage and Discover. Browse the latest available arXiv records, choose categories, and verify original sources. Next, open Explore Literature for field-aware search, date filters, and in-page results. Paper cards provide arXiv links, saving controls, and a Research Assistant. The Library organizes saved references and research questions. Research Assistant opens a dedicated space for examining papers and source-linked claims. Research Tools offers archive search, PDF reading, paper comparison, citation exploration, and alerts. The demo is a recording of the current codebase, not a guarantee that third-party search results or external services will remain unchanged.</p>
+</details></figure>
+</div></div>
+<main><section class="axiovo-onboarding" id="axiovo-onboarding" hidden aria-label="Getting started with Axiovo">
+<div><strong>Start with your research question</strong><p>Choose a research field, discover original papers, save useful references, and organize your work in Library. No account required.</p></div>
+<div class="axiovo-onboarding-actions"><button type="button" id="axiovo-pick-field">Choose my field</button><a href="./#workspace">Create a research question</a><button type="button" id="axiovo-dismiss" aria-label="Dismiss getting started tips">Dismiss</button></div></section>
+<div class="rl-unified-switch" role="group" aria-label="Research workflow"><a id="workflow-discover" href="./#discover" aria-current="page">Discover papers</a><a id="workflow-workspace" href="./#workspace">My Library &amp; questions</a></div><div id="discover-shell"><section class="rl-discover-switch" id="discover" aria-label="Literature discovery modes">
+<div><span class="rl-discover-eyebrow">ONE RESEARCH DISCOVERY SPACE</span><h2>Discover literature</h2><p>Switch between newly indexed arXiv papers and wider scholarly search without leaving Axiovo.</p></div>
+<div class="rl-discover-options" role="group" aria-label="Choose literature source">
+<button type="button" id="rl-source-arxiv" class="rl-source-button" aria-pressed="true">Latest arXiv <small>New papers, dates, followed topics</small></button>
+<button type="button" id="rl-source-biorxiv" class="rl-source-button" aria-pressed="false">bioRxiv <small>Life-science preprints, DOI and category</small></button>
+<button type="button" id="rl-source-scholarly" class="rl-source-button" aria-pressed="false">Explore my field <small>OpenAlex literature, authors and methods</small></button>
+</div></section>
+<section class="rl-focus-bar" id="rl-focus-bar" aria-label="Research field, topic and subtopic selection">
+<div class="rl-focus-bar-header"><div><span class="rl-discover-eyebrow">YOUR RESEARCH FOCUS</span><h2 id="rl-focus-headline">Explore your field</h2><p id="rl-focus-hint">Select a main field. Research areas and subtopics are optional and help narrow papers.</p></div><div class="rl-focus-current" id="rl-focus-trail" aria-live="polite"></div></div>
+<div class="rl-focus-fields">
+ <div class="rl-focus-field-control"><span class="rl-focus-label">Main research field</span><details id="rl-focus-field-details" class="rl-field-details"><summary id="rl-focus-field-title">Choose your field</summary><div id="rl-focus-fields" class="rl-field-choice-list" role="group" aria-label="Main research disciplines"></div></details></div>
+ <div class="rl-focus-area"><span class="rl-focus-label">Research area (optional)</span><div id="rl-focus-areas" class="rl-focus-chiplist" role="group" aria-label="Research areas within the selected main field"></div></div>
+</div>
+<div class="rl-focus-subrow"><div class="rl-focus-submain"><span class="rl-focus-label">Specific research subtopics (optional)</span><div id="rl-focus-subtopics" class="rl-focus-chiplist" role="group" aria-label="Subtopics for the selected research area"></div></div><div class="rl-focus-add"><label class="rl-focus-label" for="rl-focus-custom">Add my interest</label><div class="rl-focus-addrow"><input id="rl-focus-custom" maxlength="100" placeholder="Method or specific topic"><button type="button" id="rl-focus-apply" class="btn">Add & follow</button></div></div></div>
+</section>
+<section id="axiovo-author-explorer" class="axiovo-author-explorer" aria-label="Search researchers and their arXiv papers">
+ <details id="axiovo-author-details">
+  <summary><strong>Find papers by author</strong> <span>Search exact or similar researcher names, affiliations and ORCID identities</span></summary>
+  <form id="axiovo-author-form" class="axiovo-author-form">
+   <label for="axiovo-author-query">Researcher name</label>
+   <div class="axiovo-author-controls"><input id="axiovo-author-query" type="search" minlength="2" maxlength="120" autocomplete="off" placeholder="e.g. John Smith, A. Majumdar, María García"><button class="btn primary" type="submit">Find author</button></div>
+  </form>
+  <p class="small">Identity-aware search uses OpenAlex author IDs. Similar names may represent different people. Select an identity before showing its arXiv-hosted works.</p>
+  <p id="axiovo-author-status" role="status" aria-live="polite">Enter a name to find researchers and their papers.</p>
+  <div id="axiovo-author-candidates" class="axiovo-author-candidates"></div>
+  <div id="axiovo-author-papers" class="axiovo-author-papers"></div>
+  <p class="small"><a href="https://arxiv.org/search/?searchtype=author" target="_blank" rel="noopener noreferrer">Verify names with official arXiv author search ↗</a></p>
+ </details>
+</section>
+<section class="axiovo-provider-line" aria-label="Additional research evidence searches"><strong style="font-size:12px">More evidence:</strong><a class="btn" href="https://consensus.app/search/" target="_blank" rel="noopener noreferrer">Search on Consensus website ↗</a><small>Optional external literature search. No Consensus API configuration needed.</small></section><div id="arxiv-discovery"><div class="rl-source-notice" style="margin:9px 0 14px">Search historical arXiv papers directly using the blue <strong>Search all arXiv history</strong> button. Recent date-complete batches are searched via the blue history button; all other historical dates may still be incomplete until harvested. Enter IDs such as <code>2608.13942v1</code> to open exact revisions.</div><div id="coverage" class="coverage">Coverage: limited recent arXiv snapshot (multiple scientific disciplines) plus selected historical papers. For statistical mechanics, superconductivity, and broader condensed matter, choose Explore my field for wider arXiv-linked search. <a href="./?view=scholarly#discover">Search larger scholarly corpus ↗</a></div><div class="filters"><input id="q" type="search" placeholder="Search any arXiv paper, author, or v1/v2 version" aria-label="Search papers"><button type="button" id="arxiv-live-search" class="btn primary" style="min-height:46px">Search all arXiv</button><div class="rl-category-picker" id="category-picker"><label class="rl-visually-hidden" for="category-trigger">Paper category</label><button type="button" class="rl-category-trigger" id="category-trigger" aria-expanded="false" aria-controls="category-menu" aria-haspopup="true"><span id="category-label">All categories</span><span class="rl-category-chevron" aria-hidden="true">⌄</span></button><div class="rl-category-menu" id="category-menu" hidden role="group" aria-label="Paper category choices"><button type="button" data-category="" aria-pressed="true">All categories</button><button type="button" data-category="quant-ph" aria-pressed="false">Quantum physics</button><button type="button" data-category="cond-mat.stat-mech" aria-pressed="false">Statistical mechanics</button><button type="button" data-category="cond-mat.str-el" aria-pressed="false">Strongly correlated matter</button><button type="button" data-category="hep-ph" aria-pressed="false">Particle phenomenology</button><button type="button" data-category="cs.AI" aria-pressed="false">Artificial intelligence</button><button type="button" data-category="q-bio.MN" aria-pressed="false">Molecular networks</button><button type="button" data-category="stat.ML" aria-pressed="false">Machine learning statistics</button><button type="button" data-category="hep-th" aria-pressed="false">High-energy theory</button><button type="button" data-category="cs.IT" aria-pressed="false">Information theory</button><button type="button" data-category="physics.optics" aria-pressed="false">Optics</button><button type="button" data-category="cond-mat.mes-hall" aria-pressed="false">Mesoscale / nanoscale (cached)</button></div><input id="category" type="hidden" value=""></div><label class="axiovo-crosslist-toggle"><input id="crosslist-only" type="checkbox"> Cross-listed only</label><select id="order"><option value="new">Newest first</option><option value="old">Oldest first</option><option value="title">Title A–Z</option><option value="recommended">Recommended for me</option></select></div>
+<div class="row" style="margin:0 0 13px;align-items:end"><label style="font-size:12px">From (first submitted)<input id="date-from" type="date" aria-label="Filter from initial submission date" style="margin-top:4px"></label><label style="font-size:12px">To (first submitted)<input id="date-to" type="date" aria-label="Filter to initial submission date" style="margin-top:4px"></label><button class="btn" id="reset-dates">Clear dates</button><button class="btn primary" id="all-arxiv" type="button">Search all arXiv history</button><button class="btn" id="back-local" type="button" hidden>Back to new announcements</button><span class="small">Search results appear below on Axiovo. For harvested submission dates, Axiovo shows every arXiv paper across all categories with pagination. Unharvested dates use a clearly labelled partial external search; version-specific links always point to arXiv.</span></div><div class="row" style="margin:-3px 0 15px"><button class="btn" id="date-today">Today</button><button class="btn" id="date-yesterday">Yesterday</button><button class="btn" id="date-week">Past 7 days</button><span class="small">Quick dates use UTC; arXiv announcements may be published later than their submission date.</span><a class="small" href="https://github.com/pritam-roy-99/axiovo/actions/workflows/arxiv-archive-backfill.yml" target="_blank" rel="noopener noreferrer" title="Maintainers can trigger a verified date-range backfill in GitHub Actions">Maintainer: backfill missing arXiv dates ↗</a><span class="small" id="arxiv-date-coverage" role="status">Checking verified arXiv date coverage…</span></div><div id="arxiv-legacy-focus" hidden><div class="rl-field-topic-head"><div class="rl-field-title"><strong id="arxiv-field-heading">Explore your research field</strong><span class="small" id="arxiv-field-hint">Choose any research field to personalize discovery</span></div><div class="rl-field-control"><label for="arxiv-field-details">Your main research field</label><details class="rl-field-details" id="arxiv-field-details"><summary id="arxiv-field-summary">Choose your field</summary><div class="rl-field-choice-list" id="arxiv-field-choices" role="group" aria-label="Main research fields"></div></details><input id="arxiv-main-field" type="hidden" value="general"></div></div><div id="topic-buttons" class="topics" aria-label="Research topics for your selected field"></div><div class="row" style="margin:-5px 0 19px"><button class="btn" id="follow-topic">☆ Follow selected topic</button><button class="btn" id="following-only">Show followed topics</button><span class="small" id="follow-label">Choose a research topic to personalize your feed.</span><a class="btn" id="feed-link" href="./feeds/all.xml" target="_blank" rel="noopener noreferrer">Atom feed ↗</a></div></div>
+<div class="layout"><section><div id="history-view" hidden aria-live="polite"><div class="row" style="justify-content:space-between;align-items:center"><h2 style="font-size:20px">Historical arXiv-linked results</h2><span id="history-count" class="small">Searching…</span></div><p id="history-info" class="small">Search all historically arXiv-hosted papers indexed by OpenAlex. Official arXiv links preserve any version requested, while the arXiv website provides the authoritative version history. <a id="history-official-link" href="https://arxiv.org/search/advanced" target="_blank" rel="noopener noreferrer">Search directly on arXiv ↗</a></p><div id="history-cards"></div><div id="history-pagination" class="row" style="justify-content:center;margin:20px 0"></div></div><div id="local-feed-view"><div class="row" style="justify-content:space-between"><h2 style="font-size:20px">Research feed</h2><span class="small" id="count">Loading…</span></div><div id="papers" class="empty"><!--RL_SNAPSHOT_START-->Loading papers…<!--RL_SNAPSHOT_END--></div><div id="pagination" class="page-actions"></div></div></section>
+<aside><div class="panel" style="border-color:#b2d9e7"><h3>Recommended for you</h3><p>Based on followed topics and saved papers, entirely on this device.</p><div id="recommended-links"></div><div id="topic-feed-links" class="small" aria-label="Atom subscriptions for followed research topics"></div><button class="btn" id="show-recommendations">Show recommended feed</button></div><div class="panel"><h3>Research index</h3><div class="stat"><span>Indexed papers</span><strong id="total">Loading…</strong></div><div class="stat"><span>Last updated</span><strong id="updated">Loading…</strong></div><div class="stat"><span>Saved papers</span><strong id="saved">0</strong></div><p>Metadata refresh is scheduled hourly via GitHub Actions; source API indexing and scheduled jobs can lag. New submissions and revisions are both queried.</p><div class="row"><button class="btn" id="savedOnly">Show reading list</button><button class="btn" id="export-bib">Export BibTeX</button><button class="btn" id="export-json">Export JSON</button><button class="btn" id="export-ris">Export RIS</button><button class="btn" id="import-json">Import JSON</button><button class="btn" id="import-ris">Import Zotero RIS</button><input type="file" id="ris-file" accept=".ris,application/x-research-info-systems,text/plain" hidden><a href="https://www.zotero.org/support/kb/importing_standardized_formats" target="_blank" rel="noopener noreferrer" class="btn">Zotero import guide ↗</a><input type="file" id="import-file" accept=".json,application/json" style="display:none"></div></div>
+<div class="panel" style="border-color:#88c8e9;background:#edf8ff"><h3>✦ Research Assistant</h3><p>Analyze a paper, ask research questions, compare source-linked literature, and use an optional local model for further explanations.</p><a class="btn primary" style="display:inline-block" href="./copilot.html">Open Research Assistant →</a></div><div class="panel"><h3>Preliminary literature explorer</h3><p>Related papers are suggested using title and abstract keyword overlap.</p><div class="warning">This tool cannot prove theorem equivalence, lack of novelty, correctness, or scientific misconduct. Read the original literature before judging a contribution.</div></div>
+<div class="panel"><h3>Researcher workflow</h3><p><b>j/k</b> select a paper · <b>s</b> save · <b>r</b> mark read · <b>h</b> hide · <b>Enter</b> open.</p><p>Saved and followed data remains only in your browser. Export your JSON to back it up.</p><a href="./methodology.html">Methods and index coverage →</a> · <a href="https://github.com/pritam-roy-99/researchlens/issues/new" target="_blank" rel="noopener noreferrer">Report a bad match ↗</a></div></aside></div></div><section id="biorxiv-discovery" class="axiovo-biorxiv" hidden aria-label="bioRxiv recent preprints">
+<div class="axiovo-biorxiv-intro"><span class="rl-discover-eyebrow">LIFE SCIENCES · OFFICIAL BIOPREPRINT METADATA</span><h2>Recent bioRxiv preprints</h2>
+<p>Browse cached records from the public bioRxiv API. bioRxiv is a separate archive from arXiv; items are identified by DOI. Preprints have not necessarily been peer reviewed, and this limited feed is not the complete archive.</p></div>
+<div class="axiovo-biorxiv-controls">
+<label for="axiovo-biorxiv-query">Search cached bioRxiv preprints<input id="axiovo-biorxiv-query" type="search" placeholder="Gene regulation, microbiology, neuroscience…" maxlength="180"></label>
+<label for="axiovo-biorxiv-category">Biology subject area<select id="axiovo-biorxiv-category"><option value="">All indexed categories</option></select></label>
+</div>
+<p id="axiovo-biorxiv-status" role="status">Loading bioRxiv snapshot…</p>
+<p><a id="axiovo-biorxiv-official" href="https://www.biorxiv.org/search/" target="_blank" rel="noopener noreferrer">Search the full bioRxiv website ↗</a></p>
+<div id="axiovo-biorxiv-results" class="axiovo-biorxiv-results"></div></section>
+<section id="scholarly-discovery" class="rl-scholar" aria-label="Wider scholarly search" hidden>
+<div class="rl-scholar-intro"><span>ARXIV-HOSTED LITERATURE SEARCH</span><h2 id="scholar-field-heading">Explore research across disciplines</h2><p>Main fields, research areas and subtopics are optional discovery filters. Search author identities separately to avoid hiding legitimate arXiv papers under incorrect topics. OpenAlex dates may differ from original arXiv submission dates.</p></div>
+<div class="rl-scholar-layout">
+<aside class="panel rl-scholar-legacy-focus" hidden aria-hidden="true"><h2>My research interests</h2><p class="muted">Choose a field to change the topics, suggested searches and research checklist. Saved locally on this device.</p>
+<span class="label">Primary field</span><details class="rl-field-details" id="scholar-field-details"><summary id="scholar-field-trigger"><span id="scholar-field-label">Choose main field</span></summary><div class="rl-field-choice-list" id="scholar-field-choices" role="group" aria-label="Select your primary scientific discipline"></div></details><input id="scholar-field" type="hidden" value="general">
+<label class="label" for="scholar-topic-list">Research areas</label><div class="topiclist" id="scholar-topic-list" role="group" aria-label="Research areas for selected field"></div>
+<label class="label" for="scholar-subtopic-list" id="scholar-subtopic-label">Specialized research interests</label><div class="topiclist" id="scholar-subtopic-list" role="group" aria-label="Specialized subtopics in selected research area"></div>
+<label class="label" for="scholar-custom-subtopic">Your own research interest</label><input id="scholar-custom-subtopic" maxlength="120" placeholder="Specific method, technique, or topic">
+<button id="scholar-use-subtopic" type="button" style="margin-top:8px;width:100%">Search my interest</button>
+<label class="label" for="scholar-custom">Custom research topic</label><input id="scholar-custom" maxlength="100" placeholder="E.g. network steering">
+<button id="scholar-use-custom" style="margin-top:8px;width:100%">Apply custom topic</button>
+<h3>Suggested searches</h3><div id="scholar-suggestions"></div>
+<div class="notion" style="margin-top:16px">Topic selection tunes keyword search, not a verified disciplinary classification. Search coverage depends on OpenAlex.</div></aside>
+<section><div class="panel" style="margin-bottom:15px"><div class="row between"><h2 style="margin-bottom:0">Explore literature</h2><span class="pill">arXiv daily + OpenAlex</span></div>
+<form id="scholar-search-form"><label for="scholar-query" class="label">Search articles, concepts, authors or methods</label><div class="search"><input id="scholar-query" maxlength="250" placeholder="What are you investigating?" aria-label="Literature keywords"><select id="scholar-sort" aria-label="Sort order"><option value="relevance">Relevance</option><option value="publication_date:desc">Newest</option><option value="cited_by_count:desc">Most cited</option></select><button class="primary" type="submit">Search</button><button id="scholar-search-author" type="button" title="Resolve similar researcher names and browse their arXiv papers">Search by author</button></div>
+<div class="datebar"><div><label for="scholar-from" class="label">Published from</label><input id="scholar-from" type="date"></div><div><label for="scholar-to" class="label">Published to</label><input id="scholar-to" type="date"></div></div></form>
+<div class="row" style="margin-top:10px;gap:10px"><label class="rl-semantic-option" for="scholar-semantic-fallback"><input id="scholar-semantic-fallback" type="checkbox" checked> <span>Use AI semantic search when keyword results are weak</span></label><span class="muted" style="font-size:11px">OpenAlex embedding search. Query sent to OpenAlex; no AI model downloaded.</span></div>
+<div class="row" style="margin-top:14px"><button id="scholar-latest">Latest arXiv papers</button><button id="scholar-clear-dates">Clear dates</button><button id="scholar-show-saved">My saved papers</button></div>
+<p class="muted">For today or yesterday when both date fields match, Axiovo checks the official arXiv announcement-day snapshot first. Other date searches use OpenAlex publication metadata, which may differ from arXiv announcement and first-submission dates. Live source availability varies.</p></div>
+<div class="row between" style="margin-bottom:12px"><h2 style="font-size:18px;margin:0" id="scholar-result-heading">Literature results</h2><span class="muted" id="scholar-status" role="status" aria-live="polite">Select a topic or search</span><a id="scholar-official-search" href="https://arxiv.org/search/advanced" target="_blank" rel="noopener noreferrer" class="rl-official-source">Search original arXiv ↗</a></div>
+<div id="scholar-results"><div class="empty">Choose your research field and search a topic to begin.</div></div>
+<div class="row pager"><button id="scholar-prev" disabled>Previous</button><span class="muted" id="scholar-pagination">Page 1</span><button id="scholar-next" disabled>Next</button></div></section>
+<aside class="panel tools-panel"><h2>Your researcher toolkit</h2><p class="muted" id="scholar-field-summary"></p>
+<h3>Suggested workflow</h3><div id="scholar-workflow" class="muted"></div>
+<h3>Saved-paper preview <span class="pill" id="scholar-saved-count">0</span></h3><p class="muted">Your full reading library, notes and research questions are on the Library tab.</p><a class="template" href="./#workspace">Open Library <small>Saved papers, private notes, research questions and exports</small></a><details><summary>Quick saved-paper links and exports</summary><div id="scholar-saved-list"></div><div class="row" style="margin-top:10px"><button id="scholar-export-bib">Export BibTeX</button><button id="scholar-export-json">Export JSON</button></div></details>
+<h3>Research assistant</h3><a class="template" href="./copilot.html">Research Assistant <small>Literature comparison, evidence and research questions</small></a>
+<a class="template" href="./profiles.html">Research settings <small>Optional identity and local data</small></a>
+<div class="notion" style="margin-top:12px"><strong>Evidence over scores.</strong> Citation counts and AI-generated comparisons are not measures of truth, novelty, or correctness.</div></aside>
+</div></section></div><span id="workspace" aria-hidden="true"></span><section id="workspace-panel" class="rl-workspace" hidden aria-label="My research workspace"><p role="status">Loading your research library…</p></section></main>
+<dialog id="detail"><button class="btn" id="close" style="float:right">Close ✕</button><div id="content"></div></dialog>
+<footer>Axiovo is an independent open-source research workspace, not affiliated with arXiv, SciRate or other similarly named services. The recent feed uses arXiv metadata; broader discovery uses OpenAlex. <a href="./methodology.html">Coverage and limitations</a> · <a href="https://github.com/pritam-roy-99/researchlens">Source code</a></footer>
+<script>window.MathJax={tex:{inlineMath:[['$','$'],['\(','\)']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script><script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+<script>
+/* In-page category picker: hidden input retains filtering state. No native select can open. */
+(function(){
+ const root=document.getElementById("category-picker");
+ if(!root)return;
+ const trigger=document.getElementById("category-trigger");
+ const menu=document.getElementById("category-menu");
+ const selected=document.getElementById("category");
+ const label=document.getElementById("category-label");
+ const choices=[...menu.querySelectorAll("button[data-category]")];
+ const open=()=>!menu.hidden;
+ const valid=new Set(choices.map(b=>b.dataset.category));
+ function toggle(value){
+  menu.hidden=!value;
+  trigger.setAttribute("aria-expanded",String(value));
+ }
+ function selectCategory(button){
+  if(!valid.has(button.dataset.category))return;
+  selected.value=button.dataset.category;
+  label.textContent=button.textContent.trim();
+  choices.forEach(b=>b.setAttribute("aria-pressed",String(b===button)));
+  toggle(false);
+  trigger.focus();
+  selected.dispatchEvent(new Event("change",{bubbles:true}));
+ }
+ trigger.addEventListener("click",()=>{toggle(!open());if(open())choices.find(x=>x.dataset.category===selected.value)?.focus()});
+ menu.addEventListener("pointerdown",e=>e.stopPropagation());
+ choices.forEach((button,index)=>{
+  button.addEventListener("click",()=>selectCategory(button));
+  button.addEventListener("keydown",e=>{
+   if(e.key==="Escape"){e.preventDefault();toggle(false);trigger.focus();return}
+   if(e.key==="ArrowDown"||e.key==="ArrowUp"){
+    e.preventDefault();choices[(index+(e.key==="ArrowDown"?1:choices.length-1))%choices.length].focus();
+   }
+   if(e.key==="Home"){e.preventDefault();choices[0].focus()}
+   if(e.key==="End"){e.preventDefault();choices[choices.length-1].focus()}
+  });
+ });
+ trigger.addEventListener("keydown",e=>{
+  if(["ArrowDown","Enter"," "].includes(e.key)&&!open()){
+   e.preventDefault();toggle(true);choices.find(x=>x.dataset.category===selected.value)?.focus();
+  }else if(e.key==="Escape"){toggle(false)}
+ });
+ document.addEventListener("pointerdown",e=>{if(!root.contains(e.target))toggle(false)});
+ document.addEventListener("keydown",e=>{if(e.key==="Escape"&&open()){toggle(false);trigger.focus()}});
+})();
+
+"use strict";const el=id=>document.getElementById(id);let all=[],saved=[],authorFollows=[],savedOnly=false,activeTopic="",page=0,pageSize=30,topicCatalog=[],followed=[],followingOnly=false,read=[],hidden=[],selectedRow=0,lastVisit=0,rendered=[];
+try{saved=JSON.parse(localStorage.getItem("researchlens-reading-list")||"[]");if(!Array.isArray(saved))saved=[]}catch(e){saved=[]}
+try{followed=JSON.parse(localStorage.getItem("researchlens-followed-topics")||"[]");if(!Array.isArray(followed))followed=[]}catch(e){followed=[]}
+try{authorFollows=JSON.parse(localStorage.getItem("researchlens-author-follows")||"[]");if(!Array.isArray(authorFollows))authorFollows=[]}catch(e){authorFollows=[]}
+const feedback=window.AxiovoLocalFeedback;
+function localRatings(){return feedback?.load(localStorage)||{}}
+function sameAuthor(p){return (p.authors||[]).some(x=>authorFollows.includes(x))}
+
+try{read=JSON.parse(localStorage.getItem("researchlens-read")||"[]");hidden=JSON.parse(localStorage.getItem("researchlens-hidden")||"[]");lastVisit=Number(localStorage.getItem("researchlens-last-visit")||"0");if(!Array.isArray(read))read=[];if(!Array.isArray(hidden))hidden=[]}catch(e){read=[];hidden=[]}
+function persistState(){try{localStorage.setItem("researchlens-read",JSON.stringify(read));localStorage.setItem("researchlens-hidden",JSON.stringify(hidden));localStorage.setItem("researchlens-last-visit",String(Date.now()))}catch(e){}}
+function updateFollowing(){const rss=el("feed-link");if(rss){rss.href="./feeds/"+(activeTopic||"all")+".xml";rss.textContent="Subscribe to "+(activeTopic?"this topic":"all papers")+" ↗"}const chosen=topicCatalog.find(x=>x.id===activeTopic);el("follow-topic").disabled=!activeTopic;el("follow-topic").textContent=chosen?(followed.includes(activeTopic)?"★ Unfollow "+chosen.label:"☆ Follow "+chosen.label):"☆ Select a topic to follow";el("following-only").textContent=followingOnly?"Show all topics":"Show followed topics";el("follow-label").textContent=followed.length+" followed topic"+(followed.length===1?"":"s")+" · stored in this browser"}
+window.addEventListener("axiovo:author-follow-change",()=>{try{authorFollows=JSON.parse(localStorage.getItem("researchlens-author-follows")||"[]")}catch{authorFollows=[]}showRecommendations()});
+function saveFollowing(){try{localStorage.setItem("researchlens-followed-topics",JSON.stringify(followed))}catch(e){}updateFollowing()}
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function fmt(d){const n=new Date(d);return isNaN(n.getTime())?"Unknown":n.toLocaleDateString(undefined,{year:"numeric",month:"short",day:"numeric"})}
+function tok(s){return new Set((String(s||"").toLowerCase().match(/[a-z]{4,}/g)||[]))}
+function sim(a,b){const A=tok(a.title+" "+a.abstract),B=tok(b.title+" "+b.abstract);let n=0;for(const w of A)if(B.has(w))n++;return A.size&&B.size?n/Math.sqrt(A.size*B.size):0}
+function btn(label,handler,primary){const b=document.createElement("button");b.className="btn"+(primary?" primary":"");b.textContent=label;b.addEventListener("click",handler);return b}
+function showTopics(){showRecommendations();const root=el("topic-buttons");root.replaceChildren();const topics=[{id:"",label:"All indexed topics"},...topicCatalog];for(const topic of topics){const b=document.createElement("button");b.className="topic-btn"+(activeTopic===topic.id?" active":"");b.textContent=topic.label+" ("+(topic.id?all.filter(p=>(p.topics||[]).includes(topic.id)).length:all.length)+")";b.onclick=()=>{activeTopic=topic.id;page=0;showTopics();updateFollowing();render()};root.append(b)}updateFollowing()}
+function showRecommendations(){
+ const root=el("recommended-links");if(!root)return;root.replaceChildren();
+ const subscriptions=el("topic-feed-links");
+ if(subscriptions){
+  subscriptions.replaceChildren();
+  const filtered=(topicCatalog||[]).filter(t=>followed.includes(t.id)&&/^[a-z0-9-]+$/.test(String(t.id||"")));
+  if(filtered.length){
+   const label=document.createElement("strong");label.textContent="Followed-topic Atom feeds";subscriptions.append(label);
+   for(const topic of filtered){const link=document.createElement("a");link.href="./feeds/"+topic.id+".xml";
+    link.target="_blank";link.rel="noopener noreferrer";link.textContent=topic.label+" ↗";
+    link.style.display="block";subscriptions.append(link)}
+  }
+ }
+
+ const interests=new Set(followed);
+ for(const p of all.filter(x=>saved.includes(x.id)))for(const t of p.topics||[])interests.add(t);
+ const ranked=all.filter(p=>!hidden.includes(p.id)&&!saved.includes(p.id)).map(p=>({p,score:(p.topics||[]).filter(t=>interests.has(t)).length*5+(sameAuthor(p)?8:0)+(feedback?.score(p,all,localRatings())||0)})).filter(x=>x.score>0).sort((a,b)=>b.score-a.score||String(b.p.published).localeCompare(String(a.p.published))).slice(0,5);
+ if(!ranked.length){const x=document.createElement("p");x.className="small";x.textContent="Follow topics or save papers to personalize this section.";root.append(x);return}
+ for(const item of ranked){const row=document.createElement("p");const a=document.createElement("a");a.href="./paper.html?id="+encodeURIComponent(item.p.id);a.textContent=item.p.title;row.append(a);root.append(row)}
+}
+function card(p){const d=document.createElement("article");d.className="paper"+(read.includes(p.id)?" read":"");d.dataset.paperId=p.id;d.innerHTML='<span class="category">'+esc(p.primary_category)+'</span> '+(p.categories||[]).filter(c=>c!==p.primary_category).map(c=>'<span class="axiovo-crosslist-tag" title="Also listed in '+esc(c)+'">Cross-listed: '+esc(c)+'</span>').join(" ")+(p.topics||[]).slice(0,3).map(t=>'<span class="topic-label">'+esc((topicCatalog.find(x=>x.id===t)||{}).label||t)+'</span>').join(" ")+(new Date(p.published||p.updated).getTime()>lastVisit&&lastVisit>0?'<span class="new-chip">NEW</span>':'')+'<h2>'+esc(p.title)+'</h2><div class="meta">'+esc((p.authors||[]).join(", "))+' · arXiv first submitted: '+fmt(p.published)+' · '+esc(p.id)+'</div><p>'+esc(p.abstract||"").slice(0,650)+'</p>';
+if((p.abstract||"").length>650){
+ const more=document.createElement("details");
+ const summary=document.createElement("summary");summary.textContent="Read full abstract";
+ const full=document.createElement("p");full.textContent=p.abstract;
+ more.append(summary,full);d.append(more);
+}
+const r=document.createElement("div");r.className="rl-paper-actionbar";const a=document.createElement("a");a.className="rl-paper-action primary";a.href="https://arxiv.org/abs/"+encodeURIComponent(p.id);a.target="_blank";a.rel="noopener noreferrer";a.textContent="Read on arXiv ↗";r.append(a);
+const saveButton=btn(saved.includes(p.id)?"Saved":"Save paper",()=>{saved=saved.includes(p.id)?saved.filter(x=>x!==p.id):[...saved,p.id];try{localStorage.setItem("researchlens-reading-list",JSON.stringify(saved))}catch(e){}window.dispatchEvent(new Event("researchlens-library-change"));showRecommendations();render()});
+saveButton.className="rl-save-button rl-paper-action"+(saved.includes(p.id)?" is-saved":"");
+saveButton.setAttribute("aria-pressed",String(saved.includes(p.id)));
+saveButton.setAttribute("aria-label",(saved.includes(p.id)?"Remove from reading list: ":"Save to reading list: ")+p.title);
+const icon=document.createElementNS("http://www.w3.org/2000/svg","svg");icon.setAttribute("viewBox","0 0 24 24");icon.setAttribute("width","16");icon.setAttribute("height","16");icon.setAttribute("fill",saved.includes(p.id)?"currentColor":"none");icon.setAttribute("stroke","currentColor");icon.setAttribute("stroke-width","1.8");icon.setAttribute("aria-hidden","true");
+const bookmark=document.createElementNS("http://www.w3.org/2000/svg","path");bookmark.setAttribute("d","M6 4.5A1.5 1.5 0 0 1 7.5 3h9A1.5 1.5 0 0 1 18 4.5V21l-6-4-6 4z");icon.append(bookmark);saveButton.prepend(icon);r.append(saveButton);
+r.append(btn(read.includes(p.id)?"✓ Read":"Mark read",()=>{read=read.includes(p.id)?read.filter(x=>x!==p.id):[...read,p.id];persistState();render()}));r.append(btn("Hide",()=>{hidden=[...new Set([...hidden,p.id])];persistState();render()}));window.AxiovoAuthorFollow?.mount(r,p.authors||[]);const prefs=localRatings(),marked=Number(prefs[p.id]||0);
+for(const [value,text] of [[1,"More like this"],[-1,"Less like this"]]){
+ const control=btn((marked===value?"✓ ":"")+text,()=>{
+  const now=Number(localRatings()[p.id]||0);
+  feedback?.set(localStorage,p.id,now===value?0:value);
+  render();showRecommendations()
+ });
+ control.className="rl-paper-action";control.setAttribute("aria-pressed",String(marked===value));
+ control.title="Learn reading preferences on this device only, without an account.";
+ r.append(control)
+}
+const citation=window.AxiovoCitation;
+r.append(btn("Copy arXiv ID",()=>navigator.clipboard?.writeText("arXiv:"+p.id)));
+if(p.doi)r.append(btn("Copy DOI",()=>navigator.clipboard?.writeText(String(p.doi).replace(/^https?:\/\/doi.org\//,""))));
+r.append(btn("Zotero RIS",()=>{
+ try{citation?.download("arxiv-"+p.id.replace(/[^a-z0-9.]/gi,"")+".ris",citation.ris(p))}
+ catch(e){alert("RIS export unavailable: "+String(e.message||e))}
+}));
+r.append(btn("Copy ID",()=>navigator.clipboard?.writeText(p.id)));r.append(btn("Copy BibTeX",()=>{const bib="@misc{arxiv"+p.id.replace(/[^A-Za-z0-9]/g,"")+",\n  title={"+p.title.replace(/[{}]/g,"")+"},\n  author={"+(p.authors||[]).join(" and ")+"},\n  year={"+(p.published||"").slice(0,4)+"},\n  eprint={"+p.id+"},\n  archivePrefix={arXiv}\n}";navigator.clipboard?.writeText(bib)}));const social=document.createElement("a");social.href="./paper.html?id="+encodeURIComponent(p.id);social.className="btn";social.textContent="♡ Discuss / endorse";r.append(social);r.append(btn("Explore prior literature",()=>detail(p)));const share=btn("Share",()=>{const u=new URL(location.href);u.searchParams.set("q",p.id);navigator.clipboard?.writeText(u.href)});r.append(share);const ai=document.createElement("a");ai.href="./copilot.html?id="+encodeURIComponent(p.id);ai.className="rl-paper-action assistant";ai.textContent="✦ Research Assistant";ai.setAttribute("aria-label","Analyze or ask the Research Assistant about "+p.title);r.append(ai);const ext=document.createElement("a");ext.className="btn";ext.href="https://www.semanticscholar.org/search?q="+encodeURIComponent(p.title)+"&sort=relevance";ext.target="_blank";ext.rel="noopener noreferrer";ext.textContent="Find citations ↗";r.append(ext);if(p.doi){const doi=document.createElement("a");doi.className="btn";doi.target="_blank";doi.rel="noopener noreferrer";doi.href="https://doi.org/"+encodeURIComponent(p.doi.replace(/^https?:\/\/doi.org\//,""));doi.textContent="Journal DOI ↗";r.append(doi)}if(p.openalex_id){const cite=document.createElement("a");cite.className="btn";cite.href=p.openalex_id;cite.target="_blank";cite.rel="noopener noreferrer";cite.textContent="Citation record ↗";r.append(cite)}const extra=document.createElement("details");extra.className="axiovo-paper-more";
+const moreLabel=document.createElement("summary");moreLabel.textContent="More actions";
+const extraBody=document.createElement("div");extraBody.className="axiovo-paper-more-actions";
+for(const control of Array.from(r.children)){
+ const important=control===a||control===saveButton||control===ai||
+ control.classList.contains("axiovo-author-follow")||
+ (control.tagName==="BUTTON"&&control.textContent==="Copy BibTeX");
+ if(!important)extraBody.append(control);
+}
+extra.append(moreLabel,extraBody);r.append(extra);
+d.append(r);return d}
+function render(){const q=el("q").value.trim().toLowerCase(),c=el("category").value,o=el("order").value;
+let arr=all.filter(p=>(!el("crosslist-only").checked||(p.categories||[]).some(x=>x!==p.primary_category))&&(!c||(p.categories||[]).includes(c)||p.primary_category===c)&&(!savedOnly||saved.includes(p.id))&&!hidden.includes(p.id)&&(!activeTopic||(p.topics||[]).includes(activeTopic))&&(!followingOnly||(p.topics||[]).some(t=>followed.includes(t)))&&(!el("date-from").value||(p.published||"").slice(0,10)>=el("date-from").value)&&(!el("date-to").value||(p.published||"").slice(0,10)<=el("date-to").value)&&(!q||[p.title,p.abstract,p.id,(p.authors||[]).join(" ")].join(" ").toLowerCase().includes(q)));
+if(o==="recommended"){const interests=new Set(followed);for(const item of all.filter(x=>saved.includes(x.id)))for(const t of item.topics||[])interests.add(t);const interestScore=p=>(p.topics||[]).filter(t=>interests.has(t)).length*5+(saved.includes(p.id)?-3:0)+(sameAuthor(p)?8:0)+(feedback?.score(p,all,localRatings())||0);arr.sort((a,b)=>interestScore(b)-interestScore(a)||String(b.published).localeCompare(String(a.published)))}else arr.sort(o==="title"?(a,b)=>a.title.localeCompare(b.title):o==="old"?(a,b)=>String(a.published).localeCompare(String(b.published)):(a,b)=>String(b.published).localeCompare(String(a.published)));
+el("count").textContent=arr.length+" of "+all.length+" papers";el("saved").textContent=saved.length;el("total").textContent=all.length;const root=el("papers");root.className="";root.replaceChildren();if(!arr.length){const x=document.createElement("div");x.className="empty";const id=q.replace(/^arxiv:\s*/,"").replace(/v\d+$/,"");if(/^(?:\d{4}\.\d{4,5}|[a-z-]+(?:\.[a-z]{2})?\/\d{7})$/i.test(id)){const message=document.createElement("p");message.textContent="This arXiv ID is not in the current Axiovo index. Open its authoritative record directly, or request that we add it to the historical index.";const direct=document.createElement("a");direct.href="https://arxiv.org/abs/"+encodeURIComponent(id);direct.textContent="View arXiv:"+id+" ↗";direct.target="_blank";direct.rel="noopener noreferrer";const issue=document.createElement("a");issue.href="https://github.com/pritam-roy-99/researchlens/issues/new?title="+encodeURIComponent("Index arXiv:"+id)+"&body="+encodeURIComponent("Please add arXiv:"+id+" to the Axiovo historical indexing list.");issue.textContent=" · Request indexing ↗";issue.target="_blank";issue.rel="noopener noreferrer";x.append(message,direct,issue)}else{x.textContent=all.length?"No matching paper in this indexed subset. Try broader keywords, or search by arXiv ID.":"No papers indexed yet. Check the synchronization workflow."}root.append(x)}rendered=arr.slice(page*pageSize,(page+1)*pageSize);for(const p of rendered)root.append(card(p));selectedRow=Math.min(selectedRow,Math.max(0,rendered.length-1));if(savedOnly){
+ const uncached=window.AxiovoLibraryOutsideCache?.missing(saved,all)||[];
+ if(uncached.length){
+  const heading=document.createElement("h3");heading.textContent="Saved arXiv IDs outside this limited metadata cache ("+uncached.length+")";root.append(heading);
+  const explanation=document.createElement("p");explanation.className="small";explanation.textContent="These papers are saved in your reading list even though Axiovo has not indexed their metadata. Open the authoritative arXiv record or remove the bookmark.";root.append(explanation);
+  for(const id of uncached){
+   const item=document.createElement("article");item.className="paper";
+   const heading=document.createElement("h3");heading.textContent="arXiv:"+id;
+   const source=document.createElement("a");source.href=window.AxiovoLibraryOutsideCache.source(id);source.target="_blank";source.rel="noopener noreferrer";source.textContent="Open on arXiv ↗";
+   const remove=btn("Remove from reading list",()=>{
+    saved=saved.filter(value=>value!==id);
+    try{localStorage.setItem("researchlens-reading-list",JSON.stringify(saved))}catch{}
+    window.dispatchEvent(new Event("researchlens-library-change"));showRecommendations();render()
+   });
+   item.append(heading,source,remove);root.append(item)
+  }
+ }
+}
+root.querySelectorAll(".paper")[selectedRow]?.classList.add("current");if(window.MathJax?.typesetPromise)window.MathJax.typesetPromise([root]).catch(()=>{});const pager=el("pagination");pager.replaceChildren();if(arr.length>pageSize){const prev=btn("← Previous",()=>{page=Math.max(0,page-1);render();window.scrollTo({top:380,behavior:"smooth"})});prev.disabled=page===0;const next=btn("Next →",()=>{page=Math.min(Math.ceil(arr.length/pageSize)-1,page+1);render();window.scrollTo({top:380,behavior:"smooth"})});next.disabled=(page+1)*pageSize>=arr.length;const info=document.createElement("span");info.className="small";info.textContent="Page "+(page+1)+" / "+Math.ceil(arr.length/pageSize);pager.append(prev,info,next)}}
+function detail(p){const root=el("content");root.replaceChildren();const h=document.createElement("h2");h.textContent=p.title;root.append(h);const info=document.createElement("p");info.textContent="Potentially related works, ranked by lexical overlap of indexed abstracts and titles. Similarity does not imply non-novelty.";root.append(info);
+const extsearch=document.createElement("a");extsearch.href="https://www.semanticscholar.org/search?q="+encodeURIComponent(p.title)+"&sort=relevance";extsearch.target="_blank";extsearch.rel="noopener noreferrer";extsearch.textContent="Search this title and related literature on Semantic Scholar ↗";root.append(extsearch);const guide=document.createElement("p");guide.innerHTML='<strong>External literature and citation search:</strong> <a href="https://openalex.org/" target="_blank" rel="noopener noreferrer">OpenAlex ↗</a> · <a href="https://www.semanticscholar.org/" target="_blank" rel="noopener noreferrer">Semantic Scholar ↗</a>. The local shortlist below is a separate lexical preview.';root.append(guide);if(p.openalex_id){const a=document.createElement("a");a.href=p.openalex_id;a.target="_blank";a.rel="noopener noreferrer";a.textContent="Open citation record ↗";root.append(a)}const matches=all.filter(x=>x.id!==p.id).map(x=>({p:x,s:sim(p,x)})).filter(x=>x.s>0).sort((a,b)=>b.s-a.s).slice(0,7);
+for(const x of matches){const d=document.createElement("div");d.className="related";const a=document.createElement("a");a.textContent=x.p.title;a.href="https://arxiv.org/abs/"+encodeURIComponent(x.p.id);a.target="_blank";a.rel="noopener noreferrer";const t=document.createElement("small");t.textContent=fmt(x.p.published)+" · lexical score "+x.s.toFixed(2)+" (not a novelty score)";d.append(a,t);root.append(d)}if(!matches.length){const p=document.createElement("p");p.textContent="No overlaps detected in this limited index. That does not establish novelty.";root.append(p)}const w=document.createElement("p");w.className="warning";w.textContent="These are research leads only. Compare the full theorems, assumptions, proofs and citation history before making any judgment.";root.append(w);el("detail").showModal();if(window.MathJax?.typesetPromise)window.MathJax.typesetPromise([root]).catch(()=>{})}
+
+function exportJSON(){const data={version:1,exported_at:new Date().toISOString(),saved,read,hidden,followed,authorFollows};const url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:"application/json"}));const a=document.createElement("a");a.href=url;a.download="researchlens-data.json";a.click();URL.revokeObjectURL(url)}
+el("export-json").onclick=exportJSON;
+el("export-ris").onclick=()=>{const items=window.AxiovoLibraryOutsideCache?.exportRecords(saved,all)||[];if(!items.length){alert("Your reading list is empty.");return}const ris=items.map(p=>window.AxiovoCitation.ris(p)).join("\r\n\r\n");window.AxiovoCitation.download("axiovo-reading-list.ris",ris)};
+
+el("import-ris").onclick=()=>el("ris-file").click();
+el("ris-file").onchange=async event=>{
+ try{
+  const file=event.target.files?.[0];if(!file)return;
+  if(file.size>2e6)throw Error("RIS file exceeds 2 MB");
+  const ids=window.AxiovoCitation?.parseRIS(await file.text())||[];
+  if(!ids.length)throw Error("No arXiv identifiers in RIS file. Only identifiable arXiv records can be imported safely.");
+  saved=[...new Set([...saved,...ids])].slice(0,10000);
+  localStorage.setItem("researchlens-reading-list",JSON.stringify(saved));
+  window.dispatchEvent(new Event("researchlens-library-change"));
+  showRecommendations();render();
+  alert("Imported "+ids.length+" Zotero RIS arXiv identifiers. Existing saved papers were preserved.");
+ }catch(e){alert("RIS import failed: "+String(e.message||e))}
+ finally{event.target.value=""}
+};
+el("import-json").onclick=()=>el("import-file").click();
+el("import-file").onchange=async e=>{try{const file=e.target.files?.[0];if(!file)return;if(file.size>2e6)throw Error("File too large");const data=JSON.parse(await file.text());if(data.version!==1)throw Error("Unrecognized format");for(const field of ["saved","read","hidden","followed"])if(!Array.isArray(data[field])||!data[field].every(x=>typeof x==="string"))throw Error("Invalid "+field);saved=[...new Set(data.saved)].slice(0,10000);read=[...new Set(data.read)].slice(0,10000);hidden=[...new Set(data.hidden)].slice(0,10000);followed=[...new Set(data.followed)].slice(0,100);authorFollows=Array.isArray(data.authorFollows)?data.authorFollows.filter(x=>typeof x==="string").slice(0,1000):[];localStorage.setItem("researchlens-author-follows",JSON.stringify(authorFollows));localStorage.setItem("researchlens-reading-list",JSON.stringify(saved));saveFollowing();persistState();showRecommendations();render();alert("Reading and topic settings imported successfully")}catch(err){alert("Import failed: "+String(err.message||err))}finally{e.target.value=""}};
+document.addEventListener("keydown",e=>{if(e.altKey||e.ctrlKey||e.metaKey||["INPUT","TEXTAREA","SELECT"].includes(document.activeElement?.tagName)||el("detail").open)return;const k=e.key.toLowerCase();if(["j","k"].includes(k)){e.preventDefault();selectedRow=Math.max(0,Math.min(rendered.length-1,selectedRow+(k==="j"?1:-1)));const cards=[...el("papers").querySelectorAll(".paper")];cards.forEach((x,i)=>x.classList.toggle("current",i===selectedRow));cards[selectedRow]?.scrollIntoView({block:"nearest",behavior:"smooth"});return}const p=rendered[selectedRow];if(!p)return;if(k==="s"){saved=saved.includes(p.id)?saved.filter(id=>id!==p.id):[...saved,p.id];localStorage.setItem("researchlens-reading-list",JSON.stringify(saved));render()}if(k==="r"){read=read.includes(p.id)?read.filter(id=>id!==p.id):[...read,p.id];persistState();render()}if(k==="h"){hidden=[...new Set([...hidden,p.id])];persistState();render()}if(k==="enter"){window.open("https://arxiv.org/abs/"+encodeURIComponent(p.id),"_blank","noopener,noreferrer")}});
+
+el("close").onclick=()=>el("detail").close();el("show-recommendations").onclick=()=>{el("order").value="recommended";page=0;render()};el("savedOnly").onclick=()=>{savedOnly=!savedOnly;page=0;el("savedOnly").textContent=savedOnly?"Show all papers":"Show reading list";render()};
+el("follow-topic").onclick=()=>{if(!activeTopic)return;followed=followed.includes(activeTopic)?followed.filter(t=>t!==activeTopic):[...followed,activeTopic];saveFollowing();showRecommendations();page=0;render()};
+el("following-only").onclick=()=>{followingOnly=!followingOnly;page=0;updateFollowing();render()};
+el("export-bib").onclick=()=>{const selected=window.AxiovoLibraryOutsideCache?.exportRecords(saved,all)||[];if(!selected.length){alert("Your reading list is empty.");return}const bib=selected.map(p=>{const y=(p.published||"").slice(0,4);return "@misc{arxiv"+p.id.replace(/[^A-Za-z0-9]/g,"")+",\n  title={"+p.title.replace(/[{}]/g,"")+"},\n  author={"+(p.authors||[]).join(" and ")+"},\n  year={"+y+"},\n  eprint={"+p.id+"},\n  archivePrefix={arXiv},\n  url={https://arxiv.org/abs/"+p.id+"}\n}"}).join("\n\n");const blob=new Blob([bib],{type:"text/plain;charset=utf-8"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="researchlens-reading-list.bib";document.body.append(a);a.click();a.remove();URL.revokeObjectURL(url)};
+
+function updateArchiveLink(){/* Historical queries now render within this page. */}
+for(const id of ["date-from","date-to"])el(id).addEventListener("change",()=>{page=0;render();updateArchiveLink();if(el("date-from").value&&el("date-to").value)window.ResearchLensHistorySearch?.search(1)});el("reset-dates").onclick=()=>{el("date-from").value="";el("date-to").value="";page=0;render();updateArchiveLink()};
+function utcDay(delta){const d=new Date(Date.now()+delta*86400000);return d.toISOString().slice(0,10)}
+el("date-today").onclick=()=>{el("date-from").value=utcDay(0);el("date-to").value=utcDay(0);page=0;render();updateArchiveLink();window.ResearchLensHistorySearch?.search(1)};
+el("date-yesterday").onclick=()=>{el("date-from").value=utcDay(-1);el("date-to").value=utcDay(-1);page=0;render();updateArchiveLink();window.ResearchLensHistorySearch?.search(1)};
+el("date-week").onclick=()=>{el("date-from").value=utcDay(-6);el("date-to").value=utcDay(0);page=0;render();updateArchiveLink();window.ResearchLensHistorySearch?.search(1)};
+
+for(const id of ["q","category","order","crosslist-only"])el(id).addEventListener(id==="q"?"input":"change",()=>{page=0;render();updateArchiveLink()});
+{const q=new URLSearchParams(location.search).get("q");if(q)el("q").value=q.slice(0,200);if(new URLSearchParams(location.search).get("sort")==="recommended")el("order").value="recommended";updateArchiveLink()}
+// Keep the main research field synchronized with the wider scholarly explorer.
+(function connectMainField(){
+ const config=window.ResearchLensFields;
+ if(!config)return;
+ const selector=el("arxiv-main-field");
+ const stored=()=>{try{return JSON.parse(localStorage.getItem("researchlens-field-explorer-v1")||"{}")}catch{return{}}};
+ const prefs=stored();
+ for(const [key,definition] of Object.entries(config.FIELDS)){
+  const choice=document.createElement("button");choice.type="button";choice.className="rl-field-choice";
+  choice.textContent=definition.name;choice.dataset.field=key;
+  choice.onclick=()=>{selector.value=key;el("arxiv-field-details").open=false;selector.dispatchEvent(new Event("change",{bubbles:true}))};
+  el("arxiv-field-choices").append(choice);
+ }
+ function showSelected(field){
+  const key=config.fieldKey(field);selector.value=key;el("arxiv-field-summary").textContent=config.FIELDS[key].name;for(const option of el("arxiv-field-choices").querySelectorAll("button"))option.setAttribute("aria-pressed",String(option.dataset.field===key));
+  el("arxiv-field-heading").textContent="Explore "+config.FIELDS[key].name.toLowerCase();
+  el("arxiv-field-hint").textContent="Selected field: "+config.FIELDS[key].name+". Explore the cached feed or search the wider literature.";
+ }
+ showSelected(prefs.field||"general");
+ selector.addEventListener("change",()=>{
+  const field=config.fieldKey(selector.value),p=stored();
+  p.field=field;p.topic=config.FIELDS[field].topics[0];p.subtopic="";p.query="";p.areaSelected=false;
+  try{localStorage.setItem("researchlens-field-explorer-v1",JSON.stringify(p))}catch{}
+  showSelected(field);
+  if(field!=="general"){
+   el("rl-source-scholarly").click();
+   window.dispatchEvent(new CustomEvent("researchlens:choose-field",{detail:{field}}))
+  }else if(el("scholarly-discovery").hidden===false){
+   window.dispatchEvent(new CustomEvent("researchlens:choose-field",{detail:{field}}))
+  }
+ });
+ window.addEventListener("researchlens:field-changed",e=>showSelected(e.detail?.field));
+})();
+fetch("data/feed.json",{cache:"no-cache"}).then(r=>{if(!r.ok)throw Error("Feed unavailable");return r.json()}).then(d=>{all=(d.papers||[]).filter(p=>p&&p.id&&p.title);topicCatalog=d.topic_catalog||[];showTopics();el("updated").textContent=d.generated_at?fmt(d.generated_at):"Not yet";const dates=all.map(p=>p.published||p.updated).filter(Boolean).sort();el("coverage").textContent=all.length+" indexed papers · source v1 dates "+(dates[0]||"?").slice(0,10)+" to "+(dates.at(-1)||"?").slice(0,10)+" · synchronized "+(d.generated_at||"unknown")+" · selected arXiv categories across science and mathematics + selected historical IDs. This is not full arXiv coverage.";render();persistState()}).catch(e=>{el("count").textContent="Snapshot shown; live data refresh failed";console.error(e)});
+</script><script defer src="./announcement-view.js"></script><script defer src="./arxiv-freshness.js"></script><script defer src="./arxiv-daily-archive.js"></script><script defer src="./history.js"></script></body></html>
