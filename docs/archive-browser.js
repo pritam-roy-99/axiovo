@@ -89,12 +89,12 @@ function atom(xml){
 }
 function chosenTerm(){return state.query||((state.scope==="subfield")?(state.subfield||field().name):"")}
 async function remote(){
- const isCategoryCode=/^[a-z-]+(?:\.[A-Za-z-]+)?$/.test(state.subfield||"");
+ const officialCategoryCodes=new Set(definition.groups.flatMap(g=>g.areas.flatMap(a=>[a.code,...a.subfields.map(x=>x.code)])));
+ const isCategoryCode=officialCategoryCodes.has(state.subfield);
  const term=(source==="arxiv"?(state.query||(!isCategoryCode&&state.scope==="subfield"?state.subfield:"")):chosenTerm()).slice(0,150);
  if(source==="arxiv"){
   const chosen=state.scope==="subfield"?(state.subfield||field().code):"";
-  const code=/^[a-z-]+(?:\.[A-Za-z-]+)?$/.test(chosen)?chosen:field().code;
-  const officialCode=state.scope==="subfield"&&/^[a-z-]+(?:\.[A-Za-z-]+)?$/.test(code)?code:"";
+  const officialCode=state.scope==="subfield"?(officialCategoryCodes.has(chosen)?chosen:field().code):"";
   const archiveWide="("+[...new Set(definition.groups.flatMap(g=>g.areas.map(a=>a.code)))].map(c=>"cat:"+c).join(" OR ")+")";
   const baseQuery=[officialCode?"cat:"+officialCode:"",term?"all:"+term.replace(/[:()"\\]/g," "):""].filter(Boolean).join(" AND ")||archiveWide;
   // Apply the date constraint upstream. Post-filtering only the most recent 100
