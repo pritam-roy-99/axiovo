@@ -320,11 +320,11 @@ el("following-only").onclick=()=>{followingOnly=!followingOnly;page=0;updateFoll
 el("export-bib").onclick=()=>{const selected=window.AxiovoLibraryOutsideCache?.exportRecords(saved,all)||[];if(!selected.length){alert("Your reading list is empty.");return}const bib=selected.map(p=>{const y=(p.published||"").slice(0,4);return "@misc{arxiv"+p.id.replace(/[^A-Za-z0-9]/g,"")+",\n  title={"+p.title.replace(/[{}]/g,"")+"},\n  author={"+(p.authors||[]).join(" and ")+"},\n  year={"+y+"},\n  eprint={"+p.id+"},\n  archivePrefix={arXiv},\n  url={https://arxiv.org/abs/"+p.id+"}\n}"}).join("\n\n");const blob=new Blob([bib],{type:"text/plain;charset=utf-8"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="researchlens-reading-list.bib";document.body.append(a);a.click();a.remove();URL.revokeObjectURL(url)};
 
 function updateArchiveLink(){/* Historical queries now render within this page. */}
-for(const id of ["date-from","date-to"])el(id).addEventListener("change",()=>{page=0;render();updateArchiveLink()});el("reset-dates").onclick=()=>{el("date-from").value="";el("date-to").value="";page=0;render();updateArchiveLink()};
+for(const id of ["date-from","date-to"])el(id).addEventListener("change",()=>{page=0;render();updateArchiveLink();if(el("date-from").value&&el("date-to").value)window.ResearchLensHistorySearch?.search(1)});el("reset-dates").onclick=()=>{el("date-from").value="";el("date-to").value="";page=0;render();updateArchiveLink()};
 function utcDay(delta){const d=new Date(Date.now()+delta*86400000);return d.toISOString().slice(0,10)}
-el("date-today").onclick=()=>{el("date-from").value=utcDay(0);el("date-to").value=utcDay(0);page=0;render();updateArchiveLink()};
-el("date-yesterday").onclick=()=>{el("date-from").value=utcDay(-1);el("date-to").value=utcDay(-1);page=0;render();updateArchiveLink()};
-el("date-week").onclick=()=>{el("date-from").value=utcDay(-6);el("date-to").value=utcDay(0);page=0;render()};
+el("date-today").onclick=()=>{el("date-from").value=utcDay(0);el("date-to").value=utcDay(0);page=0;render();updateArchiveLink();window.ResearchLensHistorySearch?.search(1)};
+el("date-yesterday").onclick=()=>{el("date-from").value=utcDay(-1);el("date-to").value=utcDay(-1);page=0;render();updateArchiveLink();window.ResearchLensHistorySearch?.search(1)};
+el("date-week").onclick=()=>{el("date-from").value=utcDay(-6);el("date-to").value=utcDay(0);page=0;render();updateArchiveLink();window.ResearchLensHistorySearch?.search(1)};
 
 for(const id of ["q","category","order","crosslist-only"])el(id).addEventListener(id==="q"?"input":"change",()=>{page=0;render();updateArchiveLink()});
 {const q=new URLSearchParams(location.search).get("q");if(q)el("q").value=q.slice(0,200);if(new URLSearchParams(location.search).get("sort")==="recommended")el("order").value="recommended";updateArchiveLink()}

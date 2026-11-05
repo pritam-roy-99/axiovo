@@ -24,7 +24,10 @@ function historyInfo(message,query=""){
  const parent=$("history-info");if(!parent)return;
  parent.replaceChildren(document.createTextNode(message+" "));
  const link=el("a",query?"Search this query on the official arXiv website ↗":"Browse the official arXiv website ↗");
- link.id="history-official-link";link.href=Arxiv?.officialSearchUrl(query)||"https://arxiv.org/search/advanced";
+ const selectedDates=pageInfo();
+ link.id="history-official-link";link.href=(selectedDates.from||selectedDates.to)?
+  Daily?.officialDateSearchUrl({from:selectedDates.from,to:selectedDates.to,query})||"https://arxiv.org/search/advanced":
+  Arxiv?.officialSearchUrl(query)||"https://arxiv.org/search/advanced";
  link.target="_blank";link.rel="noopener noreferrer";parent.append(link);
 }
 function pageInfo(){return {q:$("q").value.trim(),from:$("date-from").value,to:$("date-to").value,sort:$("order").value,category:$("category")?.value||""}}

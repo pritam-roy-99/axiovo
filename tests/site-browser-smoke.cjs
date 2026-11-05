@@ -327,7 +327,7 @@ const base="http://127.0.0.1:8765";
   await dailyPage.goto(base+"/",{waitUntil:"domcontentloaded"});
   await dailyPage.locator("#date-from").fill("2026-11-05");
   await dailyPage.locator("#date-to").fill("2026-11-05");
-  await dailyPage.locator("#all-arxiv").click();
+  await dailyPage.locator("#date-to").dispatchEvent("change"); // selected range automatically opens complete archive
   await dailyPage.locator("#history-count").getByText("151 matching papers").waitFor({timeout:12000});
   assert.equal(await dailyPage.locator("#history-cards article").count(),25);
   assert((await dailyPage.locator("#history-pagination").innerText()).includes("Page 1 of 7"));
