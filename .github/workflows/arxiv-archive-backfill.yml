@@ -33,7 +33,12 @@ jobs:
         run: |
           python -m unittest discover -s tests -p test_arxiv_daily_archive.py -v
           node tests/arxiv-daily-archive.test.js
+      - name: Download recent metadata via official OAI-PMH as an explicitly partial fallback
+        id: oai_fallback
+        continue-on-error: true
+        run: python -m scripts.arxiv_oai_incremental
       - name: Harvest selected or latest arXiv dates
+        continue-on-error: true
         env:
           AXIOVO_ARCHIVE_FROM: ${{ inputs.from_date }}
           AXIOVO_ARCHIVE_TO: ${{ inputs.to_date }}
@@ -43,7 +48,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docs/data/arxiv-days/
+          git add docs/data/arxiv-days/ docs/data/arxiv-oai/
           if ! git diff --cached --quiet; then
             git commit -m "data: complete arXiv submission-day archive"
             git fetch origin main
