@@ -71,3 +71,16 @@ body.axiovo-home .axiovo-entry-intro{max-width:810px}
 @media(max-width:770px){
  body.axiovo-home .axiovo-entry-fields{grid-template-columns:minmax(0,1fr)!important}
 }
+
+
+/* Source-neutral archive selection. No archive gets visual precedence. */
+.axiovo-archive-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px;margin-top:13px}
+.axiovo-archive-card{display:flex;flex-direction:column;gap:13px;min-width:0;min-height:210px;padding:21px;border:1px solid var(--rl-border,#c6d9e7);background:var(--rl-panel,#fff);border-radius:14px;color:var(--rl-text,#17324b);text-decoration:none;box-shadow:0 2px 11px rgba(24,53,77,.04);transition:border-color .2s,box-shadow .2s,transform .2s}
+.axiovo-archive-card:hover{border-color:var(--axiovo-accent,#126f9c);box-shadow:0 8px 22px rgba(24,53,77,.1);transform:translateY(-2px);text-decoration:none}
+.axiovo-archive-card:focus-visible{outline:3px solid var(--axiovo-accent,#126f9c);outline-offset:3px}
+.axiovo-archive-brand{font-size:clamp(21px,2vw,27px);font-weight:820;letter-spacing:-.035em;line-height:1.25;color:var(--rl-text,#17324b)}
+.axiovo-archive-description{font-size:13px;line-height:1.6;color:var(--rl-muted,#667d91);flex:1}
+.axiovo-archive-action{display:inline-flex;align-items:center;justify-content:space-between;gap:10px;padding-top:12px;border-top:1px solid var(--rl-border,#d4e0ea);color:var(--axiovo-accent,#126f9c);font-weight:760;font-size:13px}
+.axiovo-entry-card{max-width:none!important}
+.axiovo-entry-intro{max-width:790px!important}
+@media(max-width:800px){.axiovo-archive-grid{grid-template-columns:1fr}.axiovo-archive-card{min-height:145px;padding:17px}.axiovo-archive-description{flex:initial}}
