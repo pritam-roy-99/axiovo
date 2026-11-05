@@ -49,8 +49,8 @@ class UnifiedDiscoverTests(unittest.TestCase):
         self.assertIn('window.addEventListener("researchlens:scholarly-open",init,{once:true})',js)
         self.assertIn("researchlens-field-saved-v1",js)
         switch=(ROOT/"discover.js").read_text(encoding="utf8")
-        self.assertIn("arxiv.hidden=wider",switch)
-        self.assertIn("scholar.hidden=!wider",switch)
+        self.assertIn('panel.hidden=(isWide?name!=="scholarly":name!==activeArchive)',switch)
+        self.assertIn('const panels=',switch)
         self.assertIn('new Event("researchlens:scholarly-open")',switch)
 
     def test_navigation_uses_one_discover_link(self):
