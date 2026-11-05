@@ -1,9 +1,9 @@
 /* Axiovo v40: small, verified offline shell. Remote search and PDFs stay network-only. */
 "use strict";
-const CACHE = "axiovo-shell-v44";
+const CACHE = "axiovo-shell-v45";
 const SHELL = [
   "./", "./index.html", "./arxiv.html", "./biorxiv.html", "./chemrxiv.html",
-  "./theme.css", "./theme.js", "./research-entry.css", "./research-entry.js",
+  "./theme.css", "./axiovo-shell.css", "./theme.js", "./research-entry.css", "./research-entry.js",
   "./navigation.js", "./pwa.js", "./archive-browser.css", "./archive-browser.js",
   "./archive-taxonomy.js", "./manifest.webmanifest", "./icons/axiovo.svg"
 ];
