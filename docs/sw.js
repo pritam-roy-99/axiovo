@@ -1,10 +1,10 @@
 /* ResearchLens offline shell. Do not cache remote APIs, PDFs or the live feed. */
 "use strict";
-const CACHE = "axiovo-shell-v32";
+const CACHE = "axiovo-shell-v33";
 const SHELL = [
-  "./", "./index.html", "./discover.html", "./workspace.html", "./copilot.html",
+  "./", "./index.html", "./arxiv.html", "./biorxiv.html", "./chemrxiv.html", "./discover.html", "./workspace.html", "./copilot.html",
   "./lab.html", "./paper.html", "./compare.html", "./profiles.html", "./community.html", "./methodology.html", "./privacy.html",
-  "./theme.css", "./theme.js", "./workspace.css", "./discover.css", "./paper-card-polish.css", "./research-entry.css", "./research-entry.js", "./discover-layout.css", "./discover-layout.js", "./archive-selection.css", "./archive-focus.js", "./chemrxiv.js", "./discover-modes.js", "./research-workflow.css", "./paper-research.css",
+  "./theme.css", "./theme.js", "./workspace.css", "./discover.css", "./paper-card-polish.css", "./research-entry.css", "./research-entry.js", "./discover-layout.css", "./discover-layout.js", "./archive-selection.css", "./archive-browser.css", "./archive-browser.js", "./archive-taxonomy.js", "./archive-focus.js", "./chemrxiv.js", "./discover-modes.js", "./research-workflow.css", "./paper-research.css",
   "./lab.css", "./paper-actions.css", "./navigation.js", "./pwa.js",
   "./research-fields.js", "./custom-taxonomy.js", "./focus-bar.js", "./scholar-search.js",
   "./cached-arxiv-search.js", "./arxiv-freshness.js", "./semantic-search.js", "./multisource-search.js", "./interests.js",
