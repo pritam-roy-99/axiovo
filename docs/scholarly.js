@@ -158,7 +158,7 @@ async function announcementDateSearch(query,from,to,field,signal){
   if(!response.ok)throw Error("Announcement snapshot HTTP "+response.status);
   const batch=await response.json();
   if((batch.display_date_ist||batch.announcement_date)!==from||!Array.isArray(batch.papers)||!batch.papers.length){
-   return {items:[],message:"Official arXiv announcement batch for "+from+" is not yet in Axiovo. This is an ingestion delay, not evidence of zero papers. Check arXiv's new-paper listing or retry once synchronization succeeds."};
+   throw Error("RSS batch for "+from+" not available");
   }
   const records=batch.papers.filter(p=>announcementMatches(p,query,field));
   return {items:records.map(announcementWork),
