@@ -245,8 +245,6 @@ jobs:
               raise SystemExit(f"Tour MP4 has no playable H.264 video: {streams!r}")
           print(f"Verified Axiovo MP4: {size:,} bytes, {streams.strip()}")
           PY
-      - name: Render first-paint snapshot with actual index counts
-        run: python -m scripts.build_snapshot
       - name: Build Atom topic subscriptions
         id: atom_feeds
         continue-on-error: true
