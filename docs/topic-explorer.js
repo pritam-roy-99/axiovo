@@ -222,6 +222,17 @@ function paperCard(p,c){
   save.disabled=data.save(p);save.textContent=save.disabled?"Saved to Library":"Browser storage unavailable";
  });
  save.disabled=data.saved(p);actions.append(save);
+ // Public GitHub Issues is the feedback queue. Nothing is submitted until
+ // the reporter reviews and files the issue themselves.
+ const reportUrl="https://github.com/pritam-roy-99/axiovo/issues/new?"+
+  new URLSearchParams({
+   title:"Incorrect topic classification: "+p.recordId,
+   body:"Paper source: "+p.url+"\nArchive: "+p.source+"\nDisplayed topic: "+pathText()+
+    "\n\nSuggested correction:\n\nReason or evidence:"
+  });
+ const report=link("Report wrong topic ↗",reportUrl,"rd-button rd-secondary");
+ report.title="Review and submit a public topic correction via GitHub Issues";
+ actions.append(report);
  if(p.abstract&&window.AxiovoAbstractAudio)actions.append(button("Listen to abstract",()=>window.AxiovoAbstractAudio.play([p])));
  const compare=button(data.comparison().some(item=>data.recordKey(item)===data.recordKey(p))?"In comparison":"Add to comparison",()=>{
   const result=data.addComparison(p);
