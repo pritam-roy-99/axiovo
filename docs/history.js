@@ -5,6 +5,7 @@
  * differ from arXiv's original submission date.
  */
 (function(){
+if(document.body.classList.contains("axiovo-home"))return;
 const $=id=>document.getElementById(id);
 const PAGE_SIZE=25;
 const Arxiv=window.ResearchLensArxiv;
