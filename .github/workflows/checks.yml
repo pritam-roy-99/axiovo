@@ -35,6 +35,7 @@ jobs:
           node tests/inspire-author.test.js
           node tests/multisource-search.test.js
           node tests/zotero-feedback.test.js
+          node tests/library-outside-cache.test.js
       - name: Test personalized research interest controls
         run: node tests/interests.test.js
       - name: User-editable research field hierarchy tests

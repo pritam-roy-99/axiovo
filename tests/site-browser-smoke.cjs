@@ -267,6 +267,43 @@ const base="http://127.0.0.1:8765";
   assert((await research.locator("h1").innerText()).toLowerCase().includes("settings"));
   await researchContext.close();
 
+  // Regression: imported arXiv IDs outside the rolling cache must stay visible
+  // and exportable; a surname-only author fallback must never claim a match.
+  const auditContext=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true});
+  await auditContext.addInitScript(()=>{
+   localStorage.setItem("researchlens-reading-list",JSON.stringify(["2507.18744"]));
+  });
+  await auditContext.route("**/data/feed.json",route=>route.fulfill({
+   status:200,contentType:"application/json",body:JSON.stringify({
+    generated_at:"2026-11-05T00:00:00Z",topic_catalog:[],
+    papers:[{id:"2610.10001",title:"Unrelated solid-state preprint",
+     authors:["Siddhartha Sarkar","Sourav Sarkar"],published:"2026-10-15T00:00:00Z",
+     abstract:"An unrelated materials study",primary_category:"cond-mat.mtrl-sci",
+     categories:["cond-mat.mtrl-sci"],topics:[]}]
+   })
+  }));
+  for(const url of ["https://api.openalex.org/**","https://api.semanticscholar.org/**","https://inspirehep.net/api/**"]){
+   await auditContext.route(url,route=>route.fulfill({
+    status:429,contentType:"application/json",body:'{"error":"rate limited"}'
+   }));
+  }
+  await auditContext.route("https://cdn.jsdelivr.net/**",route=>route.fulfill({status:200,contentType:"application/javascript",body:""}));
+  const audit=await auditContext.newPage();
+  audit.on("pageerror",err=>errors.push(audit.url()+": "+err.message));
+  await audit.goto(base+"/",{waitUntil:"domcontentloaded"});
+  await audit.locator("#recommended-links").getByText("Follow topics or save papers").waitFor({timeout:10000});
+  await audit.locator("#savedOnly").click();
+  await audit.locator("#papers").getByText("arXiv:2507.18744").waitFor({timeout:10000});
+  assert(await audit.locator("#papers a[href='https://arxiv.org/abs/2507.18744']").isVisible());
+  await audit.locator("#axiovo-author-details > summary").click();
+  await audit.locator("#axiovo-author-query").fill("Shubhayan Sarkar");
+  await audit.locator("#axiovo-author-form button[type='submit']").click();
+  await audit.locator("#axiovo-author-status").getByText("No confidently matching author names").waitFor({timeout:16000});
+  assert.equal(await audit.locator(".axiovo-author-choice").count(),0,
+   "Do not suggest unrelated Sarkars during provider outages");
+  assert(await audit.locator("#axiovo-author-candidates a[href*='arxiv.org/search/']").count()>0);
+  await auditContext.close();
+
   // Check the core desktop layout separately from the mobile touch session.
   const desktop=await browser.newContext({viewport:{width:1366,height:820}});
   await desktop.route("https://api.openalex.org/**",route=>route.fulfill({
