@@ -11,7 +11,7 @@ async function load(){
 }
 function info(id){
  const p=index.find(x=>x.id===id)||{};
- let memo={};try{memo=JSON.parse(localStorage.getItem("researchlens-library-metadata-v1")||"{}")}catch{}
+ let memo={};try{memo=JSON.parse(localStorage.getItem("axiovo-library-metadata-v1")||"{}")}catch{}
  const local=memo["arxiv:"+id]||{};
  return {title:p.title||"arXiv:"+id,authors:(p.authors||[]).join(", "),abstract:p.abstract||"",category:(p.categories||[]).join(", "),date:p.published||"",note:local.note||"",status:local.status||"to-read",doi:p.doi||""}
 }
