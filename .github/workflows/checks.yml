@@ -70,12 +70,14 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Install browser test tools
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install Chromium browser test tools
         run: |
-          npm install --no-save --ignore-scripts playwright@1.56.1
-          npx playwright install --with-deps chromium
-      - name: Run local Axiovo browser walkthrough
-        run: |
-          python3 -m http.server 8765 --directory docs >/tmp/axiovo-server.log 2>&1 &
-          sleep 2
-          node tests/site-browser-smoke.cjs
+          python -m pip install --disable-pip-version-check playwright==1.56.0
+          python -m playwright install --with-deps chromium
+      - name: Verify three-archive navigation, search entry and Library
+        run: python scripts/smoke_routes.py
+      - name: Verify three-archive topic and subfield interaction
+        run: python scripts/smoke_archive_pages.py
