@@ -1,4 +1,4 @@
-name: Validate proposed ResearchLens changes
+name: Validate proposed Axiovo changes
 on:
   pull_request:
   push:
@@ -57,12 +57,12 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y -qq ffmpeg espeak-ng
           python scripts/build_intro_video.py
-          ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1 docs/assets/researchlens-tour.mp4
-          test -s docs/assets/researchlens-tour-poster.jpg
-          test -s docs/assets/researchlens-tour.vtt
+          ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1 docs/assets/axiovo-tour.mp4
+          test -s docs/assets/axiovo-tour-poster.jpg
+          test -s docs/assets/axiovo-tour.vtt
 
   browser-smoke:
-    name: Smoke test ResearchLens in Chromium
+    name: Smoke test Axiovo in Chromium
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -70,12 +70,14 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Install browser test tools
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install Chromium browser test tools
         run: |
-          npm install --no-save --ignore-scripts playwright@1.56.1
-          npx playwright install --with-deps chromium
-      - name: Run local ResearchLens browser walkthrough
-        run: |
-          python3 -m http.server 8765 --directory docs >/tmp/researchlens-server.log 2>&1 &
-          sleep 2
-          node tests/site-browser-smoke.cjs
+          python -m pip install --disable-pip-version-check playwright==1.56.0
+          python -m playwright install --with-deps chromium
+      - name: Verify three-archive navigation, search entry and Library
+        run: python scripts/smoke_routes.py
+      - name: Verify three-archive topic and subfield interaction
+        run: python scripts/smoke_archive_pages.py

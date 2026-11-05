@@ -21,6 +21,10 @@ const base="http://127.0.0.1:8765";
  page.on("pageerror",err=>errors.push(page.url()+": "+err.message));
  try{
   await page.goto(base+"/",{waitUntil:"domcontentloaded"});
+  const archiveCards=page.locator(".axiovo-archive-card");
+  await archiveCards.first().waitFor();
+  assert.equal(await archiveCards.count(),3,"Homepage must show all three archives equally");
+  await page.goto(base+"/discover.html?legacy=1#discover",{waitUntil:"domcontentloaded"});
   await page.locator("#rl-focus-bar").waitFor();
   // Author-name discovery must show distinct identities before displaying papers.
   let authorWorksQuery="";
@@ -100,8 +104,9 @@ const base="http://127.0.0.1:8765";
   await page.locator("#workspace-panel #library-list").waitFor({timeout:12000});
   assert((await page.locator("#workspace-panel").isVisible()),"Workspace must appear in the unified page");
   await page.locator("#workflow-discover").click();
-  await page.locator("#discover-shell").waitFor({state:"visible",timeout:12000});
-  await page.locator("#workflow-workspace").click();
+  await page.waitForURL(url=>url.pathname==="/");
+  await page.locator(".axiovo-archive-card").first().waitFor();
+  await page.goto(base+"/discover.html#workspace",{waitUntil:"domcontentloaded"});
   await page.locator("#workspace-panel").waitFor({state:"visible",timeout:12000});
 
   await page.goto(base+"/copilot.html",{waitUntil:"domcontentloaded"});
@@ -120,13 +125,12 @@ const base="http://127.0.0.1:8765";
   await page.locator("#papers a[href*='2608.13942v2']").first().waitFor({timeout:10000});
   assert((await page.locator("#papers").innerText()).includes("v2"));
 
-  await page.goto(base+"/search.html?q=contextuality&from=2024-01-01&sort=publication_date%3Adesc",{waitUntil:"domcontentloaded"});
-  await page.waitForURL(url=>url.pathname==="/"
-    &&url.searchParams.get("view")==="scholarly"
-    &&url.searchParams.get("q")==="contextuality", {timeout:10000});
-  await page.locator("#scholar-query").waitFor();
-  assert.equal(await page.locator("#scholar-from").inputValue(),"2024-01-01");
-  assert.equal(await page.locator("#scholar-sort").inputValue(),"publication_date:desc");
+  await page.goto(base+"/search.html?q=contextuality&from=2024-01-01",{waitUntil:"domcontentloaded"});
+  await page.waitForURL(url=>url.pathname==="/"&&url.searchParams.get("q")==="contextuality",{timeout:10000});
+  await page.locator('[data-archive="biorxiv"]').click();
+  await page.waitForURL(url=>url.pathname==="/biorxiv.html"&&url.searchParams.get("q")==="contextuality",{timeout:10000});
+  assert.equal(await page.locator("#archive-query").inputValue(),"contextuality");
+
   await page.goto(base+"/ai.html?id=2608.13942v2",{waitUntil:"domcontentloaded"});
   await page.waitForURL(url=>url.pathname==="/copilot.html"&&url.searchParams.get("id")==="2608.13942v2");
 
@@ -162,7 +166,7 @@ const base="http://127.0.0.1:8765";
    field:"quantum",topic:"Quantum computing",subtopic:"",query:"Quantum computing",
    from:"2099-11-27",to:"2099-11-30",sort:"publication_date:desc"
   })));
-  await dpage.goto(base+"/?view=scholarly#discover",{waitUntil:"domcontentloaded"});
+  await dpage.goto(base+"/discover.html?legacy=1&view=scholarly#discover",{waitUntil:"domcontentloaded"});
   await dpage.locator("#scholar-results article").first().waitFor({timeout:15000});
   assert.equal(await dpage.locator("#scholar-from").inputValue(),"");
   assert.equal(await dpage.locator("#scholar-to").inputValue(),"");
@@ -202,7 +206,7 @@ const base="http://127.0.0.1:8765";
   await limited.route("https://api.semanticscholar.org/**",route=>route.fulfill({status:200,contentType:"application/json",body:JSON.stringify({data:[]})}));
   const limitedPage=await limited.newPage();
   limitedPage.on("pageerror",err=>errors.push(limitedPage.url()+": "+err.message));
-  await limitedPage.goto(base+"/?view=scholarly#discover",{waitUntil:"domcontentloaded"});
+  await limitedPage.goto(base+"/discover.html?legacy=1&view=scholarly#discover",{waitUntil:"domcontentloaded"});
   await limitedPage.locator("#scholar-query").fill("Bell nonlocality");
   await limitedPage.locator("#scholar-from").fill("2026-10-01");
   await limitedPage.locator("#scholar-to").fill("2026-10-04");
@@ -290,7 +294,7 @@ const base="http://127.0.0.1:8765";
   await auditContext.route("https://cdn.jsdelivr.net/**",route=>route.fulfill({status:200,contentType:"application/javascript",body:""}));
   const audit=await auditContext.newPage();
   audit.on("pageerror",err=>errors.push(audit.url()+": "+err.message));
-  await audit.goto(base+"/",{waitUntil:"domcontentloaded"});
+  await audit.goto(base+"/discover.html?legacy=1#discover",{waitUntil:"domcontentloaded"});
   await audit.locator("#recommended-links").getByText("Follow topics or save papers").waitFor({timeout:10000});
   await audit.locator("#savedOnly").click();
   await audit.locator("#papers").getByText("arXiv:2507.18744").waitFor({timeout:10000});
@@ -324,7 +328,7 @@ const base="http://127.0.0.1:8765";
   await dailyContext.route("https://cdn.jsdelivr.net/**",route=>route.fulfill({status:200,body:""}));
   const dailyPage=await dailyContext.newPage();
   dailyPage.on("pageerror",err=>errors.push("daily archive: "+err.message));
-  await dailyPage.goto(base+"/",{waitUntil:"domcontentloaded"});
+  await dailyPage.goto(base+"/discover.html?legacy=1#discover",{waitUntil:"domcontentloaded"});
   await dailyPage.locator("#date-from").fill("2026-11-05");
   await dailyPage.locator("#date-to").fill("2026-11-05");
   await dailyPage.locator("#date-to").dispatchEvent("change"); // selected range automatically opens complete archive

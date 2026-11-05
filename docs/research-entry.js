@@ -12,15 +12,32 @@ function enter(){
  const explicitArchive=params.get("archive");
  const oldHash=["#discover","#workspace","#library"].includes(url.hash);
  const search=["q","query","from","to","sort","author","date"].some(key=>params.has(key));
- if(oldHash||search||legacyView||explicitArchive){
-   const target=new URL("./discover.html",url);
-   target.search=url.search;
-   if(legacyView==="biorxiv")target.searchParams.set("archive","biorxiv");
-   else if(legacyView==="arxiv")target.searchParams.set("archive","arxiv");
-   if(search&&!legacyView&&!explicitArchive)target.searchParams.set("view","scholarly");
-   target.hash=url.hash||"#discover";
-   location.replace(target.href);
+ if(url.hash==="#workspace"||url.hash==="#library"){
+   location.replace(new URL("./discover.html#workspace",url).href);
    return;
+ }
+ if(oldHash||search||legacyView||explicitArchive){
+   const archive=["arxiv","biorxiv","chemrxiv"].includes(explicitArchive)?explicitArchive:
+     ["arxiv","biorxiv","chemrxiv"].includes(legacyView)?legacyView:null;
+   if(archive){
+     const target=new URL("./"+archive+".html",url);
+     const q=params.get("q")||params.get("query");
+     if(q)target.searchParams.set("q",q);
+     location.replace(target.href);
+     return;
+   }
+   // No archive chosen: show all three equal entry choices. Never guess arXiv.
+   if(url.hash==="#discover"||url.hash==="#library")history.replaceState({},"",url.pathname);
+ }
+ // A deep-linked search must not silently choose arXiv. Carry the query
+ // to each of the three equal archive choices and let the user pick a source.
+ const pending=params.get("q")||params.get("query");
+ if(pending){
+   document.querySelectorAll(".axiovo-archive-card[data-archive]").forEach(card=>{
+     const href=new URL(card.getAttribute("href"),location.href);
+     href.searchParams.set("q",pending.slice(0,300));
+     card.href=href.href;
+   });
  }
  const videoSlot=document.getElementById("axiovo-entry-demo-slot");
  const existingVideo=document.querySelector(".hero .rl-home-demo");

@@ -177,18 +177,18 @@ def narration(folder):
 def main():
     OUT.mkdir(parents=True,exist_ok=True)
     images=[frame(i) for i in range(len(SCENES))]
-    images[0].save(OUT/"researchlens-tour-poster.jpg",quality=87,optimize=True)
+    images[0].save(OUT/"axiovo-tour-poster.jpg",quality=87,optimize=True)
     captions=["WEBVTT",""]
     for i,(_,_,sentence) in enumerate(SCENES):
         captions.extend([timestamp(i*SECONDS)+" --> "+timestamp((i+1)*SECONDS-.1),sentence,""])
-    (OUT/"researchlens-tour.vtt").write_text("\n".join(captions),encoding="utf-8")
+    (OUT/"axiovo-tour.vtt").write_text("\n".join(captions),encoding="utf-8")
     with tempfile.TemporaryDirectory() as folder:
         audio=narration(folder)
         cmd=["ffmpeg","-y","-hide_banner","-loglevel","error","-f","rawvideo","-pix_fmt","rgb24","-s","960x540","-r",str(FPS),"-i","-"]
         if audio:cmd+=["-i",str(audio)]
         cmd+=["-c:v","libx264","-preset","veryfast","-crf","28","-pix_fmt","yuv420p","-movflags","+faststart"]
         if audio:cmd+=["-c:a","aac","-b:a","64k","-shortest"]
-        cmd.append(str(OUT/"researchlens-tour.mp4"))
+        cmd.append(str(OUT/"axiovo-tour.mp4"))
         proc=subprocess.Popen(cmd,stdin=subprocess.PIPE,stderr=subprocess.PIPE)
         for i in range(len(images)):
             for t in range(FPS*SECONDS):
@@ -201,7 +201,7 @@ def main():
                 proc.stdin.write(im.tobytes())
         proc.stdin.close();error=proc.stderr.read().decode(errors="replace")
         if proc.wait():raise RuntimeError("Video encoding failed: "+error[-1000:])
-    assert (OUT/"researchlens-tour.mp4").stat().st_size>10000
+    assert (OUT/"axiovo-tour.mp4").stat().st_size>10000
     print("Axiovo MP4, poster and captions created")
 
 if __name__=="__main__":main()

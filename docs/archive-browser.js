@@ -291,6 +291,8 @@ async function search(){
  render();
 }
 async function init(){
+ const deepLink=new URLSearchParams(location.search).get("q");
+ if(deepLink)state.query=deepLink.slice(0,300);
  const cat=definition.groups;
  if(!cat[Number(state.topic)])state.topic=0;
  if(!group().areas[Number(state.field)])state.field=0;

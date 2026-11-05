@@ -36,12 +36,14 @@ def main():
     assert p.locator("#archive-results").is_visible()
     assert p.locator("#archive-sort option").count()==3
     assert p.locator("#archive-scope option").count()==2
+    p.locator(".axiovo-edit-fields > summary").click()
     p.locator("#archive-custom").fill("Synthetic instrumentation")
     p.locator("#archive-custom-form button[type=submit]").click()
     assert p.locator("#archive-subfield").input_value()=="Synthetic instrumentation"
     p.reload(wait_until="domcontentloaded")
     p.locator("#archive-subfield").wait_for()
     assert p.locator("#archive-subfield").input_value()=="Synthetic instrumentation"
+    p.locator(".axiovo-edit-fields > summary").click()
     p.locator("#archive-reset").click()
     assert p.locator("#archive-subfield").input_value()==""
     assert p.locator("#archive-result-count").is_visible()

@@ -11,7 +11,7 @@ from urllib.parse import unquote, urlsplit
 import sys
 
 ROOT = Path(__file__).resolve().parents[1] / "docs"
-GENERATED = ("feeds/", "assets/researchlens-tour")
+GENERATED = ("feeds/", "assets/axiovo-tour")
 SKIP_SCHEMES = ("mailto:", "tel:", "javascript:", "data:")
 
 class Links(HTMLParser):

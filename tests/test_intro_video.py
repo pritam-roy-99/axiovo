@@ -27,8 +27,8 @@ class IntroVideoTests(unittest.TestCase):
         self.assertEqual(len(parser.videos),1)
         self.assertIn("controls",parser.videos[0])
         self.assertNotIn("autoplay",parser.videos[0])
-        self.assertEqual(parser.videos[0].get("poster"),"./assets/researchlens-tour-poster.jpg")
-        self.assertTrue(any(x.get("src")=="./assets/researchlens-tour.mp4" for x in parser.sources))
+        self.assertEqual(parser.videos[0].get("poster"),"./assets/axiovo-tour-poster.jpg")
+        self.assertTrue(any(x.get("src")=="./assets/axiovo-tour.mp4" for x in parser.sources))
         self.assertTrue(any(x.get("kind")=="captions" and x.get("srclang")=="en" for x in parser.tracks))
         self.assertIn("Read video transcript",html)
         self.assertIn("Find papers",html)
@@ -43,7 +43,7 @@ class IntroVideoTests(unittest.TestCase):
         self.assertIn("sync_playwright()",source)
         self.assertIn("page.screenshot(",source)
         self.assertIn("SCENES = [",source)
-        self.assertIn("researchlens-tour.mp4",source)
+        self.assertIn("axiovo-tour.mp4",source)
         self.assertNotIn("What does Axiovo mean?",source)
 
 if __name__=="__main__":

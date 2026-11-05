@@ -224,12 +224,12 @@ def audio_narration(folder):
 
 def build_video(images):
     OUT.mkdir(parents=True, exist_ok=True)
-    compose(images[0], 0, 0.0).save(OUT / "researchlens-tour-poster.jpg", quality=88, optimize=True)
+    compose(images[0], 0, 0.0).save(OUT / "axiovo-tour-poster.jpg", quality=88, optimize=True)
     captions = ["WEBVTT", ""]
     for i, (_, _, narration) in enumerate(SCENES):
         captions += [timecode(i * DURATION) + " --> " + timecode((i + 1) * DURATION - 0.08),
                      narration, ""]
-    (OUT / "researchlens-tour.vtt").write_text("\n".join(captions), encoding="utf-8")
+    (OUT / "axiovo-tour.vtt").write_text("\n".join(captions), encoding="utf-8")
     with tempfile.TemporaryDirectory() as folder:
         audio = audio_narration(folder)
         cmd = ["ffmpeg", "-y", "-hide_banner", "-loglevel", "error", "-f", "rawvideo",
@@ -240,7 +240,7 @@ def build_video(images):
                 "-movflags", "+faststart"]
         if audio:
             cmd += ["-c:a", "aac", "-b:a", "64k", "-shortest"]
-        cmd.append(str(OUT / "researchlens-tour.mp4"))
+        cmd.append(str(OUT / "axiovo-tour.mp4"))
         process = subprocess.Popen(cmd, stdin=subprocess.PIPE, stderr=subprocess.PIPE)
         for i, screenshot in enumerate(images):
             for t in range(FPS * DURATION):
@@ -254,7 +254,7 @@ def build_video(images):
         err = process.stderr.read().decode(errors="replace")
         if process.wait() != 0:
             raise RuntimeError("ffmpeg video generation failed: " + err[-900:])
-    if (OUT / "researchlens-tour.mp4").stat().st_size < 15000:
+    if (OUT / "axiovo-tour.mp4").stat().st_size < 15000:
         raise RuntimeError("Video asset is unexpectedly small")
 
 
