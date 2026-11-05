@@ -35,7 +35,7 @@ class UnifiedFocusTests(unittest.TestCase):
   self.assertIn('window.addEventListener("researchlens:focus-change"',explorer)
   self.assertIn('state.query=state.areaSelected?(newSubtopic||newTopic):"";',explorer)
   discover=(ROOT/"discover.js").read_text(encoding="utf8")
-  self.assertIn('show("scholarly")',discover)
+  self.assertIn('chemrxiv',discover)
  def test_legacy_sections_invisible(self):
   css=(ROOT/"discover.css").read_text(encoding="utf8")
   self.assertIn('#arxiv-legacy-focus,.rl-scholar-legacy-focus{display:none!important}',css)
