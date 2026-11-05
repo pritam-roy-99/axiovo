@@ -7,12 +7,12 @@
   const mark=document.createElement("span");mark.className="rl-logo-mark";mark.textContent="A";
   logo.append(mark,document.createTextNode(" Axiovo"));
   const nav=document.createElement("nav");nav.className="rl-nav";nav.setAttribute("aria-label","Main navigation");
-  const links=[["./#discover","Discover"],["./#workspace","Library"],["./copilot.html","Research AI"]];
+  const links=[["./discover.html#discover","Discover"],["./discover.html#workspace","Library"],["./copilot.html","Research AI"]];
   const file=location.pathname.split("/").pop()||"index.html";
   for(const [href,label] of links){
    const a=document.createElement("a");a.href=href;a.textContent=label;
-   const target=href.startsWith("./#")?"index.html":href.slice(2);
-   if(file===target&&(!href.includes("#")||location.hash===href.slice(2)))a.setAttribute("aria-current","page");
+   const target=href.split("#")[0].slice(2);
+   if(file===target&&(!href.includes("#")||location.hash===href.slice(href.indexOf("#"))))a.setAttribute("aria-current","page");
    nav.append(a);
   }
   const settings=document.createElement("a");settings.href="./profiles.html";settings.className="rl-settings-link";
