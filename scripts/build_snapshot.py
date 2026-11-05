@@ -48,8 +48,11 @@ def first_paint(data):
 def build():
     feed=json.loads(FEED.read_text(encoding="utf-8"))
     html=HTML.read_text(encoding="utf-8")
+    if html.count(START)==0 and html.count(END)==0:
+        print("Axiovo homepage is archive-first; skipping legacy arXiv feed snapshot injection")
+        return
     if html.count(START)!=1 or html.count(END)!=1:
-        raise ValueError("Missing or duplicate snapshot template markers")
+        raise ValueError("Incomplete or duplicate snapshot template markers")
     before,rest=html.split(START,1)
     _,after=rest.split(END,1)
     html=before+START+first_paint(feed)+END+after
