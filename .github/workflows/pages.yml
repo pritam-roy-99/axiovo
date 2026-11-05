@@ -153,6 +153,10 @@ jobs:
           echo '### arXiv synchronization failed' >> "$GITHUB_STEP_SUMMARY"
           echo 'The previous feed is preserved. Check the refresh step logs and retry.' >> "$GITHUB_STEP_SUMMARY"
           echo '::warning::Could not refresh arXiv data. Existing records are preserved.'
+      - name: Test normalized source schema and coverage accounting
+        run: python -m unittest discover -s tests -p test_normalized_index.py -v
+      - name: Build verified monthly source metadata shards
+        run: python -m scripts.build_normalized_index
       - name: Audit internal routes and HTML assets
         id: audit_internal_routes_and_html_assets
         continue-on-error: true
@@ -170,7 +174,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docs/data/feed.json docs/data/biorxiv.json docs/data/chemrxiv.json docs/data/arxiv-days/ docs/data/oai-recent.json docs/data/announcements.json
+          git add docs/data/feed.json docs/data/biorxiv.json docs/data/chemrxiv.json docs/data/arxiv-days/ docs/data/oai-recent.json docs/data/announcements.json docs/data/index/v1/
           if ! git diff --cached --quiet; then
             git commit -m "data: refresh arXiv index [skip ci]"
             git fetch origin main
