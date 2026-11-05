@@ -17,15 +17,15 @@ function route(){
   return;
  }
  if(url.hash==="#workspace"||url.hash==="#library"){
-  location.replace(new URL("./discover.html#workspace",url).href);
+  location.replace(new URL("./workspace.html",url).href);
   return;
  }
  const globalSearch=["q","query","from","to","sort","author","date"].some(k=>params.has(k));
  if(globalSearch||params.get("view")==="scholarly"){
-  const target=new URL("./discover.html",url);
+  const target=new URL("./arxiv.html",url);
   target.search=url.search;
-  target.searchParams.set("view","scholarly");
-  target.hash="#discover";
+  target.searchParams.delete("view");
+  target.hash="";
   location.replace(target.href);
  }
 }
