@@ -1,0 +1,12 @@
+
+/* Main research workflow: quiet, paper-first, SciRate-like reading modes */
+body.axiovo-discover .axiovo-reading-modes{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 5px;padding:3px 0}
+body.axiovo-discover .axiovo-reading-modes button{background:var(--rl-panel,#fff);color:var(--rl-text,#19354b);border:1px solid var(--rl-border,#cbdce9);border-radius:9px;padding:9px 15px;min-height:39px;font-size:12px;font-weight:700;cursor:pointer}
+body.axiovo-discover .axiovo-reading-modes button.active{background:var(--axiovo-accent,#126f9c);color:#fff;border-color:var(--axiovo-accent,#126f9c)}
+body.axiovo-discover .axiovo-reading-modes button:focus-visible{outline:3px solid var(--axiovo-accent,#126f9c);outline-offset:2px}
+body.axiovo-discover .axiovo-reading-mode-hint{font-size:11px;line-height:1.5;color:var(--rl-muted,#698195);margin:5px 0 14px}
+.axiovo-paper-detail-action{font-weight:750!important;border-color:var(--axiovo-accent,#126f9c)!important;color:var(--axiovo-accent,#126f9c)!important}
+.axiovo-collection-controls{display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap}
+.axiovo-collection-controls select,.rl-entry-tools select{min-height:38px;border:1px solid var(--rl-border,#c8dce9);border-radius:8px;background:var(--rl-panel,#fff);color:var(--rl-text,#19354b);padding:8px 10px}
+.axiovo-collection-controls .rl-button{padding:9px 12px;font-size:12px}
+@media(max-width:540px){.axiovo-reading-modes button{flex:1 1 calc(50% - 8px)}.axiovo-collection-controls{width:100%}.axiovo-collection-controls select{flex:1 1 100%}}
