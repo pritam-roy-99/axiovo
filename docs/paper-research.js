@@ -43,7 +43,7 @@ function mount(){
  const notes=panel("Private reading notes");notes.id="axiovo-paper-notes";
  const saved=read(BASE,{});const meta=saved[key()]||{};
  const status=make("select");status.setAttribute("aria-label","Reading status");
- for(const [value,label] of [["to-read","To read"],["reading","Reading"],["done","Reviewed"]]){const opt=make("option",label);opt.value=value;status.append(opt)}
+ for(const [value,label] of [["to-read","To read"],["reading","Reading"],["done","Reviewed"],["cited","Cited"]]){const opt=make("option",label);opt.value=value;status.append(opt)}
  status.value=meta.status||"to-read";
  const textarea=make("textarea");textarea.rows=5;textarea.maxLength=12000;textarea.placeholder="Record the claim, assumptions, method, limitations, or questions to verify.";textarea.value=meta.note||"";textarea.setAttribute("aria-label","Private paper notes");
  const feedback=make("p","Saved locally in this browser","muted");feedback.setAttribute("role","status");
