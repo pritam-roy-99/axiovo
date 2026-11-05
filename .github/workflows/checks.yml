@@ -1,4 +1,4 @@
-name: Validate proposed ResearchLens changes
+name: Validate proposed Axiovo changes
 on:
   pull_request:
   push:
@@ -49,7 +49,8 @@ jobs:
       - name: Unified discovery focus selection tests
         run: node tests/focus-bar.test.js
       - name: Test rate-limited arXiv fallback
-        run: node tests/cached-arxiv-search.test.js
+        run: |
+          node tests/cached-arxiv-search.test.js
           node tests/arxiv-daily-archive.test.js
       - name: Build homepage video preview
         run: |
@@ -57,12 +58,12 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y -qq ffmpeg espeak-ng
           python scripts/build_intro_video.py
-          ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1 docs/assets/researchlens-tour.mp4
-          test -s docs/assets/researchlens-tour-poster.jpg
-          test -s docs/assets/researchlens-tour.vtt
+          ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1 docs/assets/axiovo-tour.mp4
+          test -s docs/assets/axiovo-tour-poster.jpg
+          test -s docs/assets/axiovo-tour.vtt
 
   browser-smoke:
-    name: Smoke test ResearchLens in Chromium
+    name: Smoke test Axiovo in Chromium
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -74,8 +75,8 @@ jobs:
         run: |
           npm install --no-save --ignore-scripts playwright@1.56.1
           npx playwright install --with-deps chromium
-      - name: Run local ResearchLens browser walkthrough
+      - name: Run local Axiovo browser walkthrough
         run: |
-          python3 -m http.server 8765 --directory docs >/tmp/researchlens-server.log 2>&1 &
+          python3 -m http.server 8765 --directory docs >/tmp/axiovo-server.log 2>&1 &
           sleep 2
           node tests/site-browser-smoke.cjs
