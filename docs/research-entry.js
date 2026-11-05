@@ -9,10 +9,14 @@ function enter(){
  const isHome=location.pathname.endsWith("/")||location.pathname.endsWith("/index.html");
  if(!isHome)return;
  const legacyHash=["#discover","#workspace","#library"].includes(current.hash);
- const legacyView=new URLSearchParams(location.search).get("view");
- if(legacyHash||legacyView==="scholarly"||legacyView==="arxiv"||legacyView==="discover"){
+ const params=new URLSearchParams(location.search);
+ const legacyView=params.get("view");
+ const carriesSearch=["q","query","from","to","sort","author","date"].some(key=>params.has(key));
+ if(legacyHash||carriesSearch||["scholarly","arxiv","discover","biorxiv"].includes(legacyView)){
   const next=new URL("./discover.html",location.href);
-  next.search=current.search;next.hash=current.hash||"#discover";
+  next.search=current.search;
+  if(carriesSearch&&!legacyView&&!params.has("id"))next.searchParams.set("view","scholarly");
+  next.hash=current.hash||"#discover";
   location.replace(next.href);
   return;
  }
