@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run ResearchLens locally with only Python's standard library.
+"""Run Axiovo locally with only Python's standard library.
 
 Usage: python3 run.py [--port 8000] [--no-browser]
 """
@@ -83,14 +83,14 @@ class LocalHandler(SimpleHTTPRequestHandler):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Run ResearchLens locally")
+    parser = argparse.ArgumentParser(description="Run Axiovo locally")
     parser.add_argument("--port", type=int, default=0, help="Local port (default: choose a free port)")
     parser.add_argument("--no-browser", action="store_true", help="Don't open browser automatically")
     args = parser.parse_args()
     handler = partial(LocalHandler, directory=str(ROOT))
     server = ThreadingHTTPServer(("127.0.0.1", args.port), handler)
     url = f"http://127.0.0.1:{server.server_address[1]}/"
-    print(f"ResearchLens is running at {url}")
+    print(f"Axiovo is running at {url}")
     print("Press Ctrl+C to stop. External paper search requires internet.")
     print("Optional Consensus API: "+("enabled" if os.getenv("CONSENSUS_API_KEY") else "not configured")+" (server-side key only).")
     if not args.no_browser:
