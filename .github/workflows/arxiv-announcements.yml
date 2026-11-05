@@ -13,6 +13,8 @@ on:
     - cron: '37 9,15,21 * * 1-5'
 permissions:
   contents: write
+  pages: write
+  id-token: write
 concurrency:
   group: axiovo-announcement-harvest
   cancel-in-progress: false
@@ -20,6 +22,9 @@ jobs:
   harvest:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -52,3 +57,12 @@ jobs:
             git rebase -X theirs origin/main
             git push origin HEAD:main
           fi
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+      - name: Package Axiovo with updated arXiv announcements
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs
+      - name: Deploy refreshed Axiovo pages
+        id: deployment
+        uses: actions/deploy-pages@v4
