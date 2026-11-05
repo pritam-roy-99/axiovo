@@ -43,6 +43,7 @@ def main():
     p.reload(wait_until="domcontentloaded")
     p.locator("#archive-subfield").wait_for()
     assert p.locator("#archive-subfield").input_value()=="Synthetic instrumentation"
+    p.locator(".axiovo-edit-fields > summary").click()
     p.locator("#archive-reset").click()
     assert p.locator("#archive-subfield").input_value()==""
     assert p.locator("#archive-result-count").is_visible()
