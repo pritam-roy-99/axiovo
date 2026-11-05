@@ -412,6 +412,10 @@ $("download-evidence").onclick=downloadEvidence;
 
 
 document.querySelectorAll(".mode").forEach(b=>b.onclick=()=>updateMode(b.dataset.mode));
+$("hosted-provider").onchange=hostedProviderChange;
+$("hosted-key").addEventListener("input",()=>{hostedKey=$("hosted-key").value});
+$("clear-hosted-key").onclick=()=>{hostedKey="";$("hosted-key").value="";status("Hosted API key cleared from this page.")};
+window.addEventListener("pagehide",()=>{hostedKey="";$("hosted-key").value=""});
 $("engine").onchange=engineChange;$("test-ollama").onclick=checkOllama;$("detect-models").onclick=detectOllamaModels;$("load-browser").onclick=loadBrowserModel;
 $("ask").onclick=()=>submit(false);$("search-openalex").onclick=globalSearch;
 $("new-chat").onclick=()=>{history=[];sources=[];renderSources();$("conversation").replaceChildren();message("assistant","New conversation. Enter a research question or abstract to retrieve source-linked literature.");$("question").value="";$("draft").value="";rstatus("No search performed.")};
