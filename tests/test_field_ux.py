@@ -17,7 +17,7 @@ class Elements(HTMLParser):
 class DiscoveryUXTests(unittest.TestCase):
     def test_workspace_before_discover(self):
         nav=(ROOT/"navigation.js").read_text(encoding="utf8")
-        self.assertLess(nav.index('["./#discover","Discover"]'),nav.index('["./#workspace","Library"]'))
+        self.assertLess(nav.index('["./discover.html#discover","Discover"]'),nav.index('["./discover.html#workspace","Library"]'))
 
     def test_one_ai_entry_on_paper_cards(self):
         html=(ROOT/"index.html").read_text(encoding="utf8")
