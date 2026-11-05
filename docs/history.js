@@ -8,9 +8,9 @@
 if(document.body.classList.contains("axiovo-home"))return;
 const $=id=>document.getElementById(id);
 const PAGE_SIZE=25;
-const Arxiv=window.ResearchLensArxiv;
+const Arxiv=window.AxiovoArxiv;
 const ARXIV_SOURCE="S4306400194";
-const Cache=window.ResearchLensCachedArxiv,Other=window.AxiovoMultiSource,Daily=window.AxiovoDailyArchive;
+const Cache=window.AxiovoCachedArxiv,Other=window.AxiovoMultiSource,Daily=window.AxiovoDailyArchive;
 let dailyResult=null,dailySignature="";
 let page=1,found=0,loading=false,controller=null,active=false,lastRequest=null;
 const btn=$("all-arxiv"),back=$("back-local"),view=$("history-view"),feed=$("local-feed-view");
@@ -45,7 +45,7 @@ function action(parent,label,url,variant=""){
  return a
 }
 function saveVersion(button,requested){
- const key="researchlens-reading-list";
+ const key="axiovo-reading-list";
  let ids=[];try{ids=JSON.parse(localStorage.getItem(key)||"[]")}catch{}
  if(!Array.isArray(ids))ids=[];
  const isSaved=ids.includes(requested);
@@ -54,7 +54,7 @@ function saveVersion(button,requested){
  button.textContent=isSaved?"☆ Save paper":"✓ Saved";
  button.setAttribute("aria-pressed",String(!isSaved));
  button.classList.toggle("saved",!isSaved);
- window.dispatchEvent(new Event("researchlens-library-change"));
+ window.dispatchEvent(new Event("axiovo-library-change"));
 }
 function bibtex(p){
  const key=("arxiv"+(p.arxiv||p.id||"").replace(/[^a-z0-9]/gi,"")).slice(0,90);
@@ -93,7 +93,7 @@ function paperCard(w){
  action(row,"PDF",Arxiv.pdf(linked.base));
  action(row,"Research Assistant","./copilot.html?id="+encodeURIComponent(linked.base),"assistant");
  const selected=()=>linked.base+(version.value?"v"+version.value:"");
- const ids=(()=>{try{return JSON.parse(localStorage.getItem("researchlens-reading-list")||"[]")}catch{return []}})();
+ const ids=(()=>{try{return JSON.parse(localStorage.getItem("axiovo-reading-list")||"[]")}catch{return []}})();
  const isSaved=Array.isArray(ids)&&ids.includes(linked.base);
  const save=el("button",isSaved?"✓ Saved":"☆ Save paper","rl-paper-action"+(isSaved?" saved":""));
  save.type="button";save.setAttribute("aria-pressed",String(isSaved));save.setAttribute("aria-label","Save arXiv paper to reading list");
@@ -262,5 +262,5 @@ if(coverage){
   })
   .catch(()=>{coverage.textContent="Verified date coverage currently unavailable."});
 }
-window.ResearchLensHistorySearch={search};
+window.AxiovoHistorySearch={search};
 })();
