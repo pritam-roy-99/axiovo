@@ -70,6 +70,15 @@ jobs:
           echo '### bioRxiv metadata synchronization failed' >> "$GITHUB_STEP_SUMMARY"
           echo 'No live bioRxiv results were available. Cached records are preserved, if any.' >> "$GITHUB_STEP_SUMMARY"
           echo '::warning::bioRxiv synchronization unsuccessful; review diagnostics in logs.'
+      - name: Harvest every arXiv first submission for selected UTC days
+        if: github.event_name != 'push'
+        id: daily_archive
+        continue-on-error: true
+        run: python -m scripts.arxiv_daily_archive
+      - name: Report incomplete daily archive coverage
+        if: steps.daily_archive.outcome == 'failure'
+        run: |
+          echo '::warning::Complete daily archive harvesting was unavailable; earlier verified day shards remain.'
       - name: Refresh research metadata
         if: github.event_name != 'push'
         id: refresh
@@ -81,15 +90,6 @@ jobs:
           echo '### arXiv synchronization failed' >> "$GITHUB_STEP_SUMMARY"
           echo 'The previous feed is preserved. Check the refresh step logs and retry.' >> "$GITHUB_STEP_SUMMARY"
           echo '::warning::Could not refresh arXiv data. Existing records are preserved.'
-      - name: Harvest every arXiv first submission for selected UTC days
-        if: github.event_name != 'push'
-        id: daily_archive
-        continue-on-error: true
-        run: python -m scripts.arxiv_daily_archive
-      - name: Report incomplete daily archive coverage
-        if: steps.daily_archive.outcome == 'failure'
-        run: |
-          echo '::warning::Complete daily archive harvesting was unavailable; earlier verified day shards remain.'
       - name: Audit internal routes and HTML assets
         run: python scripts/audit_internal_links.py
       - name: Optional citation metadata enrichment
