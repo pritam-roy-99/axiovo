@@ -1,0 +1,16 @@
+"use strict";
+const assert=require("node:assert/strict");
+const Library=require("../docs/library-outside-cache.js");
+const Citation=require("../docs/zotero-ris.js");
+const papers=[{id:"2608.13942",title:"Known paper",authors:["Scientist One"],published:"2026-08-01"}];
+const saved=["2608.13942","2507.18744","2608.13942v2","2507.18744","invalid","javascript:evil"];
+assert.deepEqual(Library.missing(saved,papers),["2507.18744","2608.13942v2"]);
+assert.equal(Library.source("2507.18744"),"https://arxiv.org/abs/2507.18744");
+assert.throws(()=>Library.source("javascript:evil"));
+const records=Library.exportRecords(saved,papers);
+assert.equal(records.length,3);
+assert.equal(records.find(x=>x.id==="2507.18744").title,"arXiv:2507.18744 (metadata not in local index)");
+const ris=records.map(Citation.ris).join("\r\n\r\n");
+assert.deepEqual(Citation.parseRIS(ris),["2608.13942","2507.18744","2608.13942v2"]);
+assert.deepEqual(Library.exportRecords(["2507.18744v2"],papers).map(x=>x.id),["2507.18744v2"]);
+console.log("Library retains and exports saved arXiv identifiers absent from limited cache");
