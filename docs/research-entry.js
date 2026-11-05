@@ -29,6 +29,16 @@ function enter(){
    // No archive chosen: show all three equal entry choices. Never guess arXiv.
    if(url.hash==="#discover"||url.hash==="#library")history.replaceState({},"",url.pathname);
  }
+ // A deep-linked search must not silently choose arXiv. Carry the query
+ // to each of the three equal archive choices and let the user pick a source.
+ const pending=params.get("q")||params.get("query");
+ if(pending){
+   document.querySelectorAll(".axiovo-archive-card[data-archive]").forEach(card=>{
+     const href=new URL(card.getAttribute("href"),location.href);
+     href.searchParams.set("q",pending.slice(0,300));
+     card.href=href.href;
+   });
+ }
  const videoSlot=document.getElementById("axiovo-entry-demo-slot");
  const existingVideo=document.querySelector(".hero .rl-home-demo");
  if(videoSlot&&existingVideo)videoSlot.append(existingVideo);
