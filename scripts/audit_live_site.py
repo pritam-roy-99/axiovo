@@ -23,8 +23,15 @@ def check(page,path):
     try:
         response=page.goto(url,wait_until="domcontentloaded",timeout=35000)
         page.wait_for_timeout(350)
-        status=response.status if response else 0
-        if not response or status>=400:failures.append(f"HTTP {status} {url}")
+        # Playwright returns None for same-document fragment navigation; that is
+        # normal browser behavior, not HTTP 0 or a missing page.
+        if response is None:
+            if urlsplit(page.url)._replace(fragment="") != urlsplit(url)._replace(fragment=""):
+                failures.append(f"Unexpected same-document navigation {url} -> {page.url}")
+            status="same-document"
+        else:
+            status=response.status
+            if status>=400:failures.append(f"HTTP {status} {url}")
         title=page.title()
         if not title:failures.append(f"Missing title {url}")
         if page.locator("body").count()==0:failures.append(f"Missing body {url}")
@@ -78,7 +85,7 @@ def main():
             if url in visited:continue
             visited.add(url)
             try:
-                r=page.request.get(url,timeout=20000)
+                r=page.request.get(url.split("#",1)[0],timeout=20000)
                 if r.status>=400:failures.append(f"BROKEN INTERNAL LINK HTTP {r.status} {url}")
                 note(f"LINK {r.status} {url}")
             except Exception as exc:failures.append(f"BROKEN LINK {url} {str(exc)[:140]}")
