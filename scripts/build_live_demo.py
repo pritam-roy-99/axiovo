@@ -29,28 +29,20 @@ OUT = DOCS / "assets"
 W, H, FPS, DURATION = 960, 540, 8, 7
 
 SCENES = [
-    ("Axiovo", "A clear place to start your research.",
-     "Welcome to Axiovo, where research discovery begins with a simple choice."),
-    ("Choose a discipline", "Select your broad research field.",
-     "Choose a broad research field, then enter Discover to refine your interests."),
-    ("Discover your subfield", "Research areas and specialized topics.",
-     "Inside Discover, narrow your field to research areas and specific subtopics."),
-    ("Latest arXiv", "Find recent papers with the right source information.",
-     "Browse the indexed arXiv feed and check the source of each paper."),
-    ("Explore literature", "Search beyond the daily feed.",
-     "Explore wider literature and filter results by your research question."),
-    ("Paper details", "Abstracts, version links and related research.",
-     "Open a paper workspace for its abstract, version links and research connections."),
-    ("Private notes", "Keep your research questions alongside each paper.",
-     "Write private notes and track which papers you have reviewed."),
-    ("Compare papers", "Source-linked side-by-side research review.",
-     "Compare two papers and your notes, then inspect their original sources."),
-    ("My Library", "Projects, collections and reading progress.",
-     "Organize saved papers into collections, and keep your research projects together."),
-    ("Research Assistant", "Evidence-linked analysis and multi-paper comparison.",
-     "Open Research Assistant with both papers and inspect source linked comparisons."),
-    ("Research Tools", "Additional tools when you need them.",
-     "Explore PDF reading, citations and focused research tools."),
+ ("Three equal archives","Start with arXiv, bioRxiv or ChemRxiv.","Choose one of three equal research preprint archives."),
+ ("arXiv","Explore physical sciences, mathematics and computing.","Open arXiv for its own indexed scientific papers."),
+ ("Research focus","Choose your field, research area and subtopic.","Refine your field and specialized research interests inside Discover."),
+ ("arXiv papers","Read and save source-linked original papers.","Browse real arXiv records and check their original versions."),
+ ("bioRxiv","A dedicated home for biology preprints.","Switch to bioRxiv for its independent life science preprints."),
+ ("bioRxiv topics","Refine your biological interests.","Choose a biology topic and look through verified metadata."),
+ ("ChemRxiv","An equal home for chemistry preprints.","Explore ChemRxiv through verified preprint DOI records."),
+ ("ChemRxiv coverage","Honest record availability, without invented papers.","Check the ChemRxiv data source and coverage information."),
+ ("Wider search","Optional literature search beyond source feeds.","Search wider literature separately from the three archives."),
+ ("Paper details","Read abstracts and original version links.","Open a full research workspace for a selected paper."),
+ ("Paper comparison","Examine two indexed papers side by side.","Compare indexed papers and check the original sources."),
+ ("My Library","Organize reading, notes, and collections.","Save papers and research projects in your private library."),
+ ("Research Assistant","Ask questions grounded in paper sources.","Use Research Assistant for careful evidence linked questions."),
+ ("Research Tools","Extra tools for advanced research.","Access PDF reading, citation tools, and comparisons.")
 ]
 BG = (9, 30, 52)
 FOREGROUND = (243, 248, 253)
@@ -110,95 +102,60 @@ def open_page(page, url):
 
 def capture(browser, base):
     page=browser.new_page(viewport={"width":1280,"height":720},device_scale_factor=1)
-    page.set_default_timeout(11000)
+    page.set_default_timeout(13000)
     screenshots=[]
     def snap(name):
         shot=Image.open(io.BytesIO(page.screenshot(type="png",animations="disabled")))
         screenshots.append(shot.convert("RGB").resize((W,H),Image.Resampling.LANCZOS))
         print("Captured Axiovo:",name,"|",page.url,flush=True)
-
+    def switch(archive):
+        page.locator("#rl-source-"+archive).click(timeout=11000)
+        page.wait_for_url(lambda url:"archive="+archive in url,timeout=16000)
     open_page(page,base)
-    page.locator("#axiovo-entry-form").wait_for(state="visible")
-    snap("homepage")
-
-    page.select_option("#axiovo-entry-field","quantum")
-    snap("broad field")
-    page.locator("#axiovo-entry-form button[type=submit]").click()
-    page.wait_for_url("**/discover.html#discover",timeout=16000)
+    page.locator(".axiovo-archive-card").first.wait_for()
+    snap("three archive homepage")
+    page.locator('[data-archive="arxiv"]').click()
+    page.wait_for_url("**/discover.html?archive=arxiv#discover")
+    snap("arxiv")
     safe_scroll(page,"#rl-focus-bar")
-    snap("subfields in Discover")
-
-    safe_click(page,"#rl-source-arxiv")
-    safe_scroll(page,".axiovo-reading-modes")
-    snap("arxiv discovery")
-
+    snap("field area subtopic")
+    safe_scroll(page,"#local-feed-view")
+    snap("arxiv papers")
+    switch("biorxiv")
+    safe_scroll(page,"#biorxiv-discovery")
+    snap("biorxiv")
+    safe_scroll(page,"#rl-focus-bar")
+    snap("biology research areas")
+    switch("chemrxiv")
+    safe_scroll(page,"#chemrxiv-discovery")
+    snap("chemrxiv")
+    safe_scroll(page,"#axiovo-chemrxiv-status")
+    snap("chemrxiv coverage")
+    switch("arxiv")
     safe_click(page,"#rl-source-scholarly")
+    page.locator("#scholarly-discovery").wait_for(state="visible")
     safe_scroll(page,"#scholarly-discovery")
-    snap("literature search")
-
+    snap("wider literature")
     safe_click(page,"#rl-source-arxiv")
-    paper_id=""
-    second_id=""
-    try:
-        paper=page.locator("#papers .paper").first
-        paper.wait_for(timeout=13000)
-        paper_id=paper.get_attribute("data-paper-id") or ""
-        if page.locator("#papers .paper").count()>1:
-            second_id=page.locator("#papers .paper").nth(1).get_attribute("data-paper-id") or ""
-        paper.locator('a.axiovo-paper-detail-action').click(timeout=7000)
-        page.wait_for_url("**/paper.html?*",timeout=13000)
-    except Exception as e:
-        if not paper_id:
-            raise RuntimeError("Cannot capture paper detail without a real indexed paper") from e
-        open_page(page,base+"paper.html?id="+paper_id)
-    page.locator("#axiovo-versions").wait_for(timeout=12000)
-    page.wait_for_function("document.getElementById('save')?.onclick !== null",timeout=13000)
-    safe_click(page,"#save")
-    safe_scroll(page,"#axiovo-versions")
-    snap("paper research details")
-
-    safe_scroll(page,"#axiovo-paper-notes")
-    try:
-        note=page.locator("#axiovo-paper-notes textarea")
-        note.fill("Review the assumptions and verify the original proof.")
-        note.blur()
-    except Exception:pass
-    snap("private research notes")
-
-    # Use two genuinely indexed records, not a fictitious metadata example.
-    if not second_id:raise RuntimeError("Second indexed arXiv paper missing from live feed")
-    open_page(page,base+"compare.html?ids="+paper_id+","+second_id)
-    page.locator(".axiovo-compare-paper").first.wait_for(timeout=11000)
-    snap("source-linked comparison")
-
+    page.locator("#papers .paper").first.wait_for(timeout=14000)
+    first=page.locator("#papers .paper").first.get_attribute("data-paper-id")
+    second=page.locator("#papers .paper").nth(1).get_attribute("data-paper-id")
+    if not first or not second or first==second:raise RuntimeError("Need two source-indexed papers for the demo")
+    open_page(page,base+"paper.html?id="+first)
+    page.locator("#axiovo-versions").wait_for()
+    snap("paper details")
+    open_page(page,base+"compare.html?ids="+first+","+second)
+    page.locator(".axiovo-compare-paper").first.wait_for()
+    snap("comparison")
     open_page(page,base+"discover.html#workspace")
     page.locator("#workspace-panel #library-list").wait_for(timeout=15000)
-    try:
-        create=page.locator("#workspace-panel .axiovo-collection-controls button")
-        create.wait_for(timeout=10000)
-        page.once("dialog",lambda dialog:dialog.accept("Demo reading list"))
-        create.click()
-        page.locator("#axiovo-collection-filter").select_option("all")
-        paper=page.locator("#workspace-panel #library-list .rl-paper").first
-        choice=paper.locator('select[aria-label^="Assign"]')
-        if choice.count():choice.select_option(label="Demo reading list")
-    except Exception as exc:
-        print("Collection demo unavailable:",str(exc)[:160],flush=True)
-    safe_scroll(page,"#library-heading")
-    snap("Library and collections")
-
-    open_page(page,base+"copilot.html?ids="+paper_id+","+second_id)
-    page.locator("#comparison-paper").wait_for(timeout=13000)
-    safe_scroll(page,"#paper-compare-fields")
-    snap("paper research assistant")
-
+    snap("library")
+    open_page(page,base+"copilot.html?ids="+first+","+second)
+    snap("research assistant")
     open_page(page,base+"lab.html")
-    safe_scroll(page,"main")
     snap("research tools")
-
     page.close()
-    if len(screenshots)!=len(SCENES):
-        raise RuntimeError("Incomplete tour: "+str(len(screenshots))+" of "+str(len(SCENES)))
+    if len(screenshots)!=len(SCENES):raise RuntimeError("Incomplete capture")
     return screenshots
 
 def timecode(seconds):
