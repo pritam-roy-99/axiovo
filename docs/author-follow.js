@@ -9,7 +9,7 @@
  if(root)root.AxiovoAuthorFollow=api;
 })(typeof window!=="undefined"?window:null,function(){
  "use strict";
- const KEY="researchlens-author-follows";
+ const KEY="axiovo-author-follows";
  function list(){
   try{const v=JSON.parse(localStorage.getItem(KEY)||"[]");return Array.isArray(v)?v.filter(x=>typeof x==="string").slice(0,1000):[]}catch{return []}
  }
