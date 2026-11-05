@@ -1,0 +1,54 @@
+name: Synchronize official arXiv announcements
+on:
+  push:
+    branches: [main]
+    paths:
+      - scripts/arxiv_announcements.py
+      - .github/workflows/arxiv-announcements.yml
+  workflow_dispatch:
+  schedule:
+    # Frequent post-announcement and overnight RSS checks, UTC.
+    # arXiv's RSS snapshot is usually refreshed at midnight Eastern.
+    - cron: '12 4,5,6,7 * * 1-5'
+    - cron: '37 9,15,21 * * 1-5'
+permissions:
+  contents: write
+concurrency:
+  group: axiovo-announcement-harvest
+  cancel-in-progress: false
+jobs:
+  harvest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Harvest latest official arXiv announcement records
+        run: python -m scripts.arxiv_announcements
+      - name: Check announcement JSON integrity
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p = Path("docs/data/announcements.json")
+          j = json.loads(p.read_text())
+          assert j["date_type"] == "announcement"
+          assert j["count"] == len(j["papers"]) > 0
+          assert len(set(x["id"] for x in j["papers"])) == j["count"]
+          print("Verified", j["announcement_date"], j["count"], "papers, complete =", j["complete"])
+          PY
+      - name: Commit new announcement snapshot and trigger Pages deployment
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add docs/data/announcements.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'data: publish latest official arXiv announcements'
+            git fetch origin main
+            git rebase -X theirs origin/main
+            git push origin HEAD:main
+          fi
