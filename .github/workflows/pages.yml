@@ -223,28 +223,8 @@ jobs:
         if: always()
         run: |
           echo 'Browser checks: full ${{ steps.smoke_full.outcome }}, archives ${{ steps.smoke_archives.outcome }}' >> "$GITHUB_STEP_SUMMARY"
-      - name: Verify homepage video plays and has valid streams
-        run: |
-          test -s docs/assets/axiovo-tour.mp4
-          test -s docs/assets/axiovo-tour-poster.svg
-          test -s docs/assets/axiovo-tour.vtt
-          python - <<'PY'
-          from pathlib import Path
-          import subprocess
-          mp4 = Path("docs/assets/axiovo-tour.mp4")
-          size = mp4.stat().st_size
-          if size < 15000:
-              raise SystemExit(f"Tour MP4 unexpectedly small: {size} bytes")
-          check = subprocess.run(
-              ["ffprobe", "-v", "error", "-show_entries",
-               "stream=codec_name,codec_type", "-of", "csv=p=0", str(mp4)],
-              capture_output=True, text=True, check=True
-          )
-          streams = check.stdout
-          if "h264" not in streams or "video" not in streams:
-              raise SystemExit(f"Tour MP4 has no playable H.264 video: {streams!r}")
-          print(f"Verified Axiovo MP4: {size:,} bytes, {streams.strip()}")
-          PY
+      - name: Verify published website links and new tour bundle
+        run: python scripts/audit_internal_links.py --built
       - name: Build Atom topic subscriptions
         id: atom_feeds
         continue-on-error: true
