@@ -47,8 +47,8 @@ SCENES = [
      "Compare two papers and your notes, then inspect their original sources."),
     ("My Library", "Projects, collections and reading progress.",
      "Organize saved papers into collections, and keep your research projects together."),
-    ("Research Assistant", "Ask questions in the context of a paper.",
-     "Use Research Assistant to examine a selected paper and its cited evidence."),
+    ("Research Assistant", "Evidence-linked analysis and multi-paper comparison.",
+     "Open Research Assistant with both papers and inspect source linked comparisons."),
     ("Research Tools", "Additional tools when you need them.",
      "Explore PDF reading, citations and focused research tools."),
 ]
@@ -187,8 +187,9 @@ def capture(browser, base):
     safe_scroll(page,"#library-heading")
     snap("Library and collections")
 
-    open_page(page,base+"copilot.html?id="+paper_id)
-    safe_scroll(page,"main")
+    open_page(page,base+"copilot.html?ids="+paper_id+","+second_id)
+    page.locator("#comparison-paper").wait_for(timeout=13000)
+    safe_scroll(page,"#paper-compare-fields")
     snap("paper research assistant")
 
     open_page(page,base+"lab.html")
