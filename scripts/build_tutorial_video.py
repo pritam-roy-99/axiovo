@@ -64,6 +64,27 @@ def cue(t):
     ms=round(t*1000)
     return f"{ms//3600000:02}:{ms//60000%60:02}:{ms//1000%60:02}.{ms%1000:03}"
 
+
+def voice_text(value):
+    """Pronunciation hints for technical words in spoken text only."""
+    return (value.replace("Axiovo","Ax-ee-oh-voh")
+      .replace("bioRxiv","bio archive").replace("ChemRxiv","chem archive")
+      .replace("arXiv","archive").replace("DOI","D O I")
+      .replace("Ollama","Oh llama").replace("Qwen","Q wen")
+      .replace("Kimi","Kee mee").replace("OpenRouter","Open Router")
+      .replace("WebGPU","Web G P U"))
+
+async def neural_speech(text,path):
+    import edge_tts
+    speaker=edge_tts.Communicate(voice_text(text),voice="en-IN-NeerjaNeural",rate="-7%",pitch="+4Hz")
+    await speaker.save(str(path))
+
+def media_duration(path):
+    return float(subprocess.check_output([
+        "ffprobe","-v","error","-show_entries","format=duration",
+        "-of","default=noprint_wrappers=1:nokey=1",str(path)
+    ],text=True).strip())
+
 def main():
     OUT.mkdir(parents=True,exist_ok=True)
     server=ThreadingHTTPServer(("127.0.0.1",0),functools.partial(Quiet,directory=str(DOCS)))
@@ -109,6 +130,7 @@ def main():
             video_entries=[]
             audio_entries=[]
             captions=["WEBVTT",""]
+            voices_used=set()
             elapsed=0.0
             with sync_playwright() as p:
                 browser=p.chromium.launch(headless=True,args=["--no-sandbox","--disable-dev-shm-usage"])
@@ -134,10 +156,17 @@ def main():
                     shot=work/f"{index:02d}.png"
                     page.screenshot(path=str(shot))
                     stamp(shot,title,hint,index,target)
-                    sound=work/f"{index:02d}.wav"
-                    subprocess.run(["espeak-ng","-s","140","-w",str(sound),narration],check=True)
-                    with wave.open(str(sound),"rb") as file:
-                        duration=file.getnframes()/file.getframerate()+1.2
+                    sound=work/f"{index:02d}.mp3"
+                    try:
+                        asyncio.run(neural_speech(narration,sound))
+                        voice="Neerja neural Indian English"
+                    except Exception as exc:
+                        print(f"WARNING: Neural Indian voice unavailable for scene {index}: {exc}",flush=True)
+                        sound=work/f"{index:02d}.wav"
+                        subprocess.run(["espeak-ng","-v","en+f3","-s","138","-w",str(sound),voice_text(narration)],check=True)
+                        voice="eSpeak female fallback"
+                    voices_used.add(voice)
+                    duration=media_duration(sound)+1.2
                     video_entries.extend([f"file '{shot.as_posix()}'",f"duration {duration:.3f}"])
                     audio_entries.append(f"file '{sound.as_posix()}'")
                     captions.extend([f"{cue(elapsed)} --> {cue(elapsed+duration-0.2)}",narration,""])
@@ -157,6 +186,10 @@ def main():
                 "-af","apad","-shortest","-movflags","+faststart",str(output)
             ],check=True)
             (OUT/"axiovo-tour.vtt").write_text("\n".join(captions)+"\n",encoding="utf-8")
+            (OUT/"axiovo-tour-build.json").write_text(json.dumps({
+                "scenes":len(steps),"duration_seconds":round(elapsed,1),"voices":sorted(voices_used),
+                "source":"Real Chromium page captures","pronunciation":"Spoken-word technical corrections"
+            },indent=2),encoding="utf-8")
             print(f"Axiovo tutorial recorded from actual pages: {len(steps)} steps, ~{elapsed:.0f} seconds, {output.stat().st_size} bytes",flush=True)
     finally:
         server.shutdown()
