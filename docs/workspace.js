@@ -10,7 +10,7 @@ const fieldPrefs=()=>{
  try{const p=JSON.parse(localStorage.getItem("researchlens-field-explorer-v1")||"{}");return p&&typeof p==="object"?p:{}}catch{return{}}};
 function read(key,fallback){try{return JSON.parse(localStorage.getItem(key)||"null")??fallback}catch{return fallback}}
 function write(key,data){try{localStorage.setItem(key,JSON.stringify(data));return true}catch{return false}}
-const statuses=new Set(["to-read","reading","done"]);
+const statuses=new Set(["to-read","reading","done"]); // done means reviewed in existing saved data
 let metadata=read(META_KEY,{});if(!metadata||typeof metadata!=="object"||Array.isArray(metadata))metadata={};
 let lookup=new Map(),recent=[],storedFeed=[];
 const paperKey=w=>w.key||w.arxiv_id&&"arxiv:"+w.arxiv_id||w.id&&"openalex:"+w.id||"";
@@ -32,7 +32,7 @@ function bib(p){const a=(p.authors||[]).join(" and ").replace(/[{}]/g,"");const 
 function fillFocus(){const p=fieldPrefs();const names={general:"All research disciplines",quantum:"Quantum information & physics",statmech:"Statistical mechanics",condmat:"Condensed matter physics",highenergy:"High-energy physics & particle physics",mathematics:"Mathematics",astrophysics:"Astronomy & astrophysics",computer:"Computer science & AI",biology:"Biology & bioinformatics",medicine:"Medicine & public health",chemistry:"Chemistry & materials",engineering:"Engineering & robotics",social:"Social sciences & economics"};const label=names[p.field]||"Choose your research field";$("focus-name").textContent=label;const API=window.ResearchLensInterests;const followed=API?.get(read(API.KEY,{}),p.field||"general",p.topic||"")||[];$("focus-summary").textContent=(p.subtopic?"Current interest: "+p.topic+" / "+p.subtopic+". ":p.topic?"Current area: "+p.topic+". ":"Choose a field and area in Discover. ")+(followed.length?"Following: "+followed.slice(0,3).join(", ")+(followed.length>3?" and more.":"."):"Star specialized interests in Discover to personalize recommendations.");}
 function paperCard(p){const art=document.createElement("article");art.className="rl-paper";const h=document.createElement("h3");const a=document.createElement("a");a.href=p.url;a.textContent=p.title;a.target="_blank";a.rel="noopener noreferrer";h.append(a);art.append(h);
 text(art,"p",(p.authors||[]).slice(0,4).join(", ")+(p.authors?.length>4?" et al.":"")+(p.date?" · "+p.date.slice(0,10):""),"rl-paper-meta");
-const r=text(art,"div","","rl-paper-actions");link(r,"Read on arXiv",p.url);
+const r=text(art,"div","","rl-paper-actions");if(p.arxiv_id){const detail=document.createElement("a");detail.href="./paper.html?id="+encodeURIComponent(p.arxiv_id);detail.textContent="Paper details";detail.className="rl-paper-primary";r.append(detail)}link(r,"Read on arXiv",p.url);
 if(p.arxiv_id){const cop=document.createElement("a");cop.href="./copilot.html?id="+encodeURIComponent(p.arxiv_id);cop.textContent="Research Assistant";r.append(cop)}
 return art}
 function showRecent(){const root=$("recent-list");if(!root)return;root.replaceChildren();const p=fieldPrefs();const query=String(p.subtopic||p.topic||"").trim().toLowerCase();let pick=storedFeed.slice().sort((a,b)=>String(b.published||"").localeCompare(String(a.published||"")));
@@ -48,7 +48,7 @@ if(!filtered.length){text(root,"div",papers.length?"No saved papers match these 
 for(const p of filtered.slice(0,50)){
  const art=paperCard(p);const row=text(art,"div","","rl-entry-tools");
  const select=document.createElement("select");select.setAttribute("aria-label","Reading status for "+p.title);
- for(const [v,t] of [["to-read","To read"],["reading","Reading"],["done","Finished"]]){const opt=document.createElement("option");opt.value=v;opt.textContent=t;select.append(opt)}
+ for(const [v,t] of [["to-read","To read"],["reading","Reading"],["done","Reviewed"]]){const opt=document.createElement("option");opt.value=v;opt.textContent=t;select.append(opt)}
  select.value=statuses.has(metadata[p.key]?.status)?metadata[p.key].status:"to-read";
  select.onchange=()=>{saveMeta(p.key,{status:select.value});if(status!=="all")renderLibrary()};
  const note=document.createElement("textarea");note.rows=2;note.maxLength=2000;note.placeholder="Private reading note, e.g. check Theorem 2";note.setAttribute("aria-label","Private note for "+p.title);note.value=metadata[p.key]?.note||"";
