@@ -14,6 +14,16 @@ const clean=x=>String(x??"").trim();
 const simple=x=>clean(x).toLowerCase().normalize("NFKD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9\s.\/-]/g," ").replace(/\s+/g," ");
 const make=(tag,cls,value)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(value!==undefined)e.textContent=value;return e};
 let state=read(memory,{topic:0,field:0,subfield:"",query:"",author:"",affiliation:"",scope:"subfield",sort:"relevance",from:"",to:""});
+const linkedQuery=new URLSearchParams(location.search);
+if(linkedQuery.has("q")||linkedQuery.has("query")){
+ state.query=(linkedQuery.get("q")||linkedQuery.get("query")||"").slice(0,220);
+ state.scope="all";
+}
+for(const fieldName of ["author","from","to"]){
+ if(linkedQuery.has(fieldName))state[fieldName]=(linkedQuery.get(fieldName)||"").slice(0,120);
+}
+if(["recent","relevance","cited"].includes(linkedQuery.get("sort")))state.sort=linkedQuery.get("sort");
+
 let custom=read(customKey,{}),localPapers=[],shown=[],allResults=[],page=0,lastSync="",requestSeq=0;
 const responseCache=new Map();
 const group=()=>definition.groups[Number(state.topic)]||definition.groups[0];
