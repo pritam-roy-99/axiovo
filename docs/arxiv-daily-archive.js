@@ -40,11 +40,16 @@
   if(!q)return true;
   const id=String(p.id||"").toLowerCase();
   if(q===id||q===id+"v"+p.version)return true;
-  const text=[p.title,p.abstract,(p.authors||[]).join(" "),id].join(" ").toLowerCase();
-  // A full author name or exact title fragment takes precedence over keywords.
-  if(text.includes(q))return true;
+  const metadata=[p.title,p.abstract,id].join(" ").toLowerCase();
+  const normalizeName=value=>String(value||"").normalize("NFKD").replace(/[\u0300-\u036f]/g,"")
+   .toLowerCase().replace(/[^a-z0-9]+/g," ").trim();
+  const names=(Array.isArray(p.authors)?p.authors:[]).map(normalizeName);
+  const authorQuery=normalizeName(query);
+  if(names.includes(authorQuery))return true;
+  if(metadata.includes(q))return true;
   const terms=q.split(/\s+/).filter(x=>x.length>=2);
-  return terms.length>0&&terms.every(term=>text.includes(term));
+  return terms.length>0&&(terms.every(term=>metadata.includes(term))||
+   names.some(name=>{const words=name.split(" ");return terms.every(term=>words.includes(term))}));
  }
  function filterAndSort(papers,query,category,sort="new"){
   const ids=new Map();

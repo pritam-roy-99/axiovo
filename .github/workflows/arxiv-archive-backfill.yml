@@ -23,6 +23,7 @@ jobs:
   backfill:
     name: Harvest all arXiv first submissions for verified UTC dates
     runs-on: ubuntu-latest
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
