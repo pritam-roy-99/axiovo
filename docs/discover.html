@@ -44,7 +44,7 @@ dialog{border:0;border-radius:13px;box-shadow:0 20px 90px #061e3977;width:min(74
 .hero{padding:32px 24px}.hero h1{font-size:clamp(29px,3.8vw,42px)}@media(max-width:550px){.hero{padding:28px 18px}.hero a{margin:6px 4px 0 0!important}}
 
 .rl-unified-switch{max-width:1190px;margin:0 auto 18px;display:flex;gap:8px;flex-wrap:wrap}.rl-unified-switch a{display:inline-flex;padding:11px 17px;background:var(--rl-panel,#fff);color:var(--rl-text,#17324b);border:1px solid #97b8ce;border-radius:12px;font-weight:750;font-size:14px;text-decoration:none}.rl-unified-switch a[aria-current="page"]{background:#0f6090;color:#fff;border-color:#0f6090}#workspace-panel[hidden],#discover-shell[hidden]{display:none!important}#workspace-panel{max-width:1190px;margin:auto;padding:0}.rl-unified-switch a:focus-visible{outline:3px solid #49abdc;outline-offset:2px}
-</style><link rel="manifest" href="./manifest.webmanifest"><meta name="theme-color" content="#0b2239"><link rel="icon" type="image/svg+xml" href="./icons/researchlens.svg"><script defer src="./pwa.js"></script></head><body class="axiovo-discover">
+</style><link rel="manifest" href="./manifest.webmanifest"><meta name="theme-color" content="#0b2239"><link rel="icon" type="image/svg+xml" href="./icons/axiovo.svg"><script defer src="./pwa.js"></script></head><body class="axiovo-discover">
 <header><div class="brand"><span>L</span>Axiovo</div><a href="https://github.com/pritam-roy-99/axiovo" target="_blank" rel="noopener noreferrer">Source on GitHub ↗</a><a class="ai-nav" href="./copilot.html">✦ Research Assistant</a><a class="toolbar-link" href="./copilot.html">AI Lab</a><a class="toolbar-link" href="./discover.html?view=scholarly#discover">Explore by field</a><a class="toolbar-link" href="./discover.html?view=scholarly#discover">Global search</a><a class="toolbar-link" href="./methodology.html">Methodology</a><a class="toolbar-link" href="./profiles.html">My profile</a></header>
 <div class="hero"><div class="rl-home-hero-grid">
 <section class="rl-home-hero-copy" aria-labelledby="rl-home-title">
@@ -204,18 +204,18 @@ Your browser cannot play this video. Read the transcript below to explore the fe
 })();
 
 "use strict";const el=id=>document.getElementById(id);let all=[],saved=[],authorFollows=[],savedOnly=false,activeTopic="",page=0,pageSize=30,topicCatalog=[],followed=[],followingOnly=false,read=[],hidden=[],selectedRow=0,lastVisit=0,rendered=[];
-try{saved=JSON.parse(localStorage.getItem("researchlens-reading-list")||"[]");if(!Array.isArray(saved))saved=[]}catch(e){saved=[]}
-try{followed=JSON.parse(localStorage.getItem("researchlens-followed-topics")||"[]");if(!Array.isArray(followed))followed=[]}catch(e){followed=[]}
-try{authorFollows=JSON.parse(localStorage.getItem("researchlens-author-follows")||"[]");if(!Array.isArray(authorFollows))authorFollows=[]}catch(e){authorFollows=[]}
+try{saved=JSON.parse(localStorage.getItem("axiovo-reading-list")||"[]");if(!Array.isArray(saved))saved=[]}catch(e){saved=[]}
+try{followed=JSON.parse(localStorage.getItem("axiovo-followed-topics")||"[]");if(!Array.isArray(followed))followed=[]}catch(e){followed=[]}
+try{authorFollows=JSON.parse(localStorage.getItem("axiovo-author-follows")||"[]");if(!Array.isArray(authorFollows))authorFollows=[]}catch(e){authorFollows=[]}
 const feedback=window.AxiovoLocalFeedback;
 function localRatings(){return feedback?.load(localStorage)||{}}
 function sameAuthor(p){return (p.authors||[]).some(x=>authorFollows.includes(x))}
 
-try{read=JSON.parse(localStorage.getItem("researchlens-read")||"[]");hidden=JSON.parse(localStorage.getItem("researchlens-hidden")||"[]");lastVisit=Number(localStorage.getItem("researchlens-last-visit")||"0");if(!Array.isArray(read))read=[];if(!Array.isArray(hidden))hidden=[]}catch(e){read=[];hidden=[]}
-function persistState(){try{localStorage.setItem("researchlens-read",JSON.stringify(read));localStorage.setItem("researchlens-hidden",JSON.stringify(hidden));localStorage.setItem("researchlens-last-visit",String(Date.now()))}catch(e){}}
+try{read=JSON.parse(localStorage.getItem("axiovo-read")||"[]");hidden=JSON.parse(localStorage.getItem("axiovo-hidden")||"[]");lastVisit=Number(localStorage.getItem("axiovo-last-visit")||"0");if(!Array.isArray(read))read=[];if(!Array.isArray(hidden))hidden=[]}catch(e){read=[];hidden=[]}
+function persistState(){try{localStorage.setItem("axiovo-read",JSON.stringify(read));localStorage.setItem("axiovo-hidden",JSON.stringify(hidden));localStorage.setItem("axiovo-last-visit",String(Date.now()))}catch(e){}}
 function updateFollowing(){const rss=el("feed-link");if(rss){rss.href="./feeds/"+(activeTopic||"all")+".xml";rss.textContent="Subscribe to "+(activeTopic?"this topic":"all papers")+" ↗"}const chosen=topicCatalog.find(x=>x.id===activeTopic);el("follow-topic").disabled=!activeTopic;el("follow-topic").textContent=chosen?(followed.includes(activeTopic)?"★ Unfollow "+chosen.label:"☆ Follow "+chosen.label):"☆ Select a topic to follow";el("following-only").textContent=followingOnly?"Show all topics":"Show followed topics";el("follow-label").textContent=followed.length+" followed topic"+(followed.length===1?"":"s")+" · stored in this browser"}
-window.addEventListener("axiovo:author-follow-change",()=>{try{authorFollows=JSON.parse(localStorage.getItem("researchlens-author-follows")||"[]")}catch{authorFollows=[]}showRecommendations()});
-function saveFollowing(){try{localStorage.setItem("researchlens-followed-topics",JSON.stringify(followed))}catch(e){}updateFollowing()}
+window.addEventListener("axiovo:author-follow-change",()=>{try{authorFollows=JSON.parse(localStorage.getItem("axiovo-author-follows")||"[]")}catch{authorFollows=[]}showRecommendations()});
+function saveFollowing(){try{localStorage.setItem("axiovo-followed-topics",JSON.stringify(followed))}catch(e){}updateFollowing()}
 function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 function fmt(d){const n=new Date(d);return isNaN(n.getTime())?"Unknown":n.toLocaleDateString(undefined,{year:"numeric",month:"short",day:"numeric"})}
 function tok(s){return new Set((String(s||"").toLowerCase().match(/[a-z]{4,}/g)||[]))}
@@ -250,7 +250,7 @@ if((p.abstract||"").length>650){
  more.append(summary,full);d.append(more);
 }
 const r=document.createElement("div");r.className="rl-paper-actionbar";const detail=document.createElement("a");detail.className="rl-paper-action axiovo-paper-detail-action";detail.href="./paper.html?id="+encodeURIComponent(p.id);detail.textContent="Paper details";r.append(detail);const a=document.createElement("a");a.className="rl-paper-action primary";a.href="https://arxiv.org/abs/"+encodeURIComponent(p.id);a.target="_blank";a.rel="noopener noreferrer";a.textContent="Read on arXiv ↗";r.append(a);
-const saveButton=btn(saved.includes(p.id)?"Saved":"Save paper",()=>{saved=saved.includes(p.id)?saved.filter(x=>x!==p.id):[...saved,p.id];try{localStorage.setItem("researchlens-reading-list",JSON.stringify(saved))}catch(e){}window.dispatchEvent(new Event("researchlens-library-change"));showRecommendations();render()});
+const saveButton=btn(saved.includes(p.id)?"Saved":"Save paper",()=>{saved=saved.includes(p.id)?saved.filter(x=>x!==p.id):[...saved,p.id];try{localStorage.setItem("axiovo-reading-list",JSON.stringify(saved))}catch(e){}window.dispatchEvent(new Event("axiovo-library-change"));showRecommendations();render()});
 saveButton.className="rl-save-button rl-paper-action"+(saved.includes(p.id)?" is-saved":"");
 saveButton.setAttribute("aria-pressed",String(saved.includes(p.id)));
 saveButton.setAttribute("aria-label",(saved.includes(p.id)?"Remove from reading list: ":"Save to reading list: ")+p.title);
@@ -299,8 +299,8 @@ el("count").textContent=arr.length+" of "+all.length+" papers";el("saved").textC
    const source=document.createElement("a");source.href=window.AxiovoLibraryOutsideCache.source(id);source.target="_blank";source.rel="noopener noreferrer";source.textContent="Open on arXiv ↗";
    const remove=btn("Remove from reading list",()=>{
     saved=saved.filter(value=>value!==id);
-    try{localStorage.setItem("researchlens-reading-list",JSON.stringify(saved))}catch{}
-    window.dispatchEvent(new Event("researchlens-library-change"));showRecommendations();render()
+    try{localStorage.setItem("axiovo-reading-list",JSON.stringify(saved))}catch{}
+    window.dispatchEvent(new Event("axiovo-library-change"));showRecommendations();render()
    });
    item.append(heading,source,remove);root.append(item)
   }
@@ -311,7 +311,7 @@ function detail(p){const root=el("content");root.replaceChildren();const h=docum
 const extsearch=document.createElement("a");extsearch.href="https://www.semanticscholar.org/search?q="+encodeURIComponent(p.title)+"&sort=relevance";extsearch.target="_blank";extsearch.rel="noopener noreferrer";extsearch.textContent="Search this title and related literature on Semantic Scholar ↗";root.append(extsearch);const guide=document.createElement("p");guide.innerHTML='<strong>External literature and citation search:</strong> <a href="https://openalex.org/" target="_blank" rel="noopener noreferrer">OpenAlex ↗</a> · <a href="https://www.semanticscholar.org/" target="_blank" rel="noopener noreferrer">Semantic Scholar ↗</a>. The local shortlist below is a separate lexical preview.';root.append(guide);if(p.openalex_id){const a=document.createElement("a");a.href=p.openalex_id;a.target="_blank";a.rel="noopener noreferrer";a.textContent="Open citation record ↗";root.append(a)}const matches=all.filter(x=>x.id!==p.id).map(x=>({p:x,s:sim(p,x)})).filter(x=>x.s>0).sort((a,b)=>b.s-a.s).slice(0,7);
 for(const x of matches){const d=document.createElement("div");d.className="related";const a=document.createElement("a");a.textContent=x.p.title;a.href="https://arxiv.org/abs/"+encodeURIComponent(x.p.id);a.target="_blank";a.rel="noopener noreferrer";const t=document.createElement("small");t.textContent=fmt(x.p.published)+" · lexical score "+x.s.toFixed(2)+" (not a novelty score)";d.append(a,t);root.append(d)}if(!matches.length){const p=document.createElement("p");p.textContent="No overlaps detected in this limited index. That does not establish novelty.";root.append(p)}const w=document.createElement("p");w.className="warning";w.textContent="These are research leads only. Compare the full theorems, assumptions, proofs and citation history before making any judgment.";root.append(w);el("detail").showModal();if(window.MathJax?.typesetPromise)window.MathJax.typesetPromise([root]).catch(()=>{})}
 
-function exportJSON(){const data={version:1,exported_at:new Date().toISOString(),saved,read,hidden,followed,authorFollows};const url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:"application/json"}));const a=document.createElement("a");a.href=url;a.download="researchlens-data.json";a.click();URL.revokeObjectURL(url)}
+function exportJSON(){const data={version:1,exported_at:new Date().toISOString(),saved,read,hidden,followed,authorFollows};const url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:"application/json"}));const a=document.createElement("a");a.href=url;a.download="axiovo-data.json";a.click();URL.revokeObjectURL(url)}
 el("export-json").onclick=exportJSON;
 el("export-ris").onclick=()=>{const items=window.AxiovoLibraryOutsideCache?.exportRecords(saved,all)||[];if(!items.length){alert("Your reading list is empty.");return}const ris=items.map(p=>window.AxiovoCitation.ris(p)).join("\r\n\r\n");window.AxiovoCitation.download("axiovo-reading-list.ris",ris)};
 
@@ -323,37 +323,37 @@ el("ris-file").onchange=async event=>{
   const ids=window.AxiovoCitation?.parseRIS(await file.text())||[];
   if(!ids.length)throw Error("No arXiv identifiers in RIS file. Only identifiable arXiv records can be imported safely.");
   saved=[...new Set([...saved,...ids])].slice(0,10000);
-  localStorage.setItem("researchlens-reading-list",JSON.stringify(saved));
-  window.dispatchEvent(new Event("researchlens-library-change"));
+  localStorage.setItem("axiovo-reading-list",JSON.stringify(saved));
+  window.dispatchEvent(new Event("axiovo-library-change"));
   showRecommendations();render();
   alert("Imported "+ids.length+" Zotero RIS arXiv identifiers. Existing saved papers were preserved.");
  }catch(e){alert("RIS import failed: "+String(e.message||e))}
  finally{event.target.value=""}
 };
 el("import-json").onclick=()=>el("import-file").click();
-el("import-file").onchange=async e=>{try{const file=e.target.files?.[0];if(!file)return;if(file.size>2e6)throw Error("File too large");const data=JSON.parse(await file.text());if(data.version!==1)throw Error("Unrecognized format");for(const field of ["saved","read","hidden","followed"])if(!Array.isArray(data[field])||!data[field].every(x=>typeof x==="string"))throw Error("Invalid "+field);saved=[...new Set(data.saved)].slice(0,10000);read=[...new Set(data.read)].slice(0,10000);hidden=[...new Set(data.hidden)].slice(0,10000);followed=[...new Set(data.followed)].slice(0,100);authorFollows=Array.isArray(data.authorFollows)?data.authorFollows.filter(x=>typeof x==="string").slice(0,1000):[];localStorage.setItem("researchlens-author-follows",JSON.stringify(authorFollows));localStorage.setItem("researchlens-reading-list",JSON.stringify(saved));saveFollowing();persistState();showRecommendations();render();alert("Reading and topic settings imported successfully")}catch(err){alert("Import failed: "+String(err.message||err))}finally{e.target.value=""}};
-document.addEventListener("keydown",e=>{if(e.altKey||e.ctrlKey||e.metaKey||["INPUT","TEXTAREA","SELECT"].includes(document.activeElement?.tagName)||el("detail").open)return;const k=e.key.toLowerCase();if(["j","k"].includes(k)){e.preventDefault();selectedRow=Math.max(0,Math.min(rendered.length-1,selectedRow+(k==="j"?1:-1)));const cards=[...el("papers").querySelectorAll(".paper")];cards.forEach((x,i)=>x.classList.toggle("current",i===selectedRow));cards[selectedRow]?.scrollIntoView({block:"nearest",behavior:"smooth"});return}const p=rendered[selectedRow];if(!p)return;if(k==="s"){saved=saved.includes(p.id)?saved.filter(id=>id!==p.id):[...saved,p.id];localStorage.setItem("researchlens-reading-list",JSON.stringify(saved));render()}if(k==="r"){read=read.includes(p.id)?read.filter(id=>id!==p.id):[...read,p.id];persistState();render()}if(k==="h"){hidden=[...new Set([...hidden,p.id])];persistState();render()}if(k==="enter"){window.open("https://arxiv.org/abs/"+encodeURIComponent(p.id),"_blank","noopener,noreferrer")}});
+el("import-file").onchange=async e=>{try{const file=e.target.files?.[0];if(!file)return;if(file.size>2e6)throw Error("File too large");const data=JSON.parse(await file.text());if(data.version!==1)throw Error("Unrecognized format");for(const field of ["saved","read","hidden","followed"])if(!Array.isArray(data[field])||!data[field].every(x=>typeof x==="string"))throw Error("Invalid "+field);saved=[...new Set(data.saved)].slice(0,10000);read=[...new Set(data.read)].slice(0,10000);hidden=[...new Set(data.hidden)].slice(0,10000);followed=[...new Set(data.followed)].slice(0,100);authorFollows=Array.isArray(data.authorFollows)?data.authorFollows.filter(x=>typeof x==="string").slice(0,1000):[];localStorage.setItem("axiovo-author-follows",JSON.stringify(authorFollows));localStorage.setItem("axiovo-reading-list",JSON.stringify(saved));saveFollowing();persistState();showRecommendations();render();alert("Reading and topic settings imported successfully")}catch(err){alert("Import failed: "+String(err.message||err))}finally{e.target.value=""}};
+document.addEventListener("keydown",e=>{if(e.altKey||e.ctrlKey||e.metaKey||["INPUT","TEXTAREA","SELECT"].includes(document.activeElement?.tagName)||el("detail").open)return;const k=e.key.toLowerCase();if(["j","k"].includes(k)){e.preventDefault();selectedRow=Math.max(0,Math.min(rendered.length-1,selectedRow+(k==="j"?1:-1)));const cards=[...el("papers").querySelectorAll(".paper")];cards.forEach((x,i)=>x.classList.toggle("current",i===selectedRow));cards[selectedRow]?.scrollIntoView({block:"nearest",behavior:"smooth"});return}const p=rendered[selectedRow];if(!p)return;if(k==="s"){saved=saved.includes(p.id)?saved.filter(id=>id!==p.id):[...saved,p.id];localStorage.setItem("axiovo-reading-list",JSON.stringify(saved));render()}if(k==="r"){read=read.includes(p.id)?read.filter(id=>id!==p.id):[...read,p.id];persistState();render()}if(k==="h"){hidden=[...new Set([...hidden,p.id])];persistState();render()}if(k==="enter"){window.open("https://arxiv.org/abs/"+encodeURIComponent(p.id),"_blank","noopener,noreferrer")}});
 
 el("close").onclick=()=>el("detail").close();el("show-recommendations").onclick=()=>{el("order").value="recommended";page=0;render()};el("savedOnly").onclick=()=>{savedOnly=!savedOnly;page=0;el("savedOnly").textContent=savedOnly?"Show all papers":"Show reading list";render()};
 el("follow-topic").onclick=()=>{if(!activeTopic)return;followed=followed.includes(activeTopic)?followed.filter(t=>t!==activeTopic):[...followed,activeTopic];saveFollowing();showRecommendations();page=0;render()};
 el("following-only").onclick=()=>{followingOnly=!followingOnly;page=0;updateFollowing();render()};
-el("export-bib").onclick=()=>{const selected=window.AxiovoLibraryOutsideCache?.exportRecords(saved,all)||[];if(!selected.length){alert("Your reading list is empty.");return}const bib=selected.map(p=>{const y=(p.published||"").slice(0,4);return "@misc{arxiv"+p.id.replace(/[^A-Za-z0-9]/g,"")+",\n  title={"+p.title.replace(/[{}]/g,"")+"},\n  author={"+(p.authors||[]).join(" and ")+"},\n  year={"+y+"},\n  eprint={"+p.id+"},\n  archivePrefix={arXiv},\n  url={https://arxiv.org/abs/"+p.id+"}\n}"}).join("\n\n");const blob=new Blob([bib],{type:"text/plain;charset=utf-8"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="researchlens-reading-list.bib";document.body.append(a);a.click();a.remove();URL.revokeObjectURL(url)};
+el("export-bib").onclick=()=>{const selected=window.AxiovoLibraryOutsideCache?.exportRecords(saved,all)||[];if(!selected.length){alert("Your reading list is empty.");return}const bib=selected.map(p=>{const y=(p.published||"").slice(0,4);return "@misc{arxiv"+p.id.replace(/[^A-Za-z0-9]/g,"")+",\n  title={"+p.title.replace(/[{}]/g,"")+"},\n  author={"+(p.authors||[]).join(" and ")+"},\n  year={"+y+"},\n  eprint={"+p.id+"},\n  archivePrefix={arXiv},\n  url={https://arxiv.org/abs/"+p.id+"}\n}"}).join("\n\n");const blob=new Blob([bib],{type:"text/plain;charset=utf-8"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="axiovo-reading-list.bib";document.body.append(a);a.click();a.remove();URL.revokeObjectURL(url)};
 
 function updateArchiveLink(){/* Historical queries now render within this page. */}
-for(const id of ["date-from","date-to"])el(id).addEventListener("change",()=>{page=0;render();updateArchiveLink();if(el("date-from").value&&el("date-to").value)window.ResearchLensHistorySearch?.search(1)});el("reset-dates").onclick=()=>{el("date-from").value="";el("date-to").value="";page=0;render();updateArchiveLink()};
+for(const id of ["date-from","date-to"])el(id).addEventListener("change",()=>{page=0;render();updateArchiveLink();if(el("date-from").value&&el("date-to").value)window.AxiovoHistorySearch?.search(1)});el("reset-dates").onclick=()=>{el("date-from").value="";el("date-to").value="";page=0;render();updateArchiveLink()};
 function utcDay(delta){const d=new Date(Date.now()+delta*86400000);return d.toISOString().slice(0,10)}
-el("date-today").onclick=()=>{el("date-from").value=utcDay(0);el("date-to").value=utcDay(0);page=0;render();updateArchiveLink();window.ResearchLensHistorySearch?.search(1)};
-el("date-yesterday").onclick=()=>{el("date-from").value=utcDay(-1);el("date-to").value=utcDay(-1);page=0;render();updateArchiveLink();window.ResearchLensHistorySearch?.search(1)};
-el("date-week").onclick=()=>{el("date-from").value=utcDay(-6);el("date-to").value=utcDay(0);page=0;render();updateArchiveLink();window.ResearchLensHistorySearch?.search(1)};
+el("date-today").onclick=()=>{el("date-from").value=utcDay(0);el("date-to").value=utcDay(0);page=0;render();updateArchiveLink();window.AxiovoHistorySearch?.search(1)};
+el("date-yesterday").onclick=()=>{el("date-from").value=utcDay(-1);el("date-to").value=utcDay(-1);page=0;render();updateArchiveLink();window.AxiovoHistorySearch?.search(1)};
+el("date-week").onclick=()=>{el("date-from").value=utcDay(-6);el("date-to").value=utcDay(0);page=0;render();updateArchiveLink();window.AxiovoHistorySearch?.search(1)};
 
 for(const id of ["q","category","order","crosslist-only"])el(id).addEventListener(id==="q"?"input":"change",()=>{page=0;render();updateArchiveLink()});
 {const q=new URLSearchParams(location.search).get("q");if(q)el("q").value=q.slice(0,200);if(new URLSearchParams(location.search).get("sort")==="recommended")el("order").value="recommended";updateArchiveLink()}
 // Keep the main research field synchronized with the wider scholarly explorer.
 (function connectMainField(){
- const config=window.ResearchLensFields;
+ const config=window.AxiovoFields;
  if(!config)return;
  const selector=el("arxiv-main-field");
- const stored=()=>{try{return JSON.parse(localStorage.getItem("researchlens-field-explorer-v1")||"{}")}catch{return{}}};
+ const stored=()=>{try{return JSON.parse(localStorage.getItem("axiovo-field-explorer-v1")||"{}")}catch{return{}}};
  const prefs=stored();
  for(const [key,definition] of Object.entries(config.FIELDS)){
   const choice=document.createElement("button");choice.type="button";choice.className="rl-field-choice";
@@ -370,16 +370,16 @@ for(const id of ["q","category","order","crosslist-only"])el(id).addEventListene
  selector.addEventListener("change",()=>{
   const field=config.fieldKey(selector.value),p=stored();
   p.field=field;p.topic=config.FIELDS[field].topics[0];p.subtopic="";p.query="";p.areaSelected=false;
-  try{localStorage.setItem("researchlens-field-explorer-v1",JSON.stringify(p))}catch{}
+  try{localStorage.setItem("axiovo-field-explorer-v1",JSON.stringify(p))}catch{}
   showSelected(field);
   if(field!=="general"){
    el("rl-source-scholarly").click();
-   window.dispatchEvent(new CustomEvent("researchlens:choose-field",{detail:{field}}))
+   window.dispatchEvent(new CustomEvent("axiovo:choose-field",{detail:{field}}))
   }else if(el("scholarly-discovery").hidden===false){
-   window.dispatchEvent(new CustomEvent("researchlens:choose-field",{detail:{field}}))
+   window.dispatchEvent(new CustomEvent("axiovo:choose-field",{detail:{field}}))
   }
  });
- window.addEventListener("researchlens:field-changed",e=>showSelected(e.detail?.field));
+ window.addEventListener("axiovo:field-changed",e=>showSelected(e.detail?.field));
 })();
 fetch("data/feed.json",{cache:"no-cache"}).then(r=>{if(!r.ok)throw Error("Feed unavailable");return r.json()}).then(d=>{all=(d.papers||[]).filter(p=>p&&p.id&&p.title);topicCatalog=d.topic_catalog||[];showTopics();el("updated").textContent=d.generated_at?fmt(d.generated_at):"Not yet";const dates=all.map(p=>p.published||p.updated).filter(Boolean).sort();el("coverage").textContent=all.length+" indexed papers · source v1 dates "+(dates[0]||"?").slice(0,10)+" to "+(dates.at(-1)||"?").slice(0,10)+" · synchronized "+(d.generated_at||"unknown")+" · selected arXiv categories across science and mathematics + selected historical IDs. This is not full arXiv coverage.";render();persistState()}).catch(e=>{el("count").textContent="Snapshot shown; live data refresh failed";console.error(e)});
 </script><script defer src="./announcement-view.js"></script><script defer src="./arxiv-freshness.js"></script><script defer src="./arxiv-daily-archive.js"></script><script defer src="./history.js"></script></body></html>
