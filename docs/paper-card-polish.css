@@ -306,3 +306,132 @@
  #arxiv-discovery .paper .axiovo-paper-more{margin-left:0}
  #arxiv-discovery .paper .axiovo-paper-more[open] > summary{margin-left:0}
 }
+
+/* Recommendation cards also appear inside #workspace-panel on the unified page.
+ * That container does not have the standalone .rl-workspace class.
+ */
+#research-recommendations .axiovo-rec-card{
+  min-width:0;
+  background:var(--rl-panel,#fff)!important;
+  border:1px solid var(--axiovo-paper-line)!important;
+  border-radius:12px!important;
+  padding:18px!important;
+  box-shadow:0 2px 10px rgba(17,47,75,.06)!important;
+}
+#research-recommendations .axiovo-rec-card > h3{
+  margin:2px 0 9px!important;
+  font-size:17px!important;
+  line-height:1.4!important;
+  letter-spacing:-.015em;
+  font-weight:750!important;
+}
+#research-recommendations .axiovo-rec-card > h3 a{
+  color:var(--axiovo-paper-ink)!important;
+  text-decoration:none!important;
+}
+#research-recommendations .axiovo-rec-card > h3 a:hover{
+  color:var(--axiovo-paper-accent)!important;
+  text-decoration:underline!important;
+  text-underline-offset:3px;
+}
+#research-recommendations .axiovo-rec-card > .rl-paper-meta{
+  margin:0 0 7px!important;
+  font-size:12px!important;
+  line-height:1.55;
+  color:var(--axiovo-paper-muted)!important;
+}
+#research-recommendations .axiovo-rec-card > .rl-relevance-reason{
+  display:inline-block!important;
+  padding:6px 9px!important;
+  border-radius:7px;
+  background:var(--rl-soft,#eaf2f8);
+  color:var(--axiovo-paper-accent)!important;
+  font-size:12px!important;
+  line-height:1.45;
+  margin:4px 0 8px!important;
+}
+#research-recommendations .axiovo-rec-actions{
+  display:flex!important;
+  flex-direction:row!important;
+  flex-wrap:wrap!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  gap:8px!important;
+  padding:13px 0 0!important;
+  margin:13px 0 0!important;
+  border-top:1px solid var(--axiovo-paper-line)!important;
+}
+#research-recommendations .axiovo-rec-actions > a,
+#research-recommendations .axiovo-rec-actions > button{
+  -webkit-appearance:none!important;
+  appearance:none!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  flex:0 0 auto!important;
+  min-height:40px!important;
+  margin:0!important;
+  padding:9px 13px!important;
+  background:var(--rl-panel,#fff)!important;
+  border:1px solid var(--axiovo-paper-line)!important;
+  border-radius:9px!important;
+  box-shadow:none!important;
+  text-decoration:none!important;
+  white-space:nowrap!important;
+  font-family:inherit!important;
+  font-size:12px!important;
+  line-height:1.35!important;
+  font-weight:700!important;
+  color:var(--axiovo-paper-ink)!important;
+  cursor:pointer!important;
+}
+#research-recommendations .axiovo-rec-actions > a.axiovo-rec-read{
+  color:#fff!important;
+  background:var(--axiovo-paper-accent)!important;
+  border-color:var(--axiovo-paper-accent)!important;
+}
+#research-recommendations .axiovo-rec-actions > a.axiovo-rec-assistant{
+  color:var(--axiovo-paper-accent)!important;
+  background:var(--rl-soft,#eaf2f8)!important;
+  border-color:var(--axiovo-paper-line)!important;
+}
+#research-recommendations .axiovo-rec-actions > button.axiovo-rec-save[aria-pressed="true"]{
+  background:var(--axiovo-paper-accent)!important;
+  border-color:var(--axiovo-paper-accent)!important;
+  color:#fff!important;
+}
+#research-recommendations .axiovo-rec-actions > :is(a,button):hover{
+  filter:brightness(.95);
+  box-shadow:0 2px 6px rgba(15,45,75,.10)!important;
+}
+#research-recommendations .axiovo-rec-actions > :is(a,button):focus-visible{
+  outline:3px solid var(--axiovo-paper-accent)!important;
+  outline-offset:2px!important;
+}
+#research-recommendations .axiovo-rec-actions > select{
+  flex:1 1 180px;
+  min-width:0;
+  max-width:230px!important;
+  min-height:40px!important;
+  font-size:12px!important;
+  color:var(--axiovo-paper-ink)!important;
+  border:1px solid var(--axiovo-paper-line)!important;
+  border-radius:9px!important;
+  background:var(--rl-panel,#fff)!important;
+  padding:8px 10px!important;
+}
+@media(max-width:540px){
+ #research-recommendations .axiovo-rec-card{padding:15px!important}
+ #research-recommendations .axiovo-rec-actions > a.axiovo-rec-read{
+   flex:1 1 100%!important;
+ }
+ #research-recommendations .axiovo-rec-actions > a.axiovo-rec-assistant,
+ #research-recommendations .axiovo-rec-actions > button.axiovo-rec-save{
+   flex:1 1 calc(50% - 8px)!important;
+   white-space:normal!important;
+ }
+ #research-recommendations .axiovo-rec-actions > select{
+   max-width:100%!important;
+   flex:1 1 100%;
+ }
+}
