@@ -142,9 +142,11 @@ The OAI workflow can run daily and stores at most 4,000 recently modified metada
 
 ## Homepage guided video
 
-The homepage now includes a 48-second narrated, illustrated walkthrough explaining paper discovery, field-aware search, recommendations, reading lists, PDF notes, citation links and research questions. It is **a scripted product animation**, not a recording of live interactions or a claim that an AI video model generated live screenshots. The video uses accessible native browser controls, English captions (WebVTT), a poster image, a text transcript and no autoplay.
+The homepage starts with a narrated **54-second illustrated feature tour** and then three equally prominent links to the independent arXiv, bioRxiv and ChemRxiv Discover pages. The video explains current features: official archive subject categories, customizable subfields, source-specific paper searches, date/author filters, locally saved reading lists, PDF reading and comparison, and the optional Research Assistant. It illustrates the interface; it is **not** a browser recording or a claim of complete historical search coverage.
 
-The source is `scripts/build_intro_video.py`. GitHub Actions generates `docs/assets/axiovo-tour.mp4`, the poster and captions during deployment, then caches the assets so routine hourly metadata updates don't re-encode the video. The build uses Pillow, FFmpeg and espeak-ng. No commercial video API credentials are needed. Media is served directly from GitHub Pages.
+GitHub Pages runs the single maintained generator `scripts/build_intro_video.py` to produce `docs/assets/axiovo-tour.mp4`, its poster and WebVTT captions. FFmpeg validation checks that a playable H.264 stream is present before publication. The source assets are generated during deployment rather than committed as large binaries. The HTML player does not autoplay and provides a transcript and a direct link if playback fails.
+
+The prior browser-recording and legacy homepage snapshot generators have been deleted. No personal research data is deleted by this cleanup.
 
 ## Unified Discover (arXiv + field-aware scholarly search)
 
