@@ -150,16 +150,18 @@ jobs:
             docs/assets/researchlens-tour.mp4
             docs/assets/researchlens-tour-poster.jpg
             docs/assets/researchlens-tour.vtt
-          key: axiovo-real-ui-tour-v2-${{ hashFiles('scripts/build_live_demo.py', 'docs/index.html', 'docs/discover.html', 'docs/discover-layout.css', 'docs/discover-layout.js', 'docs/scholarly.js', 'docs/workspace.html', 'docs/copilot.html', 'docs/lab.html', 'docs/paper-card-polish.css') }}
+          key: axiovo-new-home-feminine-tour-v3-${{ hashFiles('scripts/build_live_demo.py', 'docs/index.html', 'docs/discover.html', 'docs/discover-layout.css', 'docs/discover-layout.js', 'docs/scholarly.js', 'docs/workspace.html', 'docs/copilot.html', 'docs/lab.html', 'docs/paper-card-polish.css') }}
       - name: Install Chromium browser test dependencies
         run: |
           python -m pip install --disable-pip-version-check Pillow playwright
           python -m playwright install --with-deps chromium
       - name: Exercise homepage, Discover, Library and critical research actions
         run: python scripts/smoke_routes.py
-      - name: Install video encoding tools when tour changed
+      - name: Install video encoding and feminine voice options
         if: steps.tour-cache.outputs.cache-hit != 'true'
-        run: sudo apt-get install -y -qq ffmpeg espeak-ng
+        run: |
+          sudo apt-get install -y -qq ffmpeg espeak-ng
+          python -m pip install --disable-pip-version-check edge-tts || echo 'Neural voice unavailable; local feminine narration fallback will be used.'
       - name: Record current Axiovo UI and build homepage tour
         if: steps.tour-cache.outputs.cache-hit != 'true'
         run: python scripts/build_live_demo.py
