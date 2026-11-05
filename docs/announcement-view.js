@@ -23,12 +23,12 @@ function start(){
  let snapshot=null, page=0;
  const dateLabel=d=>/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(d||"")?d:"unavailable";
  function save(id,control){
-  let ids=[];try{ids=JSON.parse(localStorage.getItem("researchlens-reading-list")||"[]")}catch{}
+  let ids=[];try{ids=JSON.parse(localStorage.getItem("axiovo-reading-list")||"[]")}catch{}
   if(!Array.isArray(ids))ids=[];
   if(ids.includes(id))ids=ids.filter(x=>x!==id);else ids.push(id);
-  try{localStorage.setItem("researchlens-reading-list",JSON.stringify(ids))}catch{return}
+  try{localStorage.setItem("axiovo-reading-list",JSON.stringify(ids))}catch{return}
   control.textContent=ids.includes(id)?"✓ Saved":"☆ Save paper";
-  window.dispatchEvent(new Event("researchlens-library-change"));
+  window.dispatchEvent(new Event("axiovo-library-change"));
  }
  function draw(){
   cards.replaceChildren();pages.replaceChildren();
@@ -46,7 +46,7 @@ function start(){
    const link=document.createElement("a");link.className="btn primary";link.href="https://arxiv.org/abs/"+encodeURIComponent(p.id);link.target="_blank";link.rel="noopener noreferrer";link.textContent="Read arXiv paper";row.append(link);
    const assist=document.createElement("a");assist.className="btn";assist.href="./copilot.html?id="+encodeURIComponent(p.id);assist.textContent="Research Assistant";row.append(assist);
    const saved=document.createElement("button");saved.className="btn";saved.type="button";
-   let ids=[];try{ids=JSON.parse(localStorage.getItem("researchlens-reading-list")||"[]")}catch{}
+   let ids=[];try{ids=JSON.parse(localStorage.getItem("axiovo-reading-list")||"[]")}catch{}
    saved.textContent=ids.includes(p.id)?"✓ Saved":"☆ Save paper";
    saved.addEventListener("click",()=>save(p.id,saved));row.append(saved);
    el.append(row);cards.append(el);
