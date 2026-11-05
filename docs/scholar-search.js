@@ -2,7 +2,7 @@
 (function(root,factory){
  const api=factory();
  if(typeof module==="object"&&module.exports)module.exports=api;
- if(root)root.ResearchLensSearch=api;
+ if(root)root.AxiovoSearch=api;
 })(typeof globalThis!=="undefined"?globalThis:null,function(){
  "use strict";
  // OpenAlex field identifiers are stable; IDs are from the public fields hierarchy.
