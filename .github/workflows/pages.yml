@@ -183,6 +183,9 @@ jobs:
         run: python -m scripts.build_snapshot
       - name: Build Atom topic subscriptions
         run: python -m scripts.build_feeds
+      - name: Audit internal website links and anchors
+        continue-on-error: true
+        run: python scripts/audit_site_links.py
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
