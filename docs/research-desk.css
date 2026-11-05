@@ -243,3 +243,13 @@
  .rd-topic-preview {padding:11px 13px}
  .rd-topic-preview ol {margin:6px 0}
 }
+
+/* Source-linked five-paper comparison, scrolls horizontally on small screens. */
+.rd-comparison-columns:has(.rd-evidence-matrix){display:block;overflow-x:auto;overscroll-behavior-inline:contain}
+.rd-evidence-matrix{border-collapse:separate;border-spacing:0;width:100%;min-width:640px;font-size:.79rem;line-height:1.55}
+.rd-evidence-matrix caption{text-align:left;color:var(--rd-muted);padding:7px 0 11px}
+.rd-evidence-matrix th,.rd-evidence-matrix td{border:1px solid var(--rd-border);padding:10px;vertical-align:top;min-width:140px;max-width:300px;overflow-wrap:anywhere}
+.rd-evidence-matrix th{background:var(--rd-soft);font-weight:730;text-align:left}
+.rd-evidence-matrix tbody th{position:sticky;left:0;z-index:1;min-width:125px;max-width:155px}
+.rd-evidence-excerpt{color:var(--rd-ink);font-size:.81rem;line-height:1.52;margin:0 0 7px;white-space:normal}
+.rd-evidence-matrix a:focus-visible{outline:3px solid var(--rd-link);outline-offset:2px}
