@@ -182,8 +182,8 @@ function match(hay,needle){
 }
 function relevant(p){
  if(!verified(p))return false;
- if(state.from&&p.date&&p.date<state.from)return false;
- if(state.to&&p.date&&p.date>state.to)return false;
+ if(state.from&&(!p.date||p.date<state.from))return false;
+ if(state.to&&(!p.date||p.date>state.to))return false;
  if(state.author&&!match(p.authors.join(" "),state.author))return false;
  if(state.affiliation&&!match((p.affiliations||[]).join(" "),state.affiliation))return false;
  const combined=[p.title,p.abstract,p.category,p.categories.join(" "),p.id,p.authors.join(" ")].join(" ");
@@ -276,6 +276,12 @@ function render(){
 async function search(){
  state.query=$("archive-query").value.trim();state.author=$("archive-author").value.trim();state.affiliation=$("archive-affiliation").value.trim();
  state.scope=$("archive-scope").value;state.sort=$("archive-sort").value;state.from=$("archive-from").value;state.to=$("archive-to").value;remember();
+ if(state.from&&state.to&&state.from>state.to){
+  ++requestSeq;allResults=[];render();
+  $("archive-result-count").textContent="Invalid date range: the start date must be on or before the end date.";
+  $("archive-sync-status").textContent="Correct the date range to search source records.";
+  return;
+ }
  page=0;const seq=++requestSeq;
  // Show cached results immediately while a separate remote request updates them.
  allResults=[...localPapers];render();
