@@ -70,6 +70,14 @@ jobs:
           echo '### bioRxiv metadata synchronization failed' >> "$GITHUB_STEP_SUMMARY"
           echo 'No live bioRxiv results were available. Cached records are preserved, if any.' >> "$GITHUB_STEP_SUMMARY"
           echo '::warning::bioRxiv synchronization unsuccessful; review diagnostics in logs.'
+      - name: Harvest official arXiv OAI-PMH updated records (partial date fallback)
+        if: github.event_name != 'push'
+        id: oai_refresh
+        continue-on-error: true
+        run: python -m scripts.arxiv_oai_incremental
+      - name: Report OAI-PMH synchronization errors
+        if: steps.oai_refresh.outcome == 'failure'
+        run: echo '::warning::arXiv OAI-PMH incremental harvest unavailable. Never claim complete daily coverage.'
       - name: Harvest every arXiv first submission for selected UTC days
         if: github.event_name != 'push'
         id: daily_archive
@@ -105,7 +113,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docs/data/feed.json docs/data/biorxiv.json docs/data/arxiv-days/
+          git add docs/data/feed.json docs/data/biorxiv.json docs/data/arxiv-days/ docs/data/arxiv-oai/
           if ! git diff --cached --quiet; then
             git commit -m "data: refresh arXiv index [skip ci]"
             git fetch origin main
