@@ -66,13 +66,19 @@ def parse_feed(raw: bytes, archive: str):
         if not title:
             continue
         creators = []
+        categories = [archive]
         for element in item:
-            if element.tag.endswith("creator") and clean(element.text):
-                creators.append(clean(element.text))
+            local_name = element.tag.rsplit("}", 1)[-1]
+            if local_name == "creator" and clean(element.text):
+                creators.extend(x.strip() for x in clean(element.text).split(",") if x.strip())
+            if local_name == "category" and clean(element.text):
+                categories.append(clean(element.text))
+            if local_name == "announce_type" and clean(element.text):
+                announce_type = clean(element.text).lower()
         records.append({
             "id": base, "version": int(version.group(1)) if version else 1,
             "title": title, "abstract": abstract[:9000], "authors": creators,
-            "categories": [archive], "primary_category": archive,
+            "categories": sorted(set(categories)), "primary_category": archive,
             "link": "https://arxiv.org/abs/" + base,
             "announcement_date": day, "announce_type": announce_type,
             "metadata_source": "official arXiv RSS"
