@@ -34,7 +34,7 @@ function normalize(source,p){
   source,title:plain(p.title),authors,abstract:plain(p.abstract||p.summary),date:day(p.published||p.date||p.created),
   category:clean(p.primary_category||p.category),categories:list(p.categories).map(clean).filter(Boolean),
   affiliations:list(p.affiliations).map(plain).filter(Boolean),citations:Number.isFinite(p.citations)?p.citations:null,
-  provenance:clean(p.provenance),doi:parseDOI(p.doi||p.DOI)
+  provenance:clean(p.provenance||p.metadata_source),announcementDate:day(p.announcement_date),doi:parseDOI(p.doi||p.DOI)
  };
  if(record.category&&!record.categories.includes(record.category))record.categories.unshift(record.category);
  if(source==="arxiv"){
@@ -128,7 +128,7 @@ function matchScore(p,c){
 function filter(papers,criteria){
  return papers.map(p=>({p,score:matchScore(p,criteria)})).filter(row=>row.score!==null).sort(({p:a,score:x},{p:b,score:y})=>
   (criteria.sort==="cited"?(b.citations??-1)-(a.citations??-1):criteria.sort==="recent"?0:y-x)
-  ||b.date.localeCompare(a.date)||a.title.localeCompare(b.title)).map(row=>row.p);
+  ||(b.date||b.announcementDate||"").localeCompare(a.date||a.announcementDate||"")||a.title.localeCompare(b.title)).map(row=>row.p);
 }
 async function request(url,signal,json=true){
  const timeout=AbortSignal.timeout(11000);
@@ -145,7 +145,13 @@ async function snapshot(source){
   };
   const main=load(paths[source]).catch(()=>({stamp:"",papers:[]}));
   const recent=source==="arxiv"?load("oai-recent.json").catch(()=>({papers:[]})):Promise.resolve({papers:[]});
-  snapshots.set(source,Promise.all([main,recent]).then(([primary,extra])=>({stamp:primary.stamp,papers:merge(extra.papers,primary.papers)})));
+  // Announcements are the source of newly released records, not proof of v1 dates.
+  // Keep announcementDate distinct from the first-submission date, and never
+  // treat a missing first-submission date as verified date-filter coverage.
+  const announced=source==="arxiv"?load("announcements.json").catch(()=>({papers:[]})):Promise.resolve({papers:[]});
+  snapshots.set(source,Promise.all([main,recent,announced]).then(([primary,extra,latest])=>({
+   stamp:primary.stamp,papers:merge(extra.papers,primary.papers,latest.papers)
+  })));
  }
  return snapshots.get(source);
 }
