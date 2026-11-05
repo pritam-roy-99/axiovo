@@ -1,6 +1,6 @@
 "use strict";
 const $=id=>document.getElementById(id);
-const requested=window.ResearchLensArxiv?.parse(new URLSearchParams(location.search).get("id")||"");
+const requested=window.AxiovoArxiv?.parse(new URLSearchParams(location.search).get("id")||"");
 const id=requested?.requested||"";const baseId=requested?.base||"";
 const valid=Boolean(requested);
 const issueTerm="arXiv:"+baseId;
@@ -32,8 +32,8 @@ const authors=$("author-links");authors.replaceChildren();
 for(const name of (p.authors||[]).slice(0,12)){const div=document.createElement("div");div.className="related";const query="https://arxiv.org/search/?"+new URLSearchParams({query:name,searchtype:"author"});external(div,name+" ↗",query,"");authors.append(div)}
 const related=all.filter(x=>x.id!==baseId).map(x=>({paper:x,score:overlap(p.title+" "+p.abstract,x.title+" "+x.abstract)})).filter(x=>x.score>0).sort((a,b)=>b.score-a.score).slice(0,6);
 const list=$("related");list.replaceChildren();for(const {paper,score} of related){const d=document.createElement("div");d.className="related";external(d,paper.title,"./paper.html?id="+encodeURIComponent(paper.id),"");line(d,"Lexical match",score.toFixed(2)+" · "+paper.id);list.append(d)}
-let saved=[];try{saved=JSON.parse(localStorage.getItem("researchlens-reading-list")||"[]")}catch(err){}
-const b=$("save");function saveLabel(){b.textContent=saved.includes(id)?"★ Saved":"☆ Save to reading list"}saveLabel();b.onclick=()=>{saved=saved.includes(id)?saved.filter(x=>x!==id):[...saved,id];localStorage.setItem("researchlens-reading-list",JSON.stringify(saved));saveLabel()};
+let saved=[];try{saved=JSON.parse(localStorage.getItem("axiovo-reading-list")||"[]")}catch(err){}
+const b=$("save");function saveLabel(){b.textContent=saved.includes(id)?"★ Saved":"☆ Save to reading list"}saveLabel();b.onclick=()=>{saved=saved.includes(id)?saved.filter(x=>x!==id):[...saved,id];localStorage.setItem("axiovo-reading-list",JSON.stringify(saved));saveLabel()};
 $("share").onclick=()=>navigator.clipboard?.writeText(location.href);
 }
 async function renderGithubComments(number){
@@ -76,14 +76,14 @@ if(valid){fetch("data/feed.json",{cache:"no-cache"}).then(r=>r.json()).then(d=>{
  $("authors").textContent=requested?.explicit?"Requested arXiv revision v"+requested.version:"Latest arXiv revision";
  $("abstract").textContent="This paper does not need to be in Axiovo's local feed to be accessible. Open the authoritative arXiv record below to read its abstract, available versions and PDF.";
  const links=$("links");links.replaceChildren();
- external(links,"Read on arXiv",window.ResearchLensArxiv.abs(id),"btn primary");
- external(links,"PDF",window.ResearchLensArxiv.pdf(id));
+ external(links,"Read on arXiv",window.AxiovoArxiv.abs(id),"btn primary");
+ external(links,"PDF",window.AxiovoArxiv.pdf(id));
  external(links,"Research Assistant","./copilot.html?id="+encodeURIComponent(id));
  const b=$("save");b.textContent="☆ Save paper";b.onclick=()=>{
-  let saved=[];try{saved=JSON.parse(localStorage.getItem("researchlens-reading-list")||"[]")}catch{}
+  let saved=[];try{saved=JSON.parse(localStorage.getItem("axiovo-reading-list")||"[]")}catch{}
   if(!Array.isArray(saved))saved=[];
   saved=saved.includes(id)?saved.filter(x=>x!==id):[...saved,id];
-  localStorage.setItem("researchlens-reading-list",JSON.stringify(saved));
+  localStorage.setItem("axiovo-reading-list",JSON.stringify(saved));
   b.textContent=saved.includes(id)?"✓ Saved":"☆ Save paper";
  };
  const fields=$("fields");fields.replaceChildren();line(fields,"Identifier",id);
