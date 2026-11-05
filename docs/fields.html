@@ -1,11 +1,11 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Field search has moved to Discover | Axiovo</title><meta name="description" content="The Field Explorer and arXiv feed are now combined in Axiovo Discover.">
-<link rel="canonical" href="https://pritam-roy-99.github.io/researchlens/?view=scholarly#discover">
-<meta http-equiv="refresh" content="2;url=./?view=scholarly#discover">
+<link rel="canonical" href="https://pritam-roy-99.github.io/axiovo/?view=scholarly#discover">
+<meta http-equiv="refresh" content="2;url=./discover.html?view=scholarly#discover">
 <script>
 (function(){
  const old=new URLSearchParams(location.search);
- const next=new URL("./",location.href);
+ const next=new URL("./discover.html",location.href);
  old.forEach((v,k)=>{if(k!=="view")next.searchParams.set(k,v)});
  next.searchParams.set("view","scholarly");next.hash="discover";
  location.replace(next.href)
@@ -14,5 +14,5 @@
 <link rel="stylesheet" href="./theme.css"><link rel="stylesheet" href="./workspace.css">
 </head><body><main class="rl-workspace"><h1>Field Explorer is now part of Discover</h1>
 <p>Axiovo combines the latest arXiv feed and wider cross-disciplinary literature search into a single page. Your previously saved research topics and papers remain in the same browser storage.</p>
-<p><a href="./?view=scholarly#discover">Open Discover: Search all fields</a></p>
+<p><a href="./discover.html?view=scholarly#discover">Open Discover: Search all fields</a></p>
 </main></body></html>
