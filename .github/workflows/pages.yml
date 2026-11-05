@@ -157,6 +157,24 @@ jobs:
         run: python -m unittest discover -s tests -p test_normalized_index.py -v
       - name: Build verified monthly source metadata shards
         run: python -m scripts.build_normalized_index
+      - name: Build source-verified monthly shards and versioned taxonomy
+        run: |
+          python -m unittest discover -s tests -p test_verified_records.py -v
+          python scripts/build_verified_records.py
+          python scripts/build_taxonomy.py
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root=Path("docs/data")
+          manifest=json.loads((root/"records/manifest.json").read_text())
+          coverage=json.loads((root/"coverage.json").read_text())
+          review=json.loads((root/"needs_review.json").read_text())
+          taxonomy=json.loads((root/"taxonomy.json").read_text())
+          assert sum(manifest["shards"].values())==manifest["record_count"]
+          assert manifest["record_count"]==coverage["total_indexed"]==review["count"]
+          assert taxonomy["entries"]
+          print("Phase 1 coverage, review queue and taxonomy counts validated")
+          PY
       - name: Audit internal routes and HTML assets
         id: audit_internal_routes_and_html_assets
         continue-on-error: true
@@ -174,7 +192,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docs/data/feed.json docs/data/biorxiv.json docs/data/chemrxiv.json docs/data/arxiv-days/ docs/data/oai-recent.json docs/data/announcements.json docs/data/index/v1/
+          git add docs/data/feed.json docs/data/biorxiv.json docs/data/chemrxiv.json docs/data/arxiv-days/ docs/data/oai-recent.json docs/data/announcements.json docs/data/records/ docs/data/coverage.json docs/data/needs_review.json docs/data/taxonomy.json docs/data/index/v1/
           if ! git diff --cached --quiet; then
             git commit -m "data: refresh arXiv index [skip ci]"
             git fetch origin main
