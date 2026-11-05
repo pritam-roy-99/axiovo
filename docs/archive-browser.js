@@ -96,8 +96,15 @@ async function remote(){
   const code=/^[a-z-]+(?:\.[A-Za-z-]+)?$/.test(chosen)?chosen:field().code;
   const officialCode=state.scope==="subfield"&&/^[a-z-]+(?:\.[A-Za-z-]+)?$/.test(code)?code:"";
   const archiveWide="("+[...new Set(definition.groups.flatMap(g=>g.areas.map(a=>a.code)))].map(c=>"cat:"+c).join(" OR ")+")";
-  const q=[officialCode?"cat:"+officialCode:"",term?"all:"+term.replace(/[:()"\\]/g," "):""].filter(Boolean).join(" AND ")||archiveWide;
-  const url="https://export.arxiv.org/api/query?"+new URLSearchParams({search_query:q,start:"0",max_results:"100",sortBy:(state.sort==="recent"||!term)?"submittedDate":"relevance",sortOrder:"descending"});
+  const baseQuery=[officialCode?"cat:"+officialCode:"",term?"all:"+term.replace(/[:()"\\]/g," "):""].filter(Boolean).join(" AND ")||archiveWide;
+  // Apply the date constraint upstream. Post-filtering only the most recent 100
+  // papers makes historical dates falsely appear to have no results.
+  const today=new Date().toISOString().slice(0,10);
+  const start=(state.from||"1991-01-01").replace(/-/g,"")+"0000";
+  const end=(state.to||today).replace(/-/g,"")+"2359";
+  const dateClause=state.from||state.to?"submittedDate:["+start+" TO "+end+"]":"";
+  const q=[baseQuery,dateClause].filter(Boolean).join(" AND ");
+  const url="https://export.arxiv.org/api/query?"+new URLSearchParams({search_query:q,start:"0",max_results:dateClause?"200":"100",sortBy:(state.sort==="recent"||!term)?"submittedDate":"relevance",sortOrder:"descending"});
   const c=new AbortController(),timer=setTimeout(()=>c.abort(),15000);
   try{const r=await fetch(url,{signal:c.signal});if(!r.ok)throw Error("HTTP "+r.status);return atom(await r.text())}finally{clearTimeout(timer)}
  }
@@ -273,7 +280,7 @@ async function search(){
  // Show cached results immediately while a separate remote request updates them.
  allResults=[...localPapers];render();
  $("archive-result-count").textContent="Showing cached source records; refreshing search…";
- const cacheKey=JSON.stringify([source,state.topic,state.field,state.subfield,state.query,state.author,state.affiliation,state.scope,state.sort]);
+ const cacheKey=JSON.stringify([source,state.topic,state.field,state.subfield,state.query,state.author,state.affiliation,state.scope,state.sort,state.from,state.to]);
  let fresh=[],extra=[],error="";
  const cached=responseCache.get(cacheKey);
  if(cached&&Date.now()-cached.time<300000){fresh=cached.fresh;extra=cached.extra;error=cached.error}
@@ -289,7 +296,7 @@ async function search(){
  if(seq!==requestSeq)return;
  const unique=new Map();for(const p of [...localPapers,...extra,...fresh])if(verified(p))unique.set(p.id,p);
  allResults=[...unique.values()];
- $("archive-sync-status").textContent=(error?"Live query unavailable ("+error+"); showing verified cached records. ":"Source query completed. ")+allResults.length+" verified records retrieved or cached"+(lastSync?" · cached snapshot "+lastSync:"")+". Optional OpenAlex matches accepted only with native archive verification. Not a complete historical archive.";
+ $("archive-sync-status").textContent=(error?"Live query unavailable ("+error+"); showing verified cached records. ":"Source query completed. ")+allResults.length+" verified records retrieved or cached (limited query window; not a complete archive count)"+(lastSync?" · cached snapshot "+lastSync:"")+". Optional OpenAlex matches accepted only with native archive verification. Not a complete historical archive.";
  render();
 }
 async function init(){
