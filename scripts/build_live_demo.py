@@ -29,24 +29,28 @@ OUT = DOCS / "assets"
 W, H, FPS, DURATION = 960, 540, 8, 7
 
 SCENES = [
-    ("Welcome to Axiovo", "A clear, focused home for scientific discovery.",
-     "Welcome to Axiovo, a focused research discovery and reading workspace."),
-    ("Choose your discipline", "Start with one broad field; refine after entering Discover.",
-     "Begin by choosing your broad research field, without distracting filters."),
-    ("Refine in Discover", "Choose a research area and specific subtopics.",
-     "Inside Discover, narrow your field to research areas and specific interests."),
-    ("Explore current arXiv", "Browse paper cards, categories and original sources.",
-     "Browse indexed arXiv papers, inspect abstracts, and verify original sources."),
-    ("Search wider literature", "Use field-aware search and optional date filters.",
-     "Search wider arXiv linked literature, and refine sources and dates."),
-    ("Read and save", "Keep useful papers in your own reading collection.",
-     "Read the source or save a paper for your personal library."),
-    ("My research Library", "Revisit saved papers and develop research questions.",
-     "Return to your library to review saved papers and research questions."),
-    ("Research Assistant", "Investigate claims with links to underlying evidence.",
-     "Open Research Assistant for source linked paper analysis and questions."),
-    ("Research Tools", "PDF reading, comparison and further research utilities.",
-     "Use Research Tools for PDFs, comparisons, citations and focused analysis."),
+    ("Axiovo", "A clear place to start your research.",
+     "Welcome to Axiovo, where research discovery begins with a simple choice."),
+    ("Choose a discipline", "Select your broad research field.",
+     "Choose a broad research field, then enter Discover to refine your interests."),
+    ("Discover your subfield", "Research areas and specialized topics.",
+     "Inside Discover, narrow your field to research areas and specific subtopics."),
+    ("Latest arXiv", "Find recent papers with the right source information.",
+     "Browse the indexed arXiv feed and check the source of each paper."),
+    ("Explore literature", "Search beyond the daily feed.",
+     "Explore wider literature and filter results by your research question."),
+    ("Paper details", "Abstracts, version links and related research.",
+     "Open a paper workspace for its abstract, version links and research connections."),
+    ("Private notes", "Keep your research questions alongside each paper.",
+     "Write private notes and track which papers you have reviewed."),
+    ("Compare papers", "Source-linked side-by-side research review.",
+     "Compare two papers and your notes, then inspect their original sources."),
+    ("My Library", "Projects, collections and reading progress.",
+     "Organize saved papers into collections, and keep your research projects together."),
+    ("Research Assistant", "Ask questions in the context of a paper.",
+     "Use Research Assistant to examine a selected paper and its cited evidence."),
+    ("Research Tools", "Additional tools when you need them.",
+     "Explore PDF reading, citations and focused research tools."),
 ]
 BG = (9, 30, 52)
 FOREGROUND = (243, 248, 253)
@@ -105,55 +109,66 @@ def open_page(page, url):
 
 
 def capture(browser, base):
-    page = browser.new_page(viewport={"width":1280,"height":720},device_scale_factor=1)
-    page.set_default_timeout(9000)
+    page=browser.new_page(viewport={"width":1280,"height":720},device_scale_factor=1)
+    page.set_default_timeout(11000)
     screenshots=[]
     def snap(name):
-        image=Image.open(io.BytesIO(page.screenshot(type="png",animations="disabled")))
-        screenshots.append(image.convert("RGB").resize((W,H),Image.Resampling.LANCZOS))
+        shot=Image.open(io.BytesIO(page.screenshot(type="png",animations="disabled")))
+        screenshots.append(shot.convert("RGB").resize((W,H),Image.Resampling.LANCZOS))
         print("Captured Axiovo:",name,"|",page.url,flush=True)
 
-    # Follow the exact live-user journey; never show a hidden legacy homepage
-    # or claim a card exists without actually waiting for the browser to render it.
     open_page(page,base)
     page.locator("#axiovo-entry-form").wait_for(state="visible")
-    snap("new minimal homepage")
+    snap("homepage")
 
     page.select_option("#axiovo-entry-field","quantum")
-    snap("choose broad discipline")
+    snap("broad field")
     page.locator("#axiovo-entry-form button[type=submit]").click()
-    page.wait_for_url("**/discover.html#discover",timeout=14000)
-    safe_click(page,"#rl-focus-field-details > summary")
+    page.wait_for_url("**/discover.html#discover",timeout=16000)
     safe_scroll(page,"#rl-focus-bar")
-    snap("choose subfields in Discover")
+    snap("subfields in Discover")
 
     safe_click(page,"#rl-source-arxiv")
     safe_scroll(page,"#local-feed-view")
-    snap("latest arXiv")
+    snap("arxiv discovery")
 
     safe_click(page,"#rl-source-scholarly")
     safe_scroll(page,"#scholarly-discovery")
-    snap("wider literature search")
+    snap("literature search")
 
     safe_click(page,"#rl-source-arxiv")
+    paper_id=""
     try:
-        page.locator("#papers .paper .rl-save-button").first.wait_for(timeout=12000)
-        safe_scroll(page,"#papers .paper")
-        safe_click(page,"#papers .paper .rl-save-button")
-    except Exception:
-        safe_scroll(page,"#local-feed-view")
-    snap("read and save a real indexed paper")
+        paper=page.locator("#papers .paper").first
+        paper.wait_for(timeout=13000)
+        paper_id=paper.get_attribute("data-paper-id") or ""
+        paper.locator('a.axiovo-paper-detail-action').click(timeout=7000)
+        page.wait_for_url("**/paper.html?*",timeout=13000)
+    except Exception as e:
+        if not paper_id:
+            raise RuntimeError("Cannot capture paper detail without a real indexed paper") from e
+        open_page(page,base+"paper.html?id="+paper_id)
+    page.locator("#axiovo-versions").wait_for(timeout=12000)
+    safe_scroll(page,"#axiovo-versions")
+    snap("paper research details")
 
-    # Use the actual navigation instead of linking back to hidden homepage.
-    safe_click(page,'.rl-nav a[href*="#workspace"]')
-    try:page.locator("#workspace-panel #library-list").wait_for(timeout=14000)
-    except Exception:pass
-    safe_scroll(page,"#workspace-panel")
-    snap("library and questions")
+    safe_scroll(page,"#axiovo-paper-notes")
+    snap("private research notes")
 
-    open_page(page,base+"copilot.html")
+    # Compare the exact captured paper with a distinct saved or indexed identifier;
+    # do not claim both metadata records are fully indexed when they are not.
+    open_page(page,base+"compare.html?ids="+paper_id+",2501.01234")
+    page.locator(".axiovo-compare-paper").first.wait_for(timeout=11000)
+    snap("source-linked comparison")
+
+    open_page(page,base+"discover.html#workspace")
+    page.locator("#workspace-panel #library-list").wait_for(timeout=15000)
+    safe_scroll(page,"#library-heading")
+    snap("Library and collections")
+
+    open_page(page,base+"copilot.html?id="+paper_id)
     safe_scroll(page,"main")
-    snap("research assistant")
+    snap("paper research assistant")
 
     open_page(page,base+"lab.html")
     safe_scroll(page,"main")
@@ -161,8 +176,7 @@ def capture(browser, base):
 
     page.close()
     if len(screenshots)!=len(SCENES):
-        raise RuntimeError("Incomplete tour: captured "+str(len(screenshots))+
-                           " of "+str(len(SCENES))+" actual pages")
+        raise RuntimeError("Incomplete tour: "+str(len(screenshots))+" of "+str(len(SCENES)))
     return screenshots
 
 def timecode(seconds):
