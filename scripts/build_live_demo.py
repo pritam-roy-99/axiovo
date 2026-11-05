@@ -29,20 +29,18 @@ OUT = DOCS / "assets"
 W, H, FPS, DURATION = 960, 540, 8, 7
 
 SCENES = [
- ("Three equal archives","Start with arXiv, bioRxiv or ChemRxiv.","Choose one of three equal research preprint archives."),
- ("arXiv","Explore physical sciences, mathematics and computing.","Open arXiv for its own indexed scientific papers."),
- ("Research focus","Choose your field, research area and subtopic.","Refine your field and specialized research interests inside Discover."),
- ("arXiv papers","Read and save source-linked original papers.","Browse real arXiv records and check their original versions."),
- ("bioRxiv","A dedicated home for biology preprints.","Switch to bioRxiv for its independent life science preprints."),
- ("bioRxiv topics","Refine your biological interests.","Choose a biology topic and look through verified metadata."),
- ("ChemRxiv","An equal home for chemistry preprints.","Explore ChemRxiv through verified preprint DOI records."),
- ("ChemRxiv coverage","Honest record availability, without invented papers.","Check the ChemRxiv data source and coverage information."),
- ("Wider search","Optional literature search beyond source feeds.","Search wider literature separately from the three archives."),
- ("Paper details","Read abstracts and original version links.","Open a full research workspace for a selected paper."),
- ("Paper comparison","Examine two indexed papers side by side.","Compare indexed papers and check the original sources."),
- ("My Library","Organize reading, notes, and collections.","Save papers and research projects in your private library."),
- ("Research Assistant","Ask questions grounded in paper sources.","Use Research Assistant for careful evidence linked questions."),
- ("Research Tools","Extra tools for advanced research.","Access PDF reading, citation tools, and comparisons.")
+ ("Welcome to Axiovo","A video-first home for open scientific research.","Welcome to Axiovo, a free research discovery platform for three independent preprint archives."),
+ ("Choose one of three","arXiv · bioRxiv · ChemRxiv, equal starting points.","Choose arXiv, bioRxiv or ChemRxiv, all presented equally on the homepage."),
+ ("Explore arXiv","The full arXiv archive taxonomy.","Browse physics, mathematics, computer science and the other arXiv research fields."),
+ ("Customize subfields","Topic, field and editable subfield.","Choose an area, select specialized topics, and save your own research interests."),
+ ("Search arXiv","Source-linked papers and relevance controls.","Search arXiv papers and verify the original preprint records."),
+ ("Explore bioRxiv","Biological preprints and subject areas.","Open the dedicated bioRxiv page to browse its biological research subjects."),
+ ("Search bioRxiv","Independent life science search.","Search bioRxiv metadata, filter by author, topic and date."),
+ ("Explore ChemRxiv","Chemistry and molecular science categories.","ChemRxiv has its own dedicated page for chemistry preprint discovery."),
+ ("Search ChemRxiv","DOI-verified results and clear coverage.","Inspect DOI verified ChemRxiv papers, with honest coverage information."),
+ ("My Library","Save and organize your research.","Keep paper reading lists, research notes and collections in your private library."),
+ ("Research Assistant","Ask questions using original sources.","Use Research Assistant for careful, source linked research comparisons."),
+ ("Research Tools","Specialized utilities when you need them.","Explore additional research tools, including PDF reading and citations.")
 ]
 BG = (9, 30, 52)
 FOREGROUND = (243, 248, 253)
@@ -102,60 +100,47 @@ def open_page(page, url):
 
 def capture(browser, base):
     page=browser.new_page(viewport={"width":1280,"height":720},device_scale_factor=1)
-    page.set_default_timeout(13000)
+    page.set_default_timeout(14000)
     screenshots=[]
-    def snap(name):
-        shot=Image.open(io.BytesIO(page.screenshot(type="png",animations="disabled")))
-        screenshots.append(shot.convert("RGB").resize((W,H),Image.Resampling.LANCZOS))
-        print("Captured Axiovo:",name,"|",page.url,flush=True)
-    def switch(archive):
-        page.locator("#rl-source-"+archive).click(timeout=11000)
-        page.wait_for_url(lambda url:"archive="+archive in url,timeout=16000)
+    def snap(label):
+        img=Image.open(io.BytesIO(page.screenshot(type="png",animations="disabled")))
+        screenshots.append(img.convert("RGB").resize((W,H),Image.Resampling.LANCZOS))
+        print("Captured Axiovo:",label,"|",page.url,flush=True)
     open_page(page,base)
-    page.locator(".axiovo-archive-card").first.wait_for()
-    snap("three archive homepage")
-    page.locator('[data-archive="arxiv"]').click()
-    page.wait_for_url("**/discover.html?archive=arxiv#discover")
-    snap("arxiv")
-    safe_scroll(page,"#rl-focus-bar")
-    snap("field area subtopic")
-    safe_scroll(page,"#local-feed-view")
-    snap("arxiv papers")
-    switch("biorxiv")
-    safe_scroll(page,"#biorxiv-discovery")
-    snap("biorxiv")
-    safe_scroll(page,"#rl-focus-bar")
-    snap("biology research areas")
-    switch("chemrxiv")
-    safe_scroll(page,"#chemrxiv-discovery")
-    snap("chemrxiv")
-    safe_scroll(page,"#axiovo-chemrxiv-status")
-    snap("chemrxiv coverage")
-    switch("arxiv")
-    safe_click(page,"#rl-source-scholarly")
-    page.locator("#scholarly-discovery").wait_for(state="visible")
-    safe_scroll(page,"#scholarly-discovery")
-    snap("wider literature")
-    safe_click(page,"#rl-source-arxiv")
-    page.locator("#papers .paper").first.wait_for(timeout=14000)
-    first=page.locator("#papers .paper").first.get_attribute("data-paper-id")
-    second=page.locator("#papers .paper").nth(1).get_attribute("data-paper-id")
-    if not first or not second or first==second:raise RuntimeError("Need two source-indexed papers for the demo")
-    open_page(page,base+"paper.html?id="+first)
-    page.locator("#axiovo-versions").wait_for()
-    snap("paper details")
-    open_page(page,base+"compare.html?ids="+first+","+second)
-    page.locator(".axiovo-compare-paper").first.wait_for()
-    snap("comparison")
+    page.locator(".axiovo-archive-grid").wait_for()
+    safe_scroll(page,".axiovo-video-top")
+    snap("video first")
+    safe_scroll(page,".axiovo-archive-grid")
+    snap("three equal cards")
+    open_page(page,base+"arxiv.html")
+    page.locator("#archive-topic").wait_for()
+    snap("arxiv taxonomy")
+    safe_scroll(page,"#archive-custom-form")
+    snap("customizable subfields")
+    safe_scroll(page,"#archive-search-form")
+    snap("arxiv search")
+    open_page(page,base+"biorxiv.html")
+    page.locator("#archive-field").wait_for()
+    snap("biorxiv subjects")
+    safe_scroll(page,"#archive-search-form")
+    snap("biorxiv search")
+    open_page(page,base+"chemrxiv.html")
+    page.locator("#archive-field").wait_for()
+    snap("chemrxiv subjects")
+    safe_scroll(page,"#archive-results")
+    snap("chemrxiv coverage and results")
     open_page(page,base+"discover.html#workspace")
     page.locator("#workspace-panel #library-list").wait_for(timeout=15000)
+    safe_scroll(page,"#library-heading")
     snap("library")
-    open_page(page,base+"copilot.html?ids="+first+","+second)
+    open_page(page,base+"copilot.html")
+    safe_scroll(page,"main")
     snap("research assistant")
     open_page(page,base+"lab.html")
+    safe_scroll(page,"main")
     snap("research tools")
     page.close()
-    if len(screenshots)!=len(SCENES):raise RuntimeError("Incomplete capture")
+    if len(screenshots)!=len(SCENES):raise RuntimeError("Incomplete live website tour: "+str(len(screenshots)))
     return screenshots
 
 def timecode(seconds):
