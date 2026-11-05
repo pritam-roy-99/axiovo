@@ -3,11 +3,11 @@
    All private reading data stays in browser localStorage. */
 (function(){
 "use strict";
-const BASE="researchlens-library-metadata-v1",COLLECTIONS="axiovo-paper-collections-v1";
+const BASE="axiovo-library-metadata-v1",COLLECTIONS="axiovo-paper-collections-v1";
 const $=id=>document.getElementById(id);
 const read=(key,fallback)=>{try{return JSON.parse(localStorage.getItem(key)||"null")??fallback}catch{return fallback}};
 const write=(key,val)=>{try{localStorage.setItem(key,JSON.stringify(val));return true}catch{return false}};
-const parse=window.ResearchLensArxiv?.parse;
+const parse=window.AxiovoArxiv?.parse;
 const query=new URLSearchParams(location.search);
 const requested=parse?.(query.get("id")||"");
 if(!requested)return;
@@ -54,7 +54,7 @@ function mount(){
  compare.append(make("p","Choose a saved paper to compare source metadata, assumptions and your own notes. Open both originals to verify the scientific claims.","muted"));
  const select=make("select");select.setAttribute("aria-label","Select another saved arXiv paper");
  const empty=make("option","Choose a saved paper");empty.value="";select.append(empty);
- const stored=read("researchlens-reading-list",[]);
+ const stored=read("axiovo-reading-list",[]);
  const unique=[...new Set(Array.isArray(stored)?stored:[])];
  for(const candidate of unique){const parsed=parse?.(candidate);if(!parsed||parsed.base===id)continue;const opt=make("option","arXiv:"+parsed.base);opt.value=parsed.base;select.append(opt)}
  const compareLink=link(compare,"Compare selected papers","./compare.html?ids="+encodeURIComponent(id),"btn primary");
