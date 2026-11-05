@@ -243,3 +243,9 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+      - name: Audit deployed Axiovo pages, live links, navigation and video
+        run: |
+          python scripts/audit_live_site.py
+        env:
+          AXIOVO_BASE_URL: https://pritam-roy-99.github.io/axiovo/
+
