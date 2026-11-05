@@ -247,3 +247,62 @@
  .rl-scholar #scholar-results .axiovo-action-secondary .axiovo-author-follow{width:100%!important}
  .rl-scholar #scholar-results .axiovo-author-follow .axiovo-author-select{flex:1 1 130px!important}
 }
+
+/* Long-form arXiv feed: frequently used tools visible, optional tools collapsible. */
+#arxiv-discovery .paper .axiovo-paper-more{
+  flex:0 0 auto;max-width:100%;min-width:0;
+  margin-left:auto;
+  position:relative;
+}
+#arxiv-discovery .paper .axiovo-paper-more > summary{
+  display:inline-flex;align-items:center;justify-content:center;
+  min-height:38px;padding:9px 12px;
+  border:1px solid var(--axiovo-paper-line);
+  background:var(--rl-panel,#fff);
+  color:var(--axiovo-paper-ink);
+  border-radius:8px;cursor:pointer;
+  list-style:none;font-size:12px;font-weight:700;
+  white-space:nowrap;
+}
+#arxiv-discovery .paper .axiovo-paper-more > summary::-webkit-details-marker{display:none}
+#arxiv-discovery .paper .axiovo-paper-more > summary::after{
+  content:"⌄";display:inline-block;margin-left:8px;
+  font-size:16px;line-height:0.8;transition:transform .15s;
+  color:var(--axiovo-paper-muted);
+}
+#arxiv-discovery .paper .axiovo-paper-more[open] > summary::after{transform:rotate(180deg)}
+#arxiv-discovery .paper .axiovo-paper-more-actions{
+  display:flex!important;align-items:center!important;flex-wrap:wrap!important;
+  gap:8px!important;
+  width:100%;margin-top:11px;padding:12px 0 0!important;
+  border-top:1px dashed var(--axiovo-paper-line);
+}
+#arxiv-discovery .paper .axiovo-paper-more[open]{
+  width:100%;margin-left:0;
+  order:20;
+}
+#arxiv-discovery .paper .axiovo-paper-more[open] > summary{
+  margin-left:auto;
+}
+#arxiv-discovery .paper .axiovo-paper-more-actions :is(a,button){
+  display:inline-flex;align-items:center;justify-content:center;
+  padding:8px 11px!important;min-height:36px!important;
+  color:var(--axiovo-paper-muted)!important;
+  background:var(--rl-panel,#fff)!important;
+  border:1px solid var(--axiovo-paper-line)!important;
+  border-radius:8px!important;
+  white-space:normal!important;
+  font-size:12px!important;text-decoration:none!important;
+  box-shadow:none!important;
+}
+#arxiv-discovery .paper .axiovo-paper-more-actions :is(a,button):hover{
+  border-color:var(--axiovo-paper-accent)!important;
+  color:var(--axiovo-paper-accent)!important;
+}
+#arxiv-discovery .paper .axiovo-paper-more > summary:focus-visible{
+  outline:3px solid var(--axiovo-paper-accent);outline-offset:2px;
+}
+@media(max-width:700px){
+ #arxiv-discovery .paper .axiovo-paper-more{margin-left:0}
+ #arxiv-discovery .paper .axiovo-paper-more[open] > summary{margin-left:0}
+}
