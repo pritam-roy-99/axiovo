@@ -41,6 +41,50 @@ const SUGGESTIONS={
 "Theoretical and Computational Chemistry":["Density functional theory","Machine learning potentials","Molecular simulation","Electronic structure"],
 "Computer Science":["Machine learning","Algorithms","Large language models","Cybersecurity"]
 };
+// Optional topic-specific suggestions are researcher search refinements, not
+// official archive classification IDs or measured popularity rankings.
+Object.assign(SUGGESTIONS,{
+ "Animal Behavior and Cognition":["Social behavior","Animal communication","Decision making"],
+ "Biochemistry":["Enzyme kinetics","Protein folding","Metabolomics"],
+ "Bioengineering":["Tissue engineering","Microfluidics","Biomaterials"],
+ "Biophysics":["Molecular motors","Cell mechanics","Single molecule imaging"],
+ "Cancer Biology":["Tumor microenvironment","Cancer genomics","Immuno-oncology"],
+ "Cell Biology":["Cell signaling","Organelle dynamics","Cell division"],
+ "Clinical Trials":["Trial design","Treatment outcomes","Randomized interventions"],
+ "Developmental Biology":["Stem cell differentiation","Morphogenesis","Embryonic development"],
+ "Ecology":["Population dynamics","Community ecology","Conservation genomics"],
+ "Epidemiology":["Disease modeling","Surveillance","Risk factors"],
+ "Evolutionary Biology":["Phylogenetics","Adaptation","Population evolution"],
+ "Genetics":["Genome-wide association","Mendelian genetics","Gene regulation"],
+ "Immunology":["Adaptive immunity","Innate immunity","Vaccine responses"],
+ "Microbiology":["Microbial communities","Host pathogen interactions","Antimicrobial resistance"],
+ "Molecular Biology":["RNA regulation","Protein interactions","Transcription"],
+ "Paleontology":["Fossil morphology","Paleoecology","Evolutionary history"],
+ "Pathology":["Molecular pathology","Diagnostic biomarkers","Disease mechanisms"],
+ "Pharmacology and Toxicology":["Drug discovery","Pharmacokinetics","Toxicity assessment"],
+ "Physiology":["Neurophysiology","Cardiorespiratory physiology","Metabolism"],
+ "Plant Biology":["Plant genomics","Photosynthesis","Plant stress"],
+ "Scientific Communication and Education":["Science education","Open science","Research communication"],
+ "Synthetic Biology":["Gene circuits","Genome engineering","Metabolic engineering"],
+ "Systems Biology":["Network modeling","Multi-omics","Dynamic systems"],
+ "Zoology":["Animal diversity","Comparative anatomy","Behavioral ecology"],
+ "Agriculture and Food Chemistry":["Food analysis","Agricultural chemistry","Biomass chemistry"],
+ "Analytical Chemistry":["Mass spectrometry","Chromatography","Chemical sensors"],
+ "Biological and Medicinal Chemistry":["Drug design","Chemical biology","Bioactive molecules"],
+ "Chemical Education":["Chemistry pedagogy","Laboratory education","Chemical demonstrations"],
+ "Chemical Engineering and Industrial Chemistry":["Process optimization","Separation processes","Industrial catalysis"],
+ "Earth, Space, and Environmental Chemistry":["Atmospheric chemistry","Water chemistry","Environmental pollutants"],
+ "Energy":["Hydrogen storage","Solar fuels","Electrochemical energy"],
+ "Inorganic Chemistry":["Coordination compounds","Transition metal chemistry","Solid-state inorganic"],
+ "Materials Chemistry":["Functional polymers","Battery materials","Surface chemistry"],
+ "Nanoscience":["Nanoparticles","Nanostructures","Nanoscale spectroscopy"],
+ "Organometallic Chemistry":["Metal-organic catalysis","Metal complexes","Bond activation"],
+ "Polymer Science":["Polymer synthesis","Polymer characterization","Sustainable polymers"],
+ "High Energy Physics – Theory":["Conformal field theory","Gauge-gravity duality","Scattering amplitudes"],
+ "High Energy Physics – Phenomenology":["Collider signatures","Dark matter models","Flavor physics"],
+ "Statistical Mechanics":["Critical phenomena","Nonequilibrium dynamics","Stochastic thermodynamics"],
+ "Quantum Physics":["Quantum cryptography","Quantum foundations","Quantum computing","Quantum sensing","Entanglement theory","Quantum networks"]
+});
 // Additional active arXiv categories from its public subject taxonomy.
 const additional=[
 ["math","Commutative Algebra","math.AC"],["math","Dynamical Systems","math.DS"],["math","General Mathematics","math.GM"],
@@ -57,7 +101,7 @@ const additional=[
 ["q-bio","Other Quantitative Biology","q-bio.OT"]
 ];
 for(const x of additional)if(!ARXIV.some(y=>y[2]===x[2]))ARXIV.push(x);
-const mapArxivGroup=A.map(([label,arr])=>({label,id:arr[0]?.[1]||label.toLowerCase(),areas:arr.map(([name,code])=>({name,code,subfields:ARXIV.filter(x=>x[0]===code).map(([_,n,c])=>({name:n,code:c}))}))}));
+const mapArxivGroup=A.map(([label,arr])=>({label,id:arr[0]?.[1]||label.toLowerCase(),areas:arr.map(([name,code])=>({name,code,subfields:[...ARXIV.filter(x=>x[0]===code).map(([_,n,c])=>({name:n,code:c})),...(SUGGESTIONS[name]||[]).map(x=>({name:x,code:x}))]}))}));
 const bio={groups:[{label:"Biology and Life Sciences",id:"biology",areas:BIO.map(name=>({name,code:name,subfields:(SUGGESTIONS[name]||[]).map(t=>({name:t,code:t}))}))}]};
 const chem={groups:[{label:"Chemistry and Molecular Sciences",id:"chemistry",areas:CHEM.map(name=>({name,code:name,subfields:(SUGGESTIONS[name]||[]).map(t=>({name:t,code:t}))}))}]};
 root.AxiovoArchiveTaxonomy={arxiv:{groups:mapArxivGroup},biorxiv:bio,chemrxiv:chem,suggestions:SUGGESTIONS};
