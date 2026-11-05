@@ -72,8 +72,11 @@ function queryWords(query){
  return (clean(query).match(/"[^"]+"|[^\s"]+/g)||[]).map(word=>word.replace(/^"|"$/g,"")).filter(Boolean);
 }
 function matchesText(value,term){
- const hay=simple(value);
- return queryWords(term).map(simple).filter(Boolean).every(word=>hay.includes(word));
+ // Match whole normalized terms, not arbitrary substrings such as
+ // "ion" inside "information". Apply conservative plural normalization.
+ const hay=" "+normalizePhrase(value)+" ";
+ return queryWords(term).map(normalizePhrase).filter(Boolean)
+  .every(word=>hay.includes(" "+word+" "));
 }
 const normalizePhrase=value=>simple(value).split(" ").map(word=>word.length>4?
  word.replace(/ies$/,"y").replace(/(?<![siu])s$/,""):word).join(" ");
@@ -122,8 +125,16 @@ function matchScore(p,c){
   if(!inferredSubject&&!inferredBioSubject&&!hit)return null;
  }
  if(!matchesText(text,c.refinement))return null;
- const queryScore=c.q?(matchesText(p.title,c.q)?8:0)+(matchesText(p.abstract,c.q)?3:0)+(matchesAuthor(p.authors,c.q)?5:0):0;
- return queryScore+(hit?(hit.where==="title"?12:4):0);
+ // Deterministic evidence ranking: exact title phrases are prioritized,
+ // followed by matching title terms, abstract evidence and subject terms.
+ // This affects ordering only; metadata filters above remain mandatory.
+ const q=simple(c.q),title=simple(p.title);
+ const phrase=q&&title.includes(q)?15:0;
+ const queryScore=c.q?phrase+(matchesText(p.title,c.q)?20:0)
+  +(matchesText(p.abstract,c.q)?7:0)+(matchesAuthor(p.authors,c.q)?9:0):0;
+ const topicScore=hit?(hit.where==="title"?18:7):0;
+ const categoryScore=c.category&&categoryMatch(p,c.category)?4:0;
+ return queryScore+topicScore+categoryScore;
 }
 function filter(papers,criteria){
  return papers.map(p=>({p,score:matchScore(p,criteria)})).filter(row=>row.score!==null).sort(({p:a,score:x},{p:b,score:y})=>
