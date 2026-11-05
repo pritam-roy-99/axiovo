@@ -89,19 +89,19 @@ function renderRecommendations(){
  if(!list.length){texts(root,"div","No matching arXiv-linked papers among the retrieved candidates. Broaden the research interest or search arXiv history directly.","rl-empty");return}
  for(const hit of list){
   const pp=hit.paper;
-  const item=texts(root,"article","","rl-paper");
+  const item=texts(root,"article","","rl-paper axiovo-rec-card");
   const title=texts(item,"h3","");
   const a=texts(title,"a",pp.title||"Untitled paper");a.href=Arxiv?.abs(pp.id)||"https://arxiv.org/";a.target="_blank";a.rel="noopener noreferrer";
   texts(item,"p",(pp.authors||[]).slice(0,4).join(", ")+(pp.published?" · "+pp.published.slice(0,10):""),"rl-paper-meta");
   texts(item,"p",hit.reasons.filter(x=>x!=="Already saved").slice(0,3).join(" · "),"rl-relevance-reason");
   if(hit.reasons.includes("Already saved"))texts(item,"span","In your reading list","rl-counter");
-  const row=texts(item,"div","","rl-paper-actions");
+  const row=texts(item,"div","","rl-paper-actions axiovo-rec-actions");
   const parsed=Arxiv?.parse(pp.id),sourceId=parsed?.requested||String(pp.id||"");
   const original=Arxiv?.abs(sourceId)||"https://arxiv.org/";
-  const readLink=texts(row,"a","Read on arXiv");readLink.href=original;readLink.target="_blank";readLink.rel="noopener noreferrer";readLink.className="rl-paper-primary";
-  const cop=texts(row,"a","✦ Research Assistant");cop.href="./copilot.html?id="+encodeURIComponent(sourceId);
+  const readLink=texts(row,"a","↗ Read on arXiv");readLink.href=original;readLink.target="_blank";readLink.rel="noopener noreferrer";readLink.className="rl-paper-primary axiovo-rec-read";
+  const cop=texts(row,"a","✦ Research Assistant");cop.href="./copilot.html?id="+encodeURIComponent(sourceId);cop.className="axiovo-rec-assistant";
   const current=read(OLD_SAVED,[]);const savedHere=Array.isArray(current)&&current.includes(sourceId);
-  const save=texts(row,"button",savedHere?"✓ Saved":"☆ Save paper");save.type="button";
+  const save=texts(row,"button",savedHere?"✓ Saved":"☆ Save paper");save.type="button";save.className="axiovo-rec-save";
   save.setAttribute("aria-pressed",String(savedHere));save.setAttribute("aria-label",(savedHere?"Remove ":"Save ")+"arXiv:"+sourceId+" from your reading list");
   save.onclick=()=>{
     const current=read(OLD_SAVED,[]);const ids=Array.isArray(current)?current:[];
