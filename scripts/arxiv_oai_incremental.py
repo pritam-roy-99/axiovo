@@ -142,6 +142,13 @@ def harvest(today=None, lookback=7, fetcher=fetch_window):
         if day < oldest.isoformat() or day > today.isoformat():
             continue
         grouped.setdefault(day, []).append(p)
+    previous_days = {}
+    try:
+        old = json.loads(MANIFEST.read_text(encoding="utf8"))
+        if isinstance(old.get("days"), dict):
+            previous_days = old["days"]
+    except (OSError, ValueError, AttributeError):
+        pass
     manifest = {"schema": 1,
         "source": "arXiv official OAI-PMH arXiv ListRecords",
         "coverage": "PARTIAL submission-date sets; complete OAI update-window harvest only",
@@ -149,7 +156,7 @@ def harvest(today=None, lookback=7, fetcher=fetch_window):
         "update_from": from_day.isoformat(), "update_until": today.isoformat(),
         "last_harvested_at": dt.datetime.now(dt.timezone.utc).isoformat(),
         "pages_fetched": pages, "records_seen": len(papers),
-        "days": {}}
+        "days": previous_days}
     for day, rows in grouped.items():
         shard = {"date": day, "complete": False, "coverage": "OAI changed records, not complete first-submission set",
              "source": "OAI-PMH update window", "paper_count": len(rows),
