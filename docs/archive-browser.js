@@ -1,342 +1,216 @@
-/* Independent source-verified paper discovery. No shared mixed-source results. */
+/* Dedicated archive discovery, including verified arXiv submission batches. */
 (function(){
 "use strict";
 const source=document.body.dataset.archive;
-if(!["arxiv","biorxiv","chemrxiv"].includes(source))return;
-const definition=window.AxiovoArchiveTaxonomy?.[source];if(!definition)return;
+const taxonomy=window.AxiovoArchiveTaxonomy;
+const data=window.AxiovoArchiveData;
+const definition=taxonomy?.[source];
+if(!definition||!data)return;
 const $=id=>document.getElementById(id);
+const make=(tag,value,cls)=>{const node=document.createElement(tag);if(value!==undefined)node.textContent=value;if(cls)node.className=cls;return node};
 const memory="axiovo-browser-state-"+source,customKey="axiovo-custom-fields-"+source;
-const saveKey={arxiv:"axiovo-reading-list",biorxiv:"axiovo-biorxiv-reading-v1",chemrxiv:"axiovo-chemrxiv-reading-v1"}[source];
-const official={arxiv:"https://arxiv.org/search/",biorxiv:"https://www.biorxiv.org/search/",chemrxiv:"https://chemrxiv.org/"}[source];
-const read=(k,def)=>{try{return JSON.parse(localStorage.getItem(k)||"null")??def}catch{return def}};
-const write=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}catch{return false}};
-const clean=x=>String(x??"").trim();
-const simple=x=>clean(x).toLowerCase().normalize("NFKD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9\s.\/-]/g," ").replace(/\s+/g," ");
-const make=(tag,cls,value)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(value!==undefined)e.textContent=value;return e};
-let state=read(memory,{topic:0,field:0,subfield:"",query:"",author:"",affiliation:"",scope:"subfield",sort:"relevance",from:"",to:""});
-const linkedQuery=new URLSearchParams(location.search);
-if(linkedQuery.has("q")||linkedQuery.has("query")){
- state.query=(linkedQuery.get("q")||linkedQuery.get("query")||"").slice(0,220);
- state.scope="all";
-}
-for(const fieldName of ["author","from","to"]){
- if(linkedQuery.has(fieldName))state[fieldName]=(linkedQuery.get(fieldName)||"").slice(0,120);
-}
-if(["recent","relevance","cited"].includes(linkedQuery.get("sort")))state.sort=linkedQuery.get("sort");
-
-let custom=read(customKey,{}),localPapers=[],shown=[],allResults=[],page=0,lastSync="",requestSeq=0;
-const responseCache=new Map();
+const defaults={topic:0,field:0,subfield:"",query:"",author:"",affiliation:"",scope:"all",sort:"recent",from:"",to:""};
+const url=new URL(location.href),linked=url.searchParams;
+const state={...defaults,...(linked.size?{}:data.read(memory,{}))};
+let custom=data.read(customKey,{}),controller,criteria,result=[],visible=20,next=null,status="",fetching=false;
+const directory=taxonomy.directory(source);
 const group=()=>definition.groups[Number(state.topic)]||definition.groups[0];
-const field=()=>group().areas[Number(state.field)]||group().areas[0];
-const userSubs=()=>Array.isArray(custom[field().code])?custom[field().code]:[];
-const subs=()=>[...field().subfields.map(x=>({name:x.name,code:x.code})),...userSubs().map(x=>({name:x,code:x}))];
-function remember(){write(memory,state)}
-function option(parent,value,name){const item=make("option",null,name);item.value=value;parent.append(item)}
-function selectMenu(node,rows,selected){node.replaceChildren();for(const row of rows)option(node,row.code,row.name);node.value=selected}
-function taxonomy(){
- if(!group()){state.topic=0;state.field=0}
- if(!field())state.field=0;
+const area=()=>group().areas[Number(state.field)]||group().areas[0];
+const userSubs=()=>Array.isArray(custom[area().code])?custom[area().code]:[];
+const subs=()=>[...area().subfields,...userSubs().map(name=>({name,code:name}))];
+
+function selectCategory(row){
+ Object.assign(state,{topic:row.topic,field:row.field,subfield:row.subfield,scope:"subfield"});
+}
+if(linked.has("category")){
+ const code=linked.get("category");
+ const areas=definition.groups.flatMap((g,topic)=>g.areas.map((a,field)=>({...a,topic,field,subfield:""})));
+ const row=[...directory,...areas].find(x=>data.simple(x.code)===data.simple(code));
+ if(row)selectCategory(row);
+}
+for(const key of ["author","affiliation","from","to","sort"])if(linked.has(key))state[key]=linked.get(key).slice(0,120);
+state.query=(linked.get("q")||linked.get("query")||state.query).slice(0,300);
+if(linked.has("date"))state.from=state.to=linked.get("date");
+if(!definition.groups[state.topic])state.topic=0;
+if(!group().areas[state.field])state.field=0;
+
+function remember(){data.write(memory,state)}
+function option(value,label){const node=make("option",label);node.value=value;return node}
+function fill(select,rows,value){select.replaceChildren(...rows.map(row=>option(row.code,row.name)));select.value=value}
+function button(label,fn,cls){
+ const node=make("button",label,cls);node.type="button";node.onclick=fn;return node;
+}
+function link(label,href,cls){
+ const node=make("a",label,cls);node.href=href;
+ if(href.startsWith("https:")){node.target="_blank";node.rel="noopener noreferrer"}
+ return node;
+}
+function applyFilters(){
+ for(const key of ["scope","sort","from","to","author","affiliation"])$("archive-"+key).value=state[key];
+ $("archive-query").value=state.query;
+}
+function selectAndSearch(){
+ state.scope="subfield";$("archive-scope").value=state.scope;
+ renderTaxonomy();search();
+}
+function renderTaxonomy(){
  if(!subs().some(x=>x.code===state.subfield))state.subfield="";
- selectMenu($("archive-topic"),definition.groups.map((g,i)=>({code:String(i),name:g.label})),String(state.topic));
- selectMenu($("archive-field"),group().areas.map((a,i)=>({code:String(i),name:a.name})),String(state.field));
- selectMenu($("archive-subfield"),[{code:"",name:"All "+field().name},...subs()],state.subfield);
+ fill($("archive-topic"),definition.groups.map((g,i)=>({code:i,name:g.label})),state.topic);
+ fill($("archive-field"),group().areas.map((a,i)=>({code:i,name:a.name+(a.legacy?" (historical)":"")})),state.field);
+ const official=subs().filter(x=>x.official),refinements=subs().filter(x=>!x.official);
+ const picker=$("archive-subfield");
+ picker.replaceChildren(option("","All "+area().name));
+ for(const [label,choices] of [["Official categories",official],["Search refinements",refinements]]){
+  if(!choices.length)continue;
+  const set=make("optgroup");set.label=label;set.append(...choices.map(x=>option(x.code,x.name)));picker.append(set);
+ }
+ picker.value=state.subfield;
  const chips=$("archive-category-list");chips.replaceChildren();
- for(const [i,a] of group().areas.entries()){
-  const button=make("button",null,a.name);button.type="button";button.setAttribute("aria-pressed",String(i===Number(state.field)));
-  button.onclick=()=>{state.field=String(i);state.subfield="";remember();taxonomy();search()};chips.append(button);
+ if(source==="arxiv"&&group().areas.length>1)for(const [i,item] of group().areas.entries()){
+  const chip=button(item.name,()=>{Object.assign(state,{field:i,subfield:""});selectAndSearch()});
+  chip.setAttribute("aria-pressed",String(i===Number(state.field)&&state.scope==="subfield"));chips.append(chip);
  }
  const own=$("archive-custom-list");own.replaceChildren();
  for(const name of userSubs()){
-  const b=make("button",null,name+" ×");b.type="button";b.setAttribute("aria-label","Remove "+name);
-  b.onclick=()=>{custom[field().code]=userSubs().filter(x=>x!==name);write(customKey,custom);if(state.subfield===name)state.subfield="";remember();taxonomy()};
-  own.append(b);
+  const item=button(name+" ×",()=>{
+   custom[area().code]=userSubs().filter(x=>x!==name);data.write(customKey,custom);
+   if(state.subfield===name){state.subfield="";selectAndSearch()}else renderTaxonomy();
+  });
+  item.setAttribute("aria-label","Remove "+name);own.append(item);
  }
- const list=$("archive-suggestions");list.replaceChildren();
- const vals=[...new Set([...group().areas.map(x=>x.name),...subs().map(x=>x.name),...allResults.slice(0,40).map(x=>x.title)])];
- for(const value of vals.slice(0,80))option(list,value,value);
 }
-function normalArxiv(p){
- const id=clean(p.id||p.arxiv_id).replace(/^arxiv:/i,"").replace(/v\d+$/,"");
- if(!/^(\d{4}\.\d{4,5}|[a-z-]+(?:\.[a-z-]+)?\/\d{7})$/i.test(id))return null;
- const authors=(p.authors||[]).map(a=>typeof a==="string"?a:a?.name||"").filter(Boolean);
- return {id,doi:clean(p.doi),title:clean(p.title),authors,date:clean(p.published||p.date).slice(0,10),abstract:clean(p.abstract||p.summary),
-  category:clean(p.primary_category||p.category),categories:Array.isArray(p.categories)?p.categories:[],affiliations:Array.isArray(p.affiliations)?p.affiliations:[],url:"https://arxiv.org/abs/"+id,pdf:"https://arxiv.org/pdf/"+id,citations:null,source:"arxiv"};
+function renderDirectory(){
+ const q=data.simple($("archive-category-query").value);
+ const matches=directory.filter(x=>!q||q.split(" ").every(word=>data.simple(x.name+" "+x.code+" "+x.group+" "+x.area).includes(word)));
+ $("archive-category-count").textContent=matches.length+" of "+directory.length+" listed "+(source==="arxiv"?"categories":"subjects");
+ $("archive-category-matches").replaceChildren(...matches.map(row=>{
+  const label=row.name+(source==="arxiv"?" · "+row.code:row.legacy?" · historical":"");
+  return button(label,()=>{selectCategory(row);$("archive-directory").open=false;selectAndSearch();$("archive-query").focus()});
+ }));
 }
-function normalDOI(p){
- const doi=clean(p.doi||p.DOI).toLowerCase();
- if(!/^10\.\d{4,9}\//.test(doi))return null;
- if(source==="biorxiv"&&!/^10\.(?:1101|64898)\//.test(doi))return null;
- if(source==="chemrxiv"&&!doi.startsWith("10.26434/")&&!/chemrxiv/i.test(clean(p.source)))return null;
- const title=clean(p.title);if(!title)return null;
- const authors=(Array.isArray(p.authors)?p.authors:clean(p.authors).split(/[;,]/)).map(x=>typeof x==="string"?x:clean(x.name||[x.given,x.family].filter(Boolean).join(" "))).filter(Boolean);
- return {id:doi,doi,title,authors,date:clean(p.date||p.firstPublicationDate).slice(0,10),abstract:clean(p.abstract),
-  category:clean(p.category),categories:[clean(p.category)],affiliations:Array.isArray(p.affiliations)?p.affiliations:[],url:source==="biorxiv"?"https://www.biorxiv.org/content/"+doi:"https://doi.org/"+doi,
-  pdf:source==="biorxiv"?"https://www.biorxiv.org/content/"+doi+".full.pdf":null,citations:p.citations??null,source};
+function criteriaFromForm(){
+ const selected=subs().find(x=>x.code===state.subfield);
+ const codes=area().subfields.filter(x=>x.official).map(x=>x.code);
+ const category=state.scope==="all"?null:selected?.official?{name:selected.name,code:selected.code}:
+  {name:area().name,code:area().code,...(codes.length?{codes}:{})};
+ return {q:state.query,author:state.author,affiliation:state.affiliation,from:state.from,to:state.to,sort:state.sort,category,
+  refinement:state.scope==="subfield"&&!selected?.official?state.subfield:""};
 }
-function verified(p){return p&&p.source===source&&(source==="arxiv"?p.url.startsWith("https://arxiv.org/abs/"):source==="biorxiv"?/^10\.(?:1101|64898)\//.test(p.doi):p.doi.startsWith("10.26434/"))}
-async function getJSON(url){
- const c=new AbortController(),timer=setTimeout(()=>c.abort(),13000);
- try{const r=await fetch(url,{signal:c.signal});if(!r.ok)throw Error("HTTP "+r.status);return await r.json()}finally{clearTimeout(timer)}
+function updateURL(){
+ const params=new URLSearchParams();
+ for(const [name,value] of Object.entries({q:state.query,author:state.author,affiliation:state.affiliation,from:state.from,to:state.to,sort:state.sort==="recent"?"":state.sort,category:criteria.category?.code,refine:criteria.refinement}))if(value)params.set(name,value);
+ const target=new URL(location.href);target.search=params;history.replaceState(null,"",target);
 }
-async function local(){
- const name={arxiv:"feed.json",biorxiv:"biorxiv.json",chemrxiv:"chemrxiv.json"}[source];
- try{const d=await getJSON("./data/"+name);lastSync=clean(d.generated_at||"").slice(0,19);
-  const rows=Array.isArray(d.papers)?d.papers:Array.isArray(d)?d:[];
-  return rows.map(x=>source==="arxiv"?normalArxiv(x):normalDOI(x)).filter(verified);
- }catch{return []}
-}
-function atom(xml){
- const doc=new DOMParser().parseFromString(xml,"application/xml");
- if(doc.querySelector("parsererror"))throw Error("Invalid arXiv Atom response");
- const ns="http://www.w3.org/2005/Atom";
- return [...doc.getElementsByTagNameNS(ns,"entry")].map(entry=>{
-  const val=tag=>entry.getElementsByTagNameNS(ns,tag)[0]?.textContent||"";
-  const id=val("id").split("/abs/").pop().replace(/v\d+$/,"");
-  const authors=[...entry.getElementsByTagNameNS(ns,"author")].map(x=>x.getElementsByTagNameNS(ns,"name")[0]?.textContent||"");
-  const categories=[...entry.getElementsByTagName("category")].map(x=>x.getAttribute("term")).filter(Boolean);
-  return normalArxiv({id,title:val("title"),abstract:val("summary"),published:val("published"),authors,categories,primary_category:categories[0]});
- }).filter(verified);
-}
-function chosenTerm(){return state.query||((state.scope==="subfield")?(state.subfield||field().name):"")}
-async function remote(){
- const officialCategoryCodes=new Set(definition.groups.flatMap(g=>g.areas.flatMap(a=>[a.code,...a.subfields.map(x=>x.code)])));
- const isCategoryCode=officialCategoryCodes.has(state.subfield);
- const term=(source==="arxiv"?(state.query||(!isCategoryCode&&state.scope==="subfield"?state.subfield:"")):chosenTerm()).slice(0,150);
- if(source==="arxiv"){
-  const chosen=state.scope==="subfield"?(state.subfield||field().code):"";
-  const officialCode=state.scope==="subfield"?(officialCategoryCodes.has(chosen)?chosen:field().code):"";
-  const archiveWide="("+[...new Set(definition.groups.flatMap(g=>g.areas.map(a=>a.code)))].map(c=>"cat:"+c).join(" OR ")+")";
-  const baseQuery=[officialCode?"cat:"+officialCode:"",term?"all:"+term.replace(/[:()"\\]/g," "):""].filter(Boolean).join(" AND ")||archiveWide;
-  // Apply the date constraint upstream. Post-filtering only the most recent 100
-  // papers makes historical dates falsely appear to have no results.
-  const today=new Date().toISOString().slice(0,10);
-  const start=(state.from||"1991-01-01").replace(/-/g,"")+"0000";
-  const end=(state.to||today).replace(/-/g,"")+"2359";
-  const dateClause=state.from||state.to?"submittedDate:["+start+" TO "+end+"]":"";
-  const q=[baseQuery,dateClause].filter(Boolean).join(" AND ");
-  const url="https://export.arxiv.org/api/query?"+new URLSearchParams({search_query:q,start:"0",max_results:dateClause?"200":"100",sortBy:(state.sort==="recent"||!term)?"submittedDate":"relevance",sortOrder:"descending"});
-  const c=new AbortController(),timer=setTimeout(()=>c.abort(),15000);
-  try{const r=await fetch(url,{signal:c.signal});if(!r.ok)throw Error("HTTP "+r.status);return atom(await r.text())}finally{clearTimeout(timer)}
+function paperCard(p){
+ const article=make("article",undefined,"axiovo-result-card");
+ const line=[p.recordId,p.date||"Date unavailable",p.category,p.provenance].filter(Boolean).join(" · ");
+ article.append(make("p",line,"axiovo-paper-meta"));
+ const title=make("h3");title.append(link(p.title,p.url,"axiovo-paper-title-button"));article.append(title);
+ const authors=make("p",undefined,"axiovo-paper-meta");
+ p.authors.slice(0,8).forEach((name,i)=>{
+  if(i)authors.append(document.createTextNode(", "));
+  authors.append(button(name,()=>{$("archive-author").value=name;$("archive-query").value="";search()},"axiovo-author-link"));
+ });
+ if(!p.authors.length)authors.textContent="Authors unavailable";
+ article.append(authors);
+ if(p.abstract){
+  const summary=make("details",undefined,"axiovo-article-details");
+  summary.append(make("summary","Read abstract"),make("p",p.abstract,"axiovo-abstract"));article.append(summary);
  }
- if(source==="biorxiv"){
-  const q='SRC:PPR AND JOURNAL:"bioRxiv"'+(term?" AND ("+term.replace(/[():"]/g," ")+")":"");
-  const url="https://www.ebi.ac.uk/europepmc/webservices/rest/search?"+new URLSearchParams({query:q,format:"json",pageSize:"100",resultType:"core"});
-  const data=await getJSON(url);
-  return (data.resultList?.result||[]).filter(p=>/biorxiv/i.test(clean(p.journalTitle||p.journalInfo?.journal?.title)))
-    .map(p=>normalDOI({doi:p.doi,title:p.title,authors:p.authorString,date:p.firstPublicationDate,abstract:p.abstractText,category:p.journalTitle})).filter(verified);
- }
- const params={rows:"100",sort:state.sort==="recent"?"published":"score",order:"desc"};
- if(term)params["query.bibliographic"]=term;
- const url="https://api.crossref.org/prefixes/10.26434/works?"+new URLSearchParams(params);
- const pmcQuery='SRC:PPR AND JOURNAL:"ChemRxiv"'+(term?" AND ("+term.replace(/[():"]/g," ")+")":"");
- const pmcURL="https://www.ebi.ac.uk/europepmc/webservices/rest/search?"+new URLSearchParams({query:pmcQuery,format:"json",pageSize:"100",resultType:"core"});
- const calls=await Promise.allSettled([getJSON(url),getJSON(pmcURL)]);
- const cross=calls[0].status==="fulfilled"?calls[0].value.message?.items||[]:[];
- const pmc=calls[1].status==="fulfilled"?calls[1].value.resultList?.result||[]:[];
- if(!cross.length&&!pmc.length&&calls.every(x=>x.status==="rejected"))throw Error("Crossref and Europe PMC unavailable");
- const works=cross.map(x=>normalDOI({doi:x.DOI,title:x.title?.[0],authors:(x.author||[]).map(a=>[a.given,a.family].filter(Boolean).join(" ")),
- abstract:clean(x.abstract).replace(/<[^>]*>/g," "),date:x.published?.["date-parts"]?.[0]?.map((n,i)=>String(n).padStart(i?2:4,"0")).join("-"),
- category:(x.subject||[]).join(", "),source:"ChemRxiv",citations:x["is-referenced-by-count"]})).filter(verified);
- const epmc=pmc.filter(x=>/chemrxiv/i.test(clean(x.journalTitle||x.journalInfo?.journal?.title)))
- .map(x=>normalDOI({doi:x.doi,title:x.title,authors:x.authorString,abstract:x.abstractText,date:x.firstPublicationDate,category:x.journalTitle,source:"ChemRxiv"})).filter(verified);
- const byDOI=new Map();for(const x of [...epmc,...works])byDOI.set(x.doi,x);
- return [...byDOI.values()];
-}
-// Optional cross-corpus discovery is accepted ONLY after verifying the paper's
-// native archive identifier. This broadens title/abstract concept retrieval
-// without mixing in records hosted by other preprint servers.
-function abstractFromInverted(index){
- if(!index||typeof index!=="object")return "";
- const pairs=[];
- for(const [word,positions] of Object.entries(index))
-  for(const pos of positions||[])if(Number.isInteger(pos)&&pos>=0&&pos<1800)pairs.push([pos,word]);
- return pairs.sort((a,b)=>a[0]-b[0]).slice(0,1800).map(x=>x[1]).join(" ");
-}
-async function sourceVerifiedOpenAlex(){
- const term=clean(state.query||state.author||state.affiliation).slice(0,150);
- if(!term)return [];
- const url="https://api.openalex.org/works?"+new URLSearchParams({search:term,"per-page":"60"});
- const data=await getJSON(url);
- const out=[];
- for(const x of data.results||[]){
-  const urls=(x.locations||[]).flatMap(loc=>[loc.landing_page_url,loc.pdf_url]).filter(Boolean);
-  const title=clean(x.title),abstract=abstractFromInverted(x.abstract_inverted_index);
-  const authors=(x.authorships||[]).map(a=>clean(a.author?.display_name)).filter(Boolean);
-  const affiliations=[...new Set((x.authorships||[]).flatMap(a=>(a.institutions||[]).map(i=>clean(i.display_name))).filter(Boolean))];
-  const date=clean(x.publication_date);
-  let item=null;
-  if(source==="arxiv"){
-   const ref=urls.map(u=>u.match(/arxiv\.org\/(?:abs|pdf)\/((?:\d{4}\.\d{4,5}|[a-z-]+\/\d{7})(?:v\d+)?)/i)).find(Boolean);
-   if(ref)item=normalArxiv({id:ref[1],title,abstract,published:date,authors,affiliations,categories:(x.topics||[]).map(t=>t.subfield?.display_name).filter(Boolean)});
-  }else{
-   const doi=clean(x.doi).replace(/^https?:\/\/doi\.org\//i,"").toLowerCase();
-   const native=urls.some(u=>source==="biorxiv"?/biorxiv\.org/i.test(u):/chemrxiv\.org/i.test(u))||
-    (x.locations||[]).some(loc=>new RegExp(source,"i").test(clean(loc.source?.display_name)));
-   if(native&&((source==="biorxiv"&&/^10\.(?:1101|64898)\//.test(doi))||(source==="chemrxiv"&&doi.startsWith("10.26434/"))))
-    item=normalDOI({doi,title,authors,affiliations,abstract,date,source:source==="biorxiv"?"bioRxiv":"ChemRxiv"});
-  }
-  if(verified(item)){item.semanticMatch=true;item.citations=Number.isFinite(x.cited_by_count)?x.cited_by_count:null;out.push(item)}
- }
- return out;
-}
-function match(hay,needle){
- const h=simple(hay),q=simple(needle);if(!q)return 1;if(h.includes(q))return 5;
- let n=0;for(const w of q.split(" ").filter(Boolean))if(h.includes(w))n++;
- if(n)return n;
- if(q.length<5||q.includes(" "))return 0;
- for(const token of h.split(" ")){if(Math.abs(token.length-q.length)>1)continue;let edits=0,i=0,j=0;
-  while(i<token.length&&j<q.length&&edits<2){if(token[i]===q[j]){i++;j++;continue}edits++;if(token.length>q.length)i++;else if(q.length>token.length)j++;else{i++;j++}}
-  if(edits+Math.abs(token.length-i-(q.length-j))<=1)return .5;
- }
- return 0;
-}
-function relevant(p){
- if(!verified(p))return false;
- if(state.from&&(!p.date||p.date<state.from))return false;
- if(state.to&&(!p.date||p.date>state.to))return false;
- if(state.author&&!match(p.authors.join(" "),state.author))return false;
- if(state.affiliation&&!match((p.affiliations||[]).join(" "),state.affiliation))return false;
- const combined=[p.title,p.abstract,p.category,p.categories.join(" "),p.id,p.authors.join(" ")].join(" ");
- if(state.query&&!match(combined,state.query)&&!p.semanticMatch)return false;
- if(state.scope==="subfield"){
-  const term=state.subfield||field().code;
-  const exact=source==="arxiv"&&p.categories.some(cat=>cat===term||cat.startsWith(term+"."));
-  if(term&&!exact&&!match(combined,term))return false;
- }
- return true;
-}
-function rank(p){return 8*match(p.title,state.query)+3*match(p.abstract,state.query)+5*match(p.authors.join(" "),state.query)+2*match(p.category,state.subfield||field().code)}
-function highlight(node,text,query){
- node.replaceChildren();
- const value=String(text||""),terms=clean(query).split(/\s+/).filter(x=>x.length>=3).slice(0,7);
- if(!terms.length){node.textContent=value;return}
- const low=value.toLowerCase();let at=0,seen=0;
- while(at<value.length&&seen<50){
-  let found=-1,len=0;
-  for(const word of terms){const pos=low.indexOf(word.toLowerCase(),at);if(pos>=0&&(found<0||pos<found)){found=pos;len=word.length}}
-  if(found<0)break;
-  if(found>at)node.append(document.createTextNode(value.slice(at,found)));
-  node.append(make("mark",null,value.slice(found,found+len)));
-  at=found+len;seen++;
- }
- node.append(document.createTextNode(value.slice(at)));
-}
-function outgoing(container,label,url,primary=false){
- const a=make("a",primary?"axiovo-primary":null,label);a.href=url;if(url.startsWith("https:")){a.target="_blank";a.rel="noopener noreferrer"}container.append(a);return a;
-}
-function saved(p){
- const old=read(saveKey,[]);
- if(source==="arxiv"){const vals=new Set(old.map(x=>typeof x==="string"?x:x.id));vals.add(p.id);return write(saveKey,[...vals])}
- if(old.some(x=>x.doi===p.doi))return true;
- return write(saveKey,[...old,p]);
-}
-function card(p){
- const root=make("article","axiovo-result-card");
- root.append(make("p","axiovo-paper-meta",(source==="arxiv"?"arXiv: ":"DOI: ")+p.id+" · "+(p.date||"Date unavailable")+" · "+(p.category||"Unclassified")));
- const title=make("h3");
- const titleButton=make("button","axiovo-paper-title-button");highlight(titleButton,p.title,state.query);
- titleButton.type="button";titleButton.setAttribute("aria-label","View paper details for "+p.title);
- title.append(titleButton);root.append(title);
- const author=make("p","axiovo-paper-meta");
- p.authors.slice(0,25).forEach((name,i)=>{if(i)author.append(document.createTextNode(", "));const b=make("button","axiovo-author-link",name);b.type="button";b.onclick=()=>{$("archive-author").value=name;$("archive-query").value="";$("archive-scope").value="all";search()};author.append(b)});
- if(!p.authors.length)author.textContent="Author metadata unavailable";root.append(author);
- if(p.affiliations?.length)root.append(make("p","axiovo-paper-meta","Affiliations: "+p.affiliations.slice(0,5).join("; ")));
- const preview=make("p","axiovo-abstract");
- highlight(preview,(p.abstract||"Abstract unavailable in this source").slice(0,460)+(p.abstract.length>460?"…":""),state.query);
- root.append(preview);
- const actions=make("div","axiovo-paper-actions");
- const details=make("div","axiovo-article-details");details.hidden=true;
- details.append(make("h4",null,"Full available abstract"),make("p",null,p.abstract||"No abstract provided by source."));
- details.append(make("p","axiovo-paper-meta","Publication date: "+(p.date||"Unspecified")+" · Subjects: "+(p.categories.filter(Boolean).join(", ")||p.category||"Unspecified")));
- details.append(make("p","axiovo-paper-meta",p.citations===null?"Citation count unavailable":"Crossref citation references: "+p.citations+" (not a quality score)"));
- if(p.doi)outgoing(details,"DOI ↗","https://doi.org/"+p.doi);
- outgoing(details,"Find citations and related work ↗","https://openalex.org/works?search="+encodeURIComponent(p.doi||p.id));
- const near=allResults.filter(x=>x.id!==p.id&&x.category&&x.category===p.category).slice(0,3);
- if(near.length){details.append(make("h4",null,"Related indexed papers"));
-  for(const x of near){const line=make("p");outgoing(line,x.title,x.url);details.append(line)}}
-
- const toggle=make("button",null,"View details");toggle.type="button";toggle.onclick=()=>{details.hidden=!details.hidden;toggle.textContent=details.hidden?"View details":"Hide details"};
- titleButton.onclick=()=>toggle.click();actions.append(toggle);outgoing(actions,"Source page ↗",p.url,true);
- if(p.pdf)outgoing(actions,"PDF ↗",p.pdf);
- if(source==="arxiv")outgoing(actions,"Research workspace","./paper.html?id="+encodeURIComponent(p.id));
- const saveButton=make("button",null,"Save paper");saveButton.type="button";saveButton.onclick=()=>{if(saved(p))saveButton.textContent="✓ Saved";else saveButton.textContent="Storage unavailable"};actions.append(saveButton);
- root.append(actions,details);return root;
+ const actions=make("div",undefined,"axiovo-paper-actions");
+ actions.append(link("Original record ↗",p.url,"axiovo-primary"));
+ if(p.pdf)actions.append(link("PDF ↗",p.pdf));
+ if(source==="arxiv")actions.append(link("Paper workspace","./paper.html?id="+encodeURIComponent(p.recordId)));
+ const saveButton=button(data.saved(p)?"Saved to Library":"Save to Library",()=>{
+  const ok=data.save(p);saveButton.textContent=ok?"Saved to Library":"Storage unavailable";saveButton.disabled=ok;
+ });
+ saveButton.disabled=data.saved(p);actions.append(saveButton);
+ const compare=button(data.comparison().some(item=>data.recordKey(item)===data.recordKey(p))?"Added to comparison":"Add to comparison",()=>{
+  const outcome=data.addComparison(p);
+  compare.textContent=outcome==="added"?"Added to comparison":outcome==="full"?"Comparison full (3 papers)":"Storage unavailable";
+ });
+ if(p.abstract&&window.AxiovoAbstractAudio)actions.append(button("Listen to abstract",()=>window.AxiovoAbstractAudio.play([p])));
+ actions.append(compare);article.append(actions);return article;
 }
 function render(){
- shown=allResults.filter(relevant);
- if(state.sort==="recent")shown.sort((a,b)=>b.date.localeCompare(a.date));
- else if(state.sort==="cited")shown.sort((a,b)=>(b.citations??-1)-(a.citations??-1));
- else shown.sort((a,b)=>rank(b)-rank(a)||b.date.localeCompare(a.date));
- const list=$("archive-results");list.replaceChildren();
- const max=(page+1)*20;
- $("archive-result-count").textContent=shown.length+" matching verified "+source+" records in the current search. Coverage may be incomplete.";
- for(const p of shown.slice(0,max))list.append(card(p));
- if(!shown.length){
-  const none=make("div","axiovo-no-results","No matches in the available verified index. This does not establish that the archive has no relevant paper.");
-  const tips=make("p",null,"Try a shorter phrase, a different spelling, removing the date range, or searching the whole archive.");
-  const reset=make("button","axiovo-clear-filters","Clear filters");reset.type="button";
-  reset.onclick=()=>{$("archive-query").value="";$("archive-author").value="";$("archive-affiliation").value="";$("archive-from").value="";$("archive-to").value="";$("archive-scope").value="all";search()};
-  none.append(tips,reset);outgoing(none,"Search official archive ↗",official);list.append(none);
- }
+ $("archive-sync-status").textContent=status;
+ $("archive-result-count").textContent=result.length+" matching "+data.names[source]+" record"+(result.length===1?"":"s")+(fetching?" · checking source…":"");
+ const rows=$("archive-results");rows.replaceChildren(...result.slice(0,visible).map(paperCard));
+ if(!result.length&&!fetching)rows.append(make("p","No matches in the available records for these filters.","axiovo-no-results"));
  const bar=$("archive-result-actions");bar.replaceChildren();
- if(max<shown.length){const more=make("button",null,"Show 20 more");more.type="button";more.onclick=()=>{page++;render()};bar.append(more)}
- const datalist=$("archive-suggestions");datalist.replaceChildren();
- for(const val of [...new Set([...group().areas.map(x=>x.name),...subs().map(x=>x.name),...allResults.slice(0,25).map(x=>x.title),...allResults.slice(0,15).flatMap(x=>x.authors.slice(0,2))])].slice(0,100))option(datalist,val,val);
+ if(visible<result.length)bar.append(button("Show 20 more",()=>{visible+=20;render()}));
+ if(next!==null&&!fetching)bar.append(button("Load next source page",loadMore));
+ bar.append(link("Open official archive ↗",data.sourceLink(source,criteria)));
 }
-async function search(){
- state.query=$("archive-query").value.trim();state.author=$("archive-author").value.trim();state.affiliation=$("archive-affiliation").value.trim();
- state.scope=$("archive-scope").value;state.sort=$("archive-sort").value;state.from=$("archive-from").value;state.to=$("archive-to").value;remember();
- if(state.from&&state.to&&state.from>state.to){
-  ++requestSeq;allResults=[];render();
-  $("archive-result-count").textContent="Invalid date range: the start date must be on or before the end date.";
-  $("archive-sync-status").textContent="Correct the date range to search source records.";
-  return;
+function mergeMatching(...groups){return data.merge(...groups.map(group=>data.filter(group,criteria)))}
+function show(...groups){result=data.filter(mergeMatching(...groups),criteria);render()}
+async function search({keepURL=true}={}){
+ for(const key of ["scope","sort","from","to","author","affiliation"])state[key]=$("archive-"+key).value;
+ state.query=$("archive-query").value.trim();remember();criteria=criteriaFromForm();
+ controller?.abort();controller=new AbortController();
+ const signal=controller.signal,c=criteria;next=null;visible=20;result=[];
+ if(c.from&&c.to&&c.from>c.to){
+  fetching=false;status="The start date must be on or before the end date.";render();return;
  }
- page=0;const seq=++requestSeq;
- // Show cached results immediately while a separate remote request updates them.
- allResults=[...localPapers];render();
- $("archive-result-count").textContent="Showing cached source records; refreshing search…";
- const cacheKey=JSON.stringify([source,state.topic,state.field,state.subfield,state.query,state.author,state.affiliation,state.scope,state.sort,state.from,state.to]);
- let fresh=[],extra=[],error="";
- const cached=responseCache.get(cacheKey);
- if(cached&&Date.now()-cached.time<300000){fresh=cached.fresh;extra=cached.extra;error=cached.error}
- else{
-  const settled=await Promise.allSettled([remote(),sourceVerifiedOpenAlex()]);
-  if(seq!==requestSeq)return;
-  if(settled[0].status==="fulfilled")fresh=settled[0].value;
-  else error=clean(settled[0].reason?.message||"Remote unavailable").slice(0,90);
-  if(settled[1].status==="fulfilled")extra=settled[1].value;
-  responseCache.set(cacheKey,{time:Date.now(),fresh,extra,error});
-  if(responseCache.size>25)responseCache.delete(responseCache.keys().next().value);
+ if(keepURL)updateURL();
+ fetching=true;status="Checking available records and source coverage…";render();
+ const cachedTask=data.snapshot(source);
+ const datesTask=source==="arxiv"?data.datedArxiv(c,signal).catch(()=>null):Promise.resolve(null);
+ const local=await cachedTask;if(signal.aborted)return;
+ show(local.papers);
+ const dates=await datesTask;if(signal.aborted)return;
+ if(dates?.complete){
+  fetching=false;status=dates.reason+" Dates are first submissions in UTC.";
+  show(dates.papers);return;
  }
- if(seq!==requestSeq)return;
- const unique=new Map();for(const p of [...localPapers,...extra,...fresh])if(verified(p))unique.set(p.id,p);
- allResults=[...unique.values()];
- $("archive-sync-status").textContent=(error?"Live query unavailable ("+error+"); showing verified cached records. ":"Source query completed. ")+allResults.length+" verified records retrieved or cached (limited query window; not a complete archive count)"+(lastSync?" · cached snapshot "+lastSync:"")+". Optional OpenAlex matches accepted only with native archive verification. Not a complete historical archive.";
- render();
+ const prefix=dates?.coveredDays?dates.reason+" ":"";
+ try{
+  const live=await data.live(source,c,signal);
+  if(signal.aborted)return;
+  next=live.next;
+  status=prefix+live.provider+" returned a page of metadata. "+(source==="chemrxiv"&&c.category?"Where subject tags are unavailable, chemistry matches use the subject name as a search term. ":"")+"Coverage depends on the source and filters.";
+  fetching=false;show(local.papers,dates?.papers||[],live.papers);
+ }catch(error){
+  if(signal.aborted)return;
+  fetching=false;status=prefix+"Live source unavailable. Showing available snapshots"+(local.stamp?" from "+local.stamp.slice(0,10):"")+".";
+  show(local.papers,dates?.papers||[]);
+ }
 }
-async function init(){
- const cat=definition.groups;
- if(!cat[Number(state.topic)])state.topic=0;
- if(!group().areas[Number(state.field)])state.field=0;
- taxonomy();
- $("archive-topic").onchange=()=>{state.topic=$("archive-topic").value;state.field="0";state.subfield="";remember();taxonomy();search()};
- $("archive-field").onchange=()=>{state.field=$("archive-field").value;state.subfield="";remember();taxonomy();search()};
- $("archive-subfield").onchange=()=>{state.subfield=$("archive-subfield").value;remember();search()};
- $("archive-custom-form").onsubmit=e=>{e.preventDefault();const name=clean($("archive-custom").value).slice(0,90);if(!name)return;
-  if(!userSubs().some(x=>simple(x)===simple(name))){custom[field().code]=[...userSubs(),name].slice(0,40);write(customKey,custom)}
-  state.subfield=name;$("archive-custom").value="";remember();taxonomy();search()};
- $("archive-reset").onclick=()=>{delete custom[field().code];write(customKey,custom);state.subfield="";remember();taxonomy();search()};
- $("archive-search-form").onsubmit=e=>{e.preventDefault();search()};
- $("archive-query").value=state.query||"";$("archive-author").value=state.author||"";$("archive-affiliation").value=state.affiliation||"";
- $("archive-scope").value=state.scope||"subfield";$("archive-sort").value=state.sort||"relevance";
- $("archive-from").value=state.from||"";$("archive-to").value=state.to||"";
- for(const name of ["archive-scope","archive-sort","archive-from","archive-to"])$(name).onchange=search;
- try{const file={arxiv:"feed.json",biorxiv:"biorxiv.json",chemrxiv:"chemrxiv.json"}[source];const d=await getJSON("./data/"+file);
-  lastSync=clean(d.generated_at||"").slice(0,19);
-  localPapers=(Array.isArray(d.papers)?d.papers:Array.isArray(d)?d:[]).map(x=>source==="arxiv"?normalArxiv(x):normalDOI(x)).filter(verified);
- }catch{localPapers=[]}
- search();
+async function loadMore(){
+ const signal=controller.signal,c=criteria,cursor=next;
+ fetching=true;render();
+ try{
+  const response=await data.live(source,c,signal,cursor);
+  if(signal.aborted)return;
+  next=response.next===cursor?null:response.next;
+  visible+=20;fetching=false;show(result,response.papers);
+ }catch{
+  if(signal.aborted)return;
+  fetching=false;status="The next source page could not be reached. Earlier results are still available.";render();
+ }
 }
-if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
+$("archive-directory").addEventListener("toggle",()=>{if($("archive-directory").open)renderDirectory()});
+$("archive-category-query").addEventListener("input",renderDirectory);
+$("archive-directory-label").textContent="Find any "+data.names[source]+" "+(source==="arxiv"?"category":"subject")+" ("+directory.length+")";
+$("archive-topic").onchange=()=>{Object.assign(state,{topic:$("archive-topic").value,field:0,subfield:""});selectAndSearch()};
+$("archive-field").onchange=()=>{Object.assign(state,{field:$("archive-field").value,subfield:""});selectAndSearch()};
+$("archive-subfield").onchange=()=>{state.subfield=$("archive-subfield").value;selectAndSearch()};
+$("archive-custom-form").onsubmit=e=>{
+ e.preventDefault();const name=data.clean($("archive-custom").value).slice(0,90);
+ if(!name)return;
+ if(!userSubs().includes(name)){custom[area().code]=[...userSubs(),name].slice(-40);data.write(customKey,custom)}
+ state.subfield=name;$("archive-custom").value="";selectAndSearch();
+};
+$("archive-reset").onclick=()=>{delete custom[area().code];data.write(customKey,custom);state.subfield="";selectAndSearch()};
+$("archive-search-form").onsubmit=e=>{e.preventDefault();search()};
+$("archive-sort").onchange=()=>search();
+$("archive-scope").onchange=()=>search();
+if(linked.has("refine")){
+ const refinement=linked.get("refine").slice(0,90);
+ if(refinement){
+  if(!subs().some(x=>x.code===refinement))custom={...custom,[area().code]:[...userSubs(),refinement]};
+  state.subfield=refinement;
+ }
+}
+renderTaxonomy();applyFilters();search({keepURL:false});
 })();

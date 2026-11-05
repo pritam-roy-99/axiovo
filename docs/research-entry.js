@@ -9,6 +9,8 @@ function route(){
  const native={"arxiv":"arxiv.html","biorxiv":"biorxiv.html","chemrxiv":"chemrxiv.html"};
  if(native[archive]){
   const target=new URL("./"+native[archive],url);
+  target.search=url.search;
+  target.searchParams.delete("archive");target.searchParams.delete("view");
   location.replace(target.href);
   return;
  }
@@ -29,6 +31,19 @@ function route(){
   location.replace(target.href);
  }
 }
-if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",route,{once:true});
-else route();
+function init(){
+ route();
+ for(const el of document.querySelectorAll("[data-count]")){
+  const source=el.dataset.count,topics=window.AxiovoArchiveTaxonomy?.directory(source)||[];
+  if(topics.length)el.textContent=topics.length+(source==="arxiv"?" categories":" subject labels");
+ }
+ const video=document.querySelector(".rd-tour video"),error=document.getElementById("axiovo-video-error");
+ if(!video||!error)return;
+ const fail=()=>{error.hidden=false};
+ video.addEventListener("error",fail);
+ video.querySelector("source")?.addEventListener("error",fail);
+ video.addEventListener("loadedmetadata",()=>{error.hidden=true});
+}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init,{once:true});
+else init();
 })();

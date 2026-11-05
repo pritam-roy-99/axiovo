@@ -1,0 +1,89 @@
+/* Read source abstracts aloud with on-device voices and a scientific lexicon. */
+(function(){
+"use strict";
+const synth=window.speechSynthesis;
+if(!synth||!window.SpeechSynthesisUtterance)return;
+const key="axiovo-abstract-audio-v1";
+const lexicon={
+ "arXiv":"archive","bioRxiv":"bio archive","ChemRxiv":"chem archive","Axiovo":"ax-ee-OH-voh",
+ "CRISPR":"crisper","Cas9":"cass nine","qubit":"cue bit","qubits":"cue bits","POVM":"P O V M",
+ "CHSH":"C H S H","DNA":"D N A","RNA":"R N A","mRNA":"messenger R N A","PCR":"P C R",
+ "DFT":"D F T","NMR":"N M R","GPU":"G P U","LLM":"L L M","CO₂":"carbon dioxide","CO2":"carbon dioxide",
+ "TiO2":"titanium dioxide","eV":"electron volts","ppm":"parts per million","μm":"micrometers","μs":"microseconds",
+ "Schrödinger":"shruh-ding-er","eigenvalue":"eye gen value","ħ":"h bar"
+};
+const symbols={"α":" alpha ","β":" beta ","γ":" gamma ","δ":" delta ","λ":" lambda ","μ":" mu ","σ":" sigma ","ψ":" psi ","π":" pi ","≈":" approximately ","±":" plus or minus ","≤":" at most ","≥":" at least ","×":" times ","%":" percent ","°C":" degrees Celsius "};
+let prefs={voice:"",rate:"steady"};
+try{prefs={...prefs,...JSON.parse(localStorage.getItem(key)||"{}")}}catch{}
+const female=/female|samantha|victoria|karen|moira|tessa|fiona|serena|zira|hazel|jenny|aria|sonia|libby|veena|swara|ava|allison|joanna|emma|sara|aditi|raveena/i;
+const make=(tag,label)=>{
+ const el=document.createElement(tag);if(label)el.textContent=label;return el;
+};
+const toolbar=make("section");toolbar.className="axiovo-audio-player";toolbar.hidden=true;
+toolbar.setAttribute("aria-label","Abstract audio player");
+const title=make("strong"),status=make("span");status.setAttribute("role","status");
+const caption=make("p");caption.className="axiovo-audio-caption";
+const voiceSelect=make("select"),speed=make("select");
+voiceSelect.setAttribute("aria-label","On-device voice");speed.setAttribute("aria-label","Reading speed");
+for(const [value,label] of [["steady","Steady"],["slow","Slow"],["brisk","Brisk"]]){
+ const option=make("option",label);option.value=value;speed.append(option);
+}
+speed.value=["steady","slow","brisk"].includes(prefs.rate)?prefs.rate:"steady";
+const pause=make("button","Pause"),skip=make("button","Next paper"),stop=make("button","Stop");
+for(const b of [pause,skip,stop])b.type="button";
+const controls=make("div");controls.append(voiceSelect,speed,pause,skip,stop);
+toolbar.append(title,status,caption,controls);document.body.append(toolbar);
+const available=()=>synth.getVoices().filter(v=>v.localService&&/^en(?:[-_]|$)/i.test(v.lang));
+const voiceScore=v=>Number(female.test(v.name))*4+Number(/natural|premium|enhanced/i.test(v.name))*2;
+function refresh(){
+ const options=available().sort((a,b)=>voiceScore(b)-voiceScore(a));
+ const initial=make("option","Auto-select voice");initial.value="";
+ voiceSelect.replaceChildren(initial,...options.map(v=>{const option=make("option",v.name);option.value=v.voiceURI;return option}));
+ voiceSelect.value=options.some(v=>v.voiceURI===prefs.voice)?prefs.voice:"";
+ return options;
+}
+function store(){try{localStorage.setItem(key,JSON.stringify(prefs))}catch{}}
+voiceSelect.onchange=()=>{prefs.voice=voiceSelect.value;store()};
+speed.onchange=()=>{prefs.rate=speed.value;store()};
+synth.addEventListener("voiceschanged",refresh);refresh();
+const replacement=new RegExp("(?<![\\p{L}\\p{N}])("+Object.keys(lexicon).sort((a,b)=>b.length-a.length).join("|")+")(?![\\p{L}\\p{N}])","gu");
+function pronounce(text){
+ return text.replace(replacement,term=>lexicon[term]).replace(/°C|[αβγδλμσψπ≈±≤≥×%]/gu,term=>symbols[term]).replace(/\s+/g," ").trim();
+}
+function segments(text){
+ const sentences=Intl.Segmenter?[...new Intl.Segmenter("en",{granularity:"sentence"}).segment(text)].map(x=>x.segment):[text];
+ return sentences.flatMap(value=>value.trim().match(/.{1,205}(?:\s|$)|\S+/gu)||[]).map(x=>x.trim()).filter(Boolean);
+}
+let items=[],paper=0,sentence=0,revision=0,paused=false;
+function finish(message){
+ revision++;synth.cancel();paused=false;items=[];caption.textContent="";
+ title.textContent="Abstract audio";status.textContent=message;pause.disabled=true;skip.disabled=true;stop.textContent="Close";
+}
+function say(){
+ if(paper>=items.length){finish("Playback complete.");return}
+ const {record,parts}=items[paper],phrase=parts[sentence];
+ if(!phrase){paper++;sentence=0;say();return}
+ const voices=refresh(),voice=voices.find(v=>v.voiceURI===prefs.voice)||voices[0];
+ if(!voice){finish("No on-device English voice is available in this browser.");return}
+ const run=revision,utterance=new SpeechSynthesisUtterance(pronounce(phrase));
+ utterance.voice=voice;utterance.lang=voice.lang;utterance.rate={slow:.80,steady:.94,brisk:1.17}[prefs.rate]||.94;
+ utterance.onend=()=>{if(run===revision){sentence++;say()}};
+ utterance.onerror=()=>{if(run===revision)finish("The on-device voice stopped. Select Listen to try again.")};
+ title.textContent=record.title;caption.textContent=phrase;
+ status.textContent="Paper "+(paper+1)+" of "+items.length;
+ skip.disabled=paper+1>=items.length;synth.speak(utterance);
+}
+function play(records){
+ items=records.filter(p=>p?.abstract).map(record=>({record,parts:[record.title,...segments(record.abstract)]}));
+ if(!items.length)return;
+ revision++;synth.cancel();synth.resume();paper=0;sentence=0;paused=false;
+ pause.disabled=false;pause.textContent="Pause";stop.textContent="Stop";toolbar.hidden=false;say();
+}
+pause.onclick=()=>{
+ paused=!paused;if(paused)synth.pause();else synth.resume();
+ pause.textContent=paused?"Resume":"Pause";
+};
+skip.onclick=()=>{revision++;synth.cancel();synth.resume();paused=false;pause.textContent="Pause";paper++;sentence=0;say()};
+stop.onclick=()=>{finish("");toolbar.hidden=true};
+window.AxiovoAbstractAudio={play};
+})();

@@ -236,3 +236,15 @@ html body header.rl-global-header > a.rl-logo > span.rl-logo-mark{
   height:38px!important;min-height:38px!important;padding:0 12px!important;font-size:13px!important;
  }
 }
+
+.axiovo-audio-player {
+ position:fixed;right:16px;bottom:16px;z-index:1500;width:min(470px,calc(100vw - 32px));
+ padding:13px;border:1px solid #547e9e;border-radius:12px;background:#102d46;color:#f3f9fe;
+ box-shadow:0 12px 36px #08182c65;font:14px/1.4 system-ui,sans-serif;
+}
+.axiovo-audio-player[hidden]{display:none}
+.axiovo-audio-player strong{display:block;overflow-wrap:anywhere}
+.axiovo-audio-player span,.axiovo-audio-caption{color:#cbe4f4;font-size:12px}
+.axiovo-audio-caption{max-height:82px;overflow:auto;margin:5px 0}
+.axiovo-audio-player>div{display:flex;flex-wrap:wrap;gap:5px}
+.axiovo-audio-player :is(select,button){font:inherit;min-height:34px;max-width:100%;padding:4px 7px;border:1px solid #799cb5;border-radius:6px;background:#183c59;color:#fff}

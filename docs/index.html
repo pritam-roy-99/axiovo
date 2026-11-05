@@ -4,99 +4,105 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#0b2239">
-<meta name="description" content="Axiovo: choose arXiv, bioRxiv or ChemRxiv, browse research categories and find source-linked preprints.">
-<title>Axiovo | Discover research across three independent archives</title>
+<meta name="description" content="Search arXiv, bioRxiv and ChemRxiv, compare original preprints, and organize your reading with Axiovo.">
+<title>Axiovo | A research workspace for preprints</title>
 <link rel="icon" type="image/svg+xml" href="./icons/axiovo.svg">
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="stylesheet" href="./theme.css">
 <link rel="stylesheet" href="./research-entry.css">
+<link rel="stylesheet" href="./axiovo-shell.css?v=2">
+<link rel="stylesheet" href="./research-desk.css">
 <script defer src="./theme.js"></script>
 <script defer src="./research-entry.js"></script>
 <script defer src="./navigation.js"></script>
+<script defer src="./archive-taxonomy.js"></script>
 <script defer src="./pwa.js"></script>
-<style>
-*{box-sizing:border-box}
-body.axiovo-home{margin:0;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-body.axiovo-home header{background:#0b2239;color:#fff;min-height:68px;padding:12px max(18px,calc((100% - 1190px)/2));display:flex;align-items:center;justify-content:space-between;gap:12px}
-body.axiovo-home header a{color:#e1f2ff}
-body.axiovo-home main{display:block!important;max-width:1190px;margin:0 auto;padding:24px 20px 44px}
-body.axiovo-home .axiovo-entry{max-width:none;padding:0;color:var(--rl-text,#17324b)}
-body.axiovo-home .axiovo-video-top{margin:0 0 18px}
-body.axiovo-home .rl-home-demo{margin:0;background:#082139;color:#fff;border-radius:14px;padding:12px}
-body.axiovo-home .rl-home-demo-head{display:flex;gap:8px;align-items:center;font-size:12px;margin-bottom:10px;color:#e5f4ff}
-body.axiovo-home .rl-home-live-dot{width:9px;height:9px;border-radius:50%;background:#56c4ca}
-body.axiovo-home .rl-home-demo video{width:100%;height:auto;aspect-ratio:16/9;max-height:650px;object-fit:contain;background:#061b2d;border-radius:10px;display:block}
-body.axiovo-home figcaption{font-size:12px;line-height:1.5;color:#bfd9ec;padding-top:9px}
-body.axiovo-home .rl-home-transcript{margin-top:10px;color:#d8eaf6;font-size:12px}
-body.axiovo-home .rl-home-transcript summary{cursor:pointer}
-body.axiovo-home .rl-home-transcript p{line-height:1.65}
-body.axiovo-home .axiovo-entry-card-header h1{font-size:clamp(23px,3vw,32px);line-height:1.2;margin:0;color:var(--rl-text,#17324b)}
-body.axiovo-home .axiovo-entry-card{padding:22px}
-body.axiovo-home .axiovo-entry-footer{justify-content:center}
-@media(max-width:640px){body.axiovo-home main{padding:12px 12px 30px}body.axiovo-home .axiovo-video-top{padding:12px}body.axiovo-home .axiovo-entry-card{padding:15px}body.axiovo-home .rl-home-demo-head{flex-wrap:wrap}}
-</style>
-<link rel="stylesheet" href="./axiovo-shell.css?v=2"></head>
-<body class="axiovo-home">
+</head>
+<body class="axiovo-home axiovo-research">
 <header class="rl-global-header"><a class="rl-logo" href="./" aria-label="Axiovo home"><span class="rl-logo-mark" aria-hidden="true">A</span> Axiovo</a></header>
-<main>
-<div class="axiovo-entry" id="axiovo-entry">
-<section class="axiovo-video-top" aria-labelledby="axiovo-home-demo-heading">
-<h2 id="axiovo-home-demo-heading">Discover Axiovo in action</h2>
-<p>A narrated, illustrated walkthrough of the current Axiovo features.</p>
-<figure class="rl-home-demo">
-<div class="rl-home-demo-head"><span class="rl-home-live-dot" aria-hidden="true"></span><strong>Current Axiovo feature tour</strong></div>
-<video controls playsinline preload="metadata" width="960" height="540" poster="./assets/axiovo-tour-poster.svg" aria-label="Video tour of the Axiovo research discovery website">
-<source src="./assets/axiovo-tour.mp4?v=20261106" type="video/mp4">
-<track kind="captions" src="./assets/axiovo-tour.vtt?v=20261106" srclang="en" label="English captions" default>
-Your browser does not support video. The transcript is available below.
-</video>
-<p id="axiovo-video-error" role="status" hidden>The video is unavailable on this deployment. <a href="./assets/axiovo-tour.mp4?v=20261106" target="_blank" rel="noopener noreferrer">Check the MP4 file directly</a> or use the transcript below.</p>
-<figcaption>Illustrated feature tour. Actual archive data and search availability vary by provider.</figcaption>
-<details class="rl-home-transcript"><summary>Read video transcript</summary>
-<p>Choose arXiv, bioRxiv or ChemRxiv. Each opens its own Discover page with fields, topics, subfields, search and source-linked papers. Save papers in My Library, then use Research Assistant or Research Tools when needed. Search coverage and source availability are indicated independently.</p>
-</details>
-</figure>
+<main class="rd-page">
+<section class="rd-home-hero" aria-labelledby="welcome-title">
+ <div class="rd-hero-content">
+  <p class="rd-kicker"><span aria-hidden="true"></span> PREPRINT DISCOVERY &amp; READING</p>
+  <h1 id="welcome-title">Find the work.<br>Follow the evidence.</h1>
+  <p class="rd-lead">Search three preprint archives, verify original records, and turn promising results into an organized reading list.</p>
+  <form class="rd-searchbar rd-home-search" action="./desk.html" method="get" role="search">
+   <label class="rd-sr-only" for="home-query">Search across the archives</label>
+   <input name="q" id="home-query" type="search" maxlength="220" placeholder="Paper title, method, author, DOI or arXiv ID">
+   <button type="submit" class="rd-button rd-primary">Find papers <span aria-hidden="true">→</span></button>
+  </form>
+  <div class="rd-examples" aria-label="Example searches">
+   <span>Try</span><a href="./desk.html?q=uncertainty+quantification">Uncertainty quantification</a>
+   <a href="./desk.html?q=protein+design">Protein design</a>
+   <a href="./desk.html?q=polymer+recycling">Polymer recycling</a>
+  </div>
+ </div>
+ <div class="rd-hero-preview" aria-hidden="true">
+  <div class="rd-preview-top"><span>RESEARCH DESK</span><span>● ● ●</span></div>
+  <div class="rd-preview-content">
+   <span class="rd-preview-tag">ONE QUERY</span>
+   <strong>Three views of the literature</strong>
+   <div class="rd-preview-row"><span class="rd-source-dot arxiv"></span><span>arXiv</span><i></i><i></i></div>
+   <div class="rd-preview-row"><span class="rd-source-dot biorxiv"></span><span>bioRxiv</span><i></i><i></i></div>
+   <div class="rd-preview-row"><span class="rd-source-dot chemrxiv"></span><span>ChemRxiv</span><i></i><i></i></div>
+   <div class="rd-preview-foot"><span>Original records</span><span>Compare abstracts</span><span>Save citations</span></div>
+  </div>
+ </div>
 </section>
-<section class="axiovo-entry-card" aria-labelledby="axiovo-archive-title">
-<div class="axiovo-entry-card-header">
-<h1 id="axiovo-archive-title">Choose a preprint archive</h1>
-<span>Three independent discovery pathways</span>
-</div>
-<div class="axiovo-archive-grid" role="group" aria-label="Choose a research archive">
-<a class="axiovo-archive-card" data-archive="arxiv" href="./arxiv.html">
-<span class="axiovo-archive-brand">arXiv</span>
-<span class="axiovo-archive-description">Physics, mathematics, computer science, quantitative biology, finance, statistics, engineering and economics.</span>
-<span class="axiovo-archive-action">Discover arXiv <span aria-hidden="true">→</span></span>
-</a>
-<a class="axiovo-archive-card" data-archive="biorxiv" href="./biorxiv.html">
-<span class="axiovo-archive-brand">bioRxiv</span>
-<span class="axiovo-archive-description">Biology, neuroscience, genetics, genomics, ecology, bioinformatics and other life-science subjects.</span>
-<span class="axiovo-archive-action">Discover bioRxiv <span aria-hidden="true">→</span></span>
-</a>
-<a class="axiovo-archive-card" data-archive="chemrxiv" href="./chemrxiv.html">
-<span class="axiovo-archive-brand">ChemRxiv</span>
-<span class="axiovo-archive-description">Chemistry, catalysis, materials, molecular science, analytical and computational chemistry.</span>
-<span class="axiovo-archive-action">Discover ChemRxiv <span aria-hidden="true">→</span></span>
-</a>
-</div>
-<p class="axiovo-entry-note">Choose an archive to browse its own topics and subfields. Paper results from other archives are not mixed into that page.</p>
-<div class="axiovo-entry-actions"><a class="axiovo-entry-secondary" href="./workspace.html">My Library</a><a class="axiovo-entry-secondary" href="./copilot.html">Research Assistant</a><a class="axiovo-entry-secondary" href="./lab.html">Research Tools</a></div>
+<section class="rd-home-section" aria-labelledby="axiovo-archive-title">
+ <div class="rd-section-heading"><div><p class="rd-kicker">BROWSE BY SUBJECT</p><h2 id="axiovo-archive-title">Explore the archives</h2></div><a class="rd-text-link" href="./desk.html">Open Research Desk <span aria-hidden="true">→</span></a></div>
+ <div class="axiovo-archive-grid rd-archives" aria-label="Choose a preprint archive">
+  <a class="axiovo-archive-card rd-archive-card" data-archive="arxiv" href="./arxiv.html">
+   <span class="rd-archive-top"><span class="rd-archive-icon arxiv" aria-hidden="true">ar</span><span class="rd-count" data-count="arxiv">Category directory</span></span>
+   <strong>arXiv</strong><span>Physics, mathematics, computer science, quantitative biology and finance, statistics, engineering, and economics.</span>
+   <span class="rd-card-link">Browse arXiv <span aria-hidden="true">↗</span></span>
+  </a>
+  <a class="axiovo-archive-card rd-archive-card" data-archive="biorxiv" href="./biorxiv.html">
+   <span class="rd-archive-top"><span class="rd-archive-icon biorxiv" aria-hidden="true">bio</span><span class="rd-count" data-count="biorxiv">Subject directory</span></span>
+   <strong>bioRxiv</strong><span>Life sciences from neuroscience and genomics to ecology, molecular biology, and biotechnology.</span>
+   <span class="rd-card-link">Browse bioRxiv <span aria-hidden="true">↗</span></span>
+  </a>
+  <a class="axiovo-archive-card rd-archive-card" data-archive="chemrxiv" href="./chemrxiv.html">
+   <span class="rd-archive-top"><span class="rd-archive-icon chemrxiv" aria-hidden="true">chem</span><span class="rd-count" data-count="chemrxiv">Subject directory</span></span>
+   <strong>ChemRxiv</strong><span>Catalysis, materials, synthesis, chemical engineering, and computational and physical chemistry.</span>
+   <span class="rd-card-link">Browse ChemRxiv <span aria-hidden="true">↗</span></span>
+  </a>
+ </div>
+ <p class="rd-small">Subject directories and searchable paper coverage are tracked separately. <a href="./methodology.html">See data sources and coverage</a>.</p>
 </section>
-<div class="axiovo-entry-footer"><a href="./methodology.html">Methods and coverage</a><a href="./privacy.html">Privacy</a><a href="./profiles.html">Settings</a></div>
-<p class="axiovo-entry-help">Independent open-source research tool. Not affiliated with arXiv, bioRxiv or ChemRxiv.</p>
-</div>
+<section class="rd-home-section" aria-labelledby="rd-workflow-title">
+ <div class="rd-section-heading"><div><p class="rd-kicker">YOUR WORKSPACE</p><h2 id="rd-workflow-title">Pick up where you left off</h2></div></div>
+ <div class="rd-tools">
+  <a href="./workspace.html"><strong>My Library</strong><span>Saved papers, reading notes, and collections</span><b aria-hidden="true">→</b></a>
+  <a href="./lab.html"><strong>Research Tools</strong><span>Read and annotate a PDF, then trace citations</span><b aria-hidden="true">→</b></a>
+  <a href="./copilot.html"><strong>Research Assistant</strong><span>Explore source-linked evidence and analysis</span><b aria-hidden="true">→</b></a>
+ </div>
+</section>
+<section class="axiovo-video-top rd-home-section rd-tour" aria-labelledby="axiovo-home-demo-heading">
+ <div class="rd-tour-copy">
+  <p class="rd-kicker">GUIDED TOUR</p><h2 id="axiovo-home-demo-heading">See a research session</h2>
+  <p>From a first query to a source-checked shortlist. The illustrated tour includes narration and English captions.</p>
+  <details class="rl-home-transcript"><summary>Read video transcript</summary>
+   <ol>
+    <li>Welcome to Axiovo. Search arXiv, bioRxiv, and ChemRxiv from a single research desk.</li>
+    <li>Explore the subject directory of each archive. Search by category code, field name, or a subfield you have added.</li>
+    <li>Enter a research question, a paper title, or an identifier. Use the date filters and check coverage separately for each archive.</li>
+    <li>Open the original record, or add papers to a side-by-side comparison. Read their abstracts and export the citations you need.</li>
+    <li>Save a search to rerun later, and keep papers from all three archives together in your library. Your searches and notes stay on this device.</li>
+    <li>Open Research Tools for PDF annotation, or use the Research Assistant to investigate a paper. Always follow the evidence back to its source.</li>
+   </ol>
+  </details>
+ </div>
+ <figure class="rl-home-demo">
+  <video controls playsinline preload="none" width="960" height="540" poster="./assets/axiovo-tour-poster.svg" aria-label="Axiovo research workflow tour">
+   <source src="./assets/axiovo-tour.mp4?v=research-desk-1" type="video/mp4">
+   <track kind="captions" src="./assets/axiovo-tour.vtt?v=research-desk-1" srclang="en" label="English captions" default>
+   The transcript is available above.
+  </video>
+  <p id="axiovo-video-error" role="status" hidden>Video playback is unavailable. You can read the transcript alongside the player.</p>
+  <figcaption>Illustrated workflow. Paper availability is shown in the Research Desk.</figcaption>
+ </figure>
+</section>
 </main>
-<script>
-(function(){
- const video=document.querySelector(".axiovo-video-top video");
- const source=video?.querySelector("source");
- const error=document.getElementById("axiovo-video-error");
- if(!video||!error)return;
- const fail=()=>{error.hidden=false};
- video.addEventListener("error",fail);
- source?.addEventListener("error",fail);
- video.addEventListener("loadedmetadata",()=>{error.hidden=true});
-})();
-</script>
 </body>
 </html>

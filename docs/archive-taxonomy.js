@@ -101,8 +101,16 @@ const additional=[
 ["q-bio","Other Quantitative Biology","q-bio.OT"]
 ];
 for(const x of additional)if(!ARXIV.some(y=>y[2]===x[2]))ARXIV.push(x);
-const mapArxivGroup=A.map(([label,arr])=>({label,id:arr[0]?.[1]||label.toLowerCase(),areas:arr.map(([name,code])=>({name,code,subfields:[...ARXIV.filter(x=>x[0]===code).map(([_,n,c])=>({name:n,code:c})),...(SUGGESTIONS[name]||[]).map(x=>({name:x,code:x}))]}))}));
-const bio={groups:[{label:"Biology and Life Sciences",id:"biology",areas:BIO.map(name=>({name,code:name,subfields:(SUGGESTIONS[name]||[]).map(t=>({name:t,code:t}))}))}]};
+const mapArxivGroup=A.map(([label,arr])=>({label,id:arr[0]?.[1]||label.toLowerCase(),areas:arr.map(([name,code])=>({name,code,subfields:[...ARXIV.filter(x=>x[0]===code).map(([_,n,c])=>({name:n,code:c,official:true})),...(SUGGESTIONS[name]||[]).map(x=>({name:x,code:x}))]}))}));
+const bio={groups:[{label:"Biology and Life Sciences",id:"biology",areas:BIO.map(name=>({name,code:name,legacy:["Clinical Trials","Epidemiology"].includes(name),subfields:(SUGGESTIONS[name]||[]).map(t=>({name:t,code:t}))}))}]};
 const chem={groups:[{label:"Chemistry and Molecular Sciences",id:"chemistry",areas:CHEM.map(name=>({name,code:name,subfields:(SUGGESTIONS[name]||[]).map(t=>({name:t,code:t}))}))}]};
-root.AxiovoArchiveTaxonomy={arxiv:{groups:mapArxivGroup},biorxiv:bio,chemrxiv:chem,suggestions:SUGGESTIONS};
+const archives={arxiv:{groups:mapArxivGroup},biorxiv:bio,chemrxiv:chem};
+function directory(source){
+ return archives[source]?.groups.flatMap((group,topic)=>group.areas.flatMap((area,field)=>{
+  const classes=area.subfields.filter(item=>item.official);
+  const rows=classes.length?classes:[area];
+  return rows.map(row=>({...row,topic,field,group:group.label,area:area.name,subfield:classes.length?row.code:""}));
+ }))||[];
+}
+root.AxiovoArchiveTaxonomy={...archives,directory,suggestions:SUGGESTIONS};
 })(window);

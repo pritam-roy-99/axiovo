@@ -5,25 +5,32 @@
 <meta name="description" content="Browse ChemRxiv subject areas and DOI-verified preprints. Independent source-specific preprint search, saved research topics and articles.">
 <link rel="stylesheet" href="./theme.css"><link rel="stylesheet" href="./research-entry.css"><link rel="stylesheet" href="./archive-browser.css">
 <script defer src="./theme.js"></script><script defer src="./navigation.js"></script>
-<script defer src="./archive-taxonomy.js"></script><script defer src="./archive-browser.js"></script>
+<script defer src="./archive-taxonomy.js"></script><script defer src="./arxiv-versions.js"></script><script defer src="./arxiv-daily-archive.js"></script><script defer src="./archive-data.js"></script><script defer src="./abstract-audio.js"></script><script defer src="./archive-browser.js"></script>
 <link rel="stylesheet" href="./axiovo-shell.css?v=2"></head><body class="axiovo-archive-page" data-archive="chemrxiv">
 <header></header>
 <main class="axiovo-browser">
 <nav class="axiovo-breadcrumb"><a href="./">Home</a><span aria-hidden="true">/</span><strong>ChemRxiv</strong></nav>
 <section class="axiovo-browser-hero" aria-labelledby="archive-title">
- <span class="axiovo-browser-kicker">AXIOVO · SOURCE-SPECIFIC DISCOVERY</span>
+ <span class="axiovo-browser-kicker">PREPRINT ARCHIVE</span>
  <h1 id="archive-title">ChemRxiv</h1><p>Chemistry and molecular sciences</p>
  <p class="axiovo-browser-description">Browse ChemRxiv subject areas and DOI-verified preprints. Search results stay tied to the selected preprint server.</p>
  <div class="axiovo-browser-status" id="archive-sync-status" role="status">Checking source coverage…</div>
 </section>
 <section class="axiovo-browser-fields" aria-labelledby="browse-heading">
- <div class="axiovo-browser-heading"><h2 id="browse-heading">Explore ChemRxiv subjects</h2><p>Select a topic, a field and a subfield. Modify your saved subfields at any time.</p></div>
+ <div class="axiovo-browser-heading"><h2 id="browse-heading">Explore ChemRxiv subjects</h2><p>Browse the chemistry subject directory. When a DOI record lacks a subject tag, Axiovo searches by the subject name.</p></div>
  <div class="axiovo-browser-steps">
   <div class="axiovo-browser-step"><span>01 · Topic</span><label for="archive-topic">Select primary topic</label><select id="archive-topic"></select></div>
   <div class="axiovo-browser-step"><span>02 · Field</span><label for="archive-field">Research field</label><select id="archive-field"></select></div>
   <div class="axiovo-browser-step"><span>03 · Subfield</span><label for="archive-subfield">Specific research area</label><select id="archive-subfield"></select></div>
  </div>
  <div class="axiovo-browser-taxonomy" id="archive-category-list" aria-label="Available subject categories"></div>
+ <details class="axiovo-category-directory" id="archive-directory">
+  <summary id="archive-directory-label">Browse the full subject directory</summary>
+  <label for="archive-category-query">Filter the directory by name or code</label>
+  <input id="archive-category-query" type="search" placeholder="e.g. optics or plant biology">
+  <p class="axiovo-hint" id="archive-category-count" role="status"></p>
+  <div class="axiovo-browser-chips" id="archive-category-matches"></div>
+ </details>
  <details class="axiovo-edit-fields"><summary>Customize my subfields</summary>
   <form id="archive-custom-form" class="axiovo-custom-form">
    <label for="archive-custom">Add a research subfield<input id="archive-custom" type="text" maxlength="90" placeholder="Specific method or research topic"></label>
@@ -36,8 +43,8 @@
  <div class="axiovo-browser-heading"><h2 id="archive-search-heading">Search ChemRxiv papers</h2><p>Search the selected subfield or the full archive, keeping each source separate.</p></div>
  <form id="archive-search-form" role="search">
   <label for="archive-query">Title, author, abstract, keyword, DOI or ID</label>
-  <div class="axiovo-searchline"><input id="archive-query" type="search" placeholder="Search within ChemRxiv…" autocomplete="off" maxlength="300" list="archive-suggestions" aria-describedby="archive-search-help"><datalist id="archive-suggestions"></datalist><button type="submit">Search papers</button></div>
-  <p id="archive-search-help" class="axiovo-hint">Autocomplete from available subject names and indexed paper titles.</p>
+  <div class="axiovo-searchline"><input id="archive-query" type="search" placeholder="Search within ChemRxiv…" autocomplete="off" maxlength="300" aria-describedby="archive-search-help"><button type="submit">Search papers</button></div>
+  <p id="archive-search-help" class="axiovo-hint">Open a paper by its original identifier, or combine a query with the filters below.</p>
   <div class="axiovo-browser-filters">
    <label>Scope<select id="archive-scope"><option value="subfield">Selected subfield</option><option value="all">Whole archive</option></select></label>
    <label>Sort<select id="archive-sort"><option value="relevance">Most relevant</option><option value="recent">Newest</option><option value="cited">Most cited (when available)</option></select></label>
@@ -48,7 +55,7 @@
 </section>
 <section class="axiovo-browser-results" aria-labelledby="archive-results-heading">
  <div class="axiovo-results-head"><h2 id="archive-results-heading">Research papers</h2><p id="archive-result-count" role="status" aria-live="polite">Choose a subject or enter a search.</p></div>
- <div id="archive-results"></div><div id="archive-result-actions"></div>
+ <div id="archive-results"></div><div id="archive-result-actions"></div><p><a class="axiovo-compare-link" href="./desk.html#rd-queue-heading">Open Research Desk comparison →</a></p>
 </section>
 <footer class="axiovo-browser-disclaimer">Axiovo is independent of ChemRxiv. Archive classification menus can be complete even when the searchable paper index is not. Source availability, publication dates, metadata and citation links are verified separately.</footer>
 </main>
