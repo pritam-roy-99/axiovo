@@ -236,7 +236,7 @@ function paperCard(p,c){
  if(p.abstract&&window.AxiovoAbstractAudio)actions.append(button("Listen to abstract",()=>window.AxiovoAbstractAudio.play([p])));
  const compare=button(data.comparison().some(item=>data.recordKey(item)===data.recordKey(p))?"In comparison":"Add to comparison",()=>{
   const result=data.addComparison(p);
-  compare.textContent=result==="added"?"In comparison":result==="full"?"Shortlist full (3 papers)":"Browser storage unavailable";
+  compare.textContent=result==="added"?"In comparison":result==="full"?"Shortlist full (5 papers)":"Browser storage unavailable";
  });
  actions.append(compare);card.append(actions);window.AxiovoAuthorFollow?.attach(card,p.authors);
  window.AxiovoTopicReport?.attach(card,p,pathText());return card;
