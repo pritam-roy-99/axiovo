@@ -49,29 +49,32 @@ dialog{border:0;border-radius:13px;box-shadow:0 20px 90px #061e3977;width:min(74
 <section class="axiovo-entry" id="axiovo-entry" aria-labelledby="axiovo-entry-heading">
  <div class="axiovo-entry-intro">
   <span class="axiovo-entry-kicker">AXIOVO · OPEN RESEARCH DISCOVERY</span>
-  <h1 id="axiovo-entry-heading">Find the research that matters to you.</h1>
-  <p class="axiovo-entry-lead">Select a broad discipline, then choose specific research areas and subtopics in Discover. Your interests stay available when you return.</p>
+  <h1 id="axiovo-entry-heading">Start with the archive you want to explore.</h1>
+  <p class="axiovo-entry-lead">Choose arXiv, bioRxiv or ChemRxiv. Refine by research field, area and subtopic on the next page. All three sources are equally accessible.</p>
  </div>
- <form id="axiovo-entry-form" class="axiovo-entry-card">
-  <div class="axiovo-entry-card-header"><h2>Choose your broad research field</h2><span>Choose research areas and subtopics after entering Discover</span></div>
-  <div class="axiovo-entry-fields">
-   <label for="axiovo-entry-field">Research field<select id="axiovo-entry-field" required></select></label>
-
+ <section class="axiovo-entry-card" aria-labelledby="axiovo-archive-title">
+  <div class="axiovo-entry-card-header"><h2 id="axiovo-archive-title">Choose a preprint archive</h2><span>Three equal research pathways</span></div>
+  <div class="axiovo-archive-grid" role="group" aria-label="Choose research preprint archive">
+   <a class="axiovo-archive-card" data-archive="arxiv" href="./discover.html?archive=arxiv#discover">
+    <span class="axiovo-archive-brand">arXiv</span><span class="axiovo-archive-description">Physics, mathematics, computing and interdisciplinary research</span><span class="axiovo-archive-action">Explore arXiv <span aria-hidden="true">→</span></span>
+   </a>
+   <a class="axiovo-archive-card" data-archive="biorxiv" href="./discover.html?archive=biorxiv#discover">
+    <span class="axiovo-archive-brand">bioRxiv</span><span class="axiovo-archive-description">Biology, genetics, bioinformatics and life sciences</span><span class="axiovo-archive-action">Explore bioRxiv <span aria-hidden="true">→</span></span>
+   </a>
+   <a class="axiovo-archive-card" data-archive="chemrxiv" href="./discover.html?archive=chemrxiv#discover">
+    <span class="axiovo-archive-brand">ChemRxiv</span><span class="axiovo-archive-description">Chemistry, molecular science, catalysis and materials</span><span class="axiovo-archive-action">Explore ChemRxiv <span aria-hidden="true">→</span></span>
+   </a>
   </div>
-  <div class="axiovo-entry-actions">
-   <button type="submit" class="axiovo-entry-primary">Explore papers <span aria-hidden="true">→</span></button>
-   <button type="button" class="axiovo-entry-secondary" id="axiovo-entry-all">Browse all research</button>
-   <button type="button" id="axiovo-entry-library">My Library</button>
-  </div>
-  <p class="axiovo-entry-note">In Discover, refine your subfield and subtopic, browse current papers, save references, and use Research Assistant. No account required for your local library.</p>
- </form>
+  <p class="axiovo-entry-note">After choosing an archive, select a field, research area and specific subtopic. Each source has its own records, update schedule and coverage indicators.</p>
+  <div class="axiovo-entry-actions"><a href="./discover.html#workspace" class="axiovo-entry-secondary">My Library</a></div>
+ </section>
  <div class="axiovo-entry-footer">
   <a href="./lab.html">Research Tools</a>
   <a href="./copilot.html">Research Assistant</a>
   <a href="./methodology.html">Methods &amp; coverage</a>
  </div>
  <details class="axiovo-entry-demo"><summary>Watch the Axiovo website demo</summary><div class="axiovo-entry-demo-content" id="axiovo-entry-demo-slot"></div></details>
- <p class="axiovo-entry-help">Axiovo is independent of arXiv and SciRate. Research records and availability depend on source synchronization.</p>
+ <p class="axiovo-entry-help">Axiovo is independent of arXiv, bioRxiv and ChemRxiv. Research records and availability depend on source synchronization.</p>
 </section>
 <div class="hero"><div class="rl-home-hero-grid">
 <section class="rl-home-hero-copy" aria-labelledby="rl-home-title">
