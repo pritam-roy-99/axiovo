@@ -7,7 +7,10 @@ on:
     # Hourly checks; extra post-announcement polls improve freshness.
     # GitHub scheduled workflows run on a best-effort basis and may be delayed.
     - cron: '17 * * * *'
-    - cron: '47 0,1,2,3,4,5 * * 1-5'
+    # 20:00 America/New_York is 00:00 UTC in EDT, 01:00 UTC in EST.
+    # Dense post-release checks, including late upstream metadata propagation.
+    - cron: '10,35 0,1,2,3 * * 1-5'
+    - cron: '5 4,5,6 * * 1-5'
 permissions:
   contents: write
   pages: write
@@ -56,8 +59,9 @@ jobs:
         run: node tests/arxiv-versions.test.js
       - name: Validate shared Discover focus
         run: node tests/focus-bar.test.js
-      - name: Test rate-limited arXiv fallback
-        run: node tests/cached-arxiv-search.test.js
+      - name: Test rate-limited arXiv fallback and date archive
+        run: |
+          node tests/cached-arxiv-search.test.js
           node tests/arxiv-daily-archive.test.js
       - name: Refresh free bioRxiv metadata
         if: github.event_name != 'push'
