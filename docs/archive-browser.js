@@ -89,13 +89,13 @@ function atom(xml){
 }
 function chosenTerm(){return state.query||((state.scope==="subfield")?(state.subfield||field().name):"")}
 async function remote(){
- const term=chosenTerm().slice(0,150);
+ const term=(source==="arxiv"?(state.query||state.subfield):chosenTerm()).slice(0,150);
  if(source==="arxiv"){
   const chosen=state.scope==="subfield"?(state.subfield||field().code):"";
   const code=/^[a-z-]+(?:\.[A-Za-z-]+)?$/.test(chosen)?chosen:field().code;
   const officialCode=state.scope==="subfield"&&/^[a-z-]+(?:\.[A-Za-z-]+)?$/.test(code)?code:"";
   const q=[officialCode?"cat:"+officialCode:"",term?"all:"+term.replace(/[:()"\\]/g," "):""].filter(Boolean).join(" AND ")||"all:science";
-  const url="https://export.arxiv.org/api/query?"+new URLSearchParams({search_query:q,start:"0",max_results:"100",sortBy:state.sort==="recent"?"submittedDate":"relevance",sortOrder:"descending"});
+  const url="https://export.arxiv.org/api/query?"+new URLSearchParams({search_query:q,start:"0",max_results:"100",sortBy:(state.sort==="recent"||!term)?"submittedDate":"relevance",sortOrder:"descending"});
   const c=new AbortController(),timer=setTimeout(()=>c.abort(),15000);
   try{const r=await fetch(url,{signal:c.signal});if(!r.ok)throw Error("HTTP "+r.status);return atom(await r.text())}finally{clearTimeout(timer)}
  }
