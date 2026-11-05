@@ -1,0 +1,155 @@
+#!/usr/bin/env python3
+"""Harvest the most recent arXiv announcement using arXiv's official RSS feeds.
+
+RSS channel pubDate is the ANNOUNCEMENT date. The arXiv Atom 'published' field
+is the FIRST-SUBMISSION date. Never substitute one for the other.
+RSS is refreshed at midnight Eastern, several hours after announcements.
+All archive-level feeds are fetched independently to stay below the official
+2000-record cap on multi-category feed requests.
+"""
+from __future__ import annotations
+import datetime as dt
+import email.utils
+import html
+import json
+import os
+from pathlib import Path
+import re
+import tempfile
+import time
+import urllib.request
+import urllib.error
+import xml.etree.ElementTree as ET
+
+ROOT = Path(__file__).resolve().parents[1]
+TARGET = ROOT / "docs" / "data" / "announcements.json"
+ARCHIVES = ("astro-ph", "cond-mat", "cs", "econ", "eess", "gr-qc", "hep-ex",
+            "hep-lat", "hep-ph", "hep-th", "math", "math-ph", "nlin",
+            "nucl-ex", "nucl-th", "physics", "q-bio", "q-fin", "quant-ph", "stat")
+ID = re.compile(r"(?:\d{4}\.\d{4,5}|[a-z-]+(?:\.[A-Za-z]{2})?/\d{7})(?:v\d+)?", re.I)
+TAG = re.compile(r"<[^>]*>")
+SPACE = re.compile(r"\s+")
+
+
+def clean(value):
+    return SPACE.sub(" ", html.unescape(TAG.sub(" ", value or ""))).strip()
+
+
+def parse_feed(raw: bytes, archive: str):
+    root = ET.fromstring(raw)
+    channel = root.find("channel")
+    if root.tag != "rss" or channel is None:
+        raise ValueError("Missing official arXiv RSS channel for " + archive)
+    announced = channel.findtext("pubDate")
+    if not announced:
+        raise ValueError("Announcement pubDate absent for " + archive)
+    stamp = email.utils.parsedate_to_datetime(announced)
+    if stamp.tzinfo is None:
+        raise ValueError("Timezone absent for " + archive)
+    day = stamp.date().isoformat()
+    records = []
+    for item in channel.findall("item"):
+        link = (item.findtext("link") or "").strip()
+        match = ID.search(link)
+        if not match:
+            continue
+        versioned = match.group(0)
+        base = re.sub(r"v\d+$", "", versioned)
+        version = re.search(r"v(\d+)$", versioned)
+        description = clean(item.findtext("description") or "")
+        typ = re.search(r"Announce Type:\s*([\w-]+)", description, re.I)
+        announce_type = typ.group(1).lower() if typ else "unspecified"
+        abstract = re.sub(r"^.*?\bAbstract:\s*", "", description, flags=re.I)
+        if abstract == description:
+            abstract = description
+        title = clean(item.findtext("title") or "")
+        if not title:
+            continue
+        creators = []
+        for element in item:
+            if element.tag.endswith("creator") and clean(element.text):
+                creators.append(clean(element.text))
+        records.append({
+            "id": base, "version": int(version.group(1)) if version else 1,
+            "title": title, "abstract": abstract[:9000], "authors": creators,
+            "categories": [archive], "primary_category": archive,
+            "link": "https://arxiv.org/abs/" + base,
+            "announcement_date": day, "announce_type": announce_type,
+            "metadata_source": "official arXiv RSS"
+        })
+    return day, records
+
+
+def get(archive):
+    request = urllib.request.Request(
+        "https://rss.arxiv.org/rss/" + archive,
+        headers={"User-Agent": os.getenv("ARXIV_USER_AGENT",
+            "Axiovo/0.8 (https://github.com/pritam-roy-99/axiovo; daily announcement feed)")})
+    for attempt in range(3):
+        try:
+            with urllib.request.urlopen(request, timeout=50) as response:
+                return parse_feed(response.read(), archive)
+        except urllib.error.HTTPError as exc:
+            if exc.code not in (429, 500, 502, 503, 504) or attempt == 2:
+                raise
+        except (OSError, ET.ParseError, ValueError):
+            if attempt == 2:
+                raise
+        time.sleep(8 * (attempt + 1))
+    raise RuntimeError("RSS unavailable")
+
+
+def main():
+    by_day = {}
+    failed = []
+    retrieved = 0
+    for i, archive in enumerate(ARCHIVES):
+        try:
+            day, papers = get(archive)
+            if papers:
+                retrieved += 1
+                bucket = by_day.setdefault(day, {})
+                for p in papers:
+                    old = bucket.get(p["id"])
+                    if old:
+                        p["categories"] = sorted(set(old["categories"] + p["categories"]))
+                        if old["version"] > p["version"]:
+                            p["version"] = old["version"]
+                        if len(old.get("abstract", "")) > len(p.get("abstract", "")):
+                            p["abstract"] = old["abstract"]
+                        if not p["authors"]:
+                            p["authors"] = old["authors"]
+                    bucket[p["id"]] = p
+        except (OSError, ValueError, ET.ParseError, RuntimeError) as exc:
+            failed.append(archive + ": " + str(exc)[:120])
+        if i < len(ARCHIVES)-1:
+            time.sleep(3.2)
+    if not by_day:
+        raise RuntimeError("No official RSS announcement records; preserving old snapshot")
+    latest = sorted(by_day)[-1]
+    papers = sorted(by_day[latest].values(), key=lambda p: p["id"], reverse=True)
+    # Never mark complete when a category fails or source feeds disagree.
+    complete = len(failed) == 0 and retrieved == len(ARCHIVES) and len(by_day) == 1
+    payload = {
+        "source": "https://rss.arxiv.org/rss/", "date_type": "announcement",
+        "announcement_date": latest,
+        "checked_at": dt.datetime.now(dt.timezone.utc).isoformat(),
+        "complete": complete,
+        "archive_feeds_attempted": len(ARCHIVES),
+        "archive_feeds_with_records": retrieved,
+        "failed_archives": failed,
+        "other_announcement_days": sorted(d for d in by_day if d != latest),
+        "count": len(papers), "papers": papers,
+        "note": "arXiv RSS is published at midnight US Eastern, later than the initial announcement. Crosslists and replacements are included."
+    }
+    TARGET.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.NamedTemporaryFile("w", dir=TARGET.parent, encoding="utf-8", delete=False) as f:
+        json.dump(payload, f, ensure_ascii=False, separators=(",", ":"))
+        f.write("\n")
+        temp = Path(f.name)
+    os.replace(temp, TARGET)
+    print("Official RSS:", latest, len(papers), "unique papers; complete:", complete, "failures:", failed)
+
+
+if __name__ == "__main__":
+    main()
