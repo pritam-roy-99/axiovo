@@ -23,7 +23,7 @@ function display(){
  const assistant=$("compare-assistant");
  if(assistant){
    const question="Compare the assumptions, methods, contributions and limitations of arXiv:"+a+" and arXiv:"+b+". Verify both sources and distinguish evidence from inference.";
-   assistant.href="./copilot.html?q="+encodeURIComponent(question);
+   assistant.href="./copilot.html?ids="+encodeURIComponent(a+","+b)+"&q="+encodeURIComponent(question);
    assistant.hidden=false;
  }
 
