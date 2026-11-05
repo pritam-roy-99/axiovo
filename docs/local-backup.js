@@ -10,20 +10,20 @@
 })(typeof window!=="undefined"?window:null,function(){
  "use strict";
  const KEYS=[
-  "researchlens-reading-list","researchlens-read","researchlens-hidden",
-  "researchlens-followed-topics","researchlens-author-follows","researchlens-last-visit","axiovo-paper-feedback-v1",
-  "researchlens-library-metadata-v1","researchlens-field-saved-v1",
-  "researchlens-field-explorer-v1","researchlens-research-projects-v1","axiovo-paper-collections-v1",
-  "researchlens-research-interest-settings-v1","researchlens-interests-by-field-v1",
-  "researchlens-pdf-notes-v1","researchlens-comparisons-v1",
-  "researchlens-local-profile","researchlens-theme","axiovo-palette-v1",
+  "axiovo-reading-list","axiovo-read","axiovo-hidden",
+  "axiovo-followed-topics","axiovo-author-follows","axiovo-last-visit","axiovo-paper-feedback-v1",
+  "axiovo-library-metadata-v1","axiovo-field-saved-v1",
+  "axiovo-field-explorer-v1","axiovo-research-projects-v1","axiovo-paper-collections-v1",
+  "axiovo-research-interest-settings-v1","axiovo-interests-by-field-v1",
+  "axiovo-pdf-notes-v1","axiovo-comparisons-v1",
+  "axiovo-local-profile","axiovo-theme","axiovo-palette-v1",
   "axiovo-custom-taxonomy-v1","axiovo-biorxiv-reading-v1","axiovo-biorxiv-notes-v1","axiovo-chemrxiv-reading-v1",
   "axiovo-browser-state-arxiv","axiovo-browser-state-biorxiv","axiovo-browser-state-chemrxiv",
   "axiovo-custom-fields-arxiv","axiovo-custom-fields-biorxiv","axiovo-custom-fields-chemrxiv",
-  "axiovo-onboarding-dismissed-v1","researchlens-alert-seen-v1"
+  "axiovo-onboarding-dismissed-v1","axiovo-alert-seen-v1"
  ];
  const MAX_FILE=5*1024*1024, MAX_ENTRY=2*1024*1024;
- const RAW=new Set(["researchlens-theme","axiovo-palette-v1","axiovo-onboarding-dismissed-v1","researchlens-last-visit"]);
+ const RAW=new Set(["axiovo-theme","axiovo-palette-v1","axiovo-onboarding-dismissed-v1","axiovo-last-visit"]);
  function checkRaw(key,value){
   if(typeof value!=="string"||value.length>MAX_ENTRY)throw Error("Invalid backup value for "+key);
   if(RAW.has(key))return true;
