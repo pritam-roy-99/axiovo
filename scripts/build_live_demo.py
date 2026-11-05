@@ -129,7 +129,7 @@ def capture(browser, base):
     snap("subfields in Discover")
 
     safe_click(page,"#rl-source-arxiv")
-    safe_scroll(page,"#local-feed-view")
+    safe_scroll(page,".axiovo-reading-modes")
     snap("arxiv discovery")
 
     safe_click(page,"#rl-source-scholarly")
@@ -138,10 +138,13 @@ def capture(browser, base):
 
     safe_click(page,"#rl-source-arxiv")
     paper_id=""
+    second_id=""
     try:
         paper=page.locator("#papers .paper").first
         paper.wait_for(timeout=13000)
         paper_id=paper.get_attribute("data-paper-id") or ""
+        if page.locator("#papers .paper").count()>1:
+            second_id=page.locator("#papers .paper").nth(1).get_attribute("data-paper-id") or ""
         paper.locator('a.axiovo-paper-detail-action').click(timeout=7000)
         page.wait_for_url("**/paper.html?*",timeout=13000)
     except Exception as e:
@@ -149,20 +152,38 @@ def capture(browser, base):
             raise RuntimeError("Cannot capture paper detail without a real indexed paper") from e
         open_page(page,base+"paper.html?id="+paper_id)
     page.locator("#axiovo-versions").wait_for(timeout=12000)
+    page.wait_for_function("document.getElementById('save')?.onclick !== null",timeout=13000)
+    safe_click(page,"#save")
     safe_scroll(page,"#axiovo-versions")
     snap("paper research details")
 
     safe_scroll(page,"#axiovo-paper-notes")
+    try:
+        note=page.locator("#axiovo-paper-notes textarea")
+        note.fill("Review the assumptions and verify the original proof.")
+        note.blur()
+    except Exception:pass
     snap("private research notes")
 
-    # Compare the exact captured paper with a distinct saved or indexed identifier;
-    # do not claim both metadata records are fully indexed when they are not.
-    open_page(page,base+"compare.html?ids="+paper_id+",2501.01234")
+    # Use two genuinely indexed records, not a fictitious metadata example.
+    if not second_id:raise RuntimeError("Second indexed arXiv paper missing from live feed")
+    open_page(page,base+"compare.html?ids="+paper_id+","+second_id)
     page.locator(".axiovo-compare-paper").first.wait_for(timeout=11000)
     snap("source-linked comparison")
 
     open_page(page,base+"discover.html#workspace")
     page.locator("#workspace-panel #library-list").wait_for(timeout=15000)
+    try:
+        create=page.locator("#workspace-panel .axiovo-collection-controls button")
+        create.wait_for(timeout=10000)
+        page.once("dialog",lambda dialog:dialog.accept("Demo reading list"))
+        create.click()
+        page.locator("#axiovo-collection-filter").select_option("all")
+        paper=page.locator("#workspace-panel #library-list .rl-paper").first
+        choice=paper.locator('select[aria-label^="Assign"]')
+        if choice.count():choice.select_option(label="Demo reading list")
+    except Exception as exc:
+        print("Collection demo unavailable:",str(exc)[:160],flush=True)
     safe_scroll(page,"#library-heading")
     snap("Library and collections")
 
