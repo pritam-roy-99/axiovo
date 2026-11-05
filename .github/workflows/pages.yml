@@ -71,7 +71,9 @@ jobs:
           echo 'No live bioRxiv results were available. Cached records are preserved, if any.' >> "$GITHUB_STEP_SUMMARY"
           echo '::warning::bioRxiv synchronization unsuccessful; review diagnostics in logs.'
       - name: Harvest every arXiv first submission for selected UTC days
-        if: github.event_name != 'push'
+        # The independent arXiv archive job runs twice daily; do not make
+        # hourly metadata refresh compete for the same upstream API quota.
+        if: github.event_name == 'workflow_dispatch'
         id: daily_archive
         continue-on-error: true
         run: python -m scripts.arxiv_daily_archive
@@ -79,6 +81,19 @@ jobs:
         if: steps.daily_archive.outcome == 'failure'
         run: |
           echo '::warning::Complete daily archive harvesting was unavailable; earlier verified day shards remain.'
+      - name: Refresh all-category arXiv OAI-PMH metadata
+        if: github.event_name != 'push'
+        id: oai
+        continue-on-error: true
+        env:
+          OAI_MAX_PAGES: '20'
+          OAI_LOOKBACK_DAYS: '2'
+        run: python -m scripts.oai_harvest
+      - name: Report OAI-PMH ingestion gaps
+        if: steps.oai.outcome == 'failure'
+        run: |
+          echo '::warning::arXiv OAI-PMH ingestion unavailable. Existing OAI snapshot preserved.'
+          echo '### All-category OAI source unavailable' >> "$GITHUB_STEP_SUMMARY"
       - name: Refresh research metadata
         if: github.event_name != 'push'
         id: refresh
@@ -105,7 +120,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docs/data/feed.json docs/data/biorxiv.json docs/data/arxiv-days/
+          git add docs/data/feed.json docs/data/biorxiv.json docs/data/arxiv-days/ docs/data/oai-recent.json
           if ! git diff --cached --quiet; then
             git commit -m "data: refresh arXiv index [skip ci]"
             git fetch origin main
