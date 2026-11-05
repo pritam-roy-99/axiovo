@@ -33,6 +33,11 @@ const data=root.AxiovoArchiveData;
  const announced=snapshot.papers.find(x=>x.id==="2611.00002");
  assert.equal(announced.announcementDate,"2026-11-06");
  assert.equal(announced.date,"","Announcement time must never masquerade as first-submission date");
+ const dated=data.normalize("arxiv",{id:"2611.00002",title:announced.title,
+  published:"2026-11-05",categories:["math-ph"]});
+ const combined=data.merge([dated],[announced])[0];
+ assert.equal(combined.date,"2026-11-05","Same-revision RSS records must not erase verified submission dates");
+ assert.equal(combined.announcementDate,"2026-11-06");
  assert.equal(data.filter(snapshot.papers,{q:"Lieb-Robinson"}).length,1);
  assert.equal(data.filter(snapshot.papers,{q:"ion"}).length,0,"Substring false positives prohibited");
  assert.equal(data.filter(snapshot.papers,{q:"steering"})[0].id,"2611.00001");
