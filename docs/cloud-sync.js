@@ -1,21 +1,21 @@
 /* Optional opt-in research library cloud backup. Disabled until owner configures Supabase. */
 (async function(){
 "use strict";
-const $=id=>document.getElementById(id),cfg=window.ResearchLensSocialConfig||{};
+const $=id=>document.getElementById(id),cfg=window.AxiovoSocialConfig||{};
 if(!$("lab-cloud-status"))return;
 const status=s=>$("lab-cloud-status").textContent=s;
 if(!cfg.url||!cfg.anonKey||!/^https:\/\/[a-z0-9-]+\.supabase\.co$/i.test(cfg.url)){
  status("Private cloud sync is not configured. Local research reading and questions remain usable. The site owner must enable the optional Supabase integration.");return;
 }
 const KEYS=[
- "researchlens-reading-list",
- "researchlens-field-saved-v1",
- "researchlens-library-metadata-v1",
- "researchlens-field-explorer-v1",
- "researchlens-research-projects-v1",
- "researchlens-research-interest-settings-v1",
- "researchlens-pdf-notes-v1",
- "researchlens-alert-seen-v1"
+ "axiovo-reading-list",
+ "axiovo-field-saved-v1",
+ "axiovo-library-metadata-v1",
+ "axiovo-field-explorer-v1",
+ "axiovo-research-projects-v1",
+ "axiovo-research-interest-settings-v1",
+ "axiovo-pdf-notes-v1",
+ "axiovo-alert-seen-v1"
 ];
 try{
  const {createClient}=await import("https://esm.sh/@supabase/supabase-js@2");
