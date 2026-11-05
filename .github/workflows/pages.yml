@@ -100,6 +100,9 @@ jobs:
           echo '::warning::arXiv OAI-PMH ingestion unavailable. Existing OAI snapshot preserved.'
           echo '### All-category OAI source unavailable' >> "$GITHUB_STEP_SUMMARY"
       - name: Harvest official arXiv announcement-day RSS
+        # Code pushes deploy existing verified announcements immediately.
+        # Scheduled sync and the dedicated announcement workflow update data.
+        if: github.event_name != 'push'
         id: announcements
         continue-on-error: true
         run: python -m scripts.arxiv_announcements
