@@ -46,20 +46,26 @@ dialog{border:0;border-radius:13px;box-shadow:0 20px 90px #061e3977;width:min(74
 .rl-unified-switch{max-width:1190px;margin:0 auto 18px;display:flex;gap:8px;flex-wrap:wrap}.rl-unified-switch a{display:inline-flex;padding:11px 17px;background:var(--rl-panel,#fff);color:var(--rl-text,#17324b);border:1px solid #97b8ce;border-radius:12px;font-weight:750;font-size:14px;text-decoration:none}.rl-unified-switch a[aria-current="page"]{background:#0f6090;color:#fff;border-color:#0f6090}#workspace-panel[hidden],#discover-shell[hidden]{display:none!important}#workspace-panel{max-width:1190px;margin:auto;padding:0}.rl-unified-switch a:focus-visible{outline:3px solid #49abdc;outline-offset:2px}
 </style><link rel="manifest" href="./manifest.webmanifest"><meta name="theme-color" content="#0b2239"><link rel="icon" type="image/svg+xml" href="./icons/axiovo.svg"><script defer src="./pwa.js"></script></head><body class="axiovo-home">
 <header><div class="brand"><span>L</span>Axiovo</div><a href="https://github.com/pritam-roy-99/axiovo" target="_blank" rel="noopener noreferrer">Source on GitHub ↗</a><a class="ai-nav" href="./copilot.html">✦ Research Assistant</a><a class="toolbar-link" href="./copilot.html">AI Lab</a><a class="toolbar-link" href="./discover.html?view=scholarly#discover">Explore by field</a><a class="toolbar-link" href="./discover.html?view=scholarly#discover">Global search</a><a class="toolbar-link" href="./methodology.html">Methodology</a><a class="toolbar-link" href="./profiles.html">My profile</a></header>
-<section class="axiovo-entry" id="axiovo-entry" aria-labelledby="axiovo-entry-heading">
+<section class="axiovo-entry" id="axiovo-entry" aria-label="Choose a scientific preprint archive">
 
  <section class="axiovo-video-top" aria-labelledby="axiovo-home-demo-heading">
   <h2 id="axiovo-home-demo-heading">Discover Axiovo in action</h2>
   <p>See the current three-archive research workflow in the guided website tour.</p>
-  <div id="axiovo-entry-demo-slot"></div>
+  <figure class="rl-home-demo">
+<div class="rl-home-demo-head"><span class="rl-home-live-dot" aria-hidden="true"></span><strong>See how Axiovo works</strong><span>Recorded from the current Axiovo interface</span></div>
+<details id="axiovo-video-details" class="axiovo-video-details" open><summary>Watch the real Axiovo website demo</summary>
+<video controls playsinline preload="none" width="960" height="540" poster="./assets/axiovo-tour-poster.jpg" aria-label="Axiovo video: broad field selection on new homepage, subfield discovery, latest arXiv, literature search, library, Research Assistant and Research Tools">
+<source src="./assets/axiovo-tour.mp4" type="video/mp4">
+<track kind="captions" src="./assets/axiovo-tour.vtt" srclang="en" label="English captions" default>
+Your browser cannot play this video. Read the transcript below to explore the features.
+</video></details>
+<figcaption>A guided capture of the current Axiovo interface, recorded from the site itself. The demo shows navigation, discovery, paper controls, the library, Research Assistant and Research Tools. Online sources can change after recording.</figcaption>
+<details class="rl-home-transcript"><summary>Read video transcript</summary>
+<p>Axiovo begins with three equally prominent preprint archives: arXiv, bioRxiv, and ChemRxiv. Select an archive first, then choose a research field, area, and specialized subtopic within Discover. Each archive has its own source-linked papers, search controls, and coverage status. Wider literature search is an optional separate tool. Open an individual paper's research workspace to read its abstract, check authoritative arXiv version links and research connections, and record private reading notes. Compare two papers side by side, verifying their originals rather than relying on automatic novelty claims. My Library keeps saved papers, collections, research projects and reading progress together on your device. Research Assistant and Research Tools help with paper questions, PDF reading and references. The recording demonstrates the current interface with female narration; external source availability can change.</p>
+</details></figure>
  </section>
- <div class="axiovo-entry-intro">
-  <span class="axiovo-entry-kicker">AXIOVO · OPEN RESEARCH DISCOVERY</span>
-  <h1 id="axiovo-entry-heading">Start with the archive you want to explore.</h1>
-  <p class="axiovo-entry-lead">Choose arXiv, bioRxiv or ChemRxiv. Refine by research field, area and subtopic on the next page. All three sources are equally accessible.</p>
- </div>
  <section class="axiovo-entry-card" aria-labelledby="axiovo-archive-title">
-  <div class="axiovo-entry-card-header"><h2 id="axiovo-archive-title">Choose a preprint archive</h2><span>Three equal research pathways</span></div>
+  <div class="axiovo-entry-card-header"><h1 id="axiovo-archive-title">Choose a preprint archive</h1><span>Three equal research pathways</span></div>
   <div class="axiovo-archive-grid" role="group" aria-label="Choose research preprint archive">
    <a class="axiovo-archive-card" data-archive="arxiv" href="./arxiv.html">
     <span class="axiovo-archive-brand">arXiv</span><span class="axiovo-archive-description">Physics, mathematics, computing and interdisciplinary research</span><span class="axiovo-archive-action">Explore arXiv <span aria-hidden="true">→</span></span>
@@ -90,18 +96,7 @@ dialog{border:0;border-radius:13px;box-shadow:0 20px 90px #061e3977;width:min(74
 <p class="rl-home-hero-actions"><a class="rl-home-start" href="./discover.html#discover">Find papers</a><a class="rl-home-explore" href="./discover.html#workspace">My research library</a><button type="button" class="rl-home-start axiovo-install-action" data-axiovo-install>Install Axiovo app</button></p>
 <p class="rl-home-explainer-meta">Free and open source · Installable on your device · No account needed for local reading and notes</p>
 </section>
-<figure class="rl-home-demo">
-<div class="rl-home-demo-head"><span class="rl-home-live-dot" aria-hidden="true"></span><strong>See how Axiovo works</strong><span>Recorded from the current Axiovo interface</span></div>
-<details id="axiovo-video-details" class="axiovo-video-details" open><summary>Watch the real Axiovo website demo</summary>
-<video controls playsinline preload="none" width="960" height="540" poster="./assets/axiovo-tour-poster.jpg" aria-label="Axiovo video: broad field selection on new homepage, subfield discovery, latest arXiv, literature search, library, Research Assistant and Research Tools">
-<source src="./assets/axiovo-tour.mp4" type="video/mp4">
-<track kind="captions" src="./assets/axiovo-tour.vtt" srclang="en" label="English captions" default>
-Your browser cannot play this video. Read the transcript below to explore the features.
-</video></details>
-<figcaption>A guided capture of the current Axiovo interface, recorded from the site itself. The demo shows navigation, discovery, paper controls, the library, Research Assistant and Research Tools. Online sources can change after recording.</figcaption>
-<details class="rl-home-transcript"><summary>Read video transcript</summary>
-<p>Axiovo begins with three equally prominent preprint archives: arXiv, bioRxiv, and ChemRxiv. Select an archive first, then choose a research field, area, and specialized subtopic within Discover. Each archive has its own source-linked papers, search controls, and coverage status. Wider literature search is an optional separate tool. Open an individual paper's research workspace to read its abstract, check authoritative arXiv version links and research connections, and record private reading notes. Compare two papers side by side, verifying their originals rather than relying on automatic novelty claims. My Library keeps saved papers, collections, research projects and reading progress together on your device. Research Assistant and Research Tools help with paper questions, PDF reading and references. The recording demonstrates the current interface with female narration; external source availability can change.</p>
-</details></figure>
+
 </div></div>
 <main><section class="axiovo-onboarding" id="axiovo-onboarding" hidden aria-label="Getting started with Axiovo">
 <div><strong>Start with your research question</strong><p>Choose a research field, discover original papers, save useful references, and organize your work in Library. No account required.</p></div>
