@@ -256,7 +256,16 @@ jobs:
       - name: Render first-paint snapshot with actual index counts
         run: python -m scripts.build_snapshot
       - name: Build Atom topic subscriptions
+        id: atom_feeds
+        continue-on-error: true
         run: python -m scripts.build_feeds
+      - name: Report feed generation status
+        if: always()
+        run: |
+          echo 'Atom feeds: ${{ steps.atom_feeds.outcome }}' >> "$GITHUB_STEP_SUMMARY"
+          if [ "${{ steps.atom_feeds.outcome }}" = "failure" ]; then
+            echo '::warning::Atom feed generation failed; video and main website will still deploy.'
+          fi
       - name: Audit internal website links and anchors
         continue-on-error: true
         run: python scripts/audit_site_links.py
