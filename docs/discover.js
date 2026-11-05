@@ -29,7 +29,7 @@ function init(){
   if(indicator)indicator.textContent=isWide?
     "Wider literature search uses OpenAlex metadata, not a preprint archive. Return to "+activeArchive+" using its source tab.":
     "Browsing "+({arxiv:"arXiv",biorxiv:"bioRxiv",chemrxiv:"ChemRxiv"}[activeArchive])+". Refine field → research area → subtopic. Source metadata coverage may be partial.";
-  if(isWide&&!scholarlyStarted){scholarlyStarted=true;window.dispatchEvent(new Event("researchlens:scholarly-open"))}
+  if(isWide&&!scholarlyStarted){scholarlyStarted=true;window.dispatchEvent(new Event("axiovo:scholarly-open"))}
   if(updateUrl){
     const url=new URL(location.href);
     url.searchParams.set("archive",activeArchive);
@@ -46,7 +46,7 @@ function init(){
   const source=valid(p.get("archive")||(p.get("view")==="biorxiv"?"biorxiv":"arxiv"));
   show(source,p.get("view")==="scholarly",false);
  });
- window.addEventListener("researchlens:focus-change",event=>{
+ window.addEventListener("axiovo:focus-change",event=>{
   const data=event.detail||{};
   const desired=data.areaSelected?(data.subtopic||data.topic||""):"";
   if(!isWide&&activeArchive!=="arxiv"&&desired){
