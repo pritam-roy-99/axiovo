@@ -8,6 +8,9 @@ Run after installing playwright/Chromium, Pillow, ffmpeg and espeak-ng.
 from __future__ import annotations
 
 import functools
+import asyncio
+import json
+import textwrap
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from threading import Thread
@@ -34,6 +37,7 @@ def focus(page,selector):
     try:
         el=page.locator(selector).first
         if not el.count():return None
+        el.scroll_into_view_if_needed(timeout=3000)
         el.evaluate("""el=>{el.style.outline='4px solid #16c8dd';el.style.outlineOffset='4px'}""")
         return el.bounding_box()
     except Exception:
@@ -45,7 +49,8 @@ def stamp(png,title,instruction,number,target=None):
     draw.rounded_rectangle((10,12,440,51),radius=11,fill=(9,30,51,235))
     draw.text((23,22),f"STEP {number:02}  {title}",font=font(19,True),fill=(242,251,255,255))
     draw.rectangle((0,426,W,H),fill=(7,23,42,237))
-    draw.text((26,443),instruction,font=font(20,True),fill=(245,250,255,255))
+    for line,chunk in enumerate(textwrap.wrap(instruction,width=76)[:2]):
+        draw.text((26,438+line*29),chunk,font=font(19,True),fill=(245,250,255,255))
     draw.text((26,488),"AXIOVO  |  HOW TO USE THE RESEARCH PLATFORM",font=font(13),fill=(160,211,236,255))
     if target:
         x=target["x"]*W/1280;y=target["y"]*H/720
@@ -75,7 +80,7 @@ def main():
         ("Date-aware search", "Use first-submission dates and verify completeness.", "Expand the advanced search settings. Specify a date or date range. Axiovo distinguishes verified complete date batches from partial source snapshots.", "arxiv.html", "#archive-advanced", ("open", "archive-advanced")),
         ("Cross-listed categories", "Filter arXiv primary and cross-listed records.", "For arXiv, the cross-list option can narrow results to records appearing in more than one subject category.", "arxiv.html", "#archive-crosslisted", ("open", "archive-advanced")),
         ("Find an author", "Apply author and affiliation filters.", "Use author and affiliation fields to make a more precise query and read the source evidence before using a result.", "arxiv.html", "#archive-author", ("open", "archive-advanced")),
-        ("Save your research path", "Create, follow and restore personal topics.", "You can add personal topics and subtopics, save frequently used research paths, and restore defaults when needed.", "arxiv.html?category=math-ph&topic=quantum-many-body-theory", "#archive-custom-form", ("open", "ex-personal")),
+        ("Save your research path", "Create, follow and restore personal topics.", "You can add personal topics and subtopics, save frequently used research paths, and restore defaults when needed.", "arxiv.html?category=math-ph&topic=quantum-many-body-theory", "#archive-custom-form", ("openclass", ".ex-personal")),
         ("bioRxiv Discover", "Browse independent biology subject areas.", "The bioRxiv Discover page has its own biology taxonomy, topic selectors, and preprint search.", "biorxiv.html?category=Genomics&topic=transcriptomics&subtopic=spatial-transcriptomics", "#archive-topic", None),
         ("ChemRxiv Discover", "Browse independent chemistry subject areas.", "ChemRxiv provides chemistry subject and topic browsing, while keeping the source of each paper visible.", "chemrxiv.html?category=Catalysis&topic=electrocatalysis&subtopic=electrochemical-co2-reduction", "#archive-topic", None),
         ("Cross-archive Research Desk", "Choose one or more sources.", "Open Research Desk to search all three preprint servers in one place. Results remain separated by their original archive.", "desk.html", "#rd-search-form", None),
@@ -90,7 +95,7 @@ def main():
         ("Research recommendations", "Check relevant recommendations and evidence.", "Explore research recommendations based on your saved projects and interests. Always check the original source paper.", "workspace.html", "#research-recommendations", None),
         ("Research Assistant", "Ask a specific literature question.", "Open Research Assistant and ask a focused question to retrieve source-linked evidence from indexed literature.", "copilot.html", "#question", ("question", "What are Lieb-Robinson bounds?")),
         ("Inspect paper claims", "Choose Inspect a paper to examine its abstract.", "Choose Inspect a paper and provide an arXiv ID or original link. The assistant distinguishes abstract claims from what still needs proof verification.", "copilot.html", ".assistant-task-row", None),
-        ("Choose AI options", "Use source evidence, local models or provider APIs.", "Under Optional text and local model, choose evidence-only analysis, an on-device model, Ollama, or your own hosted API provider.", "copilot.html", "#engine", ("open", "assistant-advanced")),
+        ("Choose AI options", "Use source evidence, local models or provider APIs.", "Under Optional text and local model, choose evidence-only analysis, an on-device model, Ollama, or your own hosted API provider.", "copilot.html", "#engine", ("openclass", ".assistant-advanced")),
         ("Hosted models", "OpenRouter, OpenAI, Kimi and Gemini require your own keys.", "Hosted AI choices include OpenRouter, OpenAI, Kimi and Gemini. Some have free quotas and others require payment. Your provider key is never included in public site code.", "copilot.html", "#hosted-provider", ("hosted", "hosted")),
         ("Evidence and export", "Inspect original citations and export the report.", "Use the Sources panel to open original records, verify citations, and export a research session or evidence report.", "copilot.html", "#evidence-list", None),
         ("PDF Research Tools", "Read a PDF and use the research utilities.", "Open Research Tools to read local PDFs, use available annotations and explore research utilities.", "lab.html", "#lab-local-pdf", None),
@@ -115,6 +120,11 @@ def main():
                     if action:
                         if action[0]=="open":
                             page.locator("#"+action[1]).evaluate("el=>el.open=true")
+                        elif action[0]=="openclass":
+                            page.locator(action[1]).first.evaluate("el=>el.open=true")
+                        elif action[0]=="hosted":
+                            page.locator(".assistant-advanced").first.evaluate("el=>el.open=true")
+                            page.locator("#engine").select_option("hosted")
                         else:
                             page.locator("#"+action[0]).fill(action[1])
                             if path.startswith("arxiv.html"):
