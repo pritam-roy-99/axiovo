@@ -166,6 +166,10 @@ def main():
                         subprocess.run(["espeak-ng","-v","en+f3","-s","138","-w",str(sound),voice_text(narration)],check=True)
                         voice="eSpeak female fallback"
                     voices_used.add(voice)
+                    # Convert every clip to one PCM format before ffmpeg concatenation.
+                    pcm=work/f"{index:02d}-pcm.wav"
+                    subprocess.run(["ffmpeg","-y","-v","error","-i",str(sound),"-ar","24000","-ac","1","-c:a","pcm_s16le",str(pcm)],check=True)
+                    sound=pcm
                     duration=media_duration(sound)+1.2
                     video_entries.extend([f"file '{shot.as_posix()}'",f"duration {duration:.3f}"])
                     audio_entries.append(f"file '{sound.as_posix()}'")
