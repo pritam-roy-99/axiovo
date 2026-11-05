@@ -187,6 +187,7 @@ function validHostedModel(value){
  return id;
 }
 function hostedProviderChange(){
+ hostedKey="";$("hosted-key").value=""; // never forward one provider\'s credential to another
  const provider=selectedHostedProvider();
  $("hosted-model").value=provider.model;
  status(provider.name==="openrouter"?
