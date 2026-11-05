@@ -76,12 +76,15 @@
    return {complete:false,missing:requested,papers:[],reason:"Daily archive has not been published or is unreachable"};
   }
   const missing=requested.filter(day=>manifest.days?.[day]?.complete!==true);
-  if(missing.length)return {complete:false,missing,papers:[],reason:"Some requested submission dates have not yet been completely harvested"};
+  const available=requested.filter(day=>manifest.days?.[day]?.complete===true);
+  if(!available.length)return {complete:false,missing,papers:[],totalHarvested:0,
+   coveredDays:0,requestedDays:requested.length,
+   reason:"No requested submission dates have been completely harvested"};
   const records=[];
   try{
    // Bounded concurrency, rather than loading a month of XML or a massive list at once.
-   for(let start=0;start<requested.length;start+=4){
-    const batch=await Promise.all(requested.slice(start,start+4).map(async day=>{
+   for(let start=0;start<available.length;start+=4){
+    const batch=await Promise.all(available.slice(start,start+4).map(async day=>{
      const res=await fetcher(base+day+".json",{signal,cache:"no-store"});
      if(!res.ok)throw Error("Daily file missing: "+day);
      const value=await res.json();
@@ -98,8 +101,11 @@
    if(e.name==="AbortError")throw e;
    return {complete:false,missing:requested,papers:[],reason:String(e.message||e)};
   }
-  return {complete:true,missing:[],papers:filterAndSort(records,query,category,sort),
-   totalHarvested:records.length,coveredDays:requested.length,from,to};
+  return {complete:missing.length===0,missing,
+   papers:filterAndSort(records,query,category,sort),
+   totalHarvested:records.length,coveredDays:available.length,
+   requestedDays:requested.length,from,to,
+   reason:missing.length?"Only "+available.length+"/"+requested.length+" UTC submission dates have been fully harvested.":"All requested UTC submission dates fully harvested."};
  }
  return {dates,matches,filterAndSort,search,officialDateSearchUrl};
 });
