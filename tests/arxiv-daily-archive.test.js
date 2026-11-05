@@ -56,5 +56,21 @@ const Archive=require("../docs/arxiv-daily-archive.js");
  };
  const invalid=await Archive.search({from:"2026-11-04",to:"2026-11-05",fetcher:altered});
  assert.equal(invalid.complete,false,"Disagreement between index and day shards must not claim completeness");
+ const partialFetcher=async url=>{
+  if(url.endsWith("manifest.json"))return{ok:true,json:async()=>({
+   schema:1,complete_submission_dates:false,days:{"2026-11-05":{complete:false,count:2}}
+  })};
+  const records=[papers[0],papers[1]];
+  return{ok:true,json:async()=>({date:"2026-11-05",complete:false,paper_count:2,papers:records})};
+ };
+ const partial=await Archive.partialSearch({from:"2026-11-05",to:"2026-11-05",fetcher:partialFetcher});
+ assert.equal(partial.complete,false);
+ assert.equal(partial.available,true);
+ assert.equal(partial.papers.length,2);
+ assert.equal(partial.coveredDays,1);
+ assert(partial.reason.includes("partial"));
+ const noPartial=await Archive.partialSearch({from:"2026-11-04",to:"2026-11-05",fetcher:partialFetcher});
+ assert.deepEqual(noPartial.missing,["2026-11-04"]);
+ assert.equal(noPartial.papers.length,2);
  console.log("Daily arXiv exact-date coverage and unbounded result paging tests passed");
 })().catch(err=>{console.error(err);process.exitCode=1});
