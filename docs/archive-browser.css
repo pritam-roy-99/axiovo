@@ -1,0 +1,47 @@
+/* Shared polished interface, with distinct source accents and no data mixing */
+.axiovo-archive-page{--archive:#a42c38;background:var(--rl-bg,#f4f7fa);color:var(--rl-text,#19334a)}
+.axiovo-archive-page[data-archive=biorxiv]{--archive:#167764}
+.axiovo-archive-page[data-archive=chemrxiv]{--archive:#8f5a0b}
+.axiovo-browser{max-width:1180px;padding:22px 22px 72px;margin:0 auto}
+.axiovo-breadcrumb{display:flex;gap:9px;align-items:center;font-size:12px;margin:0 0 20px;color:var(--rl-muted,#617a91)}
+.axiovo-browser-hero{padding:30px;background:var(--rl-panel,#fff);border:1px solid var(--rl-border,#cbdce8);border-top:5px solid var(--archive);border-radius:16px;margin-bottom:17px}
+.axiovo-browser-kicker{display:block;font-size:10px;font-weight:800;letter-spacing:.14em;color:var(--archive)}
+.axiovo-browser-hero h1{font-size:clamp(35px,5vw,54px);letter-spacing:-.045em;margin:9px 0 5px;line-height:1.1;color:var(--rl-text,#19334a)}
+.axiovo-browser-hero>p{font-size:15px;color:var(--rl-muted,#607b8f);line-height:1.6;margin:8px 0}
+.axiovo-browser-hero .axiovo-browser-description{font-size:12px}
+.axiovo-browser-status{margin-top:16px;font-size:12px;line-height:1.6;background:var(--rl-soft,#eff6fa);padding:12px 14px;border-radius:9px;color:var(--rl-text,#19334a)}
+.axiovo-browser-fields,.axiovo-browser-search,.axiovo-browser-results{padding:21px 24px;background:var(--rl-panel,#fff);border:1px solid var(--rl-border,#cbdce8);border-radius:15px;margin-bottom:16px}
+.axiovo-browser-heading{margin-bottom:16px}.axiovo-browser-heading h2,.axiovo-results-head h2{font-size:20px;margin:0 0 4px;line-height:1.3}.axiovo-browser-heading p,.axiovo-results-head p{color:var(--rl-muted,#617c90);font-size:12px;line-height:1.6;margin:0}
+.axiovo-browser-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:16px 0}
+.axiovo-browser-step{display:grid;gap:7px;min-width:0}.axiovo-browser-step>span{color:var(--archive);font-weight:800;letter-spacing:.05em;text-transform:uppercase;font-size:10px}
+.axiovo-browser-step label,#archive-search-form>label{font-weight:740;font-size:12px;color:var(--rl-text,#19334a)}
+.axiovo-browser :is(input,select){border:1px solid var(--rl-border,#bed1df);border-radius:9px;min-height:43px;padding:9px 11px;background:var(--rl-panel,#fff);color:var(--rl-text,#19334a);width:100%;min-width:0}
+.axiovo-browser :is(input,select):focus-visible,.axiovo-browser button:focus-visible,.axiovo-browser a:focus-visible{outline:3px solid var(--archive);outline-offset:2px}
+.axiovo-browser-taxonomy,.axiovo-browser-chips{display:flex;flex-wrap:wrap;gap:7px;margin:15px 0}
+.axiovo-browser-chips button,.axiovo-browser-taxonomy button{border:1px solid var(--rl-border,#bed1df);border-radius:999px;padding:8px 12px;background:var(--rl-soft,#edf4f8);color:var(--rl-text,#19334a);font-weight:650;font-size:11px;cursor:pointer}
+.axiovo-browser-taxonomy button[aria-pressed=true]{border-color:var(--archive);background:var(--archive);color:white}
+.axiovo-browser-chips button{border-radius:8px}
+.axiovo-edit-fields{border-top:1px solid var(--rl-border,#d1e0e9);padding-top:13px}.axiovo-edit-fields summary{font-size:12px;font-weight:780;cursor:pointer;color:var(--archive)}
+.axiovo-edit-fields>p{font-size:11px;color:var(--rl-muted,#617c90);line-height:1.6}
+.axiovo-custom-form{display:flex;align-items:end;flex-wrap:wrap;gap:8px;margin-top:15px}.axiovo-custom-form label{display:grid;gap:7px;font-size:12px;min-width:180px;flex:1}
+.axiovo-browser button[type=submit]{min-height:43px;background:var(--archive);border:1px solid var(--archive);border-radius:9px;padding:10px 18px;color:#fff;font-size:12px;font-weight:800;cursor:pointer}
+.axiovo-browser button.axiovo-secondary{min-height:43px;border:1px solid var(--rl-border,#b4cbd9);border-radius:9px;padding:10px 14px;background:var(--rl-soft,#eff5f9);color:var(--rl-text,#19334a);font-weight:730;font-size:12px;cursor:pointer}
+.axiovo-searchline{display:flex;gap:8px;margin:9px 0}.axiovo-searchline input{flex:1}.axiovo-searchline button{white-space:nowrap}
+.axiovo-hint{font-size:11px;color:var(--rl-muted,#617c90);margin:6px 0 14px}
+.axiovo-browser-filters{display:grid;grid-template-columns:repeat(5,minmax(125px,1fr));gap:10px}.axiovo-browser-filters label{font-size:11px;color:var(--rl-muted,#617c90);display:grid;gap:5px}
+.axiovo-browser-results #archive-results{display:grid;gap:12px}
+.axiovo-result-card{padding:18px;border:1px solid var(--rl-border,#ccdce6);border-radius:12px;overflow-wrap:anywhere}
+.axiovo-result-card h3{font-size:17px;line-height:1.45;margin:8px 0;color:var(--rl-text,#19334a)}
+.axiovo-result-card .axiovo-paper-meta{color:var(--rl-muted,#637c90);font-size:11px;line-height:1.6}
+.axiovo-result-card .axiovo-abstract{font-size:12px;line-height:1.65;color:var(--rl-text,#19334a);margin:10px 0}
+.axiovo-result-card .axiovo-author-link{padding:0;border:0;color:var(--archive);font-size:12px;background:transparent;cursor:pointer}
+.axiovo-result-card .axiovo-paper-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}
+.axiovo-result-card .axiovo-paper-actions :is(a,button){min-height:35px;border:1px solid var(--rl-border,#c5d8e5);border-radius:8px;padding:8px 12px;font-weight:750;font-size:11px;color:var(--rl-text,#19334a);background:var(--rl-soft,#edf5fa);text-decoration:none;cursor:pointer}
+.axiovo-result-card .axiovo-paper-actions .axiovo-primary{background:var(--archive);border-color:var(--archive);color:#fff}
+.axiovo-result-card mark{padding:0 2px;background:#ffe99b;color:#372d14}
+.axiovo-no-results{padding:24px;border:1px dashed var(--rl-border,#ccdce6);border-radius:12px;color:var(--rl-muted,#617c90);font-size:13px;line-height:1.7}
+.axiovo-browser-disclaimer{margin-top:23px;font-size:11px;line-height:1.7;color:var(--rl-muted,#617c90)}
+#archive-result-actions{display:flex;justify-content:center;gap:12px;margin:17px 0}
+#archive-result-actions button{padding:10px 15px;border-radius:8px;border:1px solid var(--rl-border,#bed3df);background:var(--rl-panel,#fff);color:var(--rl-text,#19334a);cursor:pointer}
+@media(max-width:850px){.axiovo-browser-filters{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:650px){.axiovo-browser{padding:14px 12px 45px}.axiovo-browser-hero,.axiovo-browser-fields,.axiovo-browser-search,.axiovo-browser-results{padding:16px}.axiovo-browser-steps{grid-template-columns:minmax(0,1fr)}.axiovo-browser-filters{grid-template-columns:repeat(2,minmax(0,1fr))}.axiovo-searchline{flex-wrap:wrap}.axiovo-searchline button{width:100%}}
