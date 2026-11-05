@@ -48,34 +48,36 @@ def main():
                 assert path.startswith("./"+ends),("Bad link",selector,path)
                 checked.append(selector)
             go("")
-            page.locator("#axiovo-entry-field").wait_for()
+            cards=page.locator(".axiovo-archive-card")
+            cards.first.wait_for()
+            assert cards.count()==3
+            assert set(cards.evaluate_all("(els)=>els.map(x=>x.dataset.archive)"))=={"arxiv","biorxiv","chemrxiv"}
+            assert page.locator("#axiovo-entry-field").count()==0
             assert page.locator("body").get_attribute("class")=="axiovo-home"
             target_is(".rl-nav a:nth-child(1)","discover.html#discover")
             target_is(".rl-nav a:nth-child(2)","discover.html#workspace")
-            assert page.locator("#axiovo-entry-topic").count()==0
-            assert page.locator("#axiovo-entry-subtopic").count()==0
-            assert page.locator("#axiovo-entry-field option").count()>=5
-            page.select_option("#axiovo-entry-field","quantum")
-            page.locator("#axiovo-entry-form button[type=submit]").click()
-            page.wait_for_url(lambda u:urlsplit(u).path.endswith("/discover.html") and urlsplit(u).fragment=="discover")
-            assert_path("discover.html")
-            assert page.evaluate('JSON.parse(localStorage.getItem("researchlens-field-explorer-v1")).field')=="quantum"
-            checked.append("homepage field > Discover")
-            page.locator("#rl-source-arxiv").wait_for()
+            cards.nth(2).click()
+            page.wait_for_url(lambda u:urlsplit(u).path.endswith("/discover.html") and "archive=chemrxiv" in urlsplit(u).query)
+            assert page.locator("#chemrxiv-discovery").is_visible()
+            assert page.locator("#biorxiv-discovery").is_hidden()
+            assert page.locator("#arxiv-discovery").is_hidden()
+            assert page.locator("#rl-focus-bar").is_visible()
+            assert page.evaluate('JSON.parse(localStorage.getItem("researchlens-field-explorer-v1")).field')=="chemistry"
+            checked.append("three equal archive homepage cards and ChemRxiv Discover")
+            page.locator("#rl-source-biorxiv").click()
+            page.wait_for_url(lambda u:"archive=biorxiv" in urlsplit(u).query)
+            assert page.locator("#biorxiv-discovery").is_visible()
+            assert page.evaluate('JSON.parse(localStorage.getItem("researchlens-field-explorer-v1")).field')=="biology"
+            checked.append("bioRxiv independent field focus")
+            page.locator("#rl-source-arxiv").click()
+            page.wait_for_url(lambda u:"archive=arxiv" in urlsplit(u).query)
+            assert page.locator("#arxiv-discovery").is_visible()
             assert page.locator(".axiovo-home-link").is_visible()
             assert page.locator(".axiovo-back-button").is_visible()
-            assert page.locator(".axiovo-home-link").get_attribute("href")=="./"
-            assert page.locator("#rl-focus-field-title").inner_text()!="Choose your field"
             page.locator(".axiovo-home-link").click()
             page.wait_for_url(lambda u:urlsplit(u).path.endswith("/"))
-            assert page.locator("#axiovo-entry-field").is_visible()
-            assert page.locator("#axiovo-entry-topic").count()==0
-            page.locator(".rl-nav a[href*='#discover']").click()
-            page.wait_for_url(lambda u:urlsplit(u).path.endswith("/discover.html"))
-            assert page.locator(".axiovo-back-button").is_visible()
-            page.locator(".axiovo-back-button").click()
-            page.wait_for_url(lambda u:urlsplit(u).path.endswith("/"))
-            page.locator(".rl-nav a[href*='#discover']").click()
+            assert page.locator(".axiovo-archive-card").count()==3
+            page.locator('[data-archive="arxiv"]').click()
             page.wait_for_url(lambda u:urlsplit(u).path.endswith("/discover.html"))
             assert page.locator(".axiovo-advanced-focus > summary").count()==1
             assert page.locator(".axiovo-feed-tools > summary").count()==1
@@ -84,8 +86,10 @@ def main():
             assert page.locator(".axiovo-scholar-tools > summary").count()==1
             checked.append("source tabs and advanced sections")
             page.locator("#rl-source-biorxiv").click()
+            page.wait_for_url(lambda u:"archive=biorxiv" in urlsplit(u).query)
             assert page.locator("#biorxiv-discovery").is_visible()
             page.locator("#rl-source-arxiv").click()
+            page.wait_for_url(lambda u:"archive=arxiv" in urlsplit(u).query)
             assert page.locator("#arxiv-discovery").is_visible()
             assert page.locator(".axiovo-reading-modes button").count()==4
             recommended=page.locator(".axiovo-reading-modes button").nth(1)
@@ -161,7 +165,7 @@ def main():
             checked.append("No broken local assets or unhandled page errors")
             mobile=browser.new_page(viewport={"width":390,"height":844},device_scale_factor=1)
             mobile.set_default_timeout(13000)
-            for path,ready in [("","#axiovo-entry-form"),("discover.html#discover","#rl-source-arxiv"),
+            for path,ready in [("",".axiovo-archive-grid"),("discover.html#discover","#rl-source-arxiv"),
                                ("discover.html?view=scholarly#discover","#scholar-search-form"),
                                ("discover.html#workspace","#workspace-panel #library-list")]:
                 mobile.goto(base+path,wait_until="domcontentloaded",timeout=25000)
