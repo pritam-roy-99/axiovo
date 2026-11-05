@@ -17,7 +17,7 @@
   "researchlens-research-interest-settings-v1","researchlens-interests-by-field-v1",
   "researchlens-pdf-notes-v1","researchlens-comparisons-v1",
   "researchlens-local-profile","researchlens-theme","axiovo-palette-v1",
-  "axiovo-custom-taxonomy-v1","axiovo-biorxiv-reading-v1","axiovo-biorxiv-notes-v1",
+  "axiovo-custom-taxonomy-v1","axiovo-biorxiv-reading-v1","axiovo-biorxiv-notes-v1","axiovo-chemrxiv-reading-v1",
   "axiovo-onboarding-dismissed-v1","researchlens-alert-seen-v1"
  ];
  const MAX_FILE=5*1024*1024, MAX_ENTRY=2*1024*1024;
