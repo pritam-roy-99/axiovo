@@ -149,8 +149,9 @@ function announcementWork(p){
 }
 async function announcementDateSearch(query,from,to,field,signal){
  if(!from||!to||from!==to)return null;
- const today=new Date().toLocaleDateString("en-CA",{timeZone:"Asia/Kolkata"});
- const yesterday=new Date(Date.now()-86400000).toLocaleDateString("en-CA",{timeZone:"Asia/Kolkata"});
+ const istDay=value=>{const parts=Object.fromEntries(new Intl.DateTimeFormat("en-US",{timeZone:"Asia/Kolkata",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(value).map(x=>[x.type,x.value]));return parts.year+"-"+parts.month+"-"+parts.day};
+ const today=istDay(new Date());
+ const yesterday=istDay(new Date(Date.now()-86400000));
  if(from!==today&&from!==yesterday)return null;
  try{
   const response=await fetch("./data/announcements.json?ts="+Date.now(),{cache:"no-store",signal});
