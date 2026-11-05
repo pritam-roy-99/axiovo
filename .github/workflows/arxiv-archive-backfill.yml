@@ -30,7 +30,7 @@ jobs:
           python-version: "3.12"
       - name: Validate complete archive data logic
         run: |
-          python -m unittest tests.test_arxiv_daily_archive -v
+          python -m unittest discover -s tests -p test_arxiv_daily_archive.py -v
           node tests/arxiv-daily-archive.test.js
       - name: Harvest selected or latest arXiv dates
         env:
