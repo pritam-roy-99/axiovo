@@ -92,7 +92,7 @@ def normalize(source, raw, checked_at, origin):
         landing = "https://arxiv.org/abs/" + canonical
         pdf = "https://arxiv.org/pdf/" + canonical
         identifier = "arxiv:" + base
-        doi = doi or "10.48550/arxiv." + base.lower()
+        # DOI is optional; do not infer a registered DOI from the arXiv ID.
     else:
         if not doi:
             return None
