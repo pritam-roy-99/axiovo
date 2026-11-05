@@ -209,10 +209,9 @@ jobs:
         run: |
           python -m pip install --disable-pip-version-check playwright
           python -m playwright install --with-deps chromium
-      - name: Exercise homepage, Discover, Library and critical research actions
+      - name: Exercise all current routes and mobile interactions (deployment gate)
         if: steps.chromium_deps.outcome == 'success'
         id: smoke_full
-        continue-on-error: true
         run: python scripts/smoke_routes.py
       - name: Exercise all three dedicated source Discover pages
         if: steps.chromium_deps.outcome == 'success'
