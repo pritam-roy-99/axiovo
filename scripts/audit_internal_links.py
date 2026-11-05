@@ -69,6 +69,22 @@ def audit():
         errors.append("Homepage must contain exactly three correctly linked archive choices")
     if "<video" not in home or home.find("<video") > home.find('class="axiovo-archive-grid"'):
         errors.append("Homepage video must precede the three archive choices")
+    # Standalone archives must use the same designed application shell as Home.
+    stylesheet = (DOCS / "theme.css").read_text(encoding="utf-8")
+    required = [
+        "body.axiovo-archive-page {",
+        "margin:0;",
+        "font-family:Inter,system-ui",
+        "body.axiovo-archive-page .rl-global-header",
+        "body.axiovo-archive-page .rl-global-header a:visited",
+    ]
+    for rule in required:
+        if rule not in stylesheet:
+            errors.append("Archive shared style is missing: " + rule)
+    for name in ("arxiv.html", "biorxiv.html", "chemrxiv.html"):
+        archive = (DOCS / name).read_text(encoding="utf-8")
+        if 'href="./theme.css"' not in archive or 'src="./navigation.js"' not in archive:
+            errors.append(name + ": archive theme or shared navigation not loaded")
     if BUILD_MODE:
         video = DOCS / "assets" / "axiovo-tour.mp4"
         vtt = DOCS / "assets" / "axiovo-tour.vtt"
