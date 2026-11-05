@@ -41,6 +41,22 @@ const SUGGESTIONS={
 "Theoretical and Computational Chemistry":["Density functional theory","Machine learning potentials","Molecular simulation","Electronic structure"],
 "Computer Science":["Machine learning","Algorithms","Large language models","Cybersecurity"]
 };
+// Additional active arXiv categories from its public subject taxonomy.
+const additional=[
+["math","Commutative Algebra","math.AC"],["math","Dynamical Systems","math.DS"],["math","General Mathematics","math.GM"],
+["math","Geometric Topology","math.GT"],["math","History and Overview","math.HO"],["math","K-Theory and Homology","math.KT"],
+["math","Metric Geometry","math.MG"],["math","Rings and Algebras","math.RA"],["math","Symplectic Geometry","math.SG"],["math","Spectral Theory","math.SP"],
+["cs","Hardware Architecture","cs.AR"],["cs","Computational Engineering, Finance and Science","cs.CE"],["cs","Computational Geometry","cs.CG"],
+["cs","Computer Science and Game Theory","cs.GT"],["cs","Computers and Society","cs.CY"],["cs","Digital Libraries","cs.DL"],
+["cs","Discrete Mathematics","cs.DM"],["cs","Emerging Technologies","cs.ET"],["cs","Formal Languages and Automata Theory","cs.FL"],
+["cs","General Literature","cs.GL"],["cs","Graphics","cs.GR"],["cs","Information Theory","cs.IT"],
+["cs","Logic in Computer Science","cs.LO"],["cs","Multiagent Systems","cs.MA"],["cs","Multimedia","cs.MM"],
+["cs","Mathematical Software","cs.MS"],["cs","Numerical Analysis","cs.NA"],["cs","Neural and Evolutionary Computing","cs.NE"],
+["cs","Other Computer Science","cs.OH"],["cs","Operating Systems","cs.OS"],["cs","Performance","cs.PF"],
+["cs","Programming Languages","cs.PL"],["cs","Symbolic Computation","cs.SC"],["cs","Sound","cs.SD"],["cs","Social and Information Networks","cs.SI"],
+["q-bio","Other Quantitative Biology","q-bio.OT"]
+];
+for(const x of additional)if(!ARXIV.some(y=>y[2]===x[2]))ARXIV.push(x);
 const mapArxivGroup=A.map(([label,arr])=>({label,id:arr[0]?.[1]||label.toLowerCase(),areas:arr.map(([name,code])=>({name,code,subfields:ARXIV.filter(x=>x[0]===code).map(([_,n,c])=>({name:n,code:c}))}))}));
 const bio={groups:[{label:"Biology and Life Sciences",id:"biology",areas:BIO.map(name=>({name,code:name,subfields:(SUGGESTIONS[name]||[]).map(t=>({name:t,code:t}))}))}]};
 const chem={groups:[{label:"Chemistry and Molecular Sciences",id:"chemistry",areas:CHEM.map(name=>({name,code:name,subfields:(SUGGESTIONS[name]||[]).map(t=>({name:t,code:t}))}))}]};
