@@ -1,3 +1,25 @@
+## 2026 data-trust upgrade and reproducible build
+
+The current source-trust pipeline is additive and free to operate on GitHub Pages.
+Run `python scripts/build_verified_records.py` to validate source IDs and
+produce per-source/month JSON shards, a manifest, per-archive indexed coverage,
+and a needs-review topic queue. Run `python scripts/build_taxonomy.py` to
+create `docs/data/taxonomy.json` from the existing curated TSV directories.
+Original source dates are not conflated: `submitted_date` and
+`announced_date` are separate fields, and missing values remain null.
+
+The canonical schema includes: `id`, `source`, `title`, `abstract`,
+`authors[]`, `categories[]`, `submitted_date`, `announced_date`,
+`version`, `doi`, `pdf_url`, `landing_url`, `journal_ref`, `license`,
+`source_checked_at`, `metadata_source`, `subtopics[]`, and `tag_status`.
+See [upgrade QA and manual checks](UPGRADE_QA.md) and
+[change history](CHANGELOG.md). No existing browser Library storage keys or
+page routes are migrated.
+
+These source-derived snapshots are not complete historical archives. Full
+embedding-based semantic search, secure shared collections and admin approval
+still require additional implementation and measured testing.
+
 ## arXiv ingestion: completeness versus update speed
 
 Axiovo now uses two separate official arXiv metadata paths, modeled on the
