@@ -18,6 +18,7 @@
 <script defer src="./archive-data.js"></script>
 <script defer src="./assistant-core.js"></script>
 <script defer src="./author-follow.js"></script>
+<script defer src="./hosted-ai-config.js"></script>
 <script defer src="./copilot.js"></script>
 <script defer src="./pwa.js"></script>
 </head>
@@ -61,19 +62,18 @@
     <p class="rd-small">Run Ollama locally and allow the Axiovo origin. <a href="./lab.html">Open Research Tools</a>.</p>
    </div>
    <div id="hosted-settings" hidden>
-    <label for="hosted-provider">AI provider</label>
+    <p class="rd-small">Hosted AI requires a separately deployed secure server. Axiovo never asks you to type a provider API key into this public website.</p>
+    <label for="hosted-provider">Configured provider</label>
     <select id="hosted-provider">
-     <option value="openrouter">OpenRouter free-model router (free quota)</option>
-     <option value="openai">OpenAI API (billing may apply)</option>
-     <option value="moonshot">Kimi / Moonshot API (billing may apply)</option>
-     <option value="gemini">Google Gemini API (tier-dependent free quota)</option>
+     <option value="openrouter">OpenRouter free routing (only if enabled by site administrator)</option>
+     <option value="openai">OpenAI (disabled unless explicitly configured)</option>
+     <option value="moonshot">Kimi / Moonshot (disabled unless explicitly configured)</option>
+     <option value="gemini">Gemini (disabled unless explicitly configured)</option>
     </select>
-    <label for="hosted-model">Provider model ID</label>
-    <input id="hosted-model" type="text" maxlength="100" autocomplete="off" value="openrouter/free" aria-describedby="hosted-guide">
-    <label for="hosted-key">Your provider API key (kept only in this page memory)</label>
-    <input id="hosted-key" type="password" autocomplete="off" spellcheck="false" maxlength="250" placeholder="Enter your own API key">
-    <button class="rd-button rd-secondary" type="button" id="clear-hosted-key">Clear API key</button>
-    <p class="rd-small" id="hosted-guide">The key and research prompt are sent directly from your browser to the provider you select. No key is stored by Axiovo. Do not use a shared key, and do not paste confidential papers or unpublished research unless you accept that provider's policies. Free models have limits and can change.</p>
+    <label for="hosted-model">Allowed server model</label>
+    <input id="hosted-model" type="text" maxlength="100" readonly value="Not configured" aria-describedby="hosted-guide">
+    <div id="axiovo-ai-challenge" aria-label="AI request verification" hidden></div>
+    <p class="rd-small" id="hosted-guide" role="status">Secure hosted AI is not configured. Source evidence, local Ollama and browser WebGPU remain available without an Axiovo server.</p>
    </div>
    <div id="browser-settings" hidden>
     <label for="browser-model">WebGPU model</label><select id="browser-model"><option value="Qwen2.5-0.5B-Instruct-q4f16_1-MLC">Qwen2.5 0.5B</option><option value="Qwen2.5-1.5B-Instruct-q4f16_1-MLC">Qwen2.5 1.5B</option></select>
