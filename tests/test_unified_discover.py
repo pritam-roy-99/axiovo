@@ -55,7 +55,7 @@ class UnifiedDiscoverTests(unittest.TestCase):
 
     def test_navigation_uses_one_discover_link(self):
         nav=(ROOT/"navigation.js").read_text(encoding="utf8")
-        self.assertIn('["./#discover","Discover"]',nav)
+        self.assertIn('["./discover.html#discover","Discover"]',nav)
         self.assertNotIn('["./fields.html","Explore fields"]',nav)
         self.assertNotIn('["./","arXiv feed"]',nav)
 
