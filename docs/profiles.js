@@ -1,6 +1,6 @@
 "use strict";
 const $=id=>document.getElementById(id);
-const key="researchlens-local-profile";
+const key="axiovo-local-profile";
 function safeArray(name){try{const value=JSON.parse(localStorage.getItem(name)||"[]");return Array.isArray(value)?value:[]}catch(e){return[]}}
 const fields=["name","affiliation","areas","bio","orcid","github"];
 function readProfile(){try{return JSON.parse(localStorage.getItem(key)||"{}")}catch(err){return{}}}
@@ -11,10 +11,10 @@ if(!validateURL(profile.orcid,"orcid.org")||!validateURL(profile.github,"github.
 try{localStorage.setItem(key,JSON.stringify(profile));$("state").textContent="Profile saved only on this device. Not published or verified."}catch(err){$("state").textContent="Device storage unavailable."}}
 function download(obj,name){const url=URL.createObjectURL(new Blob([JSON.stringify(obj,null,2)],{type:"application/json"}));const a=document.createElement("a");a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),500)}
 async function library(){
- const bookmarks=safeArray("researchlens-reading-list"),hidden=safeArray("researchlens-hidden"),topics=safeArray("researchlens-followed-topics");
+ const bookmarks=safeArray("axiovo-reading-list"),hidden=safeArray("axiovo-hidden"),topics=safeArray("axiovo-followed-topics");
  $("counts").textContent=bookmarks.length+" saved arXiv identifiers · "+topics.length+" followed topics · "+hidden.length+" hidden papers";
  const root=$("papers");root.replaceChildren();
- const A=window.ResearchLensArxiv;
+ const A=window.AxiovoArxiv;
  let indexed=[];
  try{const res=await fetch("./data/feed.json",{cache:"no-store"});if(res.ok)indexed=(await res.json()).papers||[]}catch{}
  const byBase=new Map(indexed.map(p=>[A?.base(p.id)||p.id,p]));
@@ -41,7 +41,7 @@ async function library(){
   const note=document.createElement("p");note.className="muted";note.textContent="Showing the first 80 saved identifiers. Use Workspace to search the full reading list.";root.append(note)
  }
 }
-$("save").onclick=save;$("export").onclick=()=>download(readProfile(),"researchlens-profile.json");
+$("save").onclick=save;$("export").onclick=()=>download(readProfile(),"axiovo-profile.json");
 $("import").onclick=()=>$("import-file").click();
 $("import-file").onchange=async event=>{
 const file=event.target.files?.[0];if(!file)return;
@@ -50,5 +50,5 @@ for(const field of fields)if(data[field]!==undefined&&typeof data[field]!=="stri
 if(!validateURL(data.orcid||"","orcid.org")||!validateURL(data.github||"","github.com"))throw Error("Invalid linked profile URL");
 localStorage.setItem(key,JSON.stringify(data));fill();$("state").textContent="Imported locally. Not published."}catch(err){$("state").textContent="Import error: "+String(err.message||err)}
 event.target.value=""};
-$("clear-hidden").onclick=()=>{try{localStorage.setItem("researchlens-hidden","[]")}catch(err){}library();$("state").textContent="Hidden-paper list reset on this device."};
+$("clear-hidden").onclick=()=>{try{localStorage.setItem("axiovo-hidden","[]")}catch(err){}library();$("state").textContent="Hidden-paper list reset on this device."};
 fill();library();
