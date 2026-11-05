@@ -1,0 +1,37 @@
+name: Axiovo SQL research database verification
+on:
+  pull_request:
+    paths:
+      - 'backend/**'
+      - 'tests/test_research_database.py'
+      - '.github/workflows/research-database.yml'
+  push:
+    branches:
+      - 'feature/**'
+    paths:
+      - 'backend/**'
+      - 'tests/test_research_database.py'
+      - '.github/workflows/research-database.yml'
+permissions:
+  contents: read
+jobs:
+  database:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify SQLite FTS5 availability
+        run: |
+          python - <<'PY'
+          import sqlite3
+          con=sqlite3.connect(":memory:")
+          con.execute("CREATE VIRTUAL TABLE probe USING fts5(text)")
+          print("SQLite",sqlite3.sqlite_version,"FTS5 available")
+          PY
+      - name: Test schema identity and ingestion
+        run: python -m unittest tests.test_research_database -v
+      - name: Import 10,000 synthetic paper records twice
+        run: python -m backend.verify_bulk
