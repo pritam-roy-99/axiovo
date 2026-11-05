@@ -1,76 +1,102 @@
 #!/usr/bin/env python3
-"""Validate local navigation links and loadable assets in source HTML.
+"""Check Axiovo source links; with --built, verify its published video bundle.
 
-Generated build artifacts (Atom feeds and homepage video) are checked separately
-during the Pages workflow after their generators run.
+Source mode intentionally allows generated MP4/VTT/Atom files that are produced
+after checkout. Built mode is a hard gate for critical homepage assets.
 """
 from __future__ import annotations
+import re
+import subprocess
+import sys
 from html.parser import HTMLParser
 from pathlib import Path
 from urllib.parse import unquote, urlsplit
-import sys
 
-ROOT = Path(__file__).resolve().parents[1] / "docs"
-GENERATED = ("feeds/", "assets/axiovo-tour")
-SKIP_SCHEMES = ("mailto:", "tel:", "javascript:", "data:")
+DOCS = Path(__file__).resolve().parents[1] / "docs"
+GENERATED = {"assets/axiovo-tour.mp4", "assets/axiovo-tour.vtt"}
+BUILD_MODE = "--built" in sys.argv
 
-class Links(HTMLParser):
+
+class References(HTMLParser):
     def __init__(self):
         super().__init__(convert_charrefs=True)
         self.links = []
-        self.ids = set()
+        self.ids = []
 
     def handle_starttag(self, tag, attrs):
         a = dict(attrs)
         if a.get("id"):
-            self.ids.add(a["id"])
-        for key in ("href", "src"):
-            value = a.get(key)
-            if value and not value.startswith(SKIP_SCHEMES):
-                self.links.append((tag, key, value))
+            self.ids.append(a["id"])
+        for key in ("href", "src", "poster"):
+            if a.get(key):
+                self.links.append((key, a[key], self.getpos()[0]))
 
-def main():
+
+def audit():
     errors = []
-    documents = {p: p.read_text(encoding="utf-8") for p in ROOT.glob("*.html")}
-    parsed = {}
-    for p, content in documents.items():
-        parser = Links()
-        parser.feed(content)
-        parsed[p.resolve()] = parser
-    checked = 0
-    for path, parsed_page in parsed.items():
-        for tag, attr, raw in parsed_page.links:
-            u = urlsplit(raw)
-            if u.scheme or u.netloc or raw.startswith("//"):
+    visited = 0
+    pages = list(DOCS.glob("*.html"))
+    for html in pages:
+        doc = References()
+        doc.feed(html.read_text(encoding="utf-8"))
+        duplicate = {x for x in doc.ids if doc.ids.count(x) > 1}
+        if duplicate:
+            errors.append(f"{html.name}: duplicate HTML IDs: {sorted(duplicate)}")
+        for attr, raw, line in doc.links:
+            url = urlsplit(raw)
+            if url.scheme or url.netloc or raw.startswith("//"):
                 continue
-            target = unquote(u.path).strip()
-            if not target and not u.fragment:
+            if not url.path or raw.startswith(("data:", "mailto:", "tel:", "javascript:")):
                 continue
-            if target.startswith("/"):
-                # Site-absolute paths are deployment dependent.
+            path = unquote(url.path)
+            if path.startswith("/"):
                 continue
-            dest = (path.parent / target).resolve() if target else path
-            if dest.is_dir():
-                dest /= "index.html"
-            relative = dest.relative_to(ROOT.resolve()).as_posix() if dest.is_relative_to(ROOT.resolve()) else ""
-            if target and relative.startswith(GENERATED):
+            resolved = (html.parent / path).resolve()
+            if not resolved.is_relative_to(DOCS.resolve()):
+                errors.append(f"{html.name}:{line}: unsafe local path {raw}")
                 continue
-            if target and not dest.is_file():
-                errors.append(f"{path.name}: missing {attr}={raw!r}")
+            if resolved.is_dir():
+                resolved = resolved / "index.html"
+            rel = resolved.relative_to(DOCS.resolve()).as_posix()
+            if rel.startswith("feeds/") or (rel in GENERATED and not BUILD_MODE):
                 continue
-            if u.fragment and dest.suffix == ".html" and dest in parsed:
-                # Some fragments are added dynamically; static IDs are only
-                # mandatory for same-page fragment navigation.
-                if (dest == path and u.fragment not in parsed_page.ids
-                    and not u.fragment.startswith("paper-")):
-                    errors.append(f"{path.name}: missing #fragment {u.fragment!r}")
-            checked += 1
-    print(f"Audited {len(parsed)} HTML pages and {checked} internal references.")
+            visited += 1
+            if not resolved.is_file():
+                errors.append(f"{html.name}:{line}: missing {attr} {raw}")
+    home = (DOCS / "index.html").read_text(encoding="utf-8")
+    archives = re.findall(r'data-archive="(arxiv|biorxiv|chemrxiv)"\s+href="([^"]+)"', home)
+    if archives != [("arxiv", "./arxiv.html"), ("biorxiv", "./biorxiv.html"), ("chemrxiv", "./chemrxiv.html")]:
+        errors.append("Homepage must contain exactly three correctly linked archive choices")
+    if "<video" not in home or home.find("<video") > home.find('class="axiovo-archive-grid"'):
+        errors.append("Homepage video must precede the three archive choices")
+    if BUILD_MODE:
+        video = DOCS / "assets" / "axiovo-tour.mp4"
+        vtt = DOCS / "assets" / "axiovo-tour.vtt"
+        poster = DOCS / "assets" / "axiovo-tour-poster.svg"
+        for p in (video, vtt, poster):
+            if not p.is_file() or p.stat().st_size < 100:
+                errors.append(f"Missing or empty published asset: {p.relative_to(DOCS)}")
+        if video.exists() and video.stat().st_size >= 15000:
+            try:
+                inspect = subprocess.run(
+                    ["ffprobe", "-v", "error", "-show_entries",
+                     "stream=codec_name,codec_type", "-of", "csv=p=0", str(video)],
+                    check=True, capture_output=True, text=True
+                ).stdout.lower()
+                if "h264" not in inspect or "video" not in inspect:
+                    errors.append("Homepage MP4 has no supported H.264 video stream")
+            except (OSError, subprocess.CalledProcessError) as exc:
+                errors.append(f"ffprobe failed: {exc}")
+        if vtt.exists() and not vtt.read_text(encoding="utf-8").startswith("WEBVTT"):
+            errors.append("Homepage captions are not valid WebVTT")
+    print(f"Audited {len(pages)} HTML pages and {visited} local asset references.")
+    for error in errors:
+        print("ERROR:", error)
     if errors:
-        print("\n".join(errors))
         return 1
-    print("All checked internal references resolve in source.")
+    print("Axiovo source" + (" and generated video" if BUILD_MODE else "") + " checks passed.")
     return 0
 
+
 if __name__ == "__main__":
-    sys.exit(main())
+    raise SystemExit(audit())
