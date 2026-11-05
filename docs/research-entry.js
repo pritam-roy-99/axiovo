@@ -31,8 +31,28 @@ function route(){
   location.replace(target.href);
  }
 }
+async function checkAnnouncement(){
+ const target=document.getElementById("axiovo-release-status");
+ if(!target)return;
+ try{
+  const response=await fetch("./data/announcements.json?fresh="+Date.now(),{cache:"no-store",signal:AbortSignal.timeout(10000)});
+  if(!response.ok)throw Error("HTTP "+response.status);
+  const batch=await response.json();
+  if(!Array.isArray(batch.papers)||!batch.announcement_date)throw Error("No verified announcement metadata");
+  const updated=batch.checked_at||batch.generated_at||"";
+  const checked=updated?new Date(updated):null;
+  const last=checked&&!Number.isNaN(checked.valueOf())?checked.toLocaleString():"not supplied";
+  target.textContent="Announcement "+batch.announcement_date+" · "+batch.papers.length.toLocaleString()+
+   " indexed records · "+(batch.complete?"all archive feeds verified":"partial archive coverage")+
+   " · last source check: "+last+".";
+ }catch{
+  target.textContent="Latest announcement metadata is temporarily unavailable. Browse arXiv or check the official source.";
+ }
+}
 function init(){
  route();
+ checkAnnouncement();
+ window.setInterval(()=>{if(!document.hidden)checkAnnouncement()},15*60*1000);
  for(const el of document.querySelectorAll("[data-count]")){
   const source=el.dataset.count,topics=window.AxiovoArchiveTaxonomy?.directory(source)||[];
   if(topics.length)el.textContent=topics.length+(source==="arxiv"?" categories":" subject labels");
