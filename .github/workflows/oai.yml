@@ -2,11 +2,14 @@ name: Harvest arXiv OAI metadata
 on:
   workflow_dispatch:
   schedule:
-    - cron: '21 4 * * *'
+    # Poll shortly after OAI publication in both EDT and EST.
+    - cron: '21 3,4,5 * * 1-5'
+    # Allow occasional weekend metadata corrections.
+    - cron: '21 5 * * 0,6'
 permissions:
   contents: write
 concurrency:
-  group: researchlens-oai-mirror
+  group: axiovo-oai-mirror
   cancel-in-progress: false
 jobs:
   harvest:
