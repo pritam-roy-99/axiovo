@@ -333,6 +333,13 @@ $("field").onchange=()=>selectPath({category:$("field").value});
 $("topic").onchange=()=>selectPath({category:selected.category,topic:$("topic").value});
 $("subfield").onchange=()=>selectPath({category:selected.category,topic:selected.topic,subtopic:$("subfield").value});
 $("clear-path").onclick=()=>selectPath({});
+$("show-results").onclick=()=>{
+ const heading=$("results-heading");
+ if(!heading)return;
+ heading.setAttribute("tabindex","-1");
+ heading.scrollIntoView({behavior:"smooth",block:"start"});
+ heading.focus({preventScroll:true});
+};
 $("topic-find").oninput=showSuggestions;
 $("topic-finder").onsubmit=e=>{
  e.preventDefault();
