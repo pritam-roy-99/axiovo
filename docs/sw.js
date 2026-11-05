@@ -1,13 +1,13 @@
 /* ResearchLens offline shell. Do not cache remote APIs, PDFs or the live feed. */
 "use strict";
-const CACHE = "axiovo-shell-v24";
+const CACHE = "axiovo-shell-v25";
 const SHELL = [
   "./", "./index.html", "./workspace.html", "./copilot.html",
   "./lab.html", "./paper.html", "./profiles.html", "./community.html", "./methodology.html", "./privacy.html",
   "./theme.css", "./theme.js", "./workspace.css", "./discover.css",
   "./lab.css", "./paper-actions.css", "./navigation.js", "./pwa.js",
   "./research-fields.js", "./custom-taxonomy.js", "./focus-bar.js", "./scholar-search.js",
-  "./cached-arxiv-search.js", "./semantic-search.js", "./multisource-search.js", "./interests.js",
+  "./cached-arxiv-search.js", "./arxiv-freshness.js", "./semantic-search.js", "./multisource-search.js", "./interests.js",
   "./scholarly.js", "./zotero-ris.js", "./library-outside-cache.js", "./local-feedback.js", "./author-follow.js", "./author-search.js", "./inspire-author.js", "./discover.js", "./arxiv-daily-archive.js", "./history.js", "./arxiv-versions.js",
   "./assistant-core.js", "./copilot.js", "./lab.js", "./workspace.js",
   "./paper.js", "./profiles.js", "./local-backup.js", "./profiles-social.js", "./social.js",
