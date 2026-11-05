@@ -48,6 +48,7 @@ jobs:
         run: |
           node tests/archive-data.test.js
           node tests/search-accuracy.test.js
+          node tests/topic-report.test.js
       - name: Test research relevance ranking
         id: test_research_relevance_ranking
         continue-on-error: true
