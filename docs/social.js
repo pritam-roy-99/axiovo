@@ -1,6 +1,6 @@
 /* Optional hosted Axiovo accounts. Requires Supabase setup by repository owner. */
 (async function(){
-const cfg=window.ResearchLensSocialConfig||{};
+const cfg=window.AxiovoSocialConfig||{};
 if(!cfg.url||!cfg.anonKey)return;
 if(!/^https:\/\/[a-z0-9-]+\.supabase\.co$/i.test(cfg.url))return;
 const root=document.getElementById("native-community");if(!root)return;
