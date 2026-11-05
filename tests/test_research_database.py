@@ -76,7 +76,8 @@ class TestResearchDatabase(unittest.TestCase):
         second["authors"]=["  ALICE  SMITH "]
         import_papers(self.connection,"arxiv",[first])
         import_papers(self.connection,"biorxiv",[second])
-        self.assertEqual(self.count("authors"),2)
+        # Identical names on different papers do not prove identical ORCIDs.
+        self.assertEqual(self.count("authors"),3)
         self.assertEqual(self.count("paper_authors"),3)
 
     def test_invalid_records_are_rejected_without_invented_links(self):
