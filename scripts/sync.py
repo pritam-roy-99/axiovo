@@ -264,7 +264,7 @@ def main():
     # Do not repeatedly request already-cached historical IDs every hour;
     # this previously amplified arXiv HTTP 429 responses.
     covered_ids = {p["id"] for p in old.get("papers", []) + fresh if p.get("id")}
-    pending = [id for id in pinned if re.sub(r"v\\d+$", "", id) not in covered_ids]
+    pending = [id for id in pinned if re.sub(r"v\d+$", "", id) not in covered_ids]
     historical = fetch_by_ids(pending)
     if pinned:
         print("Pinned ID lookup:", len(historical), "newly resolved of", len(pending), "missing IDs (", len(pinned), "total pins)")
