@@ -1,6 +1,7 @@
 """Exact UTC submission day harvesting without silent result limits."""
 import datetime as dt
 import io
+import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -30,6 +31,8 @@ class Response:
     def __enter__(self): return self
     def __exit__(self,*args): return False
     def read(self): return self.value
+
+def json_dump(obj): return json.dumps(obj)
 
 class DailyArchiveTests(unittest.TestCase):
     def test_query_is_full_day_without_category_constraint(self):
@@ -71,6 +74,23 @@ class DailyArchiveTests(unittest.TestCase):
                 self.assertNotIn("2026-11-04",r["manifest"]["days"])
                 self.assertEqual(r["manifest"]["days"]["2026-11-05"]["count"],0)
                 self.assertTrue((folder/"2026-11-05.json").exists())
+    def test_feed_sync_uses_all_verified_recent_day_papers(self):
+        from scripts import sync
+        with tempfile.TemporaryDirectory() as tmp:
+            folder = Path(tmp)/"docs"/"data"/"arxiv-days"
+            folder.mkdir(parents=True)
+            (folder/"manifest.json").write_text(json_dump({
+                "days":{"2026-11-05":{"complete":True,"count":3}}}))
+            papers=[{"id":f"2611.{i:05d}","title":f"Paper {i}",
+                    "published":"2026-11-05T02:00:00Z","updated":"2026-11-05T02:00:00Z",
+                    "version":1,"categories":["quant-ph"]} for i in range(1,4)]
+            (folder/"2026-11-05.json").write_text(json_dump({
+                "date":"2026-11-05","complete":True,"paper_count":3,"source_total":3,"papers":papers}))
+            with patch.object(sync,"ROOT",Path(tmp)):
+                result=sync.read_verified_daily_records(today=dt.date(2026,11,5))
+            self.assertEqual(len(result),3)
+            self.assertEqual({p["id"] for p in result},{"2611.00001","2611.00002","2611.00003"})
+
     def test_next_missing_days_backfilled(self):
         days=ar.select_days(dt.date(2026,11,5),{"days":{"2026-11-02":{"complete":True}}},count=5)
         self.assertEqual(days[:3],[dt.date(2026,11,5),dt.date(2026,11,4),dt.date(2026,11,3)])
