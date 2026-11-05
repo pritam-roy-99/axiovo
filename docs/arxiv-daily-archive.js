@@ -19,6 +19,21 @@
   if(count>maxDays)throw Error("Date range exceeds "+maxDays+" days. Search smaller intervals to keep mobile browsing responsive.");
   return Array.from({length:count},(_,i)=>new Date(fromMs+i*DAY).toISOString().slice(0,10));
  }
+ function officialDateSearchUrl({from="",to="",query=""}={}){
+  const params=new URLSearchParams({
+   "advanced":"","date-filter_by":"date_range",
+   "date-from_date":from||to,"date-to_date":to||from,
+   "date-date_type":"submitted_date_first",
+   "classification-include_cross_list":"include",
+   "abstracts":"show","size":"200","order":"-announced_date_first"
+  });
+  if(query){
+   params.set("terms-0-operator","AND");
+   params.set("terms-0-term",query);
+   params.set("terms-0-field","all");
+  }
+  return "https://arxiv.org/search/advanced?"+params.toString();
+ }
  function matches(p,query="",category=""){
   if(category&&!(p.categories||[]).includes(category)&&p.primary_category!==category)return false;
   const q=String(query||"").trim().toLowerCase();
@@ -81,5 +96,5 @@
   return {complete:true,missing:[],papers:filterAndSort(records,query,category,sort),
    totalHarvested:records.length,coveredDays:requested.length,from,to};
  }
- return {dates,matches,filterAndSort,search};
+ return {dates,matches,filterAndSort,search,officialDateSearchUrl};
 });
