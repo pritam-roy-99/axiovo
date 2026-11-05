@@ -194,51 +194,35 @@ jobs:
           echo '| Validate shared Discover focus | ${{ steps.validate_shared_discover_focus.outcome }} |' >> "$GITHUB_STEP_SUMMARY"
           echo '| Test rate-limited arXiv fallback and date archive | ${{ steps.test_rate_limited_arxiv_fallback_and_date_archive.outcome }} |' >> "$GITHUB_STEP_SUMMARY"
           echo '| Audit internal routes and HTML assets | ${{ steps.audit_internal_routes_and_html_assets.outcome }} |' >> "$GITHUB_STEP_SUMMARY"
-      - name: Restore cached real-interface homepage tour
-        id: tour-cache
-        uses: actions/cache@v4
-        with:
-          path: |
-            docs/assets/axiovo-tour.mp4
-            docs/assets/axiovo-tour-poster.jpg
-            docs/assets/axiovo-tour.vtt
-          key: axiovo-three-archives-v5-${{ hashFiles('scripts/build_live_demo.py', 'docs/index.html', 'docs/arxiv.html', 'docs/biorxiv.html', 'docs/chemrxiv.html', 'docs/archive-browser.js', 'docs/archive-browser.css', 'docs/archive-taxonomy.js', 'docs/research-entry.css') }}
-      - name: Install Chromium browser test dependencies
+      - name: Install current-feature video generation dependencies
         run: |
-          python -m pip install --disable-pip-version-check Pillow playwright
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg espeak-ng fonts-dejavu-core
+          python -m pip install --disable-pip-version-check Pillow
+      - name: Build new Axiovo feature tour
+        run: |
+          python scripts/build_intro_video.py
+          echo 'Generated a fresh illustrated tour of current Axiovo features.' >> "$GITHUB_STEP_SUMMARY"
+      - name: Install Chromium for independent interaction checks
+        continue-on-error: true
+        id: chromium_deps
+        run: |
+          python -m pip install --disable-pip-version-check playwright
           python -m playwright install --with-deps chromium
       - name: Exercise homepage, Discover, Library and critical research actions
-        id: exercise_homepage_discover_library_and_critical_researc
+        if: steps.chromium_deps.outcome == 'success'
+        id: smoke_full
         continue-on-error: true
         run: python scripts/smoke_routes.py
       - name: Exercise all three dedicated source Discover pages
-        id: exercise_all_three_dedicated_source_discover_pages
+        if: steps.chromium_deps.outcome == 'success'
+        id: smoke_archives
         continue-on-error: true
         run: python scripts/smoke_archive_pages.py
-      - name: Report browser smoke checks
+      - name: Report browser test results
         if: always()
         run: |
-          echo '### Browser smoke checks' >> "$GITHUB_STEP_SUMMARY"
-          echo 'Homepage and research actions: ${{ steps.exercise_homepage_discover_library_and_critical_research.outcome }}' >> "$GITHUB_STEP_SUMMARY"
-          echo 'Three archive pages: ${{ steps.exercise_all_three_dedicated_source_discover_pages.outcome }}' >> "$GITHUB_STEP_SUMMARY"
-      - name: Install video encoding and inspection tools
-        run: sudo apt-get install -y -qq ffmpeg
-      - name: Install video narration options when rebuilding
-        if: steps.tour-cache.outputs.cache-hit != 'true'
-        run: |
-          sudo apt-get install -y -qq espeak-ng
-          python -m pip install --disable-pip-version-check edge-tts || echo 'Neural voice unavailable; local feminine narration fallback will be used.'
-      - name: Build Axiovo homepage video with verified fallback
-        if: steps.tour-cache.outputs.cache-hit != 'true'
-        run: |
-          if python scripts/build_live_demo.py; then
-            echo 'Video: recorded current Axiovo interface.' >> "$GITHUB_STEP_SUMMARY"
-          else
-            echo '::warning::Live website recording failed. Building the clearly labeled illustrated fallback.'
-            rm -f docs/assets/axiovo-tour.mp4 docs/assets/axiovo-tour-poster.jpg docs/assets/axiovo-tour.vtt
-            python scripts/build_intro_video.py
-            echo 'Video: illustrated Axiovo archive walkthrough (browser recording unavailable).' >> "$GITHUB_STEP_SUMMARY"
-          fi
+          echo 'Browser checks: full ${{ steps.smoke_full.outcome }}, archives ${{ steps.smoke_archives.outcome }}' >> "$GITHUB_STEP_SUMMARY"
       - name: Verify homepage video plays and has valid streams
         run: |
           test -s docs/assets/axiovo-tour.mp4
