@@ -24,46 +24,29 @@ function enter(){
  const form=document.getElementById("axiovo-entry-form");
  if(!form||!F)return;
  const field=document.getElementById("axiovo-entry-field");
- const topic=document.getElementById("axiovo-entry-topic");
- const subtopic=document.getElementById("axiovo-entry-subtopic");
  const browse=document.getElementById("axiovo-entry-all");
  const library=document.getElementById("axiovo-entry-library");
- function read(){try{return JSON.parse(localStorage.getItem(KEY)||"{}")}catch{return {}}}
- let prefs=read();
+ function read(){try{return JSON.parse(localStorage.getItem(KEY)||"{}")||{}}catch{return {}}}
+ const prefs=read();
  for(const [key,spec] of Object.entries(F.FIELDS)){
   const o=document.createElement("option");o.value=key;o.textContent=spec.name;field.append(o);
  }
- function options(select,arr,defaultName){
-  select.replaceChildren();
-  const first=document.createElement("option");first.value="";first.textContent=defaultName;select.append(first);
-  for(const item of arr){const o=document.createElement("option");o.value=item;o.textContent=item;select.append(o)}
- }
- function fillTopics(want){
-  const topics=F.FIELDS[field.value]?.topics||[];
-  options(topic,topics,"All areas");
-  if(want&&topics.includes(want))topic.value=want;
-  fillSubtopics();
- }
- function fillSubtopics(want){
-  const terms=topic.value?F.fieldTopics(field.value,topic.value):[];
-  options(subtopic,terms,"All subtopics");
-  subtopic.disabled=!terms.length;
-  if(want&&terms.includes(want))subtopic.value=want;
- }
  field.value=F.fieldKey(prefs.field);
- fillTopics(prefs.areaSelected?prefs.topic:"");
- fillSubtopics(prefs.subtopic);
- field.addEventListener("change",()=>fillTopics(""));
- topic.addEventListener("change",()=>fillSubtopics(""));
  function saveState(reset=false){
   const chosen=reset?"general":field.value;
-  const chosenTopic=reset?"":topic.value;
-  const chosenSub=reset?"":subtopic.value;
   const spec=F.FIELDS[chosen];
-  const chosenArea=chosenTopic||spec.topics[0];
-  const next={...read(),field:chosen,topic:chosenArea,subtopic:chosenSub,
-    areaSelected:Boolean(chosenTopic),query:chosenSub||chosenTopic||"",
-    customSubtopic:false};
+  if(!spec)return;
+  const old=read();
+  // Keep a previous subfield only when the researcher keeps the same broad field.
+  // If the field changes, open Discover with "all areas" rather than
+  // silently filtering the selected discipline by an unrelated old topic.
+  const retain=!reset&&old.field===chosen;
+  const topic=retain&&spec.topics.includes(old.topic)?old.topic:spec.topics[0];
+  const next={...old,field:chosen,topic,
+   subtopic:retain?(old.subtopic||""):"",
+   areaSelected:retain?Boolean(old.areaSelected):false,
+   query:retain&&old.areaSelected?(old.subtopic||old.topic||""):"",
+   customSubtopic:retain&&Boolean(old.customSubtopic)};
   try{localStorage.setItem(KEY,JSON.stringify(next))}catch{}
  }
  function go(hash,reset=false){
