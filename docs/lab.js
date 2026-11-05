@@ -6,7 +6,7 @@ const SVG="http://www.w3.org/2000/svg";
 const PDFJS="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.min.mjs";
 const PDFWORKER="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.worker.min.mjs";
 let documents=[],pdf=null,pdfPage=1,pdfLoading=false,pdfDocumentKey="",pdfRenderTask=null,lib=null;
-const NOTES="researchlens-pdf-notes-v1", SEEN="researchlens-alert-seen-v1";
+const NOTES="axiovo-pdf-notes-v1", SEEN="axiovo-alert-seen-v1";
 function text(el,tag,value,cls){const x=document.createElement(tag);x.textContent=String(value??"");if(cls)x.className=cls;el.append(x);return x}
 function status(id,value){$(id).textContent=value}
 function read(key,def){try{return JSON.parse(localStorage.getItem(key)||"null")??def}catch{return def}}
@@ -60,9 +60,9 @@ async function searchLiterature(e){
   if(type==="openalex")root.replaceChildren();
   let count=0;
   for(const w of data.results||[]){
-   const source=window.ResearchLensArxiv?.candidates(w)[0];if(!source)continue;
+   const source=window.AxiovoArxiv?.candidates(w)[0];if(!source)continue;
    count++;
-   resultCard(root,{id:source.requested,title:w.display_name,authors:(w.authorships||[]).map(x=>x.author?.display_name).filter(Boolean),date:w.publication_date,link:window.ResearchLensArxiv.abs(source.requested)},
+   resultCard(root,{id:source.requested,title:w.display_name,authors:(w.authorships||[]).map(x=>x.author?.display_name).filter(Boolean),date:w.publication_date,link:window.AxiovoArxiv.abs(source.requested)},
       "arXiv-hosted paper · OpenAlex metadata · "+(w.cited_by_count||0)+" indexed citations")
   }
   status("lab-search-status","Found "+count+" source-confirmed arXiv-hosted records in this batch, plus local matches. Coverage is not exhaustive.")
@@ -110,7 +110,7 @@ function exportNotes(){
  if(!pdfDocumentKey){status("lab-note-status","Load a local PDF before exporting notes.");return}
  const notes=read(NOTES,{})[pdfDocumentKey]||{};
  const a=document.createElement("a"),url=URL.createObjectURL(new Blob([JSON.stringify({document_hash:pdfDocumentKey,notes},null,2)],{type:"application/json"}));
- a.href=url;a.download="researchlens-pdf-notes.json";a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)
+ a.href=url;a.download="axiovo-pdf-notes.json";a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)
 }
 function comparePaper(p,label){
  const col=text($("lab-compare-results"),"article","");
@@ -132,7 +132,7 @@ function compare(e){
  loadComparisonNotes();
  status("lab-compare-status","Side-by-side original metadata comparison. Mathematical assumptions and conclusions must be checked in the PDFs.")
 }
-const COMPARES="researchlens-comparisons-v1";
+const COMPARES="axiovo-comparisons-v1";
 function comparisonKey(){
  const a=id($("lab-paper-a").value),b=id($("lab-paper-b").value);
  return a&&b&&a!==b?[a,b].sort().join("::"):"";
@@ -165,7 +165,7 @@ function exportComparison(){
  ];
  const blob=new Blob([lines.join("\n")],{type:"text/markdown;charset=utf-8"});
  const url=URL.createObjectURL(blob),anchor=document.createElement("a");
- anchor.href=url;anchor.download="researchlens-paper-comparison.md";
+ anchor.href=url;anchor.download="axiovo-paper-comparison.md";
  document.body.append(anchor);anchor.click();anchor.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
 
@@ -229,9 +229,9 @@ function keywordMatch(p,terms){
  return terms.some(t=>text.includes(t))
 }
 function checkAlerts(){
- const prefs=read("researchlens-research-interest-settings-v1",{});
- const field=read("researchlens-field-explorer-v1",{});
- const projects=read("researchlens-research-projects-v1",[]);
+ const prefs=read("axiovo-research-interest-settings-v1",{});
+ const field=read("axiovo-field-explorer-v1",{});
+ const projects=read("axiovo-research-projects-v1",[]);
  const terms=[...(Array.isArray(prefs.interests)?prefs.interests:[]),field.topic,field.subtopic,...(Array.isArray(projects)?projects.map(p=>p.keywords):[])].filter(Boolean)
   .flatMap(x=>String(x).toLowerCase().split(/[,;]/)).map(x=>x.trim()).filter(x=>x.length>4).slice(0,40);
  const seen=read(SEEN,{});
@@ -257,14 +257,14 @@ function init(){
  $("lab-pdf-scale").onchange=()=>{if(pdf)drawPage()};
  $("lab-save-note").onclick=saveNote;$("lab-export-notes").onclick=exportNotes;
  $("lab-open-arxiv").onclick=()=>{
-  const value=window.ResearchLensArxiv?.parse($("lab-arxiv-id").value);
+  const value=window.AxiovoArxiv?.parse($("lab-arxiv-id").value);
   if(!value){status("lab-pdf-status","Enter a valid arXiv identifier, optionally ending in v1, v2, etc.");return}
-  window.open(window.ResearchLensArxiv.pdf(value.requested),"_blank","noopener,noreferrer");
+  window.open(window.AxiovoArxiv.pdf(value.requested),"_blank","noopener,noreferrer");
   status("lab-pdf-status","Opened the official arXiv PDF in another tab. Load a local copy here to add page notes.")
  };
  $("lab-check-updates").onclick=checkAlerts;$("lab-mark-seen").onclick=markSeen;
  const u=new URLSearchParams(location.search);
- if(window.ResearchLensArxiv?.parse(u.get("arxiv"))) $("lab-arxiv-id").value=window.ResearchLensArxiv.parse(u.get("arxiv")).requested;
+ if(window.AxiovoArxiv?.parse(u.get("arxiv"))) $("lab-arxiv-id").value=window.AxiovoArxiv.parse(u.get("arxiv")).requested;
  if(u.get("q")) $("lab-query").value=u.get("q").slice(0,220);
  loadMetadata().then(()=>{if(u.get("q"))$("lab-search-form").requestSubmit()});
 }
