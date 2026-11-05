@@ -131,7 +131,7 @@ function announcementMatches(p,query,field){
  const categories=[p.primary_category,...(p.categories||[])].filter(Boolean);
  const domain=!list.length||categories.some(cat=>list.some(prefix=>cat===prefix||cat.startsWith(prefix+".")||cat.startsWith(prefix+"-")));
  if(!domain)return false;
- const words=String(query||"").toLowerCase().split(/\\s+/).filter(Boolean);
+ const words=String(query||"").toLowerCase().split(/\s+/).filter(Boolean);
  if(!words.length)return true;
  const hay=[p.id,p.title,p.abstract,...(p.authors||[])].join(" ").toLowerCase();
  return words.every(w=>hay.includes(w));
