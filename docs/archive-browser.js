@@ -13,7 +13,7 @@ const write=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true}ca
 const clean=x=>String(x??"").trim();
 const simple=x=>clean(x).toLowerCase().normalize("NFKD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9\s.\/-]/g," ").replace(/\s+/g," ");
 const make=(tag,cls,value)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(value!==undefined)e.textContent=value;return e};
-let state=read(memory,{topic:0,field:0,subfield:"",query:"",author:"",scope:"subfield",sort:"relevance",from:"",to:""});
+let state=read(memory,{topic:0,field:0,subfield:"",query:"",author:"",affiliation:"",scope:"subfield",sort:"relevance",from:"",to:""});
 let custom=read(customKey,{}),localPapers=[],shown=[],allResults=[],page=0,lastSync="";
 const group=()=>definition.groups[Number(state.topic)]||definition.groups[0];
 const field=()=>group().areas[Number(state.field)]||group().areas[0];
@@ -49,7 +49,7 @@ function normalArxiv(p){
  if(!/^(\d{4}\.\d{4,5}|[a-z-]+(?:\.[a-z-]+)?\/\d{7})$/i.test(id))return null;
  const authors=(p.authors||[]).map(a=>typeof a==="string"?a:a?.name||"").filter(Boolean);
  return {id,doi:clean(p.doi),title:clean(p.title),authors,date:clean(p.published||p.date).slice(0,10),abstract:clean(p.abstract||p.summary),
-  category:clean(p.primary_category||p.category),categories:Array.isArray(p.categories)?p.categories:[],url:"https://arxiv.org/abs/"+id,pdf:"https://arxiv.org/pdf/"+id,citations:null,source:"arxiv"};
+  category:clean(p.primary_category||p.category),categories:Array.isArray(p.categories)?p.categories:[],affiliations:Array.isArray(p.affiliations)?p.affiliations:[],url:"https://arxiv.org/abs/"+id,pdf:"https://arxiv.org/pdf/"+id,citations:null,source:"arxiv"};
 }
 function normalDOI(p){
  const doi=clean(p.doi||p.DOI).toLowerCase();
@@ -59,7 +59,7 @@ function normalDOI(p){
  const title=clean(p.title);if(!title)return null;
  const authors=(Array.isArray(p.authors)?p.authors:clean(p.authors).split(/[;,]/)).map(x=>typeof x==="string"?x:clean(x.name||[x.given,x.family].filter(Boolean).join(" "))).filter(Boolean);
  return {id:doi,doi,title,authors,date:clean(p.date||p.firstPublicationDate).slice(0,10),abstract:clean(p.abstract),
-  category:clean(p.category),categories:[clean(p.category)],url:source==="biorxiv"?"https://www.biorxiv.org/content/"+doi:"https://doi.org/"+doi,
+  category:clean(p.category),categories:[clean(p.category)],affiliations:Array.isArray(p.affiliations)?p.affiliations:[],url:source==="biorxiv"?"https://www.biorxiv.org/content/"+doi:"https://doi.org/"+doi,
   pdf:source==="biorxiv"?"https://www.biorxiv.org/content/"+doi+".full.pdf":null,citations:p.citations??null,source};
 }
 function verified(p){return p&&p.source===source&&(source==="arxiv"?p.url.startsWith("https://arxiv.org/abs/"):source==="biorxiv"?p.doi.startsWith("10.1101/"):p.doi.startsWith("10.26434/"))}
@@ -124,7 +124,7 @@ function abstractFromInverted(index){
  return pairs.sort((a,b)=>a[0]-b[0]).slice(0,1800).map(x=>x[1]).join(" ");
 }
 async function sourceVerifiedOpenAlex(){
- const term=clean(state.query||state.author).slice(0,150);
+ const term=clean(state.query||state.author||state.affiliation).slice(0,150);
  if(!term)return [];
  const url="https://api.openalex.org/works?"+new URLSearchParams({search:term,"per-page":"60"});
  const data=await getJSON(url);
@@ -133,17 +133,18 @@ async function sourceVerifiedOpenAlex(){
   const urls=(x.locations||[]).flatMap(loc=>[loc.landing_page_url,loc.pdf_url]).filter(Boolean);
   const title=clean(x.title),abstract=abstractFromInverted(x.abstract_inverted_index);
   const authors=(x.authorships||[]).map(a=>clean(a.author?.display_name)).filter(Boolean);
+  const affiliations=[...new Set((x.authorships||[]).flatMap(a=>(a.institutions||[]).map(i=>clean(i.display_name))).filter(Boolean))];
   const date=clean(x.publication_date);
   let item=null;
   if(source==="arxiv"){
    const ref=urls.map(u=>u.match(/arxiv\.org\/(?:abs|pdf)\/((?:\d{4}\.\d{4,5}|[a-z-]+\/\d{7})(?:v\d+)?)/i)).find(Boolean);
-   if(ref)item=normalArxiv({id:ref[1],title,abstract,published:date,authors,categories:(x.topics||[]).map(t=>t.subfield?.display_name).filter(Boolean)});
+   if(ref)item=normalArxiv({id:ref[1],title,abstract,published:date,authors,affiliations,categories:(x.topics||[]).map(t=>t.subfield?.display_name).filter(Boolean)});
   }else{
    const doi=clean(x.doi).replace(/^https?:\/\/doi\.org\//i,"").toLowerCase();
    const native=urls.some(u=>source==="biorxiv"?/biorxiv\.org/i.test(u):/chemrxiv\.org/i.test(u))||
     (x.locations||[]).some(loc=>new RegExp(source,"i").test(clean(loc.source?.display_name)));
    if(native&&((source==="biorxiv"&&doi.startsWith("10.1101/"))||(source==="chemrxiv"&&doi.startsWith("10.26434/"))))
-    item=normalDOI({doi,title,authors,abstract,date,source:source==="biorxiv"?"bioRxiv":"ChemRxiv"});
+    item=normalDOI({doi,title,authors,affiliations,abstract,date,source:source==="biorxiv"?"bioRxiv":"ChemRxiv"});
   }
   if(verified(item)){item.semanticMatch=true;item.citations=Number.isFinite(x.cited_by_count)?x.cited_by_count:null;out.push(item)}
  }
@@ -165,6 +166,7 @@ function relevant(p){
  if(state.from&&p.date&&p.date<state.from)return false;
  if(state.to&&p.date&&p.date>state.to)return false;
  if(state.author&&!match(p.authors.join(" "),state.author))return false;
+ if(state.affiliation&&!match((p.affiliations||[]).join(" "),state.affiliation))return false;
  const combined=[p.title,p.abstract,p.category,p.categories.join(" "),p.id,p.authors.join(" ")].join(" ");
  if(state.query&&!match(combined,state.query)&&!p.semanticMatch)return false;
  if(state.scope==="subfield"){
@@ -194,6 +196,7 @@ function card(p){
  const author=make("p","axiovo-paper-meta");
  p.authors.slice(0,25).forEach((name,i)=>{if(i)author.append(document.createTextNode(", "));const b=make("button","axiovo-author-link",name);b.type="button";b.onclick=()=>{$("archive-author").value=name;search()};author.append(b)});
  if(!p.authors.length)author.textContent="Author metadata unavailable";root.append(author);
+ if(p.affiliations?.length)root.append(make("p","axiovo-paper-meta","Affiliations: "+p.affiliations.slice(0,5).join("; ")));
  root.append(make("p","axiovo-abstract",(p.abstract||"Abstract unavailable in this source").slice(0,460)+(p.abstract.length>460?"…":"")));
  const actions=make("div","axiovo-paper-actions");
  const details=make("div","axiovo-article-details");details.hidden=true;
@@ -229,10 +232,10 @@ function render(){
  const bar=$("archive-result-actions");bar.replaceChildren();
  if(max<shown.length){const more=make("button",null,"Show 20 more");more.type="button";more.onclick=()=>{page++;render()};bar.append(more)}
  const datalist=$("archive-suggestions");datalist.replaceChildren();
- for(const val of [...new Set([...group().areas.map(x=>x.name),...subs().map(x=>x.name),...allResults.slice(0,45).map(x=>x.title)])].slice(0,80))option(datalist,val,val);
+ for(const val of [...new Set([...group().areas.map(x=>x.name),...subs().map(x=>x.name),...allResults.slice(0,25).map(x=>x.title),...allResults.slice(0,15).flatMap(x=>x.authors.slice(0,2))])].slice(0,100))option(datalist,val,val);
 }
 async function search(){
- state.query=$("archive-query").value.trim();state.author=$("archive-author").value.trim();
+ state.query=$("archive-query").value.trim();state.author=$("archive-author").value.trim();state.affiliation=$("archive-affiliation").value.trim();
  state.scope=$("archive-scope").value;state.sort=$("archive-sort").value;state.from=$("archive-from").value;state.to=$("archive-to").value;remember();
  page=0;$("archive-result-count").textContent="Searching source metadata…";
  let fresh=[],extra=[],error="";
@@ -258,7 +261,7 @@ async function init(){
   state.subfield=name;$("archive-custom").value="";remember();taxonomy();search()};
  $("archive-reset").onclick=()=>{delete custom[field().code];write(customKey,custom);state.subfield="";remember();taxonomy();search()};
  $("archive-search-form").onsubmit=e=>{e.preventDefault();search()};
- $("archive-query").value=state.query||"";$("archive-author").value=state.author||"";
+ $("archive-query").value=state.query||"";$("archive-author").value=state.author||"";$("archive-affiliation").value=state.affiliation||"";
  $("archive-scope").value=state.scope||"subfield";$("archive-sort").value=state.sort||"relevance";
  $("archive-from").value=state.from||"";$("archive-to").value=state.to||"";
  for(const name of ["archive-scope","archive-sort","archive-from","archive-to"])$(name).onchange=search;
