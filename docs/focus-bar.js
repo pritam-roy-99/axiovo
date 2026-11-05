@@ -4,10 +4,10 @@
 (function(root,factory){
  const api=factory();
  if(typeof module==="object"&&module.exports)module.exports=api;
- if(root)root.ResearchLensFocusBar=api;
+ if(root)root.AxiovoFocusBar=api;
 })(typeof globalThis!=="undefined"?globalThis:null,function(){
  "use strict";
- const KEY="researchlens-field-explorer-v1";
+ const KEY="axiovo-field-explorer-v1";
  const normalize=(state,fields,subtopics)=>{
   const field=fields.fieldKey(state?.field),spec=fields.FIELDS[field];
   const topic=spec.topics.includes(state?.topic)?state.topic:spec.topics[0];
@@ -17,7 +17,7 @@
  };
  function mount(){
   if(typeof document!=="undefined"&&document.body?.classList.contains("axiovo-home"))return;
-  const Fields=window.ResearchLensFields,Interest=window.ResearchLensInterests,Custom=window.ResearchLensCustomTaxonomy;
+  const Fields=window.AxiovoFields,Interest=window.AxiovoInterests,Custom=window.AxiovoCustomTaxonomy;
   const root=document.getElementById("rl-focus-bar");
   if(!root||!Fields)return;
   const byId=id=>document.getElementById("rl-focus-"+id);
@@ -60,7 +60,7 @@
    const old=load(KEY,{});
    const query=areaSelected?(current.subtopic||current.topic):"";
    write(KEY,{...old,...current,areaSelected,query,customSubtopic:!!current.subtopic&&!Fields.fieldTopics(current.field,current.topic).includes(current.subtopic)});
-   window.dispatchEvent(new CustomEvent("researchlens:focus-change",{detail:{...current,areaSelected,query,reason}}));
+   window.dispatchEvent(new CustomEvent("axiovo:focus-change",{detail:{...current,areaSelected,query,reason}}));
   };
   function chooseField(id){
    const valid=Fields.fieldKey(id);
@@ -82,7 +82,7 @@
    if(!Interest)return;
    const data=Interest.toggle(load(Interest.KEY,{}),current.field,current.topic,name);
    write(Interest.KEY,data);render();
-   window.dispatchEvent(new Event("researchlens:interests-changed"));
+   window.dispatchEvent(new Event("axiovo:interests-changed"));
   }
   function render(){
    const spec=Fields.FIELDS[current.field];
@@ -153,7 +153,7 @@
       if(Custom.removeInterest(current.field,current.topic,topic,localStorage)){
        if(Interest&&picked.some(x=>x.toLowerCase()===topic.toLowerCase())){
         write(Interest.KEY,Interest.toggle(load(Interest.KEY,{}),current.field,current.topic,topic));
-        window.dispatchEvent(new Event("researchlens:interests-changed"));
+        window.dispatchEvent(new Event("axiovo:interests-changed"));
        }
        if(current.subtopic===topic)current={...current,subtopic:""};
        inform("Removed subtopic: "+topic);refreshTaxonomy("subtopic-removed");
@@ -180,13 +180,13 @@
     write(Interest.KEY,Interest.toggle(load(Interest.KEY,{}),current.field,current.topic,result.value));
    }
    custom.value="";inform("Added subtopic: "+result.value);refreshTaxonomy("subtopic-added");
-   window.dispatchEvent(new Event("researchlens:interests-changed"));
+   window.dispatchEvent(new Event("axiovo:interests-changed"));
   };
   custom.addEventListener("input",()=>custom.setCustomValidity(""));
   custom.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();apply.click()}});
   document.addEventListener("pointerdown",e=>{if(!fieldDetails.contains(e.target))fieldDetails.open=false});
   document.addEventListener("keydown",e=>{if(e.key==="Escape"&&fieldDetails.open)fieldDetails.open=false});
-  window.addEventListener("researchlens:field-changed",e=>{
+  window.addEventListener("axiovo:field-changed",e=>{
    const next=normalize({field:e.detail?.field,topic:e.detail?.topic},Fields);
    if(next.field===current.field&&next.topic===current.topic)return;
    current=next;areaSelected=Boolean(e.detail?.areaSelected);render();emit("external");
@@ -199,7 +199,7 @@
   });
   window.addEventListener("storage",e=>{if(e.key===KEY||e.key===Interest?.KEY){const next=load(KEY,{});current=normalize(next,Fields);areaSelected=next.areaSelected===undefined?Boolean(next.topic):Boolean(next.areaSelected);render()}});
   render();
-  window.ResearchLensCurrentFocus=()=>({...current});
+  window.AxiovoCurrentFocus=()=>({...current});
  }
  if(typeof document!=="undefined"){
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",mount);
