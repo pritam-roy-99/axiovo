@@ -55,7 +55,7 @@ function normalArxiv(p){
 function normalDOI(p){
  const doi=clean(p.doi||p.DOI).toLowerCase();
  if(!/^10\.\d{4,9}\//.test(doi))return null;
- if(source==="biorxiv"&&!doi.startsWith("10.1101/"))return null;
+ if(source==="biorxiv"&&!/^10\.(?:1101|64898)\//.test(doi))return null;
  if(source==="chemrxiv"&&!doi.startsWith("10.26434/")&&!/chemrxiv/i.test(clean(p.source)))return null;
  const title=clean(p.title);if(!title)return null;
  const authors=(Array.isArray(p.authors)?p.authors:clean(p.authors).split(/[;,]/)).map(x=>typeof x==="string"?x:clean(x.name||[x.given,x.family].filter(Boolean).join(" "))).filter(Boolean);
@@ -63,7 +63,7 @@ function normalDOI(p){
   category:clean(p.category),categories:[clean(p.category)],affiliations:Array.isArray(p.affiliations)?p.affiliations:[],url:source==="biorxiv"?"https://www.biorxiv.org/content/"+doi:"https://doi.org/"+doi,
   pdf:source==="biorxiv"?"https://www.biorxiv.org/content/"+doi+".full.pdf":null,citations:p.citations??null,source};
 }
-function verified(p){return p&&p.source===source&&(source==="arxiv"?p.url.startsWith("https://arxiv.org/abs/"):source==="biorxiv"?p.doi.startsWith("10.1101/"):p.doi.startsWith("10.26434/"))}
+function verified(p){return p&&p.source===source&&(source==="arxiv"?p.url.startsWith("https://arxiv.org/abs/"):source==="biorxiv"?/^10\.(?:1101|64898)\//.test(p.doi):p.doi.startsWith("10.26434/"))}
 async function getJSON(url){
  const c=new AbortController(),timer=setTimeout(()=>c.abort(),13000);
  try{const r=await fetch(url,{signal:c.signal});if(!r.ok)throw Error("HTTP "+r.status);return await r.json()}finally{clearTimeout(timer)}
@@ -144,7 +144,7 @@ async function sourceVerifiedOpenAlex(){
    const doi=clean(x.doi).replace(/^https?:\/\/doi\.org\//i,"").toLowerCase();
    const native=urls.some(u=>source==="biorxiv"?/biorxiv\.org/i.test(u):/chemrxiv\.org/i.test(u))||
     (x.locations||[]).some(loc=>new RegExp(source,"i").test(clean(loc.source?.display_name)));
-   if(native&&((source==="biorxiv"&&doi.startsWith("10.1101/"))||(source==="chemrxiv"&&doi.startsWith("10.26434/"))))
+   if(native&&((source==="biorxiv"&&/^10\.(?:1101|64898)\//.test(doi))||(source==="chemrxiv"&&doi.startsWith("10.26434/"))))
     item=normalDOI({doi,title,authors,affiliations,abstract,date,source:source==="biorxiv"?"bioRxiv":"ChemRxiv"});
   }
   if(verified(item)){item.semanticMatch=true;item.citations=Number.isFinite(x.cited_by_count)?x.cited_by_count:null;out.push(item)}
