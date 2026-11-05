@@ -1,11 +1,11 @@
-/* ResearchLens: field-specific followed subtopics shared by Discover and Workspace. */
+/* Axiovo: field-specific followed subtopics shared by Discover and Workspace. */
 (function(root,factory){
  const api=factory();
  if(typeof module==="object"&&module.exports)module.exports=api;
- if(root)root.ResearchLensInterests=api;
+ if(root)root.AxiovoInterests=api;
 })(typeof globalThis!=="undefined"?globalThis:null,function(){
  "use strict";
- const KEY="researchlens-interests-by-field-v1";
+ const KEY="axiovo-interests-by-field-v1";
  function clean(value){return String(value||"").trim().replace(/\s+/g," ").slice(0,100)}
  function fieldKey(field){return /^[a-z]{3,22}$/.test(field||"")?field:"quantum"}
  function topicKey(topic){return clean(topic).toLowerCase()}
