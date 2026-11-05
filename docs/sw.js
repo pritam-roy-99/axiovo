@@ -1,6 +1,6 @@
 /* ResearchLens offline shell. Do not cache remote APIs, PDFs or the live feed. */
 "use strict";
-const CACHE = "axiovo-shell-v29";
+const CACHE = "axiovo-shell-v30";
 const SHELL = [
   "./", "./index.html", "./discover.html", "./workspace.html", "./copilot.html",
   "./lab.html", "./paper.html", "./profiles.html", "./community.html", "./methodology.html", "./privacy.html",
