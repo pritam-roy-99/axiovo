@@ -16,6 +16,7 @@
   return {field,topic,subtopic};
  };
  function mount(){
+  if(typeof document!=="undefined"&&document.body?.classList.contains("axiovo-home"))return;
   const Fields=window.ResearchLensFields,Interest=window.ResearchLensInterests,Custom=window.ResearchLensCustomTaxonomy;
   const root=document.getElementById("rl-focus-bar");
   if(!root||!Fields)return;
