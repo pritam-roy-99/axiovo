@@ -96,15 +96,44 @@ function renderQueue(){
  $("rd-listen-queue").disabled=!papers.some(p=>p.abstract);
 }
 function openComparison(){
- const columns=$("rd-comparison-columns");columns.replaceChildren();
- for(const p of data.comparison()){
-  const article=node("article");
-  article.append(node("p",data.names[p.source]+" · "+p.recordId,"rd-kicker"),node("h3",p.title),
-   node("p",p.authors.slice(0,8).join(", ")||"Authors unavailable","rd-small"),
-   node("p",[p.date||"Date unavailable",p.category,p.provenance].filter(Boolean).join(" · "),"rd-small"),
-   node("h4","Abstract"),node("p",p.abstract||"No abstract in this metadata record."),link("Open original record ↗",p.url,"rd-text-link"));
-  columns.append(article);
+ const container=$("rd-comparison-columns");container.replaceChildren();
+ const selected=data.comparison();
+ const fields=window.AxiovoEvidenceExtract;
+ const matrix=node("table",undefined,"rd-evidence-matrix");
+ const caption=node("caption","Evidence table (2–5 papers). Exact abstract snippets only; absent or unverified fields are not stated.");
+ matrix.append(caption);
+ const thead=node("thead"),header=node("tr");
+ const label=node("th","Evidence field");label.scope="col";header.append(label);
+ for(const p of selected){
+  const cell=node("th");cell.scope="col";
+  cell.append(link(p.title,p.url,"rd-text-link"),node("p",data.names[p.source]+" · "+p.recordId,"rd-small"));
+  header.append(cell);
  }
+ thead.append(header);matrix.append(thead);
+ const body=node("tbody");
+ const rows=[
+  ["Source / date",p=>({text:data.names[p.source]+" · "+(p.date||"Date not in the available source metadata"),source:"provider metadata"})],
+  ["Authors",p=>({text:p.authors.join(", ")||"Not stated in the available record",source:"provider metadata"})],
+  ...(fields?fields.fields.map(name=>[name,p=>fields.extract(p.abstract)[name]]):[
+   ["Abstract",p=>({text:p.abstract||"Not stated in the available abstract",source:"original abstract"})]
+  ])
+ ];
+ for(const [name,pick] of rows){
+  const tr=node("tr");
+  const th=node("th",name);th.scope="row";tr.append(th);
+  for(const p of selected){
+   const result=pick(p);
+   const td=node("td");
+   td.append(node("p",result.text,"rd-evidence-excerpt"));
+   if(result.source!=="unavailable"){
+    td.append(node("span","Source: "+result.source+" · ","rd-small"));
+    td.append(link("Verify original ↗",p.url,"rd-text-link"));
+   }
+   tr.append(td);
+  }
+  body.append(tr);
+ }
+ matrix.append(body);container.append(matrix);
  $("rd-comparison").showModal();
 }
 function ris(p){
