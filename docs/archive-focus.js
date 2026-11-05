@@ -3,7 +3,7 @@
  */
 (function(){
 "use strict";
-const CURRENT="researchlens-field-explorer-v1";
+const CURRENT="axiovo-field-explorer-v1";
 const LAST="axiovo-last-selected-archive";
 const valid=a=>["arxiv","biorxiv","chemrxiv"].includes(a)?a:"arxiv";
 const read=k=>{try{return JSON.parse(localStorage.getItem(k)||"null")}catch{return null}};
@@ -25,7 +25,7 @@ if(previous!==chosen){
  restore(chosen);
 }
 try{localStorage.setItem(LAST,chosen)}catch{}
-window.addEventListener("researchlens:focus-change",event=>{
+window.addEventListener("axiovo:focus-change",event=>{
  const active=valid(new URL(location.href).searchParams.get("archive")||chosen);
  set("axiovo-archive-focus-"+active,read(CURRENT)||event.detail);
 });
