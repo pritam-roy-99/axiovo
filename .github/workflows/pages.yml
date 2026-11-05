@@ -53,6 +53,8 @@ jobs:
         id: test_research_relevance_ranking
         continue-on-error: true
         run: node tests/relevance.test.js
+      - name: Evaluate fifty source-grounded bibliography queries (required)
+        run: node tests/assistant-grounding-50.test.js
       - name: Unified research assistant regression tests
         id: unified_research_assistant_regression_tests
         continue-on-error: true
