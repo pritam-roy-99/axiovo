@@ -19,22 +19,22 @@ OUT = ROOT / "docs" / "assets"
 WIDTH, HEIGHT, FPS = 960, 540, 12
 SECONDS = 9
 SCENES = [
- ("What does Axiovo mean?", "AXIO = axiom  |  NOVO = new", 
-  "Axiovo joins axiom, a foundation of reasoning, with novo, new. Our goal is research that builds on evidence."),
- ("Step 1: Open Discover", "Start with the latest arXiv papers.",
-  "Choose Discover papers. Browse recent arXiv records by date, and open the original source before saving."),
- ("Step 2: Explore your field", "Select a field, topic, and subtopic.",
-  "Choose your discipline and specific topic. Search wider arXiv-linked literature without leaving Axiovo."),
- ("Step 3: Follow interests", "See why papers are recommended.",
-  "Follow research interests. Recommendations explain keyword matches, but cannot establish scientific novelty or correctness."),
- ("Step 4: Open My workspace", "Your saved papers are one click away.",
-  "Save a paper, then select My workspace on the same page. Set its reading status and add private notes."),
- ("Step 5: Read and assess", "Open PDF tools and check claims.",
-  "Use Research Tools for local PDFs and paper comparisons. Research Assistant provides source-linked evidence with optional AI."),
- ("Step 6: Record research questions", "Keep projects and reading connected.",
-  "Add a research question and keywords in My workspace. Review related recommendations and export your work."),
- ("Start with Axiovo", "Find papers. Keep evidence. Build knowledge.",
-  "Return to Discover any time. Axiovo is free and open source; full historical coverage is still in development."),
+ ("Welcome to Axiovo", "Explore three independent preprint archives.",
+  "Welcome to Axiovo. Choose between arXiv, bioRxiv and ChemRxiv to explore scientific preprints."),
+ ("Start with an archive", "arXiv, bioRxiv and ChemRxiv.",
+  "The home page presents three equal choices. Each opens its own archive discovery page."),
+ ("Discover arXiv", "Browse physics, mathematics, computing and more.",
+  "Explore the full arXiv subject taxonomy, select an official category and search research papers."),
+ ("Discover bioRxiv", "Browse life-science subject areas.",
+  "Choose a biological subject, refine your query and inspect verified preprint records."),
+ ("Discover ChemRxiv", "Find chemistry and materials preprints.",
+  "Choose chemistry research areas, search by topic and follow source linked DOI records."),
+ ("Customize research interests", "Add and remove specialized subtopics.",
+  "Each archive lets you customize research interests and filter by subfield."),
+ ("Save your research", "Collect papers and add private notes.",
+  "Save papers to My Library and organize research collections on your own device."),
+ ("Continue with Axiovo", "Research Assistant and reading tools.",
+  "Use Research Assistant and research tools to explore source linked evidence and organize reading.")
 ]
 BG=(8,27,47); SURFACE=(14,43,67); SURFACE2=(22,59,85)
 WHITE=(242,249,254); MUTED=(161,193,211); BLUE=(38,135,206)
