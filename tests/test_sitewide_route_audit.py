@@ -30,7 +30,7 @@ class RouteAuditTests(unittest.TestCase):
         html=self.read("search.html")
         self.assertIn('old.forEach',html) if False else None
         self.assertIn('const q=before.get("q")||before.get("query")',html)
-        self.assertIn('next.searchParams.set("view","scholarly")',html)
+        self.assertIn('url.searchParams.set("q",q.slice(0,300))',html)
         self.assertIn('location.replace(next.href)',html)
         self.assertNotIn('https://api.openalex.org/works?',html)
 
