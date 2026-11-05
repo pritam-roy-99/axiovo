@@ -4,6 +4,7 @@ on:
     branches: [main]
     paths:
       - scripts/arxiv_announcements.py
+      - scripts/scirate_latest.py
       - .github/workflows/arxiv-announcements.yml
   workflow_dispatch:
   schedule:
@@ -32,8 +33,9 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Harvest latest official arXiv announcement records
-        run: python -m scripts.arxiv_announcements
+      - name: Harvest latest arXiv metadata with SciRate-style paginated ingestion
+        run: |
+          python -m scripts.scirate_latest || python -m scripts.arxiv_announcements
       - name: Check announcement JSON integrity
         run: |
           python - <<'PY'
