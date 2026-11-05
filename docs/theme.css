@@ -191,3 +191,27 @@ body.axiovo-archive-page :is(a,button,input,select,textarea,summary):focus-visib
     background:var(--axiovo-hero,#0b2239);
   }
 }
+
+
+/* Single Axiovo brand mark across all pages, including minimal homepage. */
+.rl-global-header .rl-logo{
+ display:inline-flex;align-items:center;gap:9px;
+ font:800 20px/1.2 Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+ color:#fff!important;text-decoration:none!important;letter-spacing:-.025em;
+ flex-shrink:0;
+}
+.rl-global-header .rl-logo:visited{color:#fff!important}
+.rl-global-header .rl-logo-mark{
+ display:inline-flex;align-items:center;justify-content:center;
+ width:34px;height:34px;flex:0 0 34px;border-radius:10px;
+ background:#187daa;color:#fff!important;
+ font:800 23px/1 Inter,system-ui,sans-serif;letter-spacing:0;
+}
+body.axiovo-home .rl-global-header{
+ min-height:78px;gap:12px;
+}
+body.axiovo-home .rl-global-header .rl-logo{color:#fff!important}
+@media(max-width:700px){
+ .rl-global-header .rl-logo{font-size:18px}
+ .rl-global-header .rl-logo-mark{width:32px;height:32px;flex-basis:32px;font-size:21px}
+}
