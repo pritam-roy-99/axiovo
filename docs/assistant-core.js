@@ -1,7 +1,7 @@
 /* Source-grounded literature tools shared by the unified Axiovo Assistant. */
 (function(root,factory){
  const api=factory();if(typeof module==="object"&&module.exports)module.exports=api;
- if(root)root.ResearchLensAssistantCore=api;
+ if(root)root.AxiovoAssistantCore=api;
 })(typeof globalThis!=="undefined"?globalThis:null,function(){
  "use strict";
  const STOP=new Set("the and are was were from with under above into for not this that those about using novel results study research paper papers have has more than also based method methods approach quantum their between through our which what how when where then".split(" "));
