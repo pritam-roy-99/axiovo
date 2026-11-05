@@ -13,6 +13,17 @@ main code{overflow-wrap:anywhere}
 </style><link rel="manifest" href="./manifest.webmanifest"><meta name="theme-color" content="#0b2239"><link rel="icon" type="image/svg+xml" href="./icons/axiovo.svg"><script defer src="./pwa.js"></script><link rel="stylesheet" href="./axiovo-shell.css?v=2"></head><body><header></header>
 <main><h1>Axiovo data coverage and methodology</h1>
 <p>Axiovo is an independent, experimental open-source research workspace, not an official arXiv or SciRate service. This page documents what the site actually does and what it cannot guarantee.</p>
+<section id="axiovo-coverage-live" aria-labelledby="axiovo-coverage-title">
+<h2 id="axiovo-coverage-title">Verified local data coverage</h2>
+<p id="axiovo-coverage-status" role="status" aria-live="polite">Loading the current source-verified coverage manifest…</p>
+<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;text-align:left">
+<thead><tr><th scope="col">Archive</th><th scope="col">Indexed records</th><th scope="col">Monthly shards</th></tr></thead>
+<tbody id="axiovo-coverage-rows"></tbody></table></div>
+<p id="axiovo-coverage-review">Checking whether automated topic tags have been evaluated…</p>
+<h3>Last successful source metadata checks</h3>
+<ul id="axiovo-coverage-source-times"><li>Checking official source stamps…</li></ul>
+<p>Counts describe existing source-verified cached records only. They do not claim full historical coverage. An empty snapshot does not mean no papers exist at that source.</p>
+</section>
 <section><h2>Research Desk and archive directories</h2>
 <p>Each <a href="./#axiovo-archive-title">archive explorer</a> uses the archive’s published subjects as a starting point. Axiovo adds its own research subfields and sub-subtopics with search terms and aliases. Those layers are editable on this device and can be shared as links. The <a href="./desk.html">Research Desk</a> searches across archives and separates results and coverage by source. arXiv categories follow its <a href="https://arxiv.org/category_taxonomy">official taxonomy</a>. The bioRxiv directory includes its historical Clinical Trials and Epidemiology subjects. The ChemRxiv directory includes the published subject labels used across its platforms.</p>
 <p>arXiv date ranges use verified UTC first-submission batches wherever those batches exist. Other arXiv results come from available snapshots and arXiv-registered DOI metadata via <a href="https://support.datacite.org/docs/api-queries">DataCite</a>. Search by an exact revision to find a matching cached record or open the pinned arXiv source directly.</p>
@@ -39,4 +50,4 @@ main code{overflow-wrap:anywhere}
 <p>GitHub Actions rebuilds selected arXiv feeds and site assets on scheduled runs. These jobs may be delayed, fail or be paused. The daily OAI-PMH process adds a bounded subset of arXiv metadata, not a full historical mirror. Axiovo is a static GitHub Pages application and has no continuously running ingestion server. Full arXiv recall, authenticated community features and centrally synchronized research workspaces would require additional infrastructure.</p>
 <p>Bibliographic sources: <a href="https://info.arxiv.org/help/api/index.html">arXiv API documentation</a> and <a href="https://help.openalex.org/api/">OpenAlex API documentation</a>. Site source and issues: <a href="https://github.com/pritam-roy-99/axiovo">GitHub repository</a>.</p></section>
 <p><a href="./privacy.html">Privacy and device-data handling</a> · <a href="./profiles.html">Download a full local backup</a></p>
-</main></body></html>
+</main><script defer src="./coverage-status.js"></script></body></html>
