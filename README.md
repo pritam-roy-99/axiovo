@@ -1,3 +1,36 @@
+## arXiv ingestion: completeness versus update speed
+
+Axiovo now uses two separate official arXiv metadata paths, modeled on the
+[hourly OAI-PMH synchronization documented by SciRate](https://github.com/scirate/scirate/blob/main/README.markdown).
+
+1. **Hourly all-category updates:** GitHub Actions harvests arXiv OAI-PMH
+   `ListRecords` metadata with resumption tokens and uses it in the recent
+   reading feed. A source update datestamp is **not** an arXiv first-submission
+   date or a daily announcement date. Requests are rate-limited and can fail;
+   Axiovo retains the last verified snapshot instead of inventing records.
+2. **Complete dated batches:** a separate scheduled harvester queries
+   `submittedDate` for **each closed UTC day**, across all arXiv categories,
+   follows every page and verifies `opensearch:totalResults` against the
+   number of distinct arXiv identifiers received. A day is published in
+   `docs/data/arxiv-days/manifest.json` only if complete.
+3. **Custom historical ranges:** the project maintainer can run
+   [the backfill workflow](https://github.com/pritam-roy-99/axiovo/actions/workflows/arxiv-archive-backfill.yml)
+   with `from_date` and `to_date` (up to 31 UTC days per batch). Older
+   dates are **not** assumed to be indexed merely because the homepage or
+   OpenAlex contains a subset. Unavailable dates are marked incomplete.
+4. **Read-only static hosting:** GitHub Pages serves previously harvested JSON.
+   A visitor cannot launch server-side bulk arXiv harvesting from the
+   browser. For unharvested historical days, Axiovo links to the official
+   arXiv search and reports partial coverage.
+
+The official arXiv
+[bulk metadata documentation](https://github.com/arXiv/arxiv-docs/blob/develop/source/help/bulk_data.md)
+recommends OAI-PMH for bulk synchronization. Its Atom search API supports
+`submittedDate` and pagination, but GitHub-hosted requests can receive
+HTTP 429. Neither Axiovo nor SciRate guarantees instant availability after
+arXiv's announcement. Date batches refer to **first submission (UTC)**, not
+the SciRate-style announcement date.
+
 # Axiovo
 
 ## Axiovo: from knowledge to discovery
