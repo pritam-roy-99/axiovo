@@ -18,7 +18,7 @@ permissions:
   id-token: write
 concurrency:
   group: researchlens-pages
-  cancel-in-progress: false
+  cancel-in-progress: true
 jobs:
   publish:
     runs-on: ubuntu-latest
