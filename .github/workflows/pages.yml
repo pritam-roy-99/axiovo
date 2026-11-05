@@ -166,10 +166,12 @@ jobs:
         run: python scripts/smoke_routes.py
       - name: Exercise all three dedicated source Discover pages
         run: python scripts/smoke_archive_pages.py
-      - name: Install video encoding and feminine voice options
+      - name: Install video encoding and inspection tools
+        run: sudo apt-get install -y -qq ffmpeg
+      - name: Install video narration options when rebuilding
         if: steps.tour-cache.outputs.cache-hit != 'true'
         run: |
-          sudo apt-get install -y -qq ffmpeg espeak-ng
+          sudo apt-get install -y -qq espeak-ng
           python -m pip install --disable-pip-version-check edge-tts || echo 'Neural voice unavailable; local feminine narration fallback will be used.'
       - name: Record current Axiovo UI and build homepage tour
         if: steps.tour-cache.outputs.cache-hit != 'true'
