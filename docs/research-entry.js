@@ -1,31 +1,34 @@
-/* Axiovo homepage chooses an archive only.
- * Discipline, research area and subtopic are selected on Discover.
- * Preserve bookmarks, local research data and existing legacy URLs.
- */
+/* Homepage routing preserves existing bookmarks without loading legacy UI. */
 (function(){
 "use strict";
-function enter(){
+function route(){
  const url=new URL(location.href);
  if(!url.pathname.endsWith("/")&&!url.pathname.endsWith("/index.html"))return;
  const params=url.searchParams;
- const legacyView=params.get("view");
- const explicitArchive=params.get("archive");
- const oldHash=["#discover","#workspace","#library"].includes(url.hash);
- const search=["q","query","from","to","sort","author","date"].some(key=>params.has(key));
- if(oldHash||search||legacyView||explicitArchive){
-   const target=new URL("./discover.html",url);
-   target.search=url.search;
-   if(legacyView==="biorxiv")target.searchParams.set("archive","biorxiv");
-   else if(legacyView==="arxiv")target.searchParams.set("archive","arxiv");
-   if(search&&!legacyView&&!explicitArchive)target.searchParams.set("view","scholarly");
-   target.hash=url.hash||"#discover";
-   location.replace(target.href);
-   return;
+ const archive=(params.get("archive")||params.get("view")||"").toLowerCase();
+ const native={"arxiv":"arxiv.html","biorxiv":"biorxiv.html","chemrxiv":"chemrxiv.html"};
+ if(native[archive]){
+  const target=new URL("./"+native[archive],url);
+  location.replace(target.href);
+  return;
  }
- const videoSlot=document.getElementById("axiovo-entry-demo-slot");
- const existingVideo=document.querySelector(".hero .rl-home-demo");
- if(videoSlot&&existingVideo)videoSlot.append(existingVideo);
+ if(url.hash==="#discover"){
+  location.replace(new URL("./#axiovo-archive-title",url).href);
+  return;
+ }
+ if(url.hash==="#workspace"||url.hash==="#library"){
+  location.replace(new URL("./discover.html#workspace",url).href);
+  return;
+ }
+ const globalSearch=["q","query","from","to","sort","author","date"].some(k=>params.has(k));
+ if(globalSearch||params.get("view")==="scholarly"){
+  const target=new URL("./discover.html",url);
+  target.search=url.search;
+  target.searchParams.set("view","scholarly");
+  target.hash="#discover";
+  location.replace(target.href);
+ }
 }
-if(document.readyState==="complete")enter();
-else document.addEventListener("DOMContentLoaded",enter,{once:true});
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",route,{once:true});
+else route();
 })();
