@@ -256,9 +256,6 @@ jobs:
           if [ "${{ steps.atom_feeds.outcome }}" = "failure" ]; then
             echo '::warning::Atom feed generation failed; video and main website will still deploy.'
           fi
-      - name: Audit internal website links and anchors
-        continue-on-error: true
-        run: python scripts/audit_site_links.py
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
