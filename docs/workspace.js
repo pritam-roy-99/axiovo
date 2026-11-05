@@ -40,7 +40,7 @@ const fieldPrefs=()=>{
  try{const p=JSON.parse(localStorage.getItem("researchlens-field-explorer-v1")||"{}");return p&&typeof p==="object"?p:{}}catch{return{}}};
 function read(key,fallback){try{return JSON.parse(localStorage.getItem(key)||"null")??fallback}catch{return fallback}}
 function write(key,data){try{localStorage.setItem(key,JSON.stringify(data));return true}catch{return false}}
-const statuses=new Set(["to-read","reading","done"]); // done means reviewed in existing saved data
+const statuses=new Set(["to-read","reading","done","cited"]); // done means reviewed in existing saved data
 let metadata=read(META_KEY,{});if(!metadata||typeof metadata!=="object"||Array.isArray(metadata))metadata={};
 let lookup=new Map(),recent=[],storedFeed=[];
 const paperKey=w=>w.key||w.arxiv_id&&"arxiv:"+w.arxiv_id||w.id&&"openalex:"+w.id||"";
@@ -89,7 +89,7 @@ for(const p of filtered.slice(0,50)){
  row.append(collectionsSelect);
 
  const select=document.createElement("select");select.setAttribute("aria-label","Reading status for "+p.title);
- for(const [v,t] of [["to-read","To read"],["reading","Reading"],["done","Reviewed"]]){const opt=document.createElement("option");opt.value=v;opt.textContent=t;select.append(opt)}
+ for(const [v,t] of [["to-read","To read"],["reading","Reading"],["done","Reviewed"],["cited","Cited"]]){const opt=document.createElement("option");opt.value=v;opt.textContent=t;select.append(opt)}
  select.value=statuses.has(metadata[p.key]?.status)?metadata[p.key].status:"to-read";
  select.onchange=()=>{saveMeta(p.key,{status:select.value});if(status!=="all")renderLibrary()};
  const note=document.createElement("textarea");note.rows=2;note.maxLength=2000;note.placeholder="Private reading note, e.g. check Theorem 2";note.setAttribute("aria-label","Private note for "+p.title);note.value=metadata[p.key]?.note||"";
