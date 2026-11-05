@@ -73,6 +73,8 @@ function enter(){
  const existingVideo=document.querySelector(".hero .rl-home-demo");
  if(videoSlot&&existingVideo)videoSlot.append(existingVideo);
 }
-if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",enter);
-else enter();
+// Defer scripts execute while readyState can be "interactive"; wait for all
+// dependent defer scripts (including research-fields.js) before initializing.
+if(document.readyState==="complete")enter();
+else document.addEventListener("DOMContentLoaded",enter,{once:true});
 })();
