@@ -57,7 +57,7 @@ function normalDOI(p){
  if(source==="biorxiv"&&!doi.startsWith("10.1101/"))return null;
  if(source==="chemrxiv"&&!doi.startsWith("10.26434/")&&!/chemrxiv/i.test(clean(p.source)))return null;
  const title=clean(p.title);if(!title)return null;
- const authors=(Array.isArray(p.authors)?p.authors:clean(p.authors).split(";")).map(x=>typeof x==="string"?x:clean(x.name||[x.given,x.family].filter(Boolean).join(" "))).filter(Boolean);
+ const authors=(Array.isArray(p.authors)?p.authors:clean(p.authors).split(/[;,]/)).map(x=>typeof x==="string"?x:clean(x.name||[x.given,x.family].filter(Boolean).join(" "))).filter(Boolean);
  return {id:doi,doi,title,authors,date:clean(p.date||p.firstPublicationDate).slice(0,10),abstract:clean(p.abstract),
   category:clean(p.category),categories:[clean(p.category)],url:source==="biorxiv"?"https://www.biorxiv.org/content/"+doi:"https://doi.org/"+doi,
   pdf:source==="biorxiv"?"https://www.biorxiv.org/content/"+doi+".full.pdf":null,citations:p.citations??null,source};
@@ -150,7 +150,10 @@ function saved(p){
 function card(p){
  const root=make("article","axiovo-result-card");
  root.append(make("p","axiovo-paper-meta",(source==="arxiv"?"arXiv: ":"DOI: ")+p.id+" · "+(p.date||"Date unavailable")+" · "+(p.category||"Unclassified")));
- const title=make("h3",null,p.title);root.append(title);
+ const title=make("h3");
+ const titleButton=make("button","axiovo-paper-title-button",p.title);
+ titleButton.type="button";titleButton.setAttribute("aria-label","View paper details for "+p.title);
+ title.append(titleButton);root.append(title);
  const author=make("p","axiovo-paper-meta");
  p.authors.slice(0,25).forEach((name,i)=>{if(i)author.append(document.createTextNode(", "));const b=make("button","axiovo-author-link",name);b.type="button";b.onclick=()=>{$("archive-author").value=name;search()};author.append(b)});
  if(!p.authors.length)author.textContent="Author metadata unavailable";root.append(author);
@@ -161,8 +164,13 @@ function card(p){
  details.append(make("p","axiovo-paper-meta","Publication date: "+(p.date||"Unspecified")+" · Subjects: "+(p.categories.filter(Boolean).join(", ")||p.category||"Unspecified")));
  details.append(make("p","axiovo-paper-meta",p.citations===null?"Citation count unavailable":"Crossref citation references: "+p.citations+" (not a quality score)"));
  if(p.doi)outgoing(details,"DOI ↗","https://doi.org/"+p.doi);
+ outgoing(details,"Find citations and related work ↗","https://openalex.org/works?search="+encodeURIComponent(p.doi||p.id));
+ const near=allResults.filter(x=>x.id!==p.id&&x.category&&x.category===p.category).slice(0,3);
+ if(near.length){details.append(make("h4",null,"Related indexed papers"));
+  for(const x of near){const line=make("p");outgoing(line,x.title,x.url);details.append(line)}}
+
  const toggle=make("button",null,"View details");toggle.type="button";toggle.onclick=()=>{details.hidden=!details.hidden;toggle.textContent=details.hidden?"View details":"Hide details"};
- actions.append(toggle);outgoing(actions,"Source page ↗",p.url,true);
+ titleButton.onclick=()=>toggle.click();actions.append(toggle);outgoing(actions,"Source page ↗",p.url,true);
  if(p.pdf)outgoing(actions,"PDF ↗",p.pdf);
  if(source==="arxiv")outgoing(actions,"Research workspace","./paper.html?id="+encodeURIComponent(p.id));
  const saveButton=make("button",null,"Save paper");saveButton.type="button";saveButton.onclick=()=>{if(saved(p))saveButton.textContent="✓ Saved";else saveButton.textContent="Storage unavailable"};actions.append(saveButton);
