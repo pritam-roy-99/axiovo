@@ -98,6 +98,7 @@ function renderRecommendations(){
   const row=texts(item,"div","","rl-paper-actions axiovo-rec-actions");
   const parsed=Arxiv?.parse(pp.id),sourceId=parsed?.requested||String(pp.id||"");
   const original=Arxiv?.abs(sourceId)||"https://arxiv.org/";
+  if(parsed){const details=texts(row,"a","Paper details");details.href="./paper.html?id="+encodeURIComponent(sourceId);details.className="axiovo-paper-detail-action";}
   const readLink=texts(row,"a","↗ Read on arXiv");readLink.href=original;readLink.target="_blank";readLink.rel="noopener noreferrer";readLink.className="rl-paper-primary axiovo-rec-read";
   const cop=texts(row,"a","✦ Research Assistant");cop.href="./copilot.html?id="+encodeURIComponent(sourceId);cop.className="axiovo-rec-assistant";
   const current=read(OLD_SAVED,[]);const savedHere=Array.isArray(current)&&current.includes(sourceId);
