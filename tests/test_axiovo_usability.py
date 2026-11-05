@@ -14,8 +14,8 @@ class UsabilityTests(unittest.TestCase):
         self.assertIn('id="research-project-form"',workspace)
     def test_profile_is_optional_settings_not_primary_nav(self):
         nav=(DOCS/"navigation.js").read_text()
-        self.assertIn('["./#discover","Discover"]',nav)
-        self.assertIn('["./#workspace","Library"]',nav)
+        self.assertIn('["./discover.html#discover","Discover"]',nav)
+        self.assertIn('["./discover.html#workspace","Library"]',nav)
         self.assertIn('["./copilot.html","Research AI"]',nav)
         self.assertNotIn('["./community.html","Community"]',nav)
         self.assertNotIn('["./profiles.html","Profile"]',nav)
