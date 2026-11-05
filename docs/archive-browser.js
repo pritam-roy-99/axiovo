@@ -95,7 +95,8 @@ async function remote(){
   const chosen=state.scope==="subfield"?(state.subfield||field().code):"";
   const code=/^[a-z-]+(?:\.[A-Za-z-]+)?$/.test(chosen)?chosen:field().code;
   const officialCode=state.scope==="subfield"&&/^[a-z-]+(?:\.[A-Za-z-]+)?$/.test(code)?code:"";
-  const q=[officialCode?"cat:"+officialCode:"",term?"all:"+term.replace(/[:()"\\]/g," "):""].filter(Boolean).join(" AND ")||"all:science";
+  const archiveWide="("+[...new Set(definition.groups.flatMap(g=>g.areas.map(a=>a.code)))].map(c=>"cat:"+c).join(" OR ")+")";
+  const q=[officialCode?"cat:"+officialCode:"",term?"all:"+term.replace(/[:()"\\]/g," "):""].filter(Boolean).join(" AND ")||archiveWide;
   const url="https://export.arxiv.org/api/query?"+new URLSearchParams({search_query:q,start:"0",max_results:"100",sortBy:(state.sort==="recent"||!term)?"submittedDate":"relevance",sortOrder:"descending"});
   const c=new AbortController(),timer=setTimeout(()=>c.abort(),15000);
   try{const r=await fetch(url,{signal:c.signal});if(!r.ok)throw Error("HTTP "+r.status);return atom(await r.text())}finally{clearTimeout(timer)}
