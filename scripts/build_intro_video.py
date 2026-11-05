@@ -17,24 +17,26 @@ from PIL import Image, ImageDraw, ImageFont
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "docs" / "assets"
 WIDTH, HEIGHT, FPS = 960, 540, 12
-SECONDS = 9
+SECONDS = 6
 SCENES = [
- ("Welcome to Axiovo", "Explore three independent preprint archives.",
-  "Welcome to Axiovo. Choose between arXiv, bioRxiv and ChemRxiv to explore scientific preprints."),
- ("Start with an archive", "arXiv, bioRxiv and ChemRxiv.",
-  "The home page presents three equal choices. Each opens its own archive discovery page."),
- ("Discover arXiv", "Browse physics, mathematics, computing and more.",
-  "Explore the full arXiv subject taxonomy, select an official category and search research papers."),
- ("Discover bioRxiv", "Browse life-science subject areas.",
-  "Choose a biological subject, refine your query and inspect verified preprint records."),
- ("Discover ChemRxiv", "Find chemistry and materials preprints.",
-  "Choose chemistry research areas, search by topic and follow source linked DOI records."),
- ("Customize research interests", "Add and remove specialized subtopics.",
-  "Each archive lets you customize research interests and filter by subfield."),
- ("Save your research", "Collect papers and add private notes.",
-  "Save papers to My Library and organize research collections on your own device."),
- ("Continue with Axiovo", "Research Assistant and reading tools.",
-  "Use Research Assistant and research tools to explore source linked evidence and organize reading.")
+ ("Welcome to Axiovo", "Discover research through three independent archives.",
+  "Axiovo helps you discover research in arXiv, bioRxiv and ChemRxiv. Begin by choosing the archive that fits your work."),
+ ("Three independent Discover pages", "Source-specific fields, categories and records.",
+  "Each archive has its own Discover page, with its own subject areas and original source links. Papers are not mixed across servers."),
+ ("Explore all arXiv fields", "Physics, mathematics, computing and other disciplines.",
+  "Browse official arXiv subjects across physics, mathematics, computer science, statistics, finance, engineering, biology and economics."),
+ ("Browse life sciences and chemistry", "Independent bioRxiv and ChemRxiv experiences.",
+  "Explore bioRxiv subjects such as neuroscience and genomics, or ChemRxiv areas such as catalysis and materials chemistry."),
+ ("Refine your research interests", "Topic, field, subfield and custom search refinements.",
+  "Select a subject and subfield, or add your own search refinements. These choices are saved in your browser."),
+ ("Search original preprints", "Keywords, dates, authors, sort order and source links.",
+  "Search paper metadata, filter by dates and authors, and open the original paper. The site reports its available index coverage."),
+ ("Organize papers in My Library", "Saved reading lists, projects and private notes.",
+  "Save papers locally, organize collections and revisit private notes and research questions."),
+ ("Read, compare and analyze", "PDF tools, comparisons and a research assistant.",
+  "Use PDF reading tools, compare publication metadata, and explore evidence with the Research Assistant. Local model use is optional."),
+ ("Research starts with evidence", "Discover. Verify. Save. Revisit.",
+  "Axiovo is an independent open source project. Follow the original evidence and organize your research in one place.")
 ]
 BG=(8,27,47); SURFACE=(14,43,67); SURFACE2=(22,59,85)
 WHITE=(242,249,254); MUTED=(161,193,211); BLUE=(38,135,206)
@@ -86,70 +88,83 @@ def base(n):
 def frame(n):
     im,d=base(n)
     card(d,(35,224,925,462))
-    if n==0:
-        card(d,(54,261,461,412),SURFACE2,14)
-        card(d,(489,261,896,412),SURFACE2,14)
-        label(d,81,289,"AXIO",F32,CYAN)
-        label(d,82,348,"Axiom: foundations",F18,WHITE)
-        label(d,515,289,"NOVO",F32,CYAN)
-        label(d,517,348,"New discovery",F18,WHITE)
-    elif n==1:
-        x=55
-        for word in ("quant-ph","cs.IT","physics.optics"):
-            x+=pill(d,x,244,word)+12
-        paper(d,55,294,"Measurement incompatibility in networks","Recent arXiv metadata")
-        paper(d,474,294,"Secure protocols under noise","New submissions and updates")
-        label(d,57,420,"Coverage is selected categories; source freshness can vary.",F12,MUTED)
+    if n in (0,1):
+        for i,(name,rows) in enumerate((
+            ("arXiv",("Physics · mathematics","Computing · statistics")),
+            ("bioRxiv",("Neuroscience · genomics","Cell biology · ecology")),
+            ("ChemRxiv",("Catalysis · materials","Organic · analytical")))):
+            x=53+i*287
+            card(d,(x,249,x+268,439),SURFACE2,13)
+            label(d,x+17,273,name,F26,CYAN)
+            label(d,x+17,328,rows[0],F12,MUTED)
+            label(d,x+17,355,rows[1],F12,MUTED)
+            pill(d,x+17,396,"Explore "+name)
+        if n==1:
+            label(d,62,449,"Each link opens its own independent Discover page.",F10,MUTED)
     elif n==2:
-        label(d,56,246,"Research field",F12,MUTED)
-        card(d,(56,275,437,320),SURFACE2,9)
-        label(d,69,286,"Quantum information & physics",F14,WHITE)
-        label(d,470,246,"Search",F12,MUTED)
-        card(d,(470,275,901,320),SURFACE2,9)
-        label(d,483,286,"Contextuality and quantum networks",F14,WHITE)
-        paper(d,56,343,"Device-independent cryptography","Live research search")
-        paper(d,474,343,"Network steering witnesses","Results stay on Axiovo")
+        topics=(("PHYSICS","astro-ph · cond-mat · quant-ph"),
+                ("MATHEMATICS","math.AG · math.PR · math.IT"),
+                ("COMPUTER SCIENCE","cs.AI · cs.LG · cs.CR"),
+                ("OTHER FIELDS","q-bio · q-fin · stat · eess · econ"))
+        for i,(title,codes) in enumerate(topics):
+            x=55+(i%2)*436
+            y=244+(i//2)*102
+            card(d,(x,y,x+412,y+88),SURFACE2,10)
+            label(d,x+15,y+12,title,F18,CYAN)
+            label(d,x+15,y+50,codes,F12,MUTED)
     elif n==3:
-        x=55
-        for word in ("Steering","Contextuality","Quantum sensing"):
-            x+=pill(d,x,250,word)+12
-        paper(d,55,307,"Steering-based certification in networks","Why this paper appeared: matches Steering",width=839)
-        label(d,56,428,"Keyword relevance is not scientific novelty verification.",F12,MUTED)
+        card(d,(53,247,457,439),SURFACE2,12)
+        label(d,75,265,"bioRxiv",F26,CYAN)
+        for i,t in enumerate(("Neuroscience","Genomics","Ecology","Bioinformatics")):
+            pill(d,75,313+(i//2)*47,t)
+        card(d,(480,247,906,439),SURFACE2,12)
+        label(d,500,265,"ChemRxiv",F26,CYAN)
+        for i,t in enumerate(("Catalysis","Materials chemistry","Physical chemistry")):
+            pill(d,502,313+i*39,t)
     elif n==4:
-        for i,head in enumerate(("To read","Reading","Finished")):
-            x=55+i*288
-            card(d,(x,248,x+269,438),SURFACE2,14)
-            pill(d,x+15,265,head)
-            card(d,(x+15,314,x+251,393),(22,77,104),10)
-            label(d,x+26,329,("A new paper","A useful proof","Reviewed work")[i],F14)
-            label(d,x+26,360,("Save for later","Check Eq. 8","Archived in library")[i],F12,MUTED)
+        headings=(("01 · TOPIC","Physics"),("02 · FIELD","Quantum physics"),("03 · SUBFIELD","Quantum networks"))
+        for i,(head,value) in enumerate(headings):
+            x=56+i*282
+            card(d,(x,264,x+265,344),SURFACE2,10)
+            label(d,x+13,272,head,F12,MUTED)
+            label(d,x+13,303,value,F18,WHITE)
+        pill(d,63,380,"+ Add custom subfield")
+        pill(d,276,380,"Reset to defaults")
+        label(d,63,432,"Custom subfields are personal search terms, not official source classifications.",F12,MUTED)
     elif n==5:
-        card(d,(56,242,577,444),SURFACE2,12)
-        card(d,(74,257,383,429),(232,241,248),8)
-        for i in range(6):
-            d.rounded_rectangle((92,277+i*22,355-(i%3)*31,282+i*22),radius=2,fill=(130,160,183))
-        label(d,403,271,"Page notes",F18)
-        label(d,403,318,"Check assumption",F12,MUTED)
-        label(d,403,340,"before Theorem 2.",F12,MUTED)
-        card(d,(601,242,900,444),SURFACE2,12)
-        label(d,620,265,"Compare papers",F18)
-        paper(d,619,304,"Paper A","Methods & assumptions",width=258)
+        card(d,(55,249,902,316),SURFACE2,12)
+        label(d,72,267,"Search:    molecular networks",F18,WHITE)
+        for i,t in enumerate(("Selected archive","Newest","Date range","Author")):
+            pill(d,60+i*207,344,t)
+        paper(d,61,395,"Source-linked preprint metadata","Verify dates, abstracts and original archive",width=835)
     elif n==6:
-        card(d,(56,245,895,438),SURFACE2,12)
-        label(d,77,262,"My research question",F18)
-        card(d,(78,305,610,351),SURFACE,9)
-        label(d,93,318,"What enables secure quantum networks?",F14)
-        pill(d,77,376,"Keywords: quantum networks, steering")
-        card(d,(641,305,866,401),SURFACE,10)
-        label(d,657,323,"Related papers",F14)
-        label(d,657,352,"Source-linked results",F12,CYAN)
+        for i,(head,a,b) in enumerate((
+            ("TO READ","Saved paper","Open later"),
+            ("READING","Private notes","Research project"),
+            ("FINISHED","Reviewed work","Collection"))):
+            x=54+i*288
+            card(d,(x,245,x+266,437),SURFACE2,12)
+            label(d,x+17,263,head,F18,CYAN)
+            paper(d,x+14,311,a,b,width=234)
+        label(d,66,448,"Your Library stays on this browser unless you export or sync it.",F10,MUTED)
+    elif n==7:
+        for i,(head,sub) in enumerate((
+            ("PDF READER","Open local PDFs and annotate"),
+            ("COMPARE","Inspect two paper records"),
+            ("RESEARCH AI","Source-led analysis; local AI optional"))):
+            x=53+i*287
+            card(d,(x,250,x+268,433),SURFACE2,12)
+            label(d,x+15,266,head,F18,CYAN)
+            label(d,x+15,320,sub[:29],F12,MUTED)
+            if len(sub)>29: label(d,x+15,343,sub[29:],F12,MUTED)
+            pill(d,x+15,389,"Open tool")
     else:
-        card(d,(65,255,143,334),BLUE,15)
-        label(d,89,268,"A",F32)
-        label(d,175,267,"Axiovo",F32)
-        label(d,177,314,"Open source tools for researchers",F14,MUTED)
-        pill(d,177,373,"Start exploring")
-        label(d,365,382,"Discover  >  My workspace  >  Research tools",F12,CYAN)
+        card(d,(65,259,153,347),BLUE,15)
+        label(d,95,271,"A",F32)
+        label(d,188,261,"Axiovo",F32)
+        label(d,190,312,"Open research discovery",F18,CYAN)
+        pill(d,190,370,"Discover  ·  Verify  ·  Save  ·  Revisit")
+        label(d,190,426,"Independent from arXiv, bioRxiv and ChemRxiv.",F12,MUTED)
     return im
 
 def timestamp(s):
