@@ -96,16 +96,10 @@ def main():
                 assert page.locator("#question").count()==1
                 assert page.locator("#ask").count()==1
                 page.locator(".assistant-advanced").first.evaluate("el=>el.open=true")
-                page.locator("#engine").select_option("hosted")
-                assert page.locator("#hosted-settings").is_visible()
-                for provider in ("openrouter","openai","moonshot","gemini"):
-                    page.locator("#hosted-provider").select_option(provider)
-                    assert page.locator("#hosted-model").input_value(),provider
-                page.locator("#hosted-key").fill("test-key-not-real")
-                page.locator("#clear-hosted-key").click()
-                assert page.locator("#hosted-key").input_value()==""
-                page.locator("#engine").select_option("evidence")
-                assert not page.locator("#hosted-settings").is_visible()
+                assert page.locator("#engine option[value=hosted]").is_disabled(), "No server configured: hosted mode must be disabled"
+                assert page.locator("#hosted-key").count()==0, "Browser must not collect API secrets"
+                assert page.locator("#clear-hosted-key").count()==0
+                assert page.locator("#engine").input_value()=="evidence"
                 page.goto(base+"profiles.html",wait_until="domcontentloaded")
                 before = page.evaluate("document.documentElement.dataset.theme")
                 page.locator(".axiovo-header-appearance .theme-toggle").click()
