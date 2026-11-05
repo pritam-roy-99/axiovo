@@ -84,3 +84,13 @@ body.axiovo-home .axiovo-entry-intro{max-width:810px}
 .axiovo-entry-card{max-width:none!important}
 .axiovo-entry-intro{max-width:790px!important}
 @media(max-width:800px){.axiovo-archive-grid{grid-template-columns:1fr}.axiovo-archive-card{min-height:145px;padding:17px}.axiovo-archive-description{flex:initial}}
+
+/* Homepage: real full-width video leads, then three equally weighted archives. */
+.axiovo-video-top{padding:22px;margin:0 0 25px;background:var(--rl-panel,#fff);border:1px solid var(--rl-border,#cbdde9);border-radius:17px}
+.axiovo-video-top h2{margin:0 0 5px;font-size:20px;letter-spacing:-.025em}
+.axiovo-video-top>p{font-size:12px;color:var(--rl-muted,#617d90);margin:0 0 14px}
+.axiovo-video-top .rl-home-demo{width:100%;max-width:none;box-sizing:border-box}
+.axiovo-video-top .rl-home-demo video{width:100%;aspect-ratio:16/9;max-height:610px;object-fit:contain;background:#091e34;border-radius:10px}
+.axiovo-video-top .axiovo-video-details{display:block}
+.axiovo-video-top .rl-home-demo-head{color:#f5f9ff}
+@media(max-width:700px){.axiovo-video-top{padding:12px}.axiovo-video-top h2{font-size:17px}}
