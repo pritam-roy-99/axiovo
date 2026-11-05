@@ -28,7 +28,15 @@ def main():
         with sync_playwright() as pw:
             browser=pw.chromium.launch(headless=True,args=["--no-sandbox","--disable-dev-shm-usage"])
             page=browser.new_page(viewport={"width":1280,"height":900})
-            page.set_default_timeout(11000)
+            page.set_default_timeout(14000)
+            page_errors=[]
+            failed_assets=[]
+            page.on("pageerror",lambda error:page_errors.append(str(error)))
+            def check_response(response):
+                u=urlsplit(response.url)
+                if u.hostname=="127.0.0.1" and response.status>=400 and u.path.endswith((".html",".js",".css",".webmanifest")):
+                    failed_assets.append((response.status,u.path))
+            page.on("response",check_response)
             def go(path):
                 page.goto(base+path,wait_until="domcontentloaded",timeout=25000)
             def assert_path(path):
@@ -60,11 +68,24 @@ def main():
             assert page.locator("#scholarly-discovery").is_visible()
             assert page.locator(".axiovo-scholar-tools > summary").count()==1
             checked.append("source tabs and advanced sections")
+            page.locator("#rl-source-biorxiv").click()
+            assert page.locator("#biorxiv-discovery").is_visible()
+            page.locator("#rl-source-arxiv").click()
+            assert page.locator("#arxiv-discovery").is_visible()
+            page.locator("#papers .paper .rl-save-button").first.wait_for(timeout=16000)
+            paper=page.locator("#papers .paper").first
+            paper_id=paper.get_attribute("data-paper-id")
+            assert paper_id,"Indexed paper card has no arXiv identifier"
+            paper.locator(".rl-save-button").click()
+            assert paper_id in page.evaluate('JSON.parse(localStorage.getItem("researchlens-reading-list")||"[]")')
+            checked.append("arXiv browsing and saving to Library")
             target_is(".rl-nav a:nth-child(2)","discover.html#workspace")
             page.locator(".rl-nav a:nth-child(2)").click()
             page.wait_for_url(lambda u:urlsplit(u).path.endswith("/discover.html") and urlsplit(u).fragment=="workspace")
             page.locator("#workspace-panel #research-questions").wait_for(timeout=16000)
-            checked.append("Library SPA navigation")
+            assert page.locator("#workspace-panel #library-list").is_visible()
+            assert paper_id in page.locator("#workspace-panel #library-list").inner_text(timeout=10000) or paper_id in page.locator("#workspace-panel").inner_text(),"Saved paper missing from Library after navigation"
+            checked.append("Library SPA navigation and saved paper persistence")
             page.locator(".rl-nav a:nth-child(1)").click()
             page.wait_for_url(lambda u:urlsplit(u).path.endswith("/discover.html") and urlsplit(u).fragment=="discover")
             assert page.locator("#discover-shell").is_visible()
@@ -82,6 +103,9 @@ def main():
             assert page.locator("main").count()==1
             target_is(".rl-nav a:nth-child(1)","discover.html#discover")
             checked.append("Research Assistant navigation")
+            assert not failed_assets, "Broken local HTML/JS/CSS resources: "+repr(failed_assets)
+            assert not page_errors, "Unhandled JavaScript errors: "+repr(page_errors)
+            checked.append("No broken local assets or unhandled page errors")
             browser.close()
     finally:
         server.shutdown()
