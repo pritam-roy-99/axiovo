@@ -106,6 +106,17 @@ def main():
             assert not failed_assets, "Broken local HTML/JS/CSS resources: "+repr(failed_assets)
             assert not page_errors, "Unhandled JavaScript errors: "+repr(page_errors)
             checked.append("No broken local assets or unhandled page errors")
+            mobile=browser.new_page(viewport={"width":390,"height":844},device_scale_factor=1)
+            mobile.set_default_timeout(13000)
+            for path,ready in [("","#axiovo-entry-form"),("discover.html#discover","#rl-source-arxiv"),
+                               ("discover.html?view=scholarly#discover","#scholar-search-form"),
+                               ("discover.html#workspace","#workspace-panel #library-list")]:
+                mobile.goto(base+path,wait_until="domcontentloaded",timeout=25000)
+                mobile.locator(ready).wait_for(timeout=17000)
+                overflow=mobile.evaluate("Math.max(0,document.documentElement.scrollWidth-window.innerWidth)")
+                assert overflow<=5,("Horizontal overflow on mobile",path,overflow)
+                checked.append("mobile "+(path or "homepage"))
+            mobile.close()
             browser.close()
     finally:
         server.shutdown()
