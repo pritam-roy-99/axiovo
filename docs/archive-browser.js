@@ -14,7 +14,8 @@ const clean=x=>String(x??"").trim();
 const simple=x=>clean(x).toLowerCase().normalize("NFKD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9\s.\/-]/g," ").replace(/\s+/g," ");
 const make=(tag,cls,value)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(value!==undefined)e.textContent=value;return e};
 let state=read(memory,{topic:0,field:0,subfield:"",query:"",author:"",affiliation:"",scope:"subfield",sort:"relevance",from:"",to:""});
-let custom=read(customKey,{}),localPapers=[],shown=[],allResults=[],page=0,lastSync="";
+let custom=read(customKey,{}),localPapers=[],shown=[],allResults=[],page=0,lastSync="",requestSeq=0;
+const responseCache=new Map();
 const group=()=>definition.groups[Number(state.topic)]||definition.groups[0];
 const field=()=>group().areas[Number(state.field)]||group().areas[0];
 const userSubs=()=>Array.isArray(custom[field().code])?custom[field().code]:[];
@@ -194,7 +195,7 @@ function card(p){
  titleButton.type="button";titleButton.setAttribute("aria-label","View paper details for "+p.title);
  title.append(titleButton);root.append(title);
  const author=make("p","axiovo-paper-meta");
- p.authors.slice(0,25).forEach((name,i)=>{if(i)author.append(document.createTextNode(", "));const b=make("button","axiovo-author-link",name);b.type="button";b.onclick=()=>{$("archive-author").value=name;search()};author.append(b)});
+ p.authors.slice(0,25).forEach((name,i)=>{if(i)author.append(document.createTextNode(", "));const b=make("button","axiovo-author-link",name);b.type="button";b.onclick=()=>{$("archive-author").value=name;$("archive-query").value="";$("archive-scope").value="all";search()};author.append(b)});
  if(!p.authors.length)author.textContent="Author metadata unavailable";root.append(author);
  if(p.affiliations?.length)root.append(make("p","axiovo-paper-meta","Affiliations: "+p.affiliations.slice(0,5).join("; ")));
  root.append(make("p","axiovo-abstract",(p.abstract||"Abstract unavailable in this source").slice(0,460)+(p.abstract.length>460?"…":"")));
@@ -237,15 +238,27 @@ function render(){
 async function search(){
  state.query=$("archive-query").value.trim();state.author=$("archive-author").value.trim();state.affiliation=$("archive-affiliation").value.trim();
  state.scope=$("archive-scope").value;state.sort=$("archive-sort").value;state.from=$("archive-from").value;state.to=$("archive-to").value;remember();
- page=0;$("archive-result-count").textContent="Searching source metadata…";
+ page=0;const seq=++requestSeq;
+ // Show cached results immediately while a separate remote request updates them.
+ allResults=[...localPapers];render();
+ $("archive-result-count").textContent="Showing cached source records; refreshing search…";
+ const cacheKey=JSON.stringify([source,state.topic,state.field,state.subfield,state.query,state.author,state.affiliation,state.scope,state.sort]);
  let fresh=[],extra=[],error="";
- const settled=await Promise.allSettled([remote(),sourceVerifiedOpenAlex()]);
- if(settled[0].status==="fulfilled")fresh=settled[0].value;
- else error=clean(settled[0].reason?.message||"Remote unavailable").slice(0,90);
- if(settled[1].status==="fulfilled")extra=settled[1].value;
+ const cached=responseCache.get(cacheKey);
+ if(cached&&Date.now()-cached.time<300000){fresh=cached.fresh;extra=cached.extra;error=cached.error}
+ else{
+  const settled=await Promise.allSettled([remote(),sourceVerifiedOpenAlex()]);
+  if(seq!==requestSeq)return;
+  if(settled[0].status==="fulfilled")fresh=settled[0].value;
+  else error=clean(settled[0].reason?.message||"Remote unavailable").slice(0,90);
+  if(settled[1].status==="fulfilled")extra=settled[1].value;
+  responseCache.set(cacheKey,{time:Date.now(),fresh,extra,error});
+  if(responseCache.size>25)responseCache.delete(responseCache.keys().next().value);
+ }
+ if(seq!==requestSeq)return;
  const unique=new Map();for(const p of [...localPapers,...extra,...fresh])if(verified(p))unique.set(p.id,p);
  allResults=[...unique.values()];
- $("archive-sync-status").textContent=(error?"Live query unavailable ("+error+"); showing verified cached records. ":"Source query completed. ")+allResults.length+" verified records retrieved or cached"+(lastSync?" · cached snapshot "+lastSync:"")+". Optional OpenAlex matches were accepted only when native archive identity was verified. Not a complete historical archive.";
+ $("archive-sync-status").textContent=(error?"Live query unavailable ("+error+"); showing verified cached records. ":"Source query completed. ")+allResults.length+" verified records retrieved or cached"+(lastSync?" · cached snapshot "+lastSync:"")+". Optional OpenAlex matches accepted only with native archive verification. Not a complete historical archive.";
  render();
 }
 async function init(){
