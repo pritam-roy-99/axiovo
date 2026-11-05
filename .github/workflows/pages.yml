@@ -17,7 +17,7 @@ permissions:
   pages: write
   id-token: write
 concurrency:
-  group: researchlens-pages
+  group: axiovo-pages
   cancel-in-progress: true
 jobs:
   publish:
@@ -154,9 +154,9 @@ jobs:
         uses: actions/cache@v4
         with:
           path: |
-            docs/assets/researchlens-tour.mp4
-            docs/assets/researchlens-tour-poster.jpg
-            docs/assets/researchlens-tour.vtt
+            docs/assets/axiovo-tour.mp4
+            docs/assets/axiovo-tour-poster.jpg
+            docs/assets/axiovo-tour.vtt
           key: axiovo-three-archives-v5-${{ hashFiles('scripts/build_live_demo.py', 'docs/index.html', 'docs/arxiv.html', 'docs/biorxiv.html', 'docs/chemrxiv.html', 'docs/archive-browser.js', 'docs/archive-browser.css', 'docs/archive-taxonomy.js', 'docs/research-entry.css') }}
       - name: Install Chromium browser test dependencies
         run: |
@@ -176,9 +176,9 @@ jobs:
         run: python scripts/build_live_demo.py
       - name: Verify homepage video assets
         run: |
-          test -s docs/assets/researchlens-tour.mp4
-          test -s docs/assets/researchlens-tour-poster.jpg
-          test -s docs/assets/researchlens-tour.vtt
+          test -s docs/assets/axiovo-tour.mp4
+          test -s docs/assets/axiovo-tour-poster.jpg
+          test -s docs/assets/axiovo-tour.vtt
       - name: Render first-paint snapshot with actual index counts
         run: python -m scripts.build_snapshot
       - name: Build Atom topic subscriptions
