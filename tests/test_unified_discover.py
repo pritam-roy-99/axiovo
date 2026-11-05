@@ -39,7 +39,7 @@ class UnifiedDiscoverTests(unittest.TestCase):
 
     def test_legacy_field_explorer_preserves_links(self):
         html=(ROOT/"fields.html").read_text(encoding="utf8")
-        self.assertIn("location.replace(next.href)",html)
+        self.assertIn("location.replace(url.href)",html)
         self.assertIn('next.searchParams.set("view","scholarly")',html)
         self.assertIn("old.forEach",html)
 
@@ -55,7 +55,7 @@ class UnifiedDiscoverTests(unittest.TestCase):
 
     def test_navigation_uses_one_discover_link(self):
         nav=(ROOT/"navigation.js").read_text(encoding="utf8")
-        self.assertIn('["./discover.html#discover","Discover"]',nav)
+        self.assertIn('["./","Discover archives"]',nav)
         self.assertNotIn('["./fields.html","Explore fields"]',nav)
         self.assertNotIn('["./","arXiv feed"]',nav)
 
