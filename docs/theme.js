@@ -1,7 +1,20 @@
+/* One-time, non-destructive migration from the previous application namespace.
+   Retain old keys so older tabs/releases cannot erase a user's saved work. */
+try {
+  for (let i = 0; i < localStorage.length; i++) {
+    const oldKey = localStorage.key(i);
+    if (!oldKey || !/^researchlens(?:-|$)/i.test(oldKey)) continue;
+    const newKey = oldKey.replace(/^researchlens/i, "axiovo");
+    if (localStorage.getItem(newKey) === null) {
+      const value = localStorage.getItem(oldKey);
+      if (value !== null) localStorage.setItem(newKey, value);
+    }
+  }
+} catch (_) { /* storage may be unavailable in private browsing */ }
 /* Local appearance settings shared across Axiovo, without accounts or trackers. */
 (function(){
  "use strict";
- const KEY="researchlens-theme",PALETTE_KEY="axiovo-palette-v1";
+ const KEY="axiovo-theme",PALETTE_KEY="axiovo-palette-v1";
  const allowed=["ocean","forest","violet","rose","amber"];
  let theme="light",palette="ocean";
  try{theme=localStorage.getItem(KEY)==="dark"?"dark":"light";
