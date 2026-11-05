@@ -1,0 +1,42 @@
+/* Axiovo two-stage research entry. Landing is intentionally short.
+   The existing scholarly workflow lives on discover.html. */
+body.axiovo-home .hero,
+body.axiovo-home > main,
+body.axiovo-home > footer{display:none!important}
+body.axiovo-discover .hero{display:none!important}
+body.axiovo-discover > main{padding-top:20px}
+body.axiovo-home{background:var(--rl-bg,#f3f7fb)}
+.axiovo-entry{max-width:1130px;margin:0 auto;padding:clamp(25px,5vw,62px) 20px 36px;color:var(--rl-text,#17324b)}
+.axiovo-entry-intro{max-width:740px;margin-bottom:25px}
+.axiovo-entry-kicker{text-transform:uppercase;letter-spacing:.11em;font-size:11px;font-weight:800;color:var(--axiovo-accent,#146f9d)}
+.axiovo-entry h1{font-size:clamp(30px,4.4vw,49px);line-height:1.13;letter-spacing:-.045em;margin:10px 0 13px;color:var(--rl-text,#17324b)}
+.axiovo-entry-lead{font-size:15px;line-height:1.7;margin:0;color:var(--rl-muted,#607a91)}
+.axiovo-entry-card{border:1px solid var(--rl-border,#cbdde9);border-radius:18px;background:var(--rl-panel,#fff);padding:clamp(19px,3vw,30px);box-shadow:0 8px 27px #081f3710}
+.axiovo-entry-card-header{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:19px}
+.axiovo-entry-card-header h2{font-size:19px;margin:0;color:var(--rl-text,#17324b)}
+.axiovo-entry-card-header span{font-size:12px;color:var(--rl-muted,#607a91)}
+.axiovo-entry-fields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.axiovo-entry-fields label{display:grid;gap:8px;font-size:12px;font-weight:750;color:var(--rl-text,#17324b)}
+.axiovo-entry-fields select{width:100%;min-width:0;min-height:48px;font-size:14px;padding:11px 12px;border:1px solid var(--rl-border,#bbd1e0);border-radius:10px;color:var(--rl-text,#17324b);background:var(--rl-panel,#fff)}
+.axiovo-entry-actions{display:flex;align-items:center;gap:11px;flex-wrap:wrap;margin-top:22px}
+.axiovo-entry-actions a,.axiovo-entry-actions button{display:inline-flex;align-items:center;justify-content:center;min-height:45px;padding:11px 17px;text-decoration:none;font-size:13px;font-weight:750;border-radius:10px;cursor:pointer;border:1px solid var(--rl-border,#bdd2df);background:var(--rl-panel,#fff);color:var(--rl-text,#17324b)}
+.axiovo-entry-actions .axiovo-entry-primary{background:var(--axiovo-accent,#146f9d)!important;color:#fff!important;border-color:var(--axiovo-accent,#146f9d)!important}
+.axiovo-entry-actions .axiovo-entry-primary:hover{filter:brightness(.93)}
+.axiovo-entry-actions .axiovo-entry-secondary{background:var(--rl-soft,#eaf3fa)}
+.axiovo-entry-note{margin:16px 0 0;font-size:12px;line-height:1.6;color:var(--rl-muted,#607a91)}
+.axiovo-entry-footer{display:flex;justify-content:space-between;gap:15px;align-items:center;flex-wrap:wrap;margin:20px 0}
+.axiovo-entry-footer a{font-size:12px;font-weight:700;color:var(--axiovo-accent,#146f9d)}
+.axiovo-entry-demo{border:1px solid var(--rl-border,#cbdde9);border-radius:13px;background:var(--rl-panel,#fff);padding:13px 16px;margin:23px 0 0}
+.axiovo-entry-demo>summary{font-size:13px;font-weight:750;cursor:pointer;color:var(--rl-text,#17324b);padding:3px}
+.axiovo-entry-demo-content{margin-top:14px;max-width:800px}
+.axiovo-entry-demo .rl-home-demo{box-shadow:none;max-width:800px;width:100%;margin:0;background:#081f36;border-radius:12px}
+.axiovo-entry-demo .rl-home-demo-head{display:none}
+.axiovo-entry-demo .rl-home-demo video{width:100%;aspect-ratio:16/9}
+.axiovo-entry-help{margin:12px 0 0;font-size:12px;color:var(--rl-muted,#607a91)}
+.axiovo-entry-help a{color:var(--axiovo-accent,#146f9d);font-weight:700}
+.axiovo-discover .rl-unified-switch{margin-top:10px}
+.axiovo-discover #rl-focus-bar{scroll-margin-top:65px}
+.axiovo-discover .rl-discover-switch{margin-top:0}
+@media(max-width:770px){.axiovo-entry-fields{grid-template-columns:1fr}.axiovo-entry{padding:26px 14px}.axiovo-entry-card{padding:18px}.axiovo-entry-actions>*{flex:1 1 170px}.axiovo-entry-lead{font-size:14px}}
+@media(max-width:440px){.axiovo-entry-card-header{display:block}.axiovo-entry-card-header span{display:block;margin-top:5px}.axiovo-entry-actions>*{flex:1 1 100%}}
+:root[data-theme="dark"] .axiovo-entry-card,:root[data-theme="dark"] .axiovo-entry-demo{box-shadow:none}
