@@ -118,6 +118,6 @@ const SUBTOPICS={
 function fieldTopics(field,topic){return (SUBTOPICS[field]||{})[topic]||[]}
 function fieldKey(value){return Object.prototype.hasOwnProperty.call(FIELDS,value)?value:"general"}
 if(typeof module==="object"&&module.exports)module.exports={FIELDS,SUBTOPICS,fieldTopics,fieldKey};
-if(typeof window!=="undefined")window.ResearchLensFields=Object.freeze({FIELDS,SUBTOPICS,fieldTopics,fieldKey});
+if(typeof window!=="undefined")window.AxiovoFields=Object.freeze({FIELDS,SUBTOPICS,fieldTopics,fieldKey});
 
 })();
