@@ -89,7 +89,7 @@ Use Discover → **Search with Consensus (local API)**. The local HTTP server bi
 
 ## Install or run locally (no build step)
 
-- **Android / desktop:** Open [Axiovo](https://pritam-roy-99.github.io/researchlens/) in Chrome or Edge and use **Install app** or **Add to Home screen** when the browser offers it.
+- **Android / desktop:** Open [Axiovo](https://pritam-roy-99.github.io/axiovo/) in Chrome or Edge and use **Install app** or **Add to Home screen** when the browser offers it.
 - **Run on your computer:** Download or clone this GitHub repository, then run `python3 run.py` (Windows: `py run.py`). The app opens in your browser on a local address. Stop with Ctrl+C.
 - **Offline:** Previously visited app pages and scripts can work offline. Live scholarly search, remote PDFs, external discussions, and model downloads still need internet. Data saved in your browser is not automatically synced.
 
@@ -100,7 +100,7 @@ See [LOCAL_APP.md](LOCAL_APP.md) for complete installation, update, and privacy 
 
 ## Field Explorer (proposed Axiovo 2.0 workspace)
 
-Open **[Explore by field](https://pritam-roy-99.github.io/researchlens/fields.html)** after this feature branch is merged and deployed.
+Open **[Explore by field](https://pritam-roy-99.github.io/axiovo/fields.html)** after this feature branch is merged and deployed.
 
 - Nine discipline presets: quantum information/physics, mathematics, astrophysics, computer science/AI, biology, medicine/public health, chemistry/materials, engineering/robotics, and social sciences/economics.
 - Topic chips, suggested literature searches, custom research topics, and field-specific evaluation checklists.
@@ -113,13 +113,13 @@ Open **[Explore by field](https://pritam-roy-99.github.io/researchlens/fields.ht
 
 ## Researcher workspace and consistent navigation
 
-**New:** [My research workspace](https://pritam-roy-99.github.io/researchlens/workspace.html) gives researchers a single starting point with their selected Field Explorer focus, latest papers from the existing arXiv snapshot, unified browser-local saved reading from the arXiv feed and OpenAlex Field Explorer, reading progress (to-read/reading/finished), private notes, keyword filtering and library exports (JSON/BibTeX). A responsive navigation bar now appears on the site's primary pages, allowing one-click access to the Workspace, arXiv Feed, Field Explorer, Copilot, AI Lab and Profile. The homepage links directly to the workspace.
+**New:** [My research workspace](https://pritam-roy-99.github.io/axiovo/workspace.html) gives researchers a single starting point with their selected Field Explorer focus, latest papers from the existing arXiv snapshot, unified browser-local saved reading from the arXiv feed and OpenAlex Field Explorer, reading progress (to-read/reading/finished), private notes, keyword filtering and library exports (JSON/BibTeX). A responsive navigation bar now appears on the site's primary pages, allowing one-click access to the Workspace, arXiv Feed, Field Explorer, Copilot, AI Lab and Profile. The homepage links directly to the workspace.
 
 **Data limitations:** Library entries are aggregated from two existing localStorage collections; this is not a server-side account, sync service, verified literature database, or complete arXiv archive. Notes and reading states are stored on the current device. Exported JSON is a backup, not yet an import mechanism for the new unified workspace. External academic metadata retain their source caveats. The workspace displays recent papers already present in the locally indexed feed; it cannot accelerate arXiv ingestion itself.
 
 ## Personalized research discovery and question tracking
 
-The [research workspace](https://pritam-roy-99.github.io/researchlens/workspace.html) now includes **Relevant to your research** and **My research questions**.
+The [research workspace](https://pritam-roy-99.github.io/axiovo/workspace.html) now includes **Relevant to your research** and **My research questions**.
 
 - Choose specific research interests or exact author names; Axiovo additionally uses your Field Explorer topic and followed topics.
 - Rank papers from the **existing local arXiv snapshot** with transparent title, abstract, topic, project keyword and author matching. Each suggestion explains its match; existing saved papers are down-ranked and hidden papers are excluded.
@@ -131,7 +131,7 @@ The [research workspace](https://pritam-roy-99.github.io/researchlens/workspace.
 
 ## Integrated Research Tools (four stage foundations)
 
-Open [Research Tools](https://pritam-roy-99.github.io/researchlens/lab.html) from the shared navigation after deployment. The page combines:
+Open [Research Tools](https://pritam-roy-99.github.io/axiovo/lab.html) from the shared navigation after deployment. The page combines:
 
 - **Stage 2, discovery:** bounded recent metadata mirror from arXiv OAI-PMH plus live OpenAlex searches directly on Axiovo. This is *not* a complete local historical arXiv index or embedding search.
 - **Stage 3, reading:** PDF.js browser-local rendering of user-selected PDF files, page notes, export; side-by-side source-metadata comparison of two locally indexed arXiv papers and user-authored source-checked comparison notes.
@@ -148,7 +148,7 @@ The source is `scripts/build_intro_video.py`. GitHub Actions generates `docs/ass
 
 ## Unified Discover (arXiv + field-aware scholarly search)
 
-Axiovo now offers **one Discover page** at [Axiovo](https://pritam-roy-99.github.io/researchlens/#discover), with two clearly labeled source modes:
+Axiovo now offers **one Discover page** at [Axiovo](https://pritam-roy-99.github.io/axiovo/#discover), with two clearly labeled source modes:
 
 - **Latest arXiv:** the indexed new-submission feed, source categories, arXiv v1 date filters, followed quantum topics, saved and read status, keyboard shortcuts, recommendations, and historical arXiv-linked retrieval via OpenAlex.
 - **Search all fields:** discipline/topic presets, custom interests, live OpenAlex scholarly search, publication date and sort filters, pages, saved OpenAlex papers, and BibTeX/JSON export.
@@ -159,7 +159,7 @@ The two modes **do not claim the same source coverage or date semantics**: arXiv
 
 ## Unified Research Assistant
 
-Axiovo combines the former AI Lab and Research Copilot into **one** interface: [Research Assistant](https://pritam-roy-99.github.io/researchlens/copilot.html).
+Axiovo combines the former AI Lab and Research Copilot into **one** interface: [Research Assistant](https://pritam-roy-99.github.io/axiovo/copilot.html).
 
 - Start from a scientific question, arXiv ID or indexed paper; choose literature discovery, contributions, technical explanation, reviewer checks, speculative directions, or claim-and-assumption analysis.
 - Paper selection and comparison integrate AI Lab's separate metadata analysis. A source-linked comparison shows indexed abstracts, original-submission chronology, shared concepts and a checklist for human verification.
@@ -261,7 +261,7 @@ The local feed is still a small arXiv metadata snapshot. Neither OpenAlex result
 
 ## Axiovo Research Copilot
 
-**[Launch Copilot](https://pritam-roy-99.github.io/researchlens/copilot.html)** or open it from any research paper. The copilot has five task modes: literature discovery, contribution comparison, explaining results, reviewer checks, and research directions.
+**[Launch Copilot](https://pritam-roy-99.github.io/axiovo/copilot.html)** or open it from any research paper. The copilot has five task modes: literature discovery, contribution comparison, explaining results, reviewer checks, and research directions.
 
 The **evidence-only** mode works on the static site immediately and retrieves clickable paper references from the local arXiv snapshot. Use **Search wider literature** to query external OpenAlex. The optional **local Ollama** mode connects to an open-weight Qwen3.5 9B or 27B model running on the visitor's own computer. A much smaller Qwen2.5 WebGPU option is also provided for experimentation. GitHub Pages hosts no GPUs and provides **no shared inference server**.
 
@@ -274,7 +274,7 @@ Scientific explanations, model comparisons, and citations are generated from **l
 ## New SciRate-style discovery and community workflow
 
 - **Date browsing:** The research feed filters by a date range of first arXiv submission, for records present in its local snapshot. Global OpenAlex search also supports inclusive publication-date ranges.
-- **Historical arXiv:** The homepage builds a direct arXiv advanced-search link using the selected dates and keywords; it also links to [OpenAlex global search](https://pritam-roy-99.github.io/researchlens/search.html), which supports date-only queries. Axiovo does not locally mirror every paper in arXiv; historical links go to their authoritative records.
+- **Historical arXiv:** The homepage builds a direct arXiv advanced-search link using the selected dates and keywords; it also links to [OpenAlex global search](https://pritam-roy-99.github.io/axiovo/search.html), which supports date-only queries. Axiovo does not locally mirror every paper in arXiv; historical links go to their authoritative records.
 - **Recommendations:** A transparent, device-local "Recommended for me" feed based on topics the researcher follows and papers they save. No server-side personalization data collection.
 - **Paper profiles:** Each record has a shareable \`paper.html?id=<arXiv ID>\` page, PDF / arXiv / SciRate / DOI link-outs (where available), related articles, and author search links.
 - **Real shared discussions and endorsements:** Paper discussion pages look up a GitHub Issue associated with the arXiv ID. Visitors with GitHub accounts can add comments and 👍 reactions to the issue, visible to other researchers. A first discussion thread is seeded for arXiv:2608.13942 at [GitHub issue #1](https://github.com/pritam-roy-99/researchlens/issues/1). This is GitHub-hosted, **not native in-site social functionality**.
@@ -290,17 +290,17 @@ For optional *native* Axiovo authentication, public profiles, follows, comments 
 
 - A pre-rendered static 30-paper snapshot appears at first paint with verified index count and synchronization timestamp. JavaScript progressively upgrades it to a searchable, paginated feed.
 - Homepage displays local coverage (five arXiv categories plus curated historical IDs) and the oldest/newest source v1 publication dates. This is not complete arXiv coverage.
-- **Global scholarly search:** [OpenAlex live search](https://pritam-roy-99.github.io/researchlens/search.html) queries the external OpenAlex corpus, which is much larger than Axiovo's local GitHub Pages snapshot. It is not copied into our database.
-- **Quantum topic subscriptions:** [all-research Atom feed](https://pritam-roy-99.github.io/researchlens/feeds/all.xml) and [example contextuality Atom feed](https://pritam-roy-99.github.io/researchlens/feeds/contextuality.xml).
+- **Global scholarly search:** [OpenAlex live search](https://pritam-roy-99.github.io/axiovo/search.html) queries the external OpenAlex corpus, which is much larger than Axiovo's local GitHub Pages snapshot. It is not copied into our database.
+- **Quantum topic subscriptions:** [all-research Atom feed](https://pritam-roy-99.github.io/axiovo/feeds/all.xml) and [example contextuality Atom feed](https://pritam-roy-99.github.io/axiovo/feeds/contextuality.xml).
 - **Triage:** j/k navigate, s save, r mark as read, h hide, Enter open selected arXiv record. Bookmarks, read/hidden lists and followed topics are browser-local.
 - Export bookmarks as BibTeX, RIS, or JSON; import JSON to restore a reading list and preferences. Paper cards offer arXiv ID and BibTeX copy plus a shareable search URL.
 - Mathematical notation in feed cards uses external MathJax for TeX rendering, with plain text fallback when the CDN is unavailable.
 - The local AI Lab evidence index uses a *title-weighted BM25-style lexical baseline* plus category overlap; larger external OpenAlex searches are optional and explicitly distinguishable. No embedding-based search or validated theorem comparison is implemented yet.
-- [Methodology and coverage](https://pritam-roy-99.github.io/researchlens/methodology.html) documents known errors, refresh cadence, missing benchmark data, and contribution/reporting paths.
+- [Methodology and coverage](https://pritam-roy-99.github.io/axiovo/methodology.html) documents known errors, refresh cadence, missing benchmark data, and contribution/reporting paths.
 
 ## AI Lab (new, public, experimental)
 
-Open **[Axiovo AI Lab](https://pritam-roy-99.github.io/researchlens/ai.html)** from the homepage or from any paper card.
+Open **[Axiovo AI Lab](https://pritam-roy-99.github.io/axiovo/ai.html)** from the homepage or from any paper card.
 
 **Immediately usable without AI hardware:** Select a paper or paste your own manuscript title and abstract, click **Generate evidence report**, and inspect the title/abstract-derived key concepts, publication-dated candidate related papers, and source links. The report can be exported as text. This is deterministic lexical retrieval, not machine learning or proof verification.
 
@@ -315,7 +315,7 @@ The local Ollama API (`api/server.py`) is a separate experimental developer mode
 1. Open **Settings → Pages** in this repository.
 2. Under Build and deployment, set **Source: GitHub Actions**.
 3. Open **Actions → Refresh arXiv and deploy Axiovo → Run workflow** to fetch real papers and deploy.
-4. Once deployment succeeds, visit https://pritam-roy-99.github.io/researchlens/.
+4. Once deployment succeeds, visit https://pritam-roy-99.github.io/axiovo/.
 
 The scheduled refresh checks hourly at minute 17 UTC, with supplementary post-announcement checks at minute 47 during 00:00–05:59 UTC Monday–Friday, on a best-effort basis. Upstream arXiv releases and GitHub scheduling can delay updates. If the API is unavailable, the previous snapshot is retained.
 
