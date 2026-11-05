@@ -175,6 +175,9 @@ Your browser cannot play this video. Read the transcript below to explore the fe
 <footer>Axiovo is an independent open-source research workspace, not affiliated with arXiv, SciRate or other similarly named services. The recent feed uses arXiv metadata; broader discovery uses OpenAlex. <a href="./methodology.html">Coverage and limitations</a> · <a href="https://github.com/pritam-roy-99/axiovo">Source code</a></footer>
 <script>window.MathJax={tex:{inlineMath:[['$','$'],['\(','\)']]},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script><script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 <script>
+/* The homepage is an entry screen. Do not run hidden feed network requests
+   or bind its keyboard shortcuts. Those belong on discover.html. */
+if (document.body.classList.contains("axiovo-discover")) {
 /* In-page category picker: hidden input retains filtering state. No native select can open. */
 (function(){
  const root=document.getElementById("category-picker");
@@ -400,4 +403,5 @@ for(const id of ["q","category","order","crosslist-only"])el(id).addEventListene
  window.addEventListener("researchlens:field-changed",e=>showSelected(e.detail?.field));
 })();
 fetch("data/feed.json",{cache:"no-cache"}).then(r=>{if(!r.ok)throw Error("Feed unavailable");return r.json()}).then(d=>{all=(d.papers||[]).filter(p=>p&&p.id&&p.title);topicCatalog=d.topic_catalog||[];showTopics();el("updated").textContent=d.generated_at?fmt(d.generated_at):"Not yet";const dates=all.map(p=>p.published||p.updated).filter(Boolean).sort();el("coverage").textContent=all.length+" indexed papers · source v1 dates "+(dates[0]||"?").slice(0,10)+" to "+(dates.at(-1)||"?").slice(0,10)+" · synchronized "+(d.generated_at||"unknown")+" · selected arXiv categories across science and mathematics + selected historical IDs. This is not full arXiv coverage.";render();persistState()}).catch(e=>{el("count").textContent="Snapshot shown; live data refresh failed";console.error(e)});
+}
 </script><script defer src="./announcement-view.js"></script><script defer src="./arxiv-freshness.js"></script><script defer src="./arxiv-daily-archive.js"></script><script defer src="./history.js"></script></body></html>
