@@ -33,13 +33,18 @@ class IntroVideoTests(unittest.TestCase):
         self.assertIn("Read video transcript",html)
         self.assertIn("Find papers",html)
         self.assertTrue("My research library" in html or "My Library" in html)
-        self.assertIn("Axiovo combines",html)
+        self.assertIn("current Axiovo interface",html)
         self.assertIn("axiom",html)
 
     def test_video_builder_python_syntax(self):
-        script=ROOT/"scripts/build_intro_video.py"
-        ast.parse(script.read_text(encoding="utf8"),filename=str(script))
-        self.assertIn("What does Axiovo mean?",script.read_text(encoding="utf8"))
+        script=ROOT/"scripts/build_live_demo.py"
+        source=script.read_text(encoding="utf8")
+        ast.parse(source,filename=str(script))
+        self.assertIn("sync_playwright()",source)
+        self.assertIn("page.screenshot(",source)
+        self.assertIn("SCENES = [",source)
+        self.assertIn("researchlens-tour.mp4",source)
+        self.assertNotIn("What does Axiovo mean?",source)
 
 if __name__=="__main__":
     unittest.main()
