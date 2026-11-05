@@ -1,0 +1,19 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Compare research papers | Axiovo</title><meta name="description" content="Side-by-side source-linked research paper comparison.">
+<link rel="stylesheet" href="./theme.css"><link rel="stylesheet" href="./workspace.css"><link rel="stylesheet" href="./research-entry.css"><link rel="stylesheet" href="./paper-research.css">
+<script defer src="./theme.js"></script><script defer src="./navigation.js"></script><script defer src="./compare.js"></script></head>
+<body><header></header>
+<main class="axiovo-compare-page">
+ <nav class="axiovo-breadcrumb"><a href="./">Home</a> / <a href="./discover.html#workspace">Library</a> / Comparison</nav>
+ <h1>Compare research papers</h1>
+ <p class="muted">Compare publication metadata and your own research notes. This is a source-linked research aid, not an AI novelty or equivalence verdict.</p>
+ <form id="compare-form" class="axiovo-compare-form">
+  <label>First arXiv ID<input required id="compare-id-a" placeholder="e.g. 2501.01234" autocomplete="off"></label>
+  <label>Second arXiv ID<input required id="compare-id-b" placeholder="e.g. 2502.05678" autocomplete="off"></label>
+  <button type="submit">Compare papers</button>
+ </form>
+ <p id="compare-message" role="status"></p>
+ <div id="compare-results" class="axiovo-compare-grid"></div>
+ <section class="axiovo-compare-method"><h2>How to use this comparison</h2>
+ <p>Review the full original papers before drawing conclusions about novelty, rigor or implications. Local abstracts can be missing or outdated. Bibliographic metadata does not establish scientific equivalence.</p></section>
+</main><script defer src="./pwa.js"></script></body></html>
