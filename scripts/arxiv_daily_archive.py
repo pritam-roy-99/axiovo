@@ -144,12 +144,25 @@ def select_days(today: dt.date, existing: dict, count: int = 5) -> list[dt.date]
     return selected
 
 
-def run(today: dt.date | None = None, count: int = 5, fetcher=fetch_day) -> dict:
+
+def manual_days(start: str, end: str, limit: int = 31) -> list[dt.date]:
+    first, last = validate_date(start), validate_date(end)
+    if first > last:
+        raise ValueError("Backfill start must not exceed end")
+    number = (last - first).days + 1
+    if number > limit:
+        raise ValueError(f"Select at most {limit} UTC days per manual backfill")
+    if last > dt.datetime.now(dt.timezone.utc).date():
+        raise ValueError("Future arXiv submission dates cannot be backfilled")
+    return [first + dt.timedelta(days=n) for n in range(number)]
+
+
+def run(today: dt.date | None = None, count: int = 5, fetcher=fetch_day, days=None) -> dict:
     today = today or dt.datetime.now(dt.timezone.utc).date()
     manifest = read_manifest()
     completed = 0
     errors = []
-    for day in select_days(today, manifest, count):
+    for day in (days if days is not None else select_days(today, manifest, count)):
         try:
             payload = fetcher(day)
             if payload.get("date") != day.isoformat() or payload.get("complete") is not True:
@@ -179,7 +192,12 @@ def run(today: dt.date | None = None, count: int = 5, fetcher=fetch_day) -> dict
 
 if __name__ == "__main__":
     amount = max(3, min(8, int(os.environ.get("AXIOVO_DAILY_BACKFILL_COUNT", "5"))))
-    result = run(count=amount)
+    start = os.getenv("AXIOVO_ARCHIVE_FROM", "").strip()
+    end = os.getenv("AXIOVO_ARCHIVE_TO", "").strip()
+    if bool(start) != bool(end):
+        raise SystemExit("Both AXIOVO_ARCHIVE_FROM and AXIOVO_ARCHIVE_TO are required for manual backfill")
+    days = manual_days(start, end) if start else None
+    result = run(count=amount, days=days)
     # A failing arXiv source does not invalidate previously indexed days or
     # stop the rest of the website from deploying.
     if result["failed"]:
