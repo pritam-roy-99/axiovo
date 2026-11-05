@@ -52,16 +52,31 @@ def main():
             assert page.locator("body").get_attribute("class")=="axiovo-home"
             target_is(".rl-nav a:nth-child(1)","discover.html#discover")
             target_is(".rl-nav a:nth-child(2)","discover.html#workspace")
+            assert page.locator("#axiovo-entry-topic").count()==0
+            assert page.locator("#axiovo-entry-subtopic").count()==0
+            assert page.locator("#axiovo-entry-field option").count()>=5
             page.select_option("#axiovo-entry-field","quantum")
-            assert page.locator("#axiovo-entry-topic option").count()>2
-            page.select_option("#axiovo-entry-topic",label="Quantum key distribution")
             page.locator("#axiovo-entry-form button[type=submit]").click()
             page.wait_for_url(lambda u:urlsplit(u).path.endswith("/discover.html") and urlsplit(u).fragment=="discover")
             assert_path("discover.html")
             assert page.evaluate('JSON.parse(localStorage.getItem("researchlens-field-explorer-v1")).field')=="quantum"
             checked.append("homepage field > Discover")
             page.locator("#rl-source-arxiv").wait_for()
+            assert page.locator(".axiovo-home-link").is_visible()
+            assert page.locator(".axiovo-back-button").is_visible()
+            assert page.locator(".axiovo-home-link").get_attribute("href")=="./"
             assert page.locator("#rl-focus-field-title").inner_text()!="Choose your field"
+            page.locator(".axiovo-home-link").click()
+            page.wait_for_url(lambda u:urlsplit(u).path.endswith("/"))
+            assert page.locator("#axiovo-entry-field").is_visible()
+            assert page.locator("#axiovo-entry-topic").count()==0
+            page.locator(".rl-nav a[href*='#discover']").click()
+            page.wait_for_url(lambda u:urlsplit(u).path.endswith("/discover.html"))
+            assert page.locator(".axiovo-back-button").is_visible()
+            page.locator(".axiovo-back-button").click()
+            page.wait_for_url(lambda u:urlsplit(u).path.endswith("/"))
+            page.locator(".rl-nav a[href*='#discover']").click()
+            page.wait_for_url(lambda u:urlsplit(u).path.endswith("/discover.html"))
             assert page.locator(".axiovo-advanced-focus > summary").count()==1
             assert page.locator(".axiovo-feed-tools > summary").count()==1
             page.locator("#rl-source-scholarly").click()
