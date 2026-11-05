@@ -321,12 +321,12 @@ function savedRecords(source){
 }
 function recordKey(p){return p.source+":"+p.recordId+(p.source==="biorxiv"&&p.version?"v"+p.version:"")}
 function comparison(){
- return list(read(COMPARISON,[])).map(p=>normalize(p?.source,p)).filter(Boolean).slice(0,3);
+ return list(read(COMPARISON,[])).map(p=>normalize(p?.source,p)).filter(Boolean).slice(0,5);
 }
 function addComparison(p){
  const papers=comparison();
  if(papers.some(item=>recordKey(item)===recordKey(p)))return "added";
- if(papers.length>=3)return "full";
+ if(papers.length>=5)return "full";
  return write(COMPARISON,[...papers,p])?"added":"unavailable";
 }
 function removeComparison(p){
