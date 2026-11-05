@@ -8,6 +8,7 @@ from __future__ import annotations
 import functools
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
+from urllib.parse import urlsplit
 from threading import Thread
 from playwright.sync_api import sync_playwright
 
@@ -47,7 +48,7 @@ def main():
             assert page.locator("#axiovo-entry-topic option").count()>2
             page.select_option("#axiovo-entry-topic",label="Quantum key distribution")
             page.locator("#axiovo-entry-form button[type=submit]").click()
-            page.wait_for_url(lambda u:u.path.endswith("/discover.html") and u.fragment=="discover")
+            page.wait_for_url(lambda u:urlsplit(u).path.endswith("/discover.html") and urlsplit(u).fragment=="discover")
             assert_path("discover.html")
             assert page.evaluate('JSON.parse(localStorage.getItem("researchlens-field-explorer-v1")).field')=="quantum"
             checked.append("homepage field > Discover")
@@ -61,21 +62,21 @@ def main():
             checked.append("source tabs and advanced sections")
             target_is(".rl-nav a:nth-child(2)","discover.html#workspace")
             page.locator(".rl-nav a:nth-child(2)").click()
-            page.wait_for_url(lambda u:u.path.endswith("/discover.html") and u.fragment=="workspace")
+            page.wait_for_url(lambda u:urlsplit(u).path.endswith("/discover.html") and urlsplit(u).fragment=="workspace")
             page.locator("#workspace-panel #research-questions").wait_for(timeout=16000)
             checked.append("Library SPA navigation")
             page.locator(".rl-nav a:nth-child(1)").click()
-            page.wait_for_url(lambda u:u.path.endswith("/discover.html") and u.fragment=="discover")
+            page.wait_for_url(lambda u:urlsplit(u).path.endswith("/discover.html") and urlsplit(u).fragment=="discover")
             assert page.locator("#discover-shell").is_visible()
             checked.append("back to Discover")
             go("search.html?q=quantum")
-            page.wait_for_url(lambda u: u.path.endswith("/discover.html") and u.query.find("view=scholarly")>=0 and u.fragment=="discover")
+            page.wait_for_url(lambda u: urlsplit(u).path.endswith("/discover.html") and urlsplit(u).query.find("view=scholarly")>=0 and urlsplit(u).fragment=="discover")
             checked.append("legacy search redirect")
             go("fields.html")
             page.wait_for_url("**/discover.html?view=scholarly#discover")
             checked.append("legacy field redirect")
             go("index.html#workspace")
-            page.wait_for_url(lambda u:u.path.endswith("/discover.html") and u.fragment=="workspace")
+            page.wait_for_url(lambda u:urlsplit(u).path.endswith("/discover.html") and urlsplit(u).fragment=="workspace")
             checked.append("legacy homepage hash")
             go("copilot.html")
             assert page.locator("main").count()==1
