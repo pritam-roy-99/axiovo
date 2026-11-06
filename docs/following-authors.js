@@ -40,7 +40,7 @@ function paper(p){
 }
 async function openAlexAuthorPapers(name,signal){
  const endpoint="https://api.openalex.org";
- const authorQuery=new URLSearchParams({search:name,per_page:"15",
+ const authorQuery=new URLSearchParams({search:follow.searchName(name),per_page:"15",
   select:"id,display_name,works_count,last_known_institutions"});
  const response=await fetch(endpoint+"/authors?"+authorQuery,{
   headers:{Accept:"application/json"},signal});
@@ -53,28 +53,33 @@ async function openAlexAuthorPapers(name,signal){
   if(signal.aborted)break;
   const identifier=String(person.id).split("/").at(-1);
   if(!/^A\d+$/.test(identifier))continue;
-  const query=new URLSearchParams({
-   filter:"authorships.author.id:"+identifier,per_page:"100",
-   sort:"publication_date:desc",
-   select:"id,display_name,publication_date,authorships,locations,primary_location,best_oa_location,abstract_inverted_index"});
-  const works=await fetch(endpoint+"/works?"+query,{headers:{Accept:"application/json"},signal});
-  if(!works.ok)continue;
-  for(const work of (await works.json()).results||[]){
-   const arxiv=window.AxiovoArxiv?.candidates(work)?.[0];
-   if(!arxiv||!work.display_name)continue;
-   const authorNames=(work.authorships||[]).map(a=>a.author?.display_name).filter(Boolean);
-   if(!authorNames.some(a=>follow.matchesName(name,a)))continue;
-   // OpenAlex publication date is not necessarily an arXiv v1 date.
-   const index=work.abstract_inverted_index||{},positioned=[];
-   for(const [word,positions] of Object.entries(index)){
-    if(!Array.isArray(positions))continue;
-    for(const pos of positions)if(Number.isInteger(pos)&&pos>=0&&pos<1500)positioned[pos]=word;
+  for(let page=1;page<=3&&!signal.aborted;page++){
+   const query=new URLSearchParams({
+    filter:"authorships.author.id:"+identifier,per_page:"100",page:String(page),
+    sort:"publication_date:desc",
+    select:"id,display_name,publication_date,authorships,locations,primary_location,best_oa_location,abstract_inverted_index"});
+   const works=await fetch(endpoint+"/works?"+query,{headers:{Accept:"application/json"},signal});
+   if(!works.ok)break;
+   const published=(await works.json()).results||[];
+   for(const work of published){
+    const arxiv=window.AxiovoArxiv?.candidates(work)?.[0];
+    if(!arxiv||!work.display_name)continue;
+    const authorNames=(work.authorships||[]).map(a=>a.author?.display_name).filter(Boolean);
+    if(!authorNames.some(a=>follow.matchesName(name,a)))continue;
+    const index=work.abstract_inverted_index||{},positioned=[];
+    for(const [word,positions] of Object.entries(index)){
+     if(!Array.isArray(positions))continue;
+     for(const pos of positions)if(Number.isInteger(pos)&&pos>=0&&pos<1500)positioned[pos]=word;
+    }
+    // Publication dates reported by OpenAlex are not necessarily arXiv v1 dates.
+    const paper=data.normalize("arxiv",{
+     id:arxiv.requested,title:work.display_name,authors:authorNames,
+     date:work.publication_date,
+     abstract:positioned.filter(Boolean).join(" ").slice(0,5000),
+     provenance:"OpenAlex author identity, arXiv-linked work"});
+    if(paper)papers.push(paper);
    }
-   const paper=data.normalize("arxiv",{
-    id:arxiv.requested,title:work.display_name,authors:authorNames,
-    abstract:positioned.filter(Boolean).join(" ").slice(0,5000),
-    provenance:"OpenAlex author identity, arXiv-linked work"});
-   if(paper)papers.push(paper);
+   if(published.length<100||papers.length>=30)break;
   }
  }
  return {papers,identity:candidates.map(p=>p.display_name).join(" / ")};
