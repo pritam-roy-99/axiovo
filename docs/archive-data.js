@@ -144,9 +144,13 @@ function matchScore(p,c){
  return queryScore+topicScore+categoryScore;
 }
 function filter(papers,criteria){
- return papers.map(p=>({p,score:matchScore(p,criteria)})).filter(row=>row.score!==null).sort(({p:a,score:x},{p:b,score:y})=>
-  (criteria.sort==="cited"?(b.citations??-1)-(a.citations??-1):criteria.sort==="recent"?0:y-x)
-  ||(criteria.sort==="recent"?(b.announcementDate||b.date||"").localeCompare(a.announcementDate||a.date||""):(b.date||b.announcementDate||"").localeCompare(a.date||a.announcementDate||""))||a.title.localeCompare(b.title)).map(row=>row.p);
+ const scored=papers.map(p=>({p,score:matchScore(p,criteria)})).filter(row=>row.score!==null);
+ const mode=criteria.sort||"relevance";
+ const values=scored.map(x=>x.p);
+ const lookup=new Map(scored.map(x=>[x.p,x.score]));
+ if(root.AxiovoPaperSort)return root.AxiovoPaperSort.sort(values,mode,p=>lookup.get(p)||0);
+ // Standalone fallback for pages that do not load the shared sorter.
+ return scored.sort((a,b)=>b.score-a.score||String(b.p.date||"").localeCompare(a.p.date||"")).map(x=>x.p);
 }
 async function request(url,signal,json=true){
  const timeout=AbortSignal.timeout(11000);
