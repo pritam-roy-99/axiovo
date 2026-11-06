@@ -24,7 +24,7 @@ def plain(value):
 
 def arxiv_id(value):
     raw = plain(value)
-    if raw.startswith(("http://", "https://")):
+    if raw.lower().startswith(("http://", "https://")):
         url = urlsplit(raw)
         if url.hostname not in {"arxiv.org", "www.arxiv.org"}:
             raise InvalidRecord("arxiv_host")
@@ -41,7 +41,7 @@ def arxiv_id(value):
 
 def doi_id(value):
     raw = plain(value)
-    if raw.startswith(("http://", "https://")):
+    if raw.lower().startswith(("http://", "https://")):
         url = urlsplit(raw)
         if url.hostname not in {"doi.org", "dx.doi.org", "www.doi.org"}:
             raise InvalidRecord("doi_host")
