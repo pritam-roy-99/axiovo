@@ -126,7 +126,7 @@ function matchScore(p,c){
  const category=c.category;
  if(category&&!categoryMatch(p,category)){
   if(p.source==="arxiv"||p.categories.length)return null;
-  const inferredSubject=p.source==="chemrxiv"&&(p.provenance==="Crossref subject query"||matchesText(text,category.name));
+  const inferredSubject=p.source==="chemrxiv"&&Boolean(topicHit(p,c.categoryTerms||[])||matchesText([p.title,p.abstract].join(" "),category.name));
   const inferredBioSubject=p.source==="biorxiv"&&p.provenance==="Europe PMC"&&topicHit(p,c.categoryTerms||[]);
   if(!inferredSubject&&!inferredBioSubject&&!hit)return null;
  }
@@ -137,7 +137,7 @@ function matchScore(p,c){
  const q=simple(c.q),title=simple(p.title);
  const phrase=q&&title.includes(q)?15:0;
  const queryScore=c.q?phrase+(matchesText(p.title,c.q)?20:0)
-  +(matchesText(p.abstract,c.q)?7:0)+(matchesAuthor(p.authors,c.q)?9:0):0;
+  +(matchesText(p.abstract,c.q)?7:0)+(matchesAuthor(p.authors,c.q)&&simple(p.authors.join(" ")).includes(simple(c.q))?9:0):0;
  const topicScore=hit?(hit.where==="title"?18:7):0;
  const categoryScore=c.category&&categoryMatch(p,c.category)?4:0;
  return queryScore+topicScore+categoryScore;
