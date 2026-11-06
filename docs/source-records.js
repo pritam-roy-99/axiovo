@@ -40,7 +40,7 @@ function fromV2(p){
    normalizedDOI=doi(p.source_id);
    if(!normalizedDOI||p.id!==s+":"+normalizedDOI)return null;
    if(s==="biorxiv"&&!/^10\.(?:1101|64898)\//.test(normalizedDOI))return null;
-   if(s==="chemrxiv"&&!normalizedDOI.startsWith("10.26434/chemrxiv"))return null;
+   if(s==="chemrxiv"&&!normalizedDOI.startsWith("10.26434/chemrxiv")&&p.provenance?.provider!=="chemrxiv.json")return null;
    base=normalizedDOI;recordId=base;
    link=s==="biorxiv"?"https://www.biorxiv.org/content/"+base+(pinned?"v"+pinned:""):"https://doi.org/"+base;
    pdf=s==="biorxiv"?link+".full.pdf":null;
