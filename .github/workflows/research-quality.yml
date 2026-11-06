@@ -12,6 +12,9 @@ on:
       - 'docs/paper-relations.js'
       - 'docs/topic-explorer.js'
       - 'docs/research-intelligence.js'
+      - 'docs/recommendation-cards.css'
+      - 'docs/abstract-audio.js'
+      - 'scripts/smoke_recommendations.py'
       - 'docs/paper-card-polish.css'
       - 'docs/workspace.html'
       - 'tests/test_recommendation_save_ui.py'
@@ -103,6 +106,10 @@ jobs:
           node tests/feed-core.test.js
           node --check docs/feed-preferences.js
           node tests/feed-preferences.test.js
+      - name: Verify smart paper card and speech player JavaScript
+        run: |
+          node --check docs/research-intelligence.js
+          node --check docs/abstract-audio.js
       - name: Validate browser scripts and source links
         run: |
           python -m scripts.validate_site
