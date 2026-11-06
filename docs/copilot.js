@@ -230,6 +230,7 @@ async function hostedCompletion(messages,deep){
  if(!response.ok)throw Error("Secure hosted AI returned HTTP "+response.status+".");
  const body=await response.json();
  if(typeof body.answer!=="string"||!body.answer.trim())throw Error("Hosted AI returned no usable answer.");
+ lastHostedModel=String(body.model||hostedConfig.model||"Free hosted model").slice(0,110);
  return validateCitations(body.answer);
 }
 async function generate(question,draft,localResult){
