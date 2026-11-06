@@ -11,7 +11,7 @@
    return {key,present:value!==null,length:value===null?0:value.length};
   });
  }
- async function optInMirror(storage,allowlist,{approved=false,store}={}){
+ function optInMirror(storage,allowlist,{approved=false,store}={}){
   if(!approved)throw Error("Explicit migration approval required");
   const impl=store||root?.AxiovoPersonalStore;
   if(!impl)throw Error("Personal storage facade unavailable");
