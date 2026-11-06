@@ -94,6 +94,7 @@ function renderRecommendations(){
   const a=texts(title,"a",pp.title||"Untitled paper");a.href=Arxiv?.abs(pp.id)||"https://arxiv.org/";a.target="_blank";a.rel="noopener noreferrer";
   texts(item,"p",(pp.authors||[]).slice(0,4).join(", ")+(pp.published?" · "+pp.published.slice(0,10):""),"rl-paper-meta");
   texts(item,"p",hit.reasons.filter(x=>x!=="Already saved").slice(0,3).join(" · "),"rl-relevance-reason");
+  window.AxiovoAuthorFollow?.attach(item,(pp.authors||[]).filter(x=>typeof x==="string"));
   if(hit.reasons.includes("Already saved"))texts(item,"span","In your reading list","rl-counter");
   const row=texts(item,"div","","rl-paper-actions axiovo-rec-actions");
   const parsed=Arxiv?.parse(pp.id),sourceId=parsed?.requested||String(pp.id||"");
@@ -206,10 +207,12 @@ function startup(){
    }catch(err){message($("project-status"),"Import failed: "+err.message)}finally{e.target.value=""}
  };
  window.addEventListener("axiovo:workspace-activated",()=>{drawSettings();renderRecommendations()});
+  window.addEventListener("axiovo:author-follow-change",()=>renderRecommendations());
  window.addEventListener("axiovo:projects-updated",()=>{projects=(Array.isArray(read(PROJECTS,[]))?read(PROJECTS,[]):[]).map(R.cleanProject).filter(Boolean);render()});
  window.addEventListener("storage",e=>{
    if(e.key===PROJECTS){projects=(Array.isArray(read(PROJECTS,[]))?read(PROJECTS,[]):[]).map(R.cleanProject).filter(Boolean);render()}
    if(e.key===META){settings=read(META,{interests:[],authors:[]});drawSettings();renderRecommendations()}
+    if(e.key==="axiovo-author-follows")renderRecommendations();
  });
  async function mergeRecentlyVerifiedMetadata(){
   // Preserve arXiv v1 publication dates; announcement dates are separate.
