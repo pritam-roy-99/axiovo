@@ -13,6 +13,15 @@ main code{overflow-wrap:anywhere}
 </style><link rel="manifest" href="./manifest.webmanifest"><meta name="theme-color" content="#0b2239"><link rel="icon" type="image/svg+xml" href="./icons/axiovo.svg"><script defer src="./pwa.js"></script><link rel="stylesheet" href="./axiovo-shell.css?v=2"></head><body><header></header>
 <main><h1>Axiovo data coverage and methodology</h1>
 <p>Axiovo is an independent, experimental open-source research workspace, not an official arXiv or SciRate service. This page documents what the site actually does and what it cannot guarantee.</p>
+<section id="axiovo-source-health" aria-labelledby="axiovo-source-health-heading">
+<h2 id="axiovo-source-health-heading">Live archive update health</h2>
+<p id="axiovo-source-health-summary" role="status" aria-live="polite">Checking source timestamps…</p>
+<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;text-align:left">
+<thead><tr><th scope="col">Source</th><th scope="col">Cached records</th><th scope="col">Last source check</th><th scope="col">Freshness</th><th scope="col">Verified scope</th></tr></thead>
+<tbody id="axiovo-source-health-rows"></tbody></table></div>
+<p id="axiovo-arxiv-day-health">Checking verified arXiv submission days…</p>
+<p>Updates are scheduled through GitHub Actions. This reports observable published metadata only, not every manuscript held by a source. A source may release papers after its latest successful check.</p>
+</section>
 <section id="axiovo-coverage-live" aria-labelledby="axiovo-coverage-title">
 <h2 id="axiovo-coverage-title">Verified local data coverage</h2>
 <p id="axiovo-coverage-status" role="status" aria-live="polite">Loading the current source-verified coverage manifest…</p>
@@ -54,4 +63,4 @@ main code{overflow-wrap:anywhere}
 <p>GitHub Actions rebuilds selected arXiv feeds and site assets on scheduled runs. These jobs may be delayed, fail or be paused. The daily OAI-PMH process adds a bounded subset of arXiv metadata, not a full historical mirror. Axiovo is a static GitHub Pages application and has no continuously running ingestion server. Full arXiv recall, authenticated community features and centrally synchronized research workspaces would require additional infrastructure.</p>
 <p>Bibliographic sources: <a href="https://info.arxiv.org/help/api/index.html">arXiv API documentation</a> and <a href="https://help.openalex.org/api/">OpenAlex API documentation</a>. Site source and issues: <a href="https://github.com/pritam-roy-99/axiovo">GitHub repository</a>.</p></section>
 <p><a href="./privacy.html">Privacy and device-data handling</a> · <a href="./profiles.html">Download a full local backup</a></p>
-</main><script defer src="./coverage-status.js"></script></body></html>
+</main><script defer src="./coverage-status.js"></script><script defer src="./source-health.js"></script></body></html>
