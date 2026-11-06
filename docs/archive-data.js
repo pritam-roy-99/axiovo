@@ -69,14 +69,14 @@ function normalize(source,p){
  return {...record,id:doi,recordId:doi,version:versioned?version:null,url,pdf:source==="biorxiv"?url+".full.pdf":null};
 }
 function workKey(p){
- return p.source+":"+(p.source==="chemrxiv"?p.id.replace(/\/v\d+$/,""):p.id);
+ return p.source+":"+(p.source==="chemrxiv"?p.id.replace(/(?:\/|-)v\d+$/i,""):p.id);
 }
-function merge(...groups){
+function mergeRecords(keyFor,groups){
  const results=new Map();
  for(const p of groups.flat()){
-  const key=workKey(p),previous=results.get(key);
+  const key=keyFor(p),previous=results.get(key);
   if(!previous){results.set(key,p);continue}
-  const revision=x=>x.version||Number(x.id.match(/\/v(\d+)$/)?.[1])||0;
+  const revision=x=>x.version||(x.source==="chemrxiv"?Number(x.id.match(/(?:\/|-)v(\d+)$/i)?.[1])||0:0);
   const newer=revision(p)>=revision(previous)?p:previous, older=newer===p?previous:p;
   // An abstract or date from another revision cannot describe the pinned record.
   if(revision(newer)&&revision(older)!==revision(newer)){results.set(key,newer);continue}
@@ -92,6 +92,7 @@ function merge(...groups){
  }
  return [...results.values()];
 }
+const merge=(...groups)=>mergeRecords(workKey,groups);
 function queryWords(query){
  return (clean(query).match(/"[^"]+"|[^\s"]+/g)||[]).map(word=>word.replace(/^"|"$/g,"")).filter(Boolean);
 }
@@ -196,7 +197,10 @@ async function snapshot(source,options={}){
   const loaded=Promise.allSettled(files.map(load)).then(results=>{
    const available=results.filter(result=>result.status==="fulfilled").map(result=>result.value);
    if(!available.length)throw Error("No "+source+" snapshot available");
-   return {stamp:available.map(result=>result.stamp).sort().at(-1),papers:merge(...available.map(result=>result.papers))};
+   // Keep distinct revisions available for exact-ID searches. Browsing
+   // results combine versions after applying the user's filters.
+   return {stamp:available.map(result=>result.stamp).sort().at(-1),
+    papers:mergeRecords(recordKey,available.map(result=>result.papers))};
   }).catch(error=>{if(snapshots.get(source)?.promise===loaded)snapshots.delete(source);throw error});
   snapshots.set(source,{at:Date.now(),promise:loaded});
  }

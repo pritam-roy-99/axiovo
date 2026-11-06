@@ -8,6 +8,10 @@ const sandbox={
  URL,URLSearchParams,AbortSignal,Event,dispatchEvent(){},
  localStorage:{getItem:key=>storage.get(key),setItem:(key,value)=>storage.set(key,value)},
  fetch:async url=>{
+  if(String(url).startsWith("./data/")){
+   const id=String(url).endsWith("feed.json")?"2207.00001v1":"2207.00001v2";
+   return {ok:true,json:async()=>({papers:[{id,title:"Indexed revision "+id}]})};
+  }
   const request=new URL(String(url));requests.push(request);
   if(request.hostname==="api.biorxiv.org")return {
    ok:true,json:async()=>({messages:[{status:"no posts found"}],collection:[]})
@@ -68,5 +72,8 @@ data.live("biorxiv",criteria).then(async result=>{
  assert.equal(requests.at(-1).searchParams.get("sort"),"P_PDATE_D asc");
  await data.live("biorxiv",{q:"transcriptomics",sort:"cited"});
  assert.equal(requests.at(-1).searchParams.get("sort"),"CITED desc");
+ const snapshot=await data.snapshot("arxiv");
+ assert.equal(snapshot.papers.length,2,"Distinct indexed revisions remain searchable");
+ assert.equal(data.filter(snapshot.papers,{q:"2207.00001v1"})[0].recordId,"2207.00001v1");
  console.log("Archive taxonomy, exact revision matching, shortlist storage and bioRxiv source verification passed.");
 }).catch(error=>{console.error(error);process.exitCode=1});
