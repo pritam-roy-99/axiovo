@@ -99,12 +99,27 @@ def main():
                     show = page.locator("#archive-show-results")
                     assert show.count()==1,(source,"Results CTA missing")
                     assert "Show matching papers" in show.inner_text(),(source,"Results CTA label missing")
-                    contrast = show.evaluate("""el=>({
-                        color:getComputedStyle(el).color,
-                        background:getComputedStyle(el).backgroundColor,
-                        readable:el.getBoundingClientRect().width>0
-                    })""")
-                    assert contrast["readable"] and contrast["color"]=="rgb(255, 255, 255)",(source,contrast)
+                    for action_width in ((320, width) if width == 360 else (width,)):
+                        if width == 360:
+                            page.set_viewport_size({"width": action_width, "height": 850})
+                        action = show.evaluate("""el=>{
+                            const button=el.getBoundingClientRect();
+                            const clear=document.getElementById("archive-clear-path").getBoundingClientRect();
+                            const label=Array.from(el.childNodes).find(node=>node.nodeType===Node.TEXT_NODE&&node.textContent.trim());
+                            const range=document.createRange();
+                            range.selectNodeContents(label);
+                            const lines=new Set(Array.from(range.getClientRects(),rect=>Math.round(rect.top))).size;
+                            return {
+                                color:getComputedStyle(el).color,
+                                fullWidth:Math.abs(button.width-el.parentElement.clientWidth)<=1,
+                                height:button.height,lines,
+                                clearBelow:clear.top>=button.bottom,
+                                clearHeight:clear.height
+                            };
+                        }""")
+                        assert action["color"]=="rgb(255, 255, 255)",(action_width,source,action)
+                        assert action["fullWidth"] and action["lines"]==1 and 44<=action["height"]<=56,(action_width,source,action)
+                        assert action["clearBelow"] and action["clearHeight"]>=44,(action_width,source,action)
                     show.click()
                     assert page.evaluate("document.activeElement?.id")=="archive-results-heading",(source,"Results not focused")
                     page.locator(".axiovo-home-link").click()
