@@ -20,6 +20,18 @@ jobs:
         run: |
           python -m scripts.build_source_v2
           python -c "from scripts.build_source_v2 import verify_index; assert verify_index('docs/data/index/v2')['record_count'] > 0"
+      - name: Build source-verified search, graph and static API indexes
+        run: |
+          python -m scripts.build_search_index
+          python -m scripts.build_literature_graph
+          python -m scripts.build_public_api
+          python - <<'PY'
+          from scripts.build_search_index import verify as lexical
+          from scripts.build_public_api import verify as public_api
+          assert lexical()["documents"] > 0
+          assert public_api()["record_count"] > 0
+          print("Search and static API integrity checks passed")
+          PY
       - name: Verify internal navigation and assets
         run: python scripts/audit_internal_links.py
       - name: Security and privacy baseline checks
@@ -45,6 +57,9 @@ jobs:
         run: |
           python -m pip install --disable-pip-version-check playwright
           python -m playwright install --with-deps chromium
+      - name: Collect mobile and desktop performance/overflow evidence
+        continue-on-error: true
+        run: python scripts/report_web_vitals.py
       - name: Verify current pages and connected workflows
         run: |
           python scripts/smoke_routes.py
