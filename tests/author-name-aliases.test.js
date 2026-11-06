@@ -15,4 +15,7 @@ for(const [a,b] of pairs){
 for(const name of ["S. N. Majumdar","Subhash Majumdar","Archan S Mukherjee","A. D. Majumdar"]){
  assert(!Follow.matchesName("A. S. Majumdar",name),"False author identity: "+name);
 }
+assert.equal(Follow.searchName("A.S. Majumdar"),"Archan S Majumdar");
+assert.equal(Follow.searchName("A. S. Majumdar"),"Archan S Majumdar");
+assert.equal(Follow.searchName("S. N. Majumdar"),"S. N. Majumdar");
 console.log("PASS: followed-author initials, expanded names, surname-first metadata and namesake protection");
