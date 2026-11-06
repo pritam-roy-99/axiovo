@@ -252,6 +252,7 @@ function filtered(state){
 }
 function drawResults(state){
  if(state!==search)return;
+ if(state.announcementOnly)$("scope-label").textContent="Scope: latest official announcement · all arXiv categories.";
  const rows=filtered(state),results=$("results"),actions=$("result-actions"),c=state.criteria;
  $("result-count").textContent=rows.length.toLocaleString()+" matching "+name+" record"+(rows.length===1?"":"s")+(state.loading?" · checking source…":"");
  $("sync-status").textContent=state.message;
