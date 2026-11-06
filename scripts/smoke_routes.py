@@ -82,7 +82,7 @@ def main():
                             });
                             return .2126*a[0]+.7152*a[1]+.0722*a[2];
                           };
-                          const background="#0b2139";
+                          const background="rgb(11, 33, 57)";
                           const ratio=c=>(Math.max(luminance(background),luminance(c))+.05)/
                              (Math.min(luminance(background),luminance(c))+.05);
                           return {
