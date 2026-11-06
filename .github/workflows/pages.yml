@@ -265,6 +265,8 @@ jobs:
           echo '| Validate shared Discover focus | ${{ steps.validate_shared_discover_focus.outcome }} |' >> "$GITHUB_STEP_SUMMARY"
           echo '| Test rate-limited arXiv fallback and date archive | ${{ steps.test_rate_limited_arxiv_fallback_and_date_archive.outcome }} |' >> "$GITHUB_STEP_SUMMARY"
           echo '| Audit internal routes and HTML assets | ${{ steps.audit_internal_routes_and_html_assets.outcome }} |' >> "$GITHUB_STEP_SUMMARY"
+      - name: Verify Axiovo meaning in the homepage and video opening
+        run: python -m unittest discover -s tests -p test_axiovo_brand_intro.py -v
       - name: Install current-feature video generation dependencies
         run: |
           sudo apt-get update -qq
