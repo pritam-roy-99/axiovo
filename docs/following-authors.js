@@ -55,12 +55,24 @@ async function checkLane(archive,criteria,signal){
  async function load(next=null){
   const loadButton=actions.querySelector("button:last-of-type");if(loadButton)loadButton.disabled=true;
   try{
-   const page=await data.live(archive,criteria,signal,next);
-   if(signal.aborted)return;
-   records=data.filter(data.merge(records,data.filter(page.papers,criteria)),criteria);
-   cursor=page.next===next?null:page.next;
+   let current=next,provider="",checked=0;
+   const seen=new Set();
+   // Avoid false emptiness when a broad provider returns only namesakes
+   // or unrelated papers on the first page. Constrain the request budget.
+   while(!signal.aborted&&checked<3){
+    if(seen.has(String(current??"initial")))break;
+    seen.add(String(current??"initial"));
+    const page=await data.live(archive,criteria,signal,current);
+    if(signal.aborted)return;
+    records=data.filter(data.merge(records,data.filter(page.papers,criteria)),criteria);
+    const after=page.next===current?null:page.next;
+    cursor=after;provider=page.provider;checked++;
+    if(records.length>=6||after==null)break;
+    current=after;
+   }
    if(next!=null)visible+=6;
-   message.textContent=records.length+" matching record"+(records.length===1?"":"s")+" · "+page.provider+" and available snapshots";
+   message.textContent=records.length+" matching record"+(records.length===1?"":"s")+" · "+provider+
+    " · "+checked+" source page"+(checked===1?"":"s")+" checked (name matches may include namesakes)";
   }catch{
    if(signal.aborted)return;
    message.textContent="Live lookup unavailable · "+records.length+" matching cached record"+(records.length===1?"":"s");
