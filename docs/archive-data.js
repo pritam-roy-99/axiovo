@@ -237,7 +237,8 @@ function dataCiteArxiv(item){
   }).filter(Boolean))];
  return normalize("arxiv",{id:id.base,title:p.titles?.[0]?.title,date:submitted?.date,doi:p.doi,
   authors:list(p.creators).map(a=>a.name),affiliations:list(p.creators).flatMap(a=>list(a.affiliation).map(x=>x.name)),categories,primary_category:categories[0],
-  abstract:list(p.descriptions).find(d=>d.descriptionType==="Abstract")?.description,provenance:"arXiv DOI metadata via DataCite"});
+  abstract:list(p.descriptions).find(d=>d.descriptionType==="Abstract")?.description,
+  citations:Number.isFinite(p.citationCount)?p.citationCount:null,provenance:"arXiv DOI metadata via DataCite"});
 }
 async function arxivLive(c,signal,cursor){
  const id=identifier(c.q).arxiv;
@@ -247,7 +248,13 @@ async function arxivLive(c,signal,cursor){
   const paper=dataCiteArxiv(data.data);
   return {papers:paper?[paper]:[],total:paper?1:0,provider:"arXiv DOI metadata via DataCite",next:null};
  }
- const q=new URLSearchParams({prefix:"10.48550","page[size]":"60","page[cursor]":cursor||"1"});
+ // DataCite cursor pagination ignores requested sort (always created ascending).
+ // Interactive search uses page numbers to honor relevance, date and citations.
+ // This covers up to 10,000 provider matches; older complete date coverage is
+ // supplied separately by the verified arXiv daily archive shards.
+ const page=cursor?Number(cursor):1;
+ if(!Number.isInteger(page)||page<1||page>167)throw Error("Invalid DataCite page");
+ const q=new URLSearchParams({prefix:"10.48550","page[size]":"60","page[number]":String(page)});
  const clauses=[];
  if(c.category){
   const codes=c.category.codes||[c.category.code];
@@ -265,10 +272,14 @@ async function arxivLive(c,signal,cursor){
   }
  if(c.from||c.to)clauses.push("publicationYear:["+(c.from?.slice(0,4)||"1991")+" TO "+(c.to?.slice(0,4)||today().slice(0,4))+"]");
  if(clauses.length)q.set("query",clauses.join(" AND "));
- if(c.sort==="recent"||(!c.q&&!c.topicTerms?.length))q.set("sort","-published,-registered");
+ const order=c.sort==="oldest"?"published":c.sort==="cited"?"-citation-count":
+  c.sort==="recent"||(!c.q&&!c.topicTerms?.length)?"-published":"relevance";
+ q.set("sort",order);
  const result=await request(endpoints.arxiv+"?"+q,signal);
  const papers=list(result.data).map(dataCiteArxiv).filter(Boolean);
- const next=result.links?.next?new URL(result.links.next,endpoints.arxiv).searchParams.get("page[cursor]"):null;
+ const nextNumber=result.links?.next?
+  Number(new URL(result.links.next,endpoints.arxiv).searchParams.get("page[number]")):null;
+ const next=Number.isInteger(nextNumber)&&nextNumber>page&&nextNumber<=167?String(nextNumber):null;
  return {papers,total:Number(result.meta?.total)||0,provider:"arXiv DOI metadata via DataCite",next};
 }
 async function bioNative(c,signal,cursor){
