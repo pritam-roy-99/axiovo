@@ -41,6 +41,24 @@ completeness of the arXiv, bioRxiv or ChemRxiv archives.
    1360 px. A cross-archive Desk -> Library flow has been added at widths
    390 and 1360 px; the browser acceptance result must be checked in CI.
 
+## Release readiness follow-up
+
+Axiovo’s goal is to help researchers find relevant preprints, verify their
+original records, and organize useful papers in a private reading workspace.
+
+| Area | Check before publishing |
+| --- | --- |
+| Search and Discover | Run a keyword, exact ID and date-bound search. Change sorting after loading results and confirm source pagination starts again from page one. Check empty and unavailable providers separately. |
+| Desk and Library | Save one result per archive. Open Library and verify the original URLs, reading notes and collections after reload. Verify distinct saved revisions and an older device Library. |
+| My Feed | Start with a fresh browser profile. Verify browsing alone creates no follow. Add and remove a topic, follow an author, save a Discover path, and open a paper added to the Desk comparison. |
+| Research Assistant | Inspect a pinned arXiv revision. An unavailable revision should offer the original link outside the evidence list. A query in indexed-only mode should remain local. |
+| Home, navigation and tutorial | Check the archive choices, Back, Home, theme, keyboard focus, tutorial playback and captions. Confirm the Library loads after disconnecting an installed app. |
+
+The pull-request browser job runs the maintained route, archive, Desk, Feed
+and recommendation smoke tests. The Pages job also validates the generated
+tutorial and audits the deployed URLs. Provider recall, cold mobile latency,
+physical iOS and Android devices, and a full WCAG audit remain separate checks.
+
 ## Rules for any page review
 
 - Run the exact same search on phone and desktop. Compare titles, IDs, links,

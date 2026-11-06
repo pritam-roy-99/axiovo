@@ -35,18 +35,18 @@ async function checkAnnouncement(){
  const target=document.getElementById("axiovo-release-status");
  if(!target)return;
  try{
-  const response=await fetch("./data/announcements.json?fresh="+Date.now(),{cache:"no-store",signal:AbortSignal.timeout(10000)});
+  const response=await fetch("./data/records/manifest.json",{cache:"no-cache",signal:AbortSignal.timeout(10000)});
   if(!response.ok)throw Error("HTTP "+response.status);
-  const batch=await response.json();
-  if(!Array.isArray(batch.papers)||!batch.announcement_date)throw Error("No verified announcement metadata");
-  const updated=batch.checked_at||batch.generated_at||"";
+  const batch=(await response.json()).latest_arxiv_announcement;
+  if(!batch?.date||!Number.isInteger(batch.count))throw Error("No verified announcement metadata");
+  const updated=batch.checked_at||"";
   const checked=updated?new Date(updated):null;
   const last=checked&&!Number.isNaN(checked.valueOf())?checked.toLocaleString():"not supplied";
-  target.textContent="Announcement "+batch.announcement_date+" · "+batch.papers.length.toLocaleString()+
+  target.textContent="Announcement "+batch.date+" · "+batch.count.toLocaleString()+
    " indexed records · "+(batch.complete?"all archive feeds verified":"partial archive coverage")+
    " · last source check: "+last+".";
  }catch{
-  target.textContent="Latest announcement metadata is temporarily unavailable. Browse arXiv or check the official source.";
+  target.textContent="Open the latest announcement to see its date, source records and coverage.";
  }
 }
 async function renderTutorialChapters(){

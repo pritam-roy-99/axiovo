@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#0b2239">
-<meta name="description" content="Explore arXiv, bioRxiv and ChemRxiv through predefined research subfields and sub-subtopics. Read, compare and save original preprints.">
-<title>Axiovo | Explore preprints by research topic</title>
+<meta name="description" content="Find relevant preprints across arXiv, bioRxiv and ChemRxiv, verify the original sources, and organize your reading in a private Library.">
+<title>Axiovo | Find, verify and organize preprints</title>
 <link rel="icon" type="image/svg+xml" href="./icons/axiovo.svg">
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="stylesheet" href="./theme.css">
@@ -59,21 +59,42 @@
 <section class="rd-home-hero rd-topic-home" aria-labelledby="welcome-title">
  <div class="rd-hero-content">
   <p class="rd-kicker"><span aria-hidden="true"></span> AXIOVO · FROM KNOWLEDGE TO DISCOVERY</p>
-  <h1 id="welcome-title">Find papers on the question you’re asking.</h1>
+  <h1 id="welcome-title">Find and organize preprints you can verify.</h1>
   <p class="axiovo-name-meaning"><strong>Axiovo = Axiom + Novo</strong><span>“Axiom” is a foundation for reasoning. “Novo” means new. Together, they represent turning established knowledge into new discoveries.</span></p>
-  <p class="rd-lead">Choose arXiv, bioRxiv, or ChemRxiv. Start with an archive subject and narrow through Axiovo’s own research subfields and sub-subtopics.</p>
+  <p class="rd-lead">Search arXiv, bioRxiv and ChemRxiv, open the original records, and save useful papers to a private Library on this device.</p>
   <div class="rd-actions"><a class="rd-button rd-primary" href="#axiovo-archive-title">Choose an archive ↓</a><a class="rd-button rd-hero-link" href="./desk.html">Search all three archives</a></div>
  </div>
- <div class="rd-topic-preview" aria-label="Example research path">
-  <span>EXAMPLE RESEARCH PATH</span>
-  <ol><li>Mathematical Physics</li><li>Quantum many-body theory</li><li>Lieb-Robinson bounds</li></ol>
-  <a href="./arxiv.html?category=math-ph&amp;topic=quantum-many-body-theory&amp;subtopic=lieb-robinson-bounds">See papers on this path →</a>
+ <div class="rd-topic-preview" aria-label="Axiovo research workflow">
+  <span>HOW AXIOVO FITS YOUR WORK</span>
+  <ol><li>Search by title, topic, author or identifier.</li><li>Check the abstract and open the original.</li><li>Save papers and follow topics or authors you choose.</li></ol>
+  <a href="./feed.html#feed-follow-tools">Set up My Feed →</a>
  </div>
+</section>
+<section class="rd-home-section" aria-labelledby="axiovo-archive-title">
+ <div class="rd-section-heading"><div><p class="rd-kicker">BROWSE BY SUBJECT</p><h2 id="axiovo-archive-title">Explore the archives</h2></div><a class="rd-text-link" href="./desk.html">Open Research Desk <span aria-hidden="true">→</span></a></div>
+ <div class="axiovo-archive-grid rd-archives" aria-label="Choose a preprint archive">
+  <a class="axiovo-archive-card rd-archive-card" data-archive="arxiv" href="./arxiv.html">
+   <span class="rd-archive-top"><span class="rd-archive-icon arxiv" aria-hidden="true">ar</span><span class="rd-count" data-count="arxiv">Category directory</span></span>
+   <strong>arXiv</strong><span>Physics, mathematics, computer science, quantitative biology and finance, statistics, engineering, and economics.</span>
+   <span class="rd-card-link">Browse arXiv <span aria-hidden="true">↗</span></span>
+  </a>
+  <a class="axiovo-archive-card rd-archive-card" data-archive="biorxiv" href="./biorxiv.html">
+   <span class="rd-archive-top"><span class="rd-archive-icon biorxiv" aria-hidden="true">bio</span><span class="rd-count" data-count="biorxiv">Subject directory</span></span>
+   <strong>bioRxiv</strong><span>Life sciences from neuroscience and genomics to ecology, molecular biology, and biotechnology.</span>
+   <span class="rd-card-link">Browse bioRxiv <span aria-hidden="true">↗</span></span>
+  </a>
+  <a class="axiovo-archive-card rd-archive-card" data-archive="chemrxiv" href="./chemrxiv.html">
+   <span class="rd-archive-top"><span class="rd-archive-icon chemrxiv" aria-hidden="true">chem</span><span class="rd-count" data-count="chemrxiv">Subject directory</span></span>
+   <strong>ChemRxiv</strong><span>Catalysis, materials, synthesis, chemical engineering, and computational and physical chemistry.</span>
+   <span class="rd-card-link">Browse ChemRxiv <span aria-hidden="true">↗</span></span>
+  </a>
+ </div>
+ <p class="rd-small">Predefined research subfields are curated by Axiovo. Paper coverage is reported separately for each archive. <a href="./methodology.html">See data sources and coverage</a>.</p>
 </section>
 <section class="rd-home-section axiovo-live-release" aria-labelledby="axiovo-release-title">
   <div class="rd-section-heading">
     <div><p class="rd-kicker">OFFICIAL ARXIV RELEASE</p><h2 id="axiovo-release-title">Latest announcement</h2></div>
-    <a class="rd-text-link" href="./arxiv.html?announced=latest">Browse today’s arXiv announcement →</a>
+    <a class="rd-text-link" href="./arxiv.html?announced=latest">Browse the latest arXiv announcement →</a>
   </div>
   <p id="axiovo-release-status" class="rd-small" role="status" aria-live="polite">Checking the latest synchronized arXiv announcement…</p>
   <p class="rd-small">Axiovo syncs official announced records, not unpublished submissions. Announcement timestamps and first-submission dates are different.</p>
@@ -108,27 +129,6 @@
   <figcaption>Step-by-step Axiovo walkthrough with optional captions. <a href="./assets/axiovo-tour.mp4?v=20261106-brand-intro" target="_blank" rel="noopener">Open video in a new tab</a>.</figcaption>
  </figure>
 </section>
-<section class="rd-home-section" aria-labelledby="axiovo-archive-title">
- <div class="rd-section-heading"><div><p class="rd-kicker">BROWSE BY SUBJECT</p><h2 id="axiovo-archive-title">Explore the archives</h2></div><a class="rd-text-link" href="./desk.html">Open Research Desk <span aria-hidden="true">→</span></a></div>
- <div class="axiovo-archive-grid rd-archives" aria-label="Choose a preprint archive">
-  <a class="axiovo-archive-card rd-archive-card" data-archive="arxiv" href="./arxiv.html">
-   <span class="rd-archive-top"><span class="rd-archive-icon arxiv" aria-hidden="true">ar</span><span class="rd-count" data-count="arxiv">Category directory</span></span>
-   <strong>arXiv</strong><span>Physics, mathematics, computer science, quantitative biology and finance, statistics, engineering, and economics.</span>
-   <span class="rd-card-link">Browse arXiv <span aria-hidden="true">↗</span></span>
-  </a>
-  <a class="axiovo-archive-card rd-archive-card" data-archive="biorxiv" href="./biorxiv.html">
-   <span class="rd-archive-top"><span class="rd-archive-icon biorxiv" aria-hidden="true">bio</span><span class="rd-count" data-count="biorxiv">Subject directory</span></span>
-   <strong>bioRxiv</strong><span>Life sciences from neuroscience and genomics to ecology, molecular biology, and biotechnology.</span>
-   <span class="rd-card-link">Browse bioRxiv <span aria-hidden="true">↗</span></span>
-  </a>
-  <a class="axiovo-archive-card rd-archive-card" data-archive="chemrxiv" href="./chemrxiv.html">
-   <span class="rd-archive-top"><span class="rd-archive-icon chemrxiv" aria-hidden="true">chem</span><span class="rd-count" data-count="chemrxiv">Subject directory</span></span>
-   <strong>ChemRxiv</strong><span>Catalysis, materials, synthesis, chemical engineering, and computational and physical chemistry.</span>
-   <span class="rd-card-link">Browse ChemRxiv <span aria-hidden="true">↗</span></span>
-  </a>
- </div>
- <p class="rd-small">Predefined research subfields are curated by Axiovo. Paper coverage is reported separately for each archive. <a href="./methodology.html">See data sources and coverage</a>.</p>
-</section>
 <section class="rd-home-section axiovo-home-feed" aria-labelledby="axiovo-home-feed-heading">
  <div class="rd-section-heading">
   <div><p class="rd-kicker">PERSONALIZED LITERATURE</p><h2 id="axiovo-home-feed-heading">Your research, in one feed</h2></div>
@@ -136,14 +136,6 @@
  </div>
  <p class="rd-small">New papers from followed authors and research topics. Every recommendation links to its original source and explains why it appears.</p>
  <div id="axiovo-home-feed-preview" class="axiovo-home-feed-preview" aria-live="polite">Checking your followed research topics…</div>
-</section>
-<section class="rd-home-section" aria-labelledby="rd-topic-examples">
- <div class="rd-section-heading"><div><p class="rd-kicker">GO BEYOND THE ARCHIVE SUBJECT</p><h2 id="rd-topic-examples">Try a research path</h2></div></div>
- <div class="rd-tools">
-  <a href="./arxiv.html?category=cond-mat.mes-hall&amp;topic=topological-phases-of-matter&amp;subtopic=higher-order-topology"><strong>Higher-order topology</strong><span>arXiv › Mesoscale physics › Topological phases</span><b aria-hidden="true">→</b></a>
-  <a href="./biorxiv.html?category=Genomics&amp;topic=transcriptomics&amp;subtopic=spatial-transcriptomics"><strong>Spatial transcriptomics</strong><span>bioRxiv › Genomics › Transcriptomics</span><b aria-hidden="true">→</b></a>
-  <a href="./chemrxiv.html?category=Catalysis&amp;topic=electrocatalysis&amp;subtopic=electrochemical-co2-reduction"><strong>Electrochemical CO₂ reduction</strong><span>ChemRxiv › Catalysis › Electrocatalysis</span><b aria-hidden="true">→</b></a>
- </div>
 </section>
 <section class="rd-home-section" aria-labelledby="rd-workflow-title">
  <div class="rd-section-heading"><div><p class="rd-kicker">YOUR WORKSPACE</p><h2 id="rd-workflow-title">Pick up where you left off</h2></div></div>

@@ -39,7 +39,7 @@
    <a class="rd-text-link" href="./desk.html#rd-queue-heading">Compare papers →</a>
   </div>
   <label class="rd-label" for="question" id="assistant-question-label">Research question or keywords</label>
-  <textarea id="question" rows="2" maxlength="3500" placeholder="e.g. What bounds information propagation in quantum spin systems?"></textarea>
+  <textarea id="question" rows="2" maxlength="3500" placeholder="Enter a research question or keywords"></textarea>
   <div class="rd-actions">
    <button class="rd-button rd-primary" id="ask" type="button">Find related papers</button>
    <button class="rd-button rd-secondary" id="search-openalex" type="button">Search more arXiv records</button>
@@ -54,7 +54,7 @@
    <label for="retrieval-scope">Search scope for public questions</label>
    <select id="retrieval-scope"><option value="local">Indexed arXiv records</option><option value="all">Also search public arXiv metadata</option></select>
    <label for="engine">Answer mode</label>
-   <select id="engine"><option value="evidence">Source evidence</option><option value="ollama">Local Ollama model</option><option value="browser">On-device WebGPU model</option><option value="hosted">Hosted AI (bring your own API key)</option></select>
+   <select id="engine"><option value="evidence">Source evidence</option><option value="ollama">Local Ollama model</option><option value="browser">On-device WebGPU model</option><option value="hosted">Hosted AI (when configured)</option></select>
    <div id="ollama-settings" hidden>
     <label for="model">Ollama model</label><select id="model"><option value="qwen3.5:9b">Qwen3.5 9B</option><option value="qwen3.5:27b">Qwen3.5 27B</option><option value="qwen3.5:35b">Qwen3.5 35B</option><option value="qwen3.5:4b">Qwen3.5 4B</option></select>
     <div class="rd-actions"><button class="rd-button rd-secondary" id="detect-models" type="button">Detect installed models</button><button class="rd-button rd-secondary" id="test-ollama" type="button">Check connection</button></div>
