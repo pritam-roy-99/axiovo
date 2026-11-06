@@ -66,7 +66,7 @@
     if(text(p.source).toLowerCase()!=="arxiv")return false;
     const candidate=identifier(p.recordId||p.source_id||p.id);
     if(!candidate||candidate.kind!=="arxiv"||candidate.base.toLowerCase()!==c.identity.base.toLowerCase())return false;
-    if(c.identity.exact&&candidate.version!==c.identity.version)return false;
+    if(c.identity.exact&&(candidate.version??p.version??null)!==c.identity.version)return false;
    }else if(text(p.doi||p.source_id||p.id).toLowerCase().replace(/^(biorxiv|chemrxiv):/,"")!==c.identity.doi)return false;
   }
   const when=text(p.submitted_date||p.date||p.published).slice(0,10);
