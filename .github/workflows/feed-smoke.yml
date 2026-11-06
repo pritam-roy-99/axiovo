@@ -1,0 +1,44 @@
+name: My Feed browser acceptance
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/feed-smoke.yml'
+      - 'docs/feed.html'
+      - 'docs/feed.js'
+      - 'docs/feed.css'
+      - 'docs/feed-core.js'
+      - 'docs/feed-preferences.js'
+      - 'docs/archive-data.js'
+      - 'docs/author-follow.js'
+      - 'scripts/smoke_feed.py'
+      - 'tests/feed-preferences.test.js'
+      - 'tests/feed-core.test.js'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  mobile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify feed and preference models
+        run: |
+          node --check docs/feed.js
+          node --check docs/feed-core.js
+          node --check docs/feed-preferences.js
+          node tests/feed-core.test.js
+          node tests/feed-preferences.test.js
+      - name: Install browser
+        run: |
+          python -m pip install playwright
+          python -m playwright install --with-deps chromium
+      - name: Test mobile feed with source fixtures
+        run: python scripts/smoke_feed.py
