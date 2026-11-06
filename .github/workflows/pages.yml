@@ -34,6 +34,8 @@ jobs:
         id: test_metadata_processing
         continue-on-error: true
         run: python -m unittest discover -s tests -v
+      - name: Verify free-only research AI provider wiring
+        run: python -m unittest discover -s tests -p test_free_research_ai.py -v
       - name: Security and privacy baseline gate (deployment required)
         id: security_and_privacy_baseline_gate
         run: python scripts/security_audit.py
