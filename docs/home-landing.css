@@ -56,3 +56,115 @@ body.axiovo-home .rd-page>.rd-home-section{margin-top:33px}
 
 .axiovo-welcome .axiovo-home-video{display:block;width:100%;height:auto;aspect-ratio:16/9;object-fit:contain;border:1px solid #719db57d;border-radius:16px;background:#08192b;box-shadow:0 25px 50px #04111d60}
 .axiovo-welcome .axiovo-home-video[hidden],.axiovo-welcome .axiovo-demo-frame[hidden]{display:none!important}
+
+/* Unified landing layout: welcome and walkthrough are one continuous section. */
+body.axiovo-home .rd-page > .axiovo-welcome{
+ display:flex!important;
+ flex-direction:column!important;
+ align-items:stretch!important;
+ gap:0!important;
+ padding:clamp(18px,3vw,42px)!important;
+}
+body.axiovo-home .axiovo-welcome-header{
+ display:flex;
+ align-items:flex-end;
+ justify-content:space-between;
+ gap:clamp(20px,4vw,48px);
+ padding-bottom:clamp(20px,3vw,32px);
+}
+body.axiovo-home .axiovo-welcome-copy{flex:1 1 600px;max-width:840px}
+body.axiovo-home .axiovo-welcome h1{
+ max-width:22ch;
+ margin:12px 0 15px;
+ font-size:clamp(2rem,4.2vw,4rem);
+ line-height:1.08;
+}
+body.axiovo-home .axiovo-intro{max-width:72ch}
+body.axiovo-home .axiovo-name-line{margin-top:7px!important}
+body.axiovo-home .axiovo-welcome-header .axiovo-welcome-actions{
+ flex:0 1 240px;display:flex;flex-direction:column;
+ align-items:stretch;margin:0;gap:10px;
+}
+body.axiovo-home .axiovo-welcome-header .axiovo-cta{
+ width:100%;min-width:190px;
+}
+body.axiovo-home .axiovo-welcome-media{
+ width:100%;
+ border-top:1px solid rgba(192,228,246,.35);
+ padding-top:clamp(20px,3vw,32px);
+}
+body.axiovo-home .axiovo-demo-heading{
+ display:flex;align-items:end;justify-content:space-between;
+ gap:16px;padding-bottom:14px;margin:0;
+}
+body.axiovo-home .axiovo-demo-heading > div{min-width:0}
+body.axiovo-home .axiovo-demo-heading h2{
+ color:#fff!important;font-size:clamp(1.4rem,2.4vw,2.15rem);
+ font-weight:800;line-height:1.2;letter-spacing:-.035em;margin:9px 0 5px;
+}
+body.axiovo-home .axiovo-demo-heading p{color:#d4e8f4;line-height:1.55;font-size:.94rem}
+body.axiovo-home .axiovo-demo-frame{
+ display:block;
+ width:100%;max-width:none;
+ border-radius:16px;
+}
+body.axiovo-home .axiovo-demo-screen{
+ display:grid;grid-template-columns:minmax(0,1.25fr) minmax(220px,.75fr);
+ grid-template-rows:auto auto 1fr;
+ align-items:center;
+ gap:0 36px;
+ min-height:310px;
+ padding:clamp(24px,4vw,46px);
+}
+body.axiovo-home .axiovo-demo-overline{grid-column:1;grid-row:1}
+body.axiovo-home .axiovo-demo-screen h3{
+ grid-column:1;grid-row:2;
+ margin:0 0 14px;
+ max-width:24ch;
+ color:white;
+ font-size:clamp(1.7rem,3vw,3rem);
+ line-height:1.13;letter-spacing:-.045em;
+}
+body.axiovo-home .axiovo-demo-screen p{
+ grid-column:1;grid-row:3;align-self:start;
+ font-size:clamp(.95rem,1.2vw,1.06rem);
+ max-width:56ch;
+}
+body.axiovo-home .axiovo-demo-illustration{
+ grid-column:2;grid-row:1/4;
+ display:flex;flex-direction:column;
+ justify-content:center;
+ margin:0;gap:12px;
+}
+body.axiovo-home .axiovo-demo-illustration span{
+ min-height:64px;font-size:1rem;
+}
+body.axiovo-home .axiovo-demo-bottom{margin-top:14px}
+@media(max-width:900px){
+ body.axiovo-home .axiovo-welcome-header{align-items:stretch;flex-direction:column;gap:18px}
+ body.axiovo-home .axiovo-welcome-header .axiovo-welcome-actions{
+  flex:auto;flex-direction:row;flex-wrap:wrap;
+ }
+ body.axiovo-home .axiovo-welcome-header .axiovo-cta{width:auto;min-width:0}
+ body.axiovo-home .axiovo-demo-screen{gap:0 20px}
+}
+@media(max-width:650px){
+ body.axiovo-home .rd-page>.axiovo-welcome{
+  padding:18px 15px!important;border-radius:16px;
+ }
+ body.axiovo-home .axiovo-welcome h1{font-size:clamp(2.05rem,8vw,3rem)}
+ body.axiovo-home .axiovo-welcome-header .axiovo-welcome-actions{display:grid;grid-template-columns:1fr}
+ body.axiovo-home .axiovo-demo-heading{align-items:start;flex-direction:column}
+ body.axiovo-home .axiovo-demo-screen{
+  display:flex;flex-direction:column;align-items:stretch;
+  min-height:300px;gap:0;padding:22px 18px;
+ }
+ body.axiovo-home .axiovo-demo-screen h3{font-size:clamp(1.7rem,7vw,2.4rem)}
+ body.axiovo-home .axiovo-demo-illustration{
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+  margin:24px 0 0;gap:7px;
+ }
+ body.axiovo-home .axiovo-demo-illustration span{
+  min-height:55px;font-size:.75rem;padding:10px 3px;
+ }
+}
