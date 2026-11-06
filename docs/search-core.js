@@ -20,7 +20,7 @@
   const semantic=hybridEnabled?semanticResults.filter(p=>filters.eligible(p.paper||p,q)):[];
   const ranked=hybridEnabled?rrf.fuse({lexical:lexicalRank,semantic}):lexicalRank;
   const getDate=p=>String(p.date||p.submitted_date||p.published||"");
-  const getCite=p=>Number.isFinite(Number(p.citations))?Number(p.citations):null;
+  const getCite=p=>p.citations===null||p.citations===undefined||p.citations===""?null:(Number.isFinite(Number(p.citations))?Number(p.citations):null);
   if(q.sort==="newest")ranked.sort((a,b)=>getDate(b.paper).localeCompare(getDate(a.paper))||a.id.localeCompare(b.id));
   if(q.sort==="oldest")ranked.sort((a,b)=>getDate(a.paper).localeCompare(getDate(b.paper))||a.id.localeCompare(b.id));
   if(q.sort==="title")ranked.sort((a,b)=>String(a.paper.title).localeCompare(String(b.paper.title))||a.id.localeCompare(b.id));
