@@ -38,7 +38,7 @@ RECORDS_PER_PAGE = 1000
 RETRY_DELAYS = (12, 30, 60)  # Respect arXiv rate limits rather than immediately hammering a shared IP
 REQUEST_DELAY = 3.2
 MAX_PAGES_PER_DAY = 20
-BACKFILL_DAYS = 180
+BACKFILL_DAYS = 3650  # Gradual historical coverage; older dates remain explicitly unindexed
 
 
 def validate_date(value: str) -> dt.date:
@@ -125,6 +125,10 @@ def fetch_day(day: dt.date, opener=None, sleep=time.sleep) -> dict:
         if page + 1 >= MAX_PAGES_PER_DAY:
             raise RuntimeError("Maximum pages reached before completing selected day")
         sleep(REQUEST_DELAY)
+    # arXiv's API can temporarily report zero while new batches propagate.
+    # A zero-count response cannot certify a paper-free UTC date.
+    if total == 0:
+        raise RuntimeError("Zero records from arXiv API; retry later rather than certify an empty date")
     if total is None or start != total or len(by_id) != total:
         raise RuntimeError(
             f"Unverified day: fetched {start}/{total} records, {len(by_id)} unique matching IDs"
@@ -153,10 +157,11 @@ def select_days(today: dt.date, existing: dict, count: int = 5) -> list[dt.date]
     # API snapshot at fetched_at, not a promise that arXiv will never change it.
     # Never mark an in-progress UTC day as fully covered.
     # Two recently closed days are checked again for late metadata revisions.
-    selected = [today - dt.timedelta(days=i) for i in (1, 2)]
+    selected = [today - dt.timedelta(days=i) for i in (1, 2, 3)]
     for age in range(3, BACKFILL_DAYS + 1):
         day = today - dt.timedelta(days=age)
-        if day.isoformat() not in existing.get("days", {}):
+        record = existing.get("days", {}).get(day.isoformat(), {})
+        if not record.get("complete") or not isinstance(record.get("count"), int) or record["count"] <= 0:
             selected.append(day)
             if len(selected) >= count:
                 break
@@ -179,6 +184,12 @@ def manual_days(start: str, end: str, limit: int = 31) -> list[dt.date]:
 def run(today: dt.date | None = None, count: int = 5, fetcher=fetch_day, days=None) -> dict:
     today = today or dt.datetime.now(dt.timezone.utc).date()
     manifest = read_manifest()
+    # Repair legacy snapshots that incorrectly marked empty dates complete.
+    # Never erase a positive verified day solely because a later source request fails.
+    for key, record in list(manifest["days"].items()):
+        if record.get("count") == 0:
+            record["complete"] = False
+            record["reason"] = "Zero-paper response must be revalidated against official source"
     completed = 0
     errors = []
     for day in (days if days is not None else select_days(today, manifest, count)):
@@ -188,6 +199,8 @@ def run(today: dt.date | None = None, count: int = 5, fetcher=fetch_day, days=No
             payload = fetcher(day)
             if payload.get("date") != day.isoformat() or payload.get("complete") is not True:
                 raise RuntimeError("Unverified fetcher output")
+            if not isinstance(payload.get("paper_count"), int) or payload["paper_count"] <= 0:
+                raise RuntimeError("Empty source results are unverified, not a complete day")
             if payload.get("paper_count") != payload.get("source_total"):
                 raise RuntimeError("Paper count differs from arXiv totalResults")
             atomic_json(ARCHIVE / (day.isoformat() + ".json"), payload)
@@ -204,7 +217,7 @@ def run(today: dt.date | None = None, count: int = 5, fetcher=fetch_day, days=No
         time.sleep(REQUEST_DELAY)
     manifest["schema"] = 1
     manifest["updated_at"] = dt.datetime.now(dt.timezone.utc).isoformat()
-    manifest["scope"] = "Only explicitly listed UTC submission dates are complete"
+    manifest["scope"] = "Only dates with complete=true and positive verified counts are complete"
     manifest["earliest_backfill_days"] = BACKFILL_DAYS
     atomic_json(MANIFEST, manifest)
     print(f"Daily archive: {completed} complete days; {len(errors)} failed attempts")
