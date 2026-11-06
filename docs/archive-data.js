@@ -12,6 +12,13 @@ const simple=value=>clean(value).normalize("NFKD").replace(/\p{M}/gu,"").toLower
 const plain=value=>clean(value).replace(/<\/?[a-z][^>]*>/gi," ").replace(/&(?:lt|gt|amp|quot|apos|nbsp);/g,m=>({"&lt;":"<","&gt;":">","&amp;":"&","&quot;":'"',"&apos;":"'","&nbsp;":" "}[m])).replace(/\s+/g," ");
 const list=value=>Array.isArray(value)?value:[];
 const day=value=>/^\d{4}-\d{2}-\d{2}/.test(clean(value))?clean(value).slice(0,10):"";
+const citationCount=value=>{
+ if(typeof value==="number")return Number.isInteger(value)&&value>=0?value:null;
+ if(typeof value==="string"&&/^\d+$/.test(value.trim())){
+  const parsed=Number(value);return Number.isSafeInteger(parsed)?parsed:null;
+ }
+ return null;
+};
 const today=()=>new Date().toISOString().slice(0,10);
 const daysAgo=n=>new Date(Date.now()-n*86400000).toISOString().slice(0,10);
 const parseArxiv=value=>root.AxiovoArxiv.parse(clean(value));
@@ -33,7 +40,7 @@ function normalize(source,p){
  const record={
   source,title:plain(p.title),authors,abstract:plain(p.abstract||p.summary),date:day(p.published||p.date||p.created),
   category:clean(p.primary_category||p.category),categories:list(p.categories).map(clean).filter(Boolean),
-  affiliations:list(p.affiliations).map(plain).filter(Boolean),citations:Number.isFinite(p.citations)?p.citations:null,
+  affiliations:list(p.affiliations).map(plain).filter(Boolean),citations:citationCount(p.citations),
   provenance:clean(p.provenance||p.metadata_source),announcementDate:day(p.announcement_date),doi:parseDOI(p.doi||p.DOI)
  };
  if(record.category&&!record.categories.includes(record.category))record.categories.unshift(record.category);
