@@ -16,6 +16,8 @@ on:
       - 'docs/workspace.html'
       - 'tests/test_recommendation_save_ui.py'
       - 'docs/following-authors.js'
+      - 'docs/author-follow.js'
+      - 'tests/author-name-aliases.test.js'
       - 'docs/archive-data.js'
       - 'docs/copilot.js'
       - 'docs/assistant-core.js'
@@ -64,6 +66,11 @@ jobs:
           node tests/assistant-grounding-50.test.js
       - name: Verify mobile Library save button and persistent storage compatibility
         run: python -m unittest discover -s tests -p test_recommendation_save_ui.py -v
+      - name: Verify followed-author initials and researcher identity matching
+        run: |
+          node --check docs/following-authors.js
+          node --check docs/author-follow.js
+          node tests/author-name-aliases.test.js
       - name: Validate browser scripts and source links
         run: |
           python -m scripts.validate_site
