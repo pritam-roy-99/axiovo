@@ -385,3 +385,17 @@ body.axiovo-home .axiovo-brand-meaning strong {
   font-size:14px;
  }
 }
+
+/* Consistent sorting UI in all research result views. */
+.paper-sort-toolbar{display:flex;align-items:center;flex-wrap:wrap;gap:9px;margin:12px 0;
+ padding:10px 12px;border:1px solid var(--rl-border,#cbdde9);
+ border-radius:11px;background:var(--rl-panel,#fff)}
+.paper-sort-toolbar label{font-size:12px;font-weight:750;color:var(--rl-text,#17324a)}
+.paper-sort-toolbar select{min-width:150px;max-width:100%;min-height:42px;
+ border:1px solid var(--rl-border,#cbdde9);border-radius:9px;
+ padding:8px 12px;background:var(--rl-panel,#fff);color:var(--rl-text,#17324a);
+ font:inherit;font-size:13px;cursor:pointer}
+.paper-sort-toolbar [role="status"]{flex:1 1 160px;font-size:12px;line-height:1.5;color:var(--rl-muted,#607a91)}
+.paper-sort-toolbar select:focus-visible{outline:3px solid var(--axiovo-brand,#157ba7);outline-offset:2px}
+@media(max-width:520px){.paper-sort-toolbar{align-items:stretch}
+.paper-sort-toolbar label{width:100%}.paper-sort-toolbar select{flex:1 1 100%}}
