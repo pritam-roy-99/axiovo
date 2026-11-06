@@ -38,6 +38,47 @@ function paper(p){
  });
  save.disabled=data.saved(p);card.append(save);return card;
 }
+async function openAlexAuthorPapers(name,signal){
+ const endpoint="https://api.openalex.org";
+ const authorQuery=new URLSearchParams({search:name,per_page:"15",
+  select:"id,display_name,works_count,last_known_institutions"});
+ const response=await fetch(endpoint+"/authors?"+authorQuery,{
+  headers:{Accept:"application/json"},signal});
+ if(!response.ok)throw Error("OpenAlex author lookup HTTP "+response.status);
+ const people=(await response.json()).results||[];
+ const candidates=people.filter(p=>p.id&&follow.matchesName(name,p.display_name)).slice(0,3);
+ if(!candidates.length)return {papers:[],identity:"No confirmed matching OpenAlex author name"};
+ const papers=[];
+ for(const person of candidates){
+  if(signal.aborted)break;
+  const identifier=String(person.id).split("/").at(-1);
+  if(!/^A\d+$/.test(identifier))continue;
+  const query=new URLSearchParams({
+   filter:"authorships.author.id:"+identifier,per_page:"100",
+   sort:"publication_date:desc",
+   select:"id,display_name,publication_date,authorships,locations,primary_location,best_oa_location,abstract_inverted_index"});
+  const works=await fetch(endpoint+"/works?"+query,{headers:{Accept:"application/json"},signal});
+  if(!works.ok)continue;
+  for(const work of (await works.json()).results||[]){
+   const arxiv=window.AxiovoArxiv?.candidates(work)?.[0];
+   if(!arxiv||!work.display_name)continue;
+   const authorNames=(work.authorships||[]).map(a=>a.author?.display_name).filter(Boolean);
+   if(!authorNames.some(a=>follow.matchesName(name,a)))continue;
+   // OpenAlex publication date is not necessarily an arXiv v1 date.
+   const index=work.abstract_inverted_index||{},positioned=[];
+   for(const [word,positions] of Object.entries(index)){
+    if(!Array.isArray(positions))continue;
+    for(const pos of positions)if(Number.isInteger(pos)&&pos>=0&&pos<1500)positioned[pos]=word;
+   }
+   const paper=data.normalize("arxiv",{
+    id:arxiv.requested,title:work.display_name,authors:authorNames,
+    abstract:positioned.filter(Boolean).join(" ").slice(0,5000),
+    provenance:"OpenAlex author identity, arXiv-linked work"});
+   if(paper)papers.push(paper);
+  }
+ }
+ return {papers,identity:candidates.map(p=>p.display_name).join(" / ")};
+}
 async function checkLane(archive,criteria,signal){
  const lane=make("section",undefined,"rd-panel");
  const message=make("p","Checking this archive…","rd-small");
@@ -84,6 +125,20 @@ async function checkLane(archive,criteria,signal){
   records=data.filter(data.merge(records,data.filter(snapshot.papers,criteria)),criteria);render();
  });
  await Promise.all([cache,load()]);
+ if(archive==="arxiv"&&!signal.aborted&&records.length<6){
+  try{
+   message.textContent="Checking verified author identities and arXiv-linked works…";
+   const expanded=await openAlexAuthorPapers(criteria.author,signal);
+   if(signal.aborted)return;
+   records=data.filter(data.merge(records,expanded.papers),criteria);
+   message.textContent=records.length+" arXiv-linked matching papers. Author search checked "+
+    expanded.identity+". OpenAlex records may have incomplete arXiv coverage and publication dates.";
+   render();
+  }catch(error){
+   if(!signal.aborted)message.textContent=records.length+
+    " matching cached/DataCite papers. OpenAlex identity lookup unavailable. Try again or use archive search.";
+  }
+ }
 }
 async function refresh(){
  controller?.abort();results.replaceChildren();
