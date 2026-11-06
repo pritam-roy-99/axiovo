@@ -30,6 +30,13 @@ class PaperSortUITests(unittest.TestCase):
         source=(DOCS/"feed.js").read_text(encoding="utf8")
         self.assertIn('AxiovoPaperSort',source)
         self.assertIn('const filtered=current.filter(',source)
+    def test_research_assistant_evidence_references_stay_stable(self):
+        html=(DOCS/"copilot.html").read_text(encoding="utf8")
+        code=(DOCS/"copilot.js").read_text(encoding="utf8")
+        self.assertIn('id="source-sort"',html)
+        self.assertIn('src="./paper-sort.js"',html)
+        self.assertIn('const i=sources.indexOf(s)',code)
+        self.assertIn('AxiovoPaperSort?.sort(sources,mode)',code)
     def test_source_filtering_remains_before_sorting(self):
         data=(DOCS/"archive-data.js").read_text(encoding="utf8")
         self.assertIn('score:matchScore(p,criteria)',data)
