@@ -16,6 +16,7 @@
 <script defer src="./navigation.js"></script>
 <script defer src="./arxiv-versions.js"></script>
 <script defer src="./archive-data.js"></script>
+<script defer src="./paper-sort.js"></script>
 <script defer src="./assistant-core.js"></script>
 <script defer src="./author-follow.js"></script>
 <script defer src="./hosted-ai-config.js"></script>
@@ -91,6 +92,7 @@
   </section>
   <section class="rd-panel" aria-labelledby="assistant-source-title">
    <div class="assistant-panel-head"><h2 id="assistant-source-title">Sources</h2><span id="source-count" class="rd-count">0</span></div>
+   <div class="paper-sort-toolbar"><label for="source-sort">Order source papers</label><select id="source-sort"><option value="relevance">Evidence citation order</option><option value="recent">Newest first</option><option value="oldest">Oldest first</option><option value="cited">Most cited (known counts)</option></select><span id="source-sort-note" class="rd-small" role="status"></span></div>
    <p id="retrieval-status" class="rd-small" role="status">Loading the arXiv index…</p>
    <p class="rd-small">Showing the strongest matching papers first. Abstracts and author actions are collapsed to keep mobile browsing readable.</p>
    <div id="evidence-list"></div>
