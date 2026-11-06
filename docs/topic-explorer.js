@@ -49,7 +49,7 @@ let selected=pathFrom(params.size?Object.fromEntries(params):stored?.last);
 let catalog=new Map(), catalogReady=false, index=[], topics=[], topic, leaf, subject;
 let search=null, datePreset=0;
 const initialSort=params.get("sort");
-$("sort").value=["recent","cited"].includes(initialSort)?initialSort:"relevance";
+$("sort").value=["recent","oldest","cited"].includes(initialSort)?initialSort:"relevance";
 $("match").value=params.get("match")==="title"?"title":"metadata";
 $("query").value=clean(params.get("q")||params.get("query"),220);
 for(const field of ["author","affiliation","from","to"])$(field).value=clean(params.get(field));
@@ -284,7 +284,10 @@ function filtered(state){
 function drawResults(state){
  if(state!==search)return;
  if(state.announcementOnly)$("scope-label").textContent="Scope: latest official announcement · "+(pathText()||"all arXiv categories")+".";
- const rows=filtered(state),results=$("results"),actions=$("result-actions"),c=state.criteria;
+ const c=state.criteria,sorter=$("result-sort");
+ if(sorter&&sorter.value!==c.sort)sorter.value=c.sort||"relevance";
+ const rows=filtered(state),results=$("results"),actions=$("result-actions");
+ if($("sort-note"))$("sort-note").textContent=window.AxiovoPaperSort?.note(rows,c.sort)||"";
  $("result-count").textContent=rows.length.toLocaleString()+" matching "+name+" record"+(rows.length===1?"":"s")+(state.loading?" · checking source…":"");
  $("sync-status").textContent=state.message;
  $("match-details").hidden=!c.topicTerms.length;
@@ -528,6 +531,18 @@ $("save-path").onclick=()=>{
  if(!data.write(key,{personal,followed:next,last:selected})){personalStatus("Browser storage is unavailable.");return}
  followed=next;drawPersonal();personalStatus("Research path saved on this device.");
 };
+const sortSelection=$("result-sort");
+if(sortSelection){
+ sortSelection.value=$("sort").value;
+ sortSelection.addEventListener("change",()=>{
+  $("sort").value=sortSelection.value;
+  if(search){search.criteria.sort=sortSelection.value;search.visible=12;drawResults(search);}
+ });
+ $("sort").addEventListener("change",()=>{
+  sortSelection.value=$("sort").value;
+  if(search){search.criteria.sort=$("sort").value;drawResults(search);}
+ });
+}
 drawPath();rebuildIndex();
 fetch("./data/topics/"+source+".tsv",{signal:AbortSignal.timeout(6500)})
  .then(response=>{if(!response.ok)throw Error("Topic directory unavailable");return response.text()})
