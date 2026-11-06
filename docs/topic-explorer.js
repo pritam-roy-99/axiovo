@@ -7,6 +7,7 @@ if(!data||!atlas||!Object.hasOwn(data.names,source))return;
 const name=data.names[source], $=id=>document.getElementById("archive-"+id);
 const key="axiovo-topic-explorer-"+source+"-v1";
 const subjects=atlas.subjects(source);
+const researchPickers=[];
 const params=new URLSearchParams(location.search);
 const clean=(value,max=100)=>typeof value==="string"?value.trim().slice(0,max):"";
 const option=(value,label)=>new Option(label,value);
@@ -157,6 +158,7 @@ function drawPath(){
  $("topic").value=topic?.id||"";$("topic").disabled=!topics.length;
  $("subfield").replaceChildren(option("",!topic?"Choose a research topic first":!topic.leaves.length?"No sub-subtopics yet":"All sub-subtopics in this topic"),...(topic?.leaves||[]).map(l=>option(l.id,l.name)));
  $("subfield").value=leaf?.id||"";$("subfield").disabled=!topic?.leaves.length;
+ for(const picker of researchPickers)picker.sync();
  drawChoices("topic-options",topics,topic,row=>selectPath({category:selected.category,topic:row.id}));
  drawChoices("subtopic-options",topic?.leaves||[],leaf,row=>selectPath({category:selected.category,topic:selected.topic,subtopic:row.id}));
  $("clear-path").disabled=!subject&&!selected.refine;
@@ -542,11 +544,21 @@ if(sortSelection){
  sortSelection.value=$("sort").value;
  sortSelection.addEventListener("change",()=>changeSort(sortSelection.value));
 }
+if(window.AxiovoSearchableSelect){
+ for(const [id,hint] of [["field","Type a subject or category code"],["topic","Type a research subfield"],
+  ["subfield","Type a subtopic"]]){
+  researchPickers.push(window.AxiovoSearchableSelect.mount($(id),hint));
+ }
+}
 drawPath();rebuildIndex();
 fetch("./data/topics/"+source+".tsv",{signal:AbortSignal.timeout(6500)})
  .then(response=>{if(!response.ok)throw Error("Topic directory unavailable");return response.text()})
  .then(setCatalog)
- .catch(()=>{$("taxonomy-count").textContent="Topic directory unavailable · subject search is still available";$("topic").options[0].textContent="Topic directory unavailable"})
+ .catch(()=>{
+  $("taxonomy-count").textContent="Topic directory unavailable · subject search is still available";
+  $("topic").options[0].textContent="Topic directory unavailable";
+  for(const picker of researchPickers)picker.sync();
+ })
  .finally(()=>{
   const needsBioScope=source==="biorxiv"&&selected.category&&($("query").value||$("author").value);
   if(!(source==="arxiv"&&params.get("announced")==="latest")&&(!search||selected.topic||selected.refine||needsBioScope))runSearch({persist:false});
