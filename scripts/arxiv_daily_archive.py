@@ -158,6 +158,22 @@ def select_days(today: dt.date, existing: dict, count: int = 5) -> list[dt.date]
     # Never mark an in-progress UTC day as fully covered.
     # Three recently closed days are checked again for late metadata revisions.
     selected = [today - dt.timedelta(days=i) for i in (1, 2, 3)]
+    # Prioritize previously detected missing/corrupt batches before older
+    # historical dates. The audit report contains no unsupported paper claims.
+    try:
+        report = json.loads((ROOT / "docs/data/literature-health.json").read_text(encoding="utf8"))
+        repairs = report.get("arxiv", {}).get("repair_queue", [])
+    except (OSError, ValueError, AttributeError):
+        repairs = []
+    for candidate in repairs:
+        try:
+            day = validate_date(candidate)
+        except (ValueError, TypeError):
+            continue
+        if day < today and (today-day).days <= BACKFILL_DAYS and day not in selected:
+            selected.append(day)
+            if len(selected) >= count:
+                return selected[:count]
     for age in range(4, BACKFILL_DAYS + 1):
         day = today - dt.timedelta(days=age)
         record = existing.get("days", {}).get(day.isoformat(), {})
