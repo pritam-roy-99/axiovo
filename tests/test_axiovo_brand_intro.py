@@ -1,33 +1,38 @@
-"""Guard the original Axiovo name meaning in the homepage and both video openings."""
+"""Check the unified Axiovo welcome and the genuine narrated video source."""
 from pathlib import Path
 import unittest
 
 ROOT=Path(__file__).resolve().parents[1]
 HOME=(ROOT/"docs/index.html").read_text(encoding="utf8")
-TUTORIAL=(ROOT/"scripts/build_tutorial_video.py").read_text(encoding="utf8")
+TOUR=(ROOT/"scripts/build_tutorial_video.py").read_text(encoding="utf8")
 INTRO=(ROOT/"scripts/build_intro_video.py").read_text(encoding="utf8")
 
 class BrandIntroTest(unittest.TestCase):
-    def test_brand_meaning_in_home_hero(self):
-        self.assertIn('id="welcome-title"', HOME)
-        self.assertEqual(HOME.count('class="axiovo-name-meaning"'), 1)
-        self.assertIn("Axiovo = Axiom + Novo", HOME)
-        self.assertIn("foundation for reasoning", HOME)
-        self.assertIn("new discoveries", HOME)
+    def test_one_unified_home_hero(self):
+        self.assertEqual(HOME.count('<section class="axiovo-welcome"'),1)
+        self.assertEqual(HOME.count('id="welcome-title"'),1)
+        self.assertIn('class="axiovo-name-line"',HOME)
+        self.assertIn('Axiom</em> + <em>Novo',HOME)
+        self.assertIn("new discoveries",HOME)
+        self.assertNotIn('class="rd-home-hero rd-topic-home"',HOME)
+        section=HOME.split('<section class="axiovo-welcome"',1)[1].split('</section>',1)[0]
+        self.assertIn('id="axiovo-home-video"',section)
+        self.assertIn('id="axiovo-tour-heading"',section)
+        self.assertLess(section.index('id="welcome-title"'),section.index('id="axiovo-home-video"'))
 
-    def test_video_starts_with_meaning_and_narrates_it(self):
-        first=TUTORIAL.split("steps=[",1)[1].split('("Three preprint archives"',1)[0]
+    def test_narration_keeps_brand_intro(self):
+        first=TOUR.split("steps=[",1)[1].split('("Three preprint archives"',1)[0]
         self.assertIn('Axiovo = Axiom + Novo',first)
         self.assertIn("foundational starting point for reasoning",first)
-        self.assertIn(".axiovo-name-meaning",first)
+        self.assertIn('".axiovo-welcome"',first)
         self.assertIn('("Axiovo = Axiom + Novo"',INTRO)
-        self.assertIn("novo, meaning new",INTRO)
 
-    def test_video_and_transcript_refreshed(self):
-        self.assertIn("Read video transcript",HOME)
-        self.assertIn("Axiovo combines axiom",HOME)
-        self.assertIn("axiovo-tour.mp4?v=20261106-brand-intro",HOME)
-        self.assertIn("axiovo-tour.vtt?v=20261106-brand-intro",HOME)
+    def test_one_video_with_captions_and_a_guide(self):
+        self.assertIn('src="./assets/axiovo-tour.mp4"',HOME)
+        self.assertIn('src="./assets/axiovo-tour.vtt"',HOME)
+        self.assertIn('kind="captions"',HOME)
+        self.assertIn("Full step-by-step guide",HOME)
+        self.assertIn('id="axiovo-tour" hidden',HOME)
 
 if __name__=="__main__":
     unittest.main()
