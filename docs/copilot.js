@@ -24,11 +24,17 @@ function addSources(records,appendMode=false){
  for(const raw of records){const p=normSource(raw);if(!isSourceURL(p.url)||keys.has(p.url))continue;keys.add(p.url);existing.push(p);if(existing.length>=15)break}
  sources=existing;renderSources();
 }
+if($("source-sort"))$("source-sort").addEventListener("change",renderSources);
 function renderSources(){
  const root=$("evidence-list");root.replaceChildren();$("source-count").textContent=String(sources.length);
+ const mode=$("source-sort")?.value||"relevance";
+ const shown=mode==="relevance"?sources:window.AxiovoPaperSort?.sort(sources,mode)||sources;
+ if($("source-sort-note"))$("source-sort-note").textContent=
+  window.AxiovoPaperSort?.note(sources,mode)||"Source reference numbers remain fixed to the answer.";
  function render(limit){
   root.replaceChildren();
-  sources.slice(0,limit).forEach((s,i)=>{
+  shown.slice(0,limit).forEach(s=>{
+   const i=sources.indexOf(s);
    const item=append("article","",root,"source");
    append("span","["+(i+1)+"]",item,"number");
    append("span"," "+s.provider+" · "+(s.date||"date unknown").slice(0,10),item,"tiny");
@@ -40,15 +46,15 @@ function renderSources(){
    window.AxiovoAuthorFollow?.attach(details,s.authors);
    item.append(details);
   });
-  if(limit<sources.length){
-   const more=append("button","Show all "+sources.length+" sources",root,"rd-button rd-secondary assistant-more-sources");
+  if(limit<shown.length){
+   const more=append("button","Show all "+shown.length+" sources",root,"rd-button rd-secondary assistant-more-sources");
    more.type="button";more.onclick=()=>render(sources.length);
-  }else if(sources.length>4){
+  }else if(shown.length>4){
    const less=append("button","Show fewer sources",root,"rd-button rd-secondary assistant-more-sources");
    less.type="button";less.onclick=()=>render(4);
   }
  }
- render(Math.min(sources.length,4));
+ render(Math.min(shown.length,4));
 }
 function message(role,content){
  const box=append("div","",$("conversation"),"message "+role);
