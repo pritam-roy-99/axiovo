@@ -1,5 +1,6 @@
 import sys
 import unittest
+from unittest.mock import patch
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -37,6 +38,12 @@ class OaiTests(unittest.TestCase):
     def test_oai_error(self):
         source = b'<OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/"><error code="badArgument">Invalid argument</error></OAI-PMH>'
         self.assertEqual(parse_page(source)[2], ["Invalid argument"])
+
+
+    def test_repeated_continuation_token_aborts_without_completion(self):
+        with patch("scripts.oai_harvest.fetch", return_value=SAMPLE), patch("scripts.oai_harvest.time.sleep"):
+            with self.assertRaisesRegex(RuntimeError,"Repeated or invalid OAI continuation token"):
+                harvest("2026-11-01", max_pages=5)
 
     def test_deleted_record(self):
         source = b'<OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/"><ListRecords><record><header status="deleted"><identifier>oai:arXiv.org:2601.00123</identifier></header></record></ListRecords></OAI-PMH>'
