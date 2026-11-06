@@ -5,14 +5,8 @@ const host=document.getElementById("axiovo-home-feed-preview");
 if(!host||!window.AxiovoFeedCore||!window.AxiovoArchiveData)return;
 const core=window.AxiovoFeedCore,archive=window.AxiovoArchiveData,follow=window.AxiovoAuthorFollow;
 function read(k,otherwise){try{return JSON.parse(localStorage.getItem(k)||"null")??otherwise}catch{return otherwise}}
-const settings=read("axiovo-research-interest-settings-v1",{}),field=read("axiovo-field-explorer-v1",{});
-const interests=read("axiovo-interests-by-field-v1",{}),all=[];
-for(const x of settings.interests||[])if(typeof x==="string")all.push(x);
-for(const x of read("axiovo-followed-topics",[])||[])if(typeof x==="string")all.push(x);
-for(const x of [field.topic,field.subtopic])if(typeof x==="string")all.push(x);
-for(const group of Object.values(interests||{}))for(const entries of Object.values(group||{}))
- if(Array.isArray(entries))all.push(...entries.filter(x=>typeof x==="string"));
-const topics=[...new Set(all.filter(Boolean))],authors=[...(follow?.list()||[]),...(settings.authors||[])];
+const preferences=window.AxiovoFeedPreferences?.derive(localStorage);
+const topics=preferences?.topics||[],authors=preferences?.authors||[];
 function paragraph(text){const p=document.createElement("p");p.textContent=text;host.append(p)}
 if(!topics.length&&!authors.length){
  host.replaceChildren();const box=document.createElement("article");box.className="feed-preview-empty";
