@@ -28,7 +28,7 @@ def main():
              {"id":"2611.00011","title":"Preparation contextuality and quantum dimension witnessing",
               "abstract":"Quantum preparation contextuality is an operational signature of nonclassicality.",
               "authors":["Archan S Majumdar"],"published":"2026-11-04"},
-             {"id":"2611.00012","title":"Experimental quantum contextuality under operational equivalences",
+             {"id":"2611.00012","title":"Experimental preparation contextuality under operational equivalences",
               "abstract":"We demonstrate quantum contextuality under experimental operational constraints.",
               "authors":["Another Researcher"],"published":"2026-11-05"},
              {"id":"2611.00013","title":"Educational robotics beyond ROS",
