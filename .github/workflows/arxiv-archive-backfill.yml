@@ -7,6 +7,8 @@ on:
       - scripts/arxiv_daily_archive.py
       - tests/test_arxiv_daily_archive.py
       - docs/arxiv-daily-archive.js
+      - scripts/audit_literature_coverage.py
+      - tests/test_literature_coverage.py
   schedule:
     # Independent SciRate-style ingestion: revisit closed UTC dates and
     # gradually backfill older gaps without competing with hourly OAI pulls.
@@ -47,12 +49,16 @@ jobs:
           AXIOVO_ARCHIVE_TO: ${{ inputs.to_date }}
           AXIOVO_DAILY_BACKFILL_COUNT: "5"
         run: python -m scripts.arxiv_daily_archive
+      - name: Validate repair queue from published source counts
+        run: |
+          python -m unittest discover -s tests -p test_literature_coverage.py -v
+          python -m scripts.audit_literature_coverage
       - name: Publish only complete source-verified date shards
         id: archive_commit
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docs/data/arxiv-days/
+          git add docs/data/arxiv-days/ docs/data/literature-health.json
           if ! git diff --cached --quiet; then
             echo "changed=true" >> "$GITHUB_OUTPUT"
             git commit -m "data: complete arXiv submission-day archive"
