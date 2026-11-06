@@ -60,7 +60,7 @@ for(const field of ["from","to"])$(field).max=allDates();
 
 function savePrefs(){
  const existing=data.read(key,{});
- return data.write(key,{personal,followed,...existing,last:selected});
+ return data.write(key,{...existing,last:selected});
 }
 function syncURL(criteria){
  const url=new URL(location.href);
@@ -210,7 +210,8 @@ function paperCard(p,c){
  const meta=[recordLabel,
   ...(releaseView?["Announced "+(p.announcementDate||"date unavailable")+" (US Eastern)",
     p.date?"First submitted "+p.date+" (UTC)":"First-submission date unavailable"]:
-   [p.date?"First submitted "+p.date+" (UTC)":p.announcementDate?"Announced "+p.announcementDate:"Date unavailable"]),
+   [p.date?(p.source==="arxiv"?"First submitted "+p.date+" (UTC)":"Posted "+p.date):
+    p.announcementDate?"Announced "+p.announcementDate:"Date unavailable"]),
   p.category].filter(Boolean).join(" · ");
  card.append(element("p",meta,"rd-small"));
  if(Number.isFinite(p.citations)&&p.citations>=0)card.append(element("p","Cited by "+p.citations.toLocaleString()+" (available source metadata)","rd-small"));
@@ -230,7 +231,11 @@ function paperCard(p,c){
  const actions=element("div",undefined,"rd-actions");
  actions.append(link("Original record ↗",p.url,"rd-button"));
  if(p.pdf)actions.append(link("PDF ↗",p.pdf,"rd-button"));
- if(source==="arxiv")actions.append(link("Paper workspace","./paper.html?id="+encodeURIComponent(p.recordId),"rd-button"));
+ if(source==="arxiv"){
+  const id=encodeURIComponent(p.recordId);
+  actions.append(link("Paper workspace","./paper.html?id="+id,"rd-button"));
+  actions.append(link("Research Assistant","./copilot.html?id="+id,"rd-button"));
+ }
  const save=button(data.saved(p)?"Saved to Library":"Save to Library",()=>{
   save.disabled=data.save(p);save.textContent=save.disabled?"Saved to Library":"Browser storage unavailable";
  });
@@ -324,36 +329,32 @@ async function loadLive(state,more=false){
  if(signal.aborted)return;
  state.loading=true;state.failed=false;state.message=state.coverage+"Checking live "+name+" metadata…";drawResults(state);
  const cursor=more?state.next:null;
+ let checked=0, page=[], provider="";
+ const seen=new Set();
+ let next=cursor;
  try{
-  const result=await data.live(source,c,signal,cursor);
-  if(signal.aborted)return;
-  // Continue through bounded source pages until the first screen has enough
-  // actual matches. A provider hit is not necessarily a relevant paper.
-  let page=data.filter(result.papers,c);
-  let next=result.next===cursor?null:result.next;
-  let pagesChecked=1;
-  const seen=new Set([String(cursor??"")]);
-  while(page.length<12&&next!=null&&pagesChecked<4&&!signal.aborted){
-   const current=String(next);
-   if(seen.has(current))break;
-   seen.add(current);
-   const additional=await data.live(source,c,signal,next);
+  // Keep each successful page even if a later request fails.
+  do{
+   seen.add(String(next));
+   const result=await data.live(source,c,signal,next);
    if(signal.aborted)return;
-   page=data.merge(page,data.filter(additional.papers,c));
-   next=additional.next===next?null:additional.next;
-   pagesChecked++;
-  }
-  state.remote=more?data.merge(state.remote,page):page;
-  state.next=next;
-  if(more)state.visible+=12;
+   provider=result.provider;
+   page=data.merge(page,data.filter(result.papers,c));
+   checked++;
+   next=seen.has(String(result.next))?null:result.next;
+   state.next=next;
+   state.remote=data.merge(state.remote,page);
+   drawResults(state);
+  }while(page.length<12&&next!=null&&checked<4);
   const fallbackCategory=c.category&&source==="biorxiv"&&(c.topicTerms.length||c.q||c.author||c.refinement);
   const categoryNote=fallbackCategory?" bioRxiv papers without a subject tag are checked using topical evidence.":c.category&&source==="chemrxiv"?" Chemistry subject matches use topic terms when Crossref omits subject tags.":"";
-  state.message=state.coverage+result.provider+" · "+pagesChecked+" source page"+(pagesChecked===1?"":"s")+" checked · "+page.length+" matching record"+(page.length===1?"":"s")+" retrieved"+(next!=null?" · More pages available.":" · Source pagination exhausted.")+" Full archive coverage is not implied."+categoryNote;
+  state.message=state.coverage+provider+" · "+checked+" source page"+(checked===1?"":"s")+" checked · "+page.length+" matching record"+(page.length===1?"":"s")+" retrieved"+(next!=null?" · More pages available.":" · Source pagination exhausted.")+" Coverage may be partial."+categoryNote;
  }catch{
   if(signal.aborted)return;
   state.failed=true;
-  state.message=state.coverage+"The live source could not be reached. Available snapshots are shown, and you can retry the source.";
+  state.message=state.coverage+"The live source could not be reached. Earlier results are available, and you can retry the source.";
  }
+ if(more&&checked)state.visible+=12;
  state.loading=false;drawResults(state);
 }
 /* Announced releases are explicitly separate from UTC first-submission
@@ -384,9 +385,7 @@ async function showLatestAnnouncement(){
   state.local=batch.papers;
   state.loading=false;
   state.complete=false;
-  const indiaDay=new Date(Date.parse(batch.date+"T00:00:00Z")+86400000).toISOString().slice(0,10);
-  state.message="Official arXiv release: "+batch.date+" (US Eastern), shown as "+indiaDay+
-    " in India · "+batch.papers.length.toLocaleString()+" source-linked records."+
+  state.message="Official arXiv release: "+batch.date+" · "+batch.papers.length.toLocaleString()+" source-linked records."+
     (batch.complete?" All official archive RSS feeds were verified.":" Partial source coverage; not all archive feeds were verified.")+
     " This is the announcement date, not the first-submission date.";
   drawResults(state);
@@ -422,7 +421,7 @@ async function runSearch({persist=true}={}){
  }
  const local=data.snapshot(source).then(snapshot=>{
   if(!state.controller.signal.aborted&&!state.complete)useSnapshot(state,snapshot);
- });
+ }).catch(()=>{});
  let batch=null;
  if(source==="arxiv"){
   try{batch=await data.datedArxiv(c,state.controller.signal)}catch{}
@@ -476,11 +475,17 @@ $("search-form").onsubmit=e=>{
   search.criteria=criteriaFromForm();search.visible=12;drawResults(search);
  }else{datePreset++;runSearch()}
 };
-$("sort").onchange=()=>{
- if(search?.announcementOnly&&!search.loading){
-  search.criteria=criteriaFromForm();drawResults(search);
+function changeSort(mode){
+ $("sort").value=mode;
+ if($("result-sort"))$("result-sort").value=mode;
+ if(search?.announcementOnly||search?.complete){
+  search.criteria={...search.criteria,sort:mode};
+  search.visible=12;
+  if(!search.announcementOnly)syncURL(criteriaFromForm());
+  drawResults(search);
  }else{datePreset++;runSearch()}
-};
+}
+$("sort").onchange=()=>changeSort($("sort").value);
 $("date-open").onclick=()=>{$("advanced").open=true;$("from").focus()};
 $("announced")?.addEventListener("click",showLatestAnnouncement);
 $("latest").onclick=()=>{
@@ -535,14 +540,7 @@ $("save-path").onclick=()=>{
 const sortSelection=$("result-sort");
 if(sortSelection){
  sortSelection.value=$("sort").value;
- sortSelection.addEventListener("change",()=>{
-  $("sort").value=sortSelection.value;
-  if(search){search.criteria.sort=sortSelection.value;search.visible=12;drawResults(search);}
- });
- $("sort").addEventListener("change",()=>{
-  sortSelection.value=$("sort").value;
-  if(search){search.criteria.sort=$("sort").value;drawResults(search);}
- });
+ sortSelection.addEventListener("change",()=>changeSort(sortSelection.value));
 }
 drawPath();rebuildIndex();
 fetch("./data/topics/"+source+".tsv",{signal:AbortSignal.timeout(6500)})

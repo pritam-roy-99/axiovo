@@ -19,4 +19,6 @@ const source=[...papers];Sort.sort(papers,"recent");assert.deepEqual(papers,sour
 const ranked=papers.map((paper,i)=>({paper,score:i*2}));
 assert.equal(Sort.sort(ranked,"relevance",x=>x.score)[0].paper.id,"c");
 assert.equal(Sort.sort(ranked,"recent")[0].paper.id,"d");
+assert.equal(Sort.when({date:"2026-10-01",announcementDate:"2026-11-04"}),Date.parse("2026-10-01"),
+ "A later announcement does not change the recorded submission date");
 console.log("PASS: cross-archive newest/oldest/cited/relevance and missing metadata ordering");

@@ -8,9 +8,11 @@ const records=[
  {DOI:"10.26434/other-nonchemrxiv",title:["Non-ChemRxiv work"]},
  {DOI:"10.99999/chemrxiv-2024-invalid",title:["Different DOI prefix"]}
 ];
+const requests=[];
 const root={URL,URLSearchParams,AbortSignal,Event,dispatchEvent(){},localStorage:{getItem(){return null},setItem(){}},
  fetch:async url=>{
   assert.match(String(url),/api\.crossref\.org\/prefixes\/10\.26434\/works/);
+  requests.push(new URL(String(url)).searchParams);
   return {ok:true,json:async()=>({message:{items:records,"total-results":records.length}})};
  }};
 root.window=root;vm.createContext(root);
@@ -25,5 +27,11 @@ const data=root.AxiovoArchiveData;
  assert(result.papers.some(p=>p.id==="10.26434/chemrxiv-2024-hsvp"));
  assert(result.papers.some(p=>p.id==="10.26434/chemrxiv.987654"));
  assert(!result.papers.some(p=>p.id.includes("other-nonchemrxiv")));
+ await data.live("chemrxiv",{q:"catalysis",sort:"oldest"});
+ assert.equal(requests.at(-1).get("sort"),"published");
+ assert.equal(requests.at(-1).get("order"),"asc");
+ await data.live("chemrxiv",{q:"catalysis",sort:"cited"});
+ assert.equal(requests.at(-1).get("sort"),"is-referenced-by-count");
+ assert.equal(requests.at(-1).get("order"),"desc");
  console.log("PASS: hyphenated and dotted ChemRxiv DOI ingestion excludes unrelated records");
 })().catch(e=>{console.error(e);process.exitCode=1});

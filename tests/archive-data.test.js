@@ -2,11 +2,16 @@
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
 const vm=require("node:vm");
-const storage=new Map();
+const storage=new Map([["researchlens-reading-list",'["2207.00009v1"]']]);
+const requests=[];
 const sandbox={
  URL,URLSearchParams,AbortSignal,Event,dispatchEvent(){},
  localStorage:{getItem:key=>storage.get(key),setItem:(key,value)=>storage.set(key,value)},
  fetch:async url=>{
+  const request=new URL(String(url));requests.push(request);
+  if(request.hostname==="api.biorxiv.org")return {
+   ok:true,json:async()=>({messages:[{status:"no posts found"}],collection:[]})
+  };
   assert.match(String(url),/ebi\.ac\.uk\/europepmc/);
   const query=new URL(String(url)).searchParams.get("query");
   assert.match(query,/PUBLISHER:"bioRxiv"/);
@@ -22,6 +27,7 @@ vm.createContext(sandbox);
 for(const file of ["arxiv-versions.js","archive-taxonomy.js","archive-data.js"])
  vm.runInContext(fs.readFileSync("docs/"+file,"utf8"),sandbox);
 const data=sandbox.AxiovoArchiveData;
+assert.equal(storage.get("axiovo-reading-list"),'["2207.00009v1"]',"Read older saved papers when the current key is absent");
 const taxonomy=sandbox.AxiovoArchiveTaxonomy;
 assert.equal(taxonomy.directory("arxiv").length,155);
 assert.equal(taxonomy.directory("biorxiv").length,27);
@@ -36,8 +42,15 @@ assert.equal(data.comparison().length,2);
 assert.equal(data.save(revision),true);
 assert.equal(data.saved(revision),true);
 assert.equal(data.savedRecords("arxiv")[0].recordId,"2207.00001v2");
+const bioV1=data.normalize("biorxiv",{doi:"10.1101/123456",version:1,title:"Early version"});
+const bioV2=data.normalize("biorxiv",{doi:"10.1101/123456",version:2,title:"Later version"});
+assert(data.save(bioV1)&&data.save(bioV2));
+assert.equal(data.savedRecords("biorxiv").length,2);
+assert(data.unsave(bioV1));
+assert.equal(data.saved(bioV1),false);
+assert.equal(data.saved(bioV2),true,"Removing one bioRxiv version must keep the other");
 const criteria={category:{code:"Genomics",name:"Genomics"},topicTerms:["spatial transcriptomics","spatially resolved transcriptomics"]};
-data.live("biorxiv",criteria).then(result=>{
+data.live("biorxiv",criteria).then(async result=>{
  assert.equal(result.papers.length,1);
  assert.equal(result.papers[0].id,"10.1101/123456");
  assert.equal(data.filter(result.papers,criteria).length,1);
@@ -47,5 +60,13 @@ data.live("biorxiv",criteria).then(result=>{
  const b=data.normalize("arxiv",{id:"2611.00002",title:"Paper B",authors:["Pritam Other","Alice Roy"]});
  assert.equal(data.filter([a,b],{author:"Pritam Roy",crosslisted:true}).length,1);
  assert.equal(data.filter([a,b],{author:"Pritam Roy"}).length,1);
+ const empty=await data.live("biorxiv",{q:"10.1101/123450"});
+ assert.equal(empty.total,0);
+ await data.live("biorxiv",{to:"2018-03-15"});
+ assert.match(requests.at(-1).pathname,/2013-11-01\/2018-03-15/);
+ await data.live("biorxiv",{q:"transcriptomics",sort:"oldest"});
+ assert.equal(requests.at(-1).searchParams.get("sort"),"P_PDATE_D asc");
+ await data.live("biorxiv",{q:"transcriptomics",sort:"cited"});
+ assert.equal(requests.at(-1).searchParams.get("sort"),"CITED desc");
  console.log("Archive taxonomy, exact revision matching, shortlist storage and bioRxiv source verification passed.");
 }).catch(error=>{console.error(error);process.exitCode=1});

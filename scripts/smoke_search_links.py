@@ -9,6 +9,7 @@ import json
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from threading import Thread
+from urllib.parse import parse_qs, urlsplit
 from playwright.sync_api import sync_playwright
 
 DOCS=Path(__file__).resolve().parents[1]/"docs"
@@ -47,7 +48,10 @@ def main():
                     payload={"papers":sources[key],"generated_at":"2026-11-06T12:00:00Z"} if key else {"papers":[]}
                     route.fulfill(status=200,content_type="application/json",body=json.dumps(payload))
                 page.route("**/data/*.json",data_route)
+                provider_orders=[]
                 def empty_doi(route):
+                    query=parse_qs(urlsplit(route.request.url).query)
+                    provider_orders.append((query.get("sort"), query.get("page[number]")))
                     route.fulfill(status=200,content_type="application/json",body=json.dumps({"data":[],"meta":{"total":0},"links":{}}))
                 page.route("https://api.datacite.org/dois?**",empty_doi)
                 page.route("https://www.ebi.ac.uk/europepmc/**",lambda route:route.fulfill(status=200,content_type="application/json",
@@ -65,6 +69,9 @@ def main():
                 assert "newer" in arxiv.locator("h4").first.inner_text().lower()
                 page.locator("#rd-results-sort").select_option("oldest")
                 assert "older" in arxiv.locator("h4").first.inner_text().lower()
+                page.wait_for_function("location.search.includes('sort=oldest')")
+                page.wait_for_function("document.getElementById('rd-search-status').textContent.includes('matching records shown')")
+                assert (["published"], ["1"]) in provider_orders,(width,provider_orders)
                 for source in ("arxiv","biorxiv","chemrxiv"):
                     lane=page.locator("#rd-source-"+source)
                     lane.get_by_role("button",name="Save to Library").first.click()

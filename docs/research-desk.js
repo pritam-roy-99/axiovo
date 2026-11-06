@@ -157,6 +157,7 @@ function recordCard(p){
  }
  const actions=node("div",undefined,"rd-actions");
  actions.append(link("Original record ↗",p.url,"rd-button"),...(p.pdf?[link("PDF ↗",p.pdf,"rd-button")]:[]));
+ if(p.source==="arxiv")actions.append(link("Research Assistant","./copilot.html?id="+encodeURIComponent(p.recordId),"rd-button"));
  const save=button(data.saved(p)?"Saved to Library":"Save to Library",()=>{
   if(data.save(p)){save.disabled=true;save.textContent="Saved to Library";status("Saved in My Library.")}
   else status("Browser storage is unavailable.");
@@ -165,7 +166,7 @@ function recordCard(p){
  const compare=button(data.comparison().some(item=>data.recordKey(item)===data.recordKey(p))?"In comparison":"Add to comparison",()=>{
   const result=data.addComparison(p);
   if(result==="added"){
-   compare.textContent="In comparison";renderQueue();status("Paper added to the shortlist.");
+   compare.textContent="In comparison";status("Paper added to the shortlist.");
   }else status(result==="full"?"The shortlist holds five papers. Remove one to add another.":"Browser storage is unavailable.");
  });
  if(p.abstract&&window.AxiovoAbstractAudio)actions.append(button("Listen to abstract",()=>window.AxiovoAbstractAudio.play([p])));
@@ -183,71 +184,69 @@ function makeLane(source,criteria){
  head.append(group,link("Open archive page →",native.href,"rd-text-link"));
  const list=node("div"),footer=node("div",undefined,"rd-actions");
  section.append(head,list,footer);$("rd-results").append(section);
- return {source,section,summary,list,footer,criteria,items:[],visible:6,next:null};
+ return {source,section,summary,list,footer,criteria,items:[],local:[],batch:[],remote:[],visible:6,next:null};
 }
 function redraw(lane,{focus=false}={}){
  const before=lane.list.childElementCount;
- const sorter=window.AxiovoPaperSort;
- const mode=$("rd-results-sort")?.value||lane.criteria.sort||"relevance";
- const displayed=sorter?.sort(lane.items,mode,p=>lane.items.length-lane.items.indexOf(p))||lane.items;
- lane.list.replaceChildren(...displayed.slice(0,lane.visible).map(recordCard));
- if($("rd-sort-note"))$("rd-sort-note").textContent=sorter?.note(displayed,mode)||"";
+ lane.list.replaceChildren(...lane.items.slice(0,lane.visible).map(recordCard));
+ if($("rd-sort-note"))$("rd-sort-note").textContent=window.AxiovoPaperSort?.note(
+  [...lanes.values()].flatMap(current=>current.items),lane.criteria.sort)||"";
  lane.summary.textContent=lane.message+" · "+lane.items.length+" matching record"+(lane.items.length===1?"":"s");
  lane.footer.replaceChildren();
  if(lane.items.length>lane.visible){
   lane.footer.append(button("Show more matches",()=>{lane.visible+=6;redraw(lane,{focus:true})}));
  }
  if(lane.next!==null&&!lane.loading)lane.footer.append(button("Load next source page",()=>more(lane)));
+ if(lane.failed&&!lane.loading&&lane.next===null)lane.footer.append(button("Retry live source",()=>more(lane)));
  lane.footer.append(link("Search official archive ↗",data.sourceLink(lane.source,lane.criteria),"rd-button"));
  if(!lane.loading&&!lane.items.length)lane.list.append(node("p","No matching records in the available results.","rd-small"));
  if(focus)lane.list.children[before]?.querySelector("h4 a")?.focus();
 }
-function setItems(lane,...groups){
+function setItems(lane){
+ const groups=lane.complete?[lane.batch]:[lane.local,lane.batch,lane.remote];
  lane.items=data.filter(data.merge(...groups.map(group=>data.filter(group,lane.criteria))),lane.criteria);
 }
 async function load(lane,signal){
  const {source,criteria}=lane;
  lane.loading=true;lane.message="Loading source and snapshot";redraw(lane);
- const datesTask=source==="arxiv"?data.datedArxiv(criteria,signal).catch(()=>null):Promise.resolve(null);
- const snapshot=await data.snapshot(source);
+ const local=data.snapshot(source).then(snapshot=>{
+  if(signal.aborted||lane.complete)return;
+  lane.local=snapshot.papers;setItems(lane);redraw(lane);
+ }).catch(()=>{});
+ const dates=source==="arxiv"?await data.datedArxiv(criteria,signal).catch(()=>null):null;
  if(signal.aborted)return;
- setItems(lane,snapshot.papers);redraw(lane);
- const dates=await datesTask;if(signal.aborted)return;
+ lane.batch=dates?.papers||[];
  if(dates?.complete){
-  lane.loading=false;lane.message="Verified UTC first-submission dates";setItems(lane,dates.papers);redraw(lane);return;
+  lane.complete=true;lane.loading=false;lane.message="Verified UTC first-submission dates";setItems(lane);redraw(lane);return;
  }
- const available=dates?.coveredDays?dates.coveredDays+" of "+dates.requestedDays+" UTC dates verified · ":"";
- try{
-  const result=await data.live(source,criteria,signal);
-  if(signal.aborted)return;
-  lane.next=result.next;lane.message=available+result.provider+" and available snapshots · coverage varies";
-  setItems(lane,snapshot.papers,dates?.papers||[],result.papers);
- }catch{
-  if(signal.aborted)return;
-  lane.message=available+"Live source unavailable · "+(snapshot.stamp?"snapshot "+snapshot.stamp.slice(0,10):"available cache only");
-  setItems(lane,snapshot.papers,dates?.papers||[]);
- }
- lane.loading=false;redraw(lane);
+ lane.coverage=dates?.coveredDays?dates.coveredDays+" of "+dates.requestedDays+" UTC dates verified · ":"";
+ await Promise.all([local,more(lane,signal)]);
 }
-async function more(lane){
- const {signal}=controller,cursor=lane.next;
- lane.loading=true;redraw(lane);
+async function more(lane,signal=controller.signal){
+ const cursor=lane.next;
+ lane.loading=true;lane.failed=false;redraw(lane);
  try{
   const response=await data.live(lane.source,lane.criteria,signal,cursor);
   if(signal.aborted)return;
-  setItems(lane,lane.items,response.papers);
-  lane.next=response.next===cursor?null:response.next;lane.visible+=6;
+  lane.remote=data.merge(lane.remote,response.papers);
+  setItems(lane);
+  lane.next=response.next===cursor?null:response.next;
+  lane.message=lane.coverage+response.provider+" and available snapshots · coverage varies";
+  if(cursor!==null)lane.visible+=6;
  }catch{
   if(signal.aborted)return;
-  lane.message="Could not load the next page · earlier records are available";
+  lane.failed=true;
+  lane.message=lane.coverage+(cursor===null?"Live source unavailable · showing available indexed records":"Could not load the next page · earlier records are available");
+  setItems(lane);
  }
- lane.loading=false;redraw(lane,{focus:true});
+ lane.loading=false;redraw(lane,{focus:cursor!==null});
 }
-async function runSearch(){
- const search=readForm(),criteria=effective(search),message=$("rd-search-status");
+async function runSearch(search=readForm()){
+ const criteria=effective(search),message=$("rd-search-status");
  if(!search.sources.length){message.textContent="Choose at least one archive.";return}
  if(criteria.from&&criteria.to&&criteria.from>criteria.to){message.textContent="The start date must be on or before the end date.";return}
  lastSearch=search;$("rd-save-search").disabled=false;
+ if($("rd-results-sort"))$("rd-results-sort").value=search.sort;
  updateURL(search);
  controller?.abort();controller=new AbortController();
  const {signal}=controller;
@@ -278,11 +277,11 @@ if(resultSort){
  resultSort.value=$("rd-sort").value;
  resultSort.addEventListener("change",()=>{
   $("rd-sort").value=resultSort.value;
-  for(const lane of lanes.values()){lane.criteria.sort=resultSort.value;redraw(lane)}
+  if(lastSearch)runSearch({...lastSearch,sort:resultSort.value});
  });
  $("rd-sort").addEventListener("change",()=>{
   resultSort.value=$("rd-sort").value;
-  for(const lane of lanes.values()){lane.criteria.sort=resultSort.value;redraw(lane)}
+  if(lastSearch)runSearch({...lastSearch,sort:resultSort.value});
  });
 }
 $("rd-range").addEventListener("change",showDates);
@@ -298,6 +297,7 @@ $("rd-save-queue").onclick=()=>{
  status(saved+" of "+papers.length+" selected papers saved to My Library.");
 };
 window.addEventListener("storage",()=>{drawWatches();renderQueue()});
+window.addEventListener("axiovo:comparison-change",renderQueue);
 const params=new URLSearchParams(location.search);
 const valuesFromURL=Object.fromEntries(values.filter(key=>params.has(key)).map(key=>[key,params.get(key)]));
 if(!valuesFromURL.range&&(params.has("from")||params.has("to")))valuesFromURL.range="custom";

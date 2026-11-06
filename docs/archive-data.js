@@ -32,6 +32,16 @@ function read(key,fallback){
 function write(key,value){
  try{localStorage.setItem(key,JSON.stringify(value));return true}catch{return false}
 }
+// Recover older Library data only when its current key has never been written.
+for(const [suffix,valid] of [
+ ["reading-list",Array.isArray],["field-saved-v1",Array.isArray],
+ ["research-projects-v1",Array.isArray],["library-metadata-v1",value=>value&&typeof value==="object"&&!Array.isArray(value)]
+]){
+ const key="axiovo-"+suffix;
+ if(read(key,null)!==null)continue;
+ const legacy=read("researchlens-"+suffix,null);
+ if(valid(legacy))write(key,legacy);
+}
 function normalize(source,p){
  if(!p||!Object.hasOwn(names,source)||!plain(p.title))return null;
  const authors=(Array.isArray(p.authors)?p.authors:clean(p.authors).split(/;\s*/))
@@ -41,7 +51,7 @@ function normalize(source,p){
   source,title:plain(p.title),authors,abstract:plain(p.abstract||p.summary),date:day(p.published||p.date||p.created),
   category:clean(p.primary_category||p.category),categories:list(p.categories).map(clean).filter(Boolean),
   affiliations:list(p.affiliations).map(plain).filter(Boolean),citations:citationCount(p.citations),
-  provenance:clean(p.provenance||p.metadata_source),announcementDate:day(p.announcement_date),doi:parseDOI(p.doi||p.DOI)
+  provenance:clean(p.provenance||p.metadata_source),announcementDate:day(p.announcementDate||p.announcement_date),doi:parseDOI(p.doi||p.DOI)
  };
  if(record.category&&!record.categories.includes(record.category))record.categories.unshift(record.category);
  if(source==="arxiv"){
@@ -73,6 +83,7 @@ function merge(...groups){
   results.set(key,{...newer,
    date:newer.date||older.date,
    announcementDate:newer.announcementDate||older.announcementDate,
+   citations:newer.citations??older.citations,
    authors:newer.authors.length?newer.authors:older.authors,
    category:newer.category||older.category,
    categories:[...new Set([...newer.categories,...older.categories])],
@@ -174,17 +185,19 @@ async function snapshot(source,options={}){
  if(!snapshots.has(source)){
   const load=async path=>{
    const data=await request("./data/"+path);
-   return {stamp:clean(data.generated_at),papers:list(data.papers||data.records||data).map(p=>normalize(source,p)).filter(Boolean)};
+   const rows=data?.papers??data?.records??data;
+   if(!Array.isArray(rows))throw Error("Invalid "+source+" snapshot");
+   return {stamp:clean(data.generated_at||data.checked_at),papers:rows.map(p=>normalize(source,p)).filter(Boolean)};
   };
-  const main=load(paths[source]).catch(()=>({stamp:"",papers:[]}));
-  const recent=source==="arxiv"?load("oai-recent.json").catch(()=>({papers:[]})):Promise.resolve({papers:[]});
   // Announcements are the source of newly released records, not proof of v1 dates.
   // Keep announcementDate distinct from the first-submission date, and never
   // treat a missing first-submission date as verified date-filter coverage.
-  const announced=source==="arxiv"?load("announcements.json").catch(()=>({papers:[]})):Promise.resolve({papers:[]});
-  const loaded=Promise.all([main,recent,announced]).then(([primary,extra,latest])=>({
-   stamp:primary.stamp,papers:merge(extra.papers,primary.papers,latest.papers)
-  })).catch(error=>{snapshots.delete(source);throw error});
+  const files=source==="arxiv"?["oai-recent.json",paths[source],"announcements.json"]:[paths[source]];
+  const loaded=Promise.allSettled(files.map(load)).then(results=>{
+   const available=results.filter(result=>result.status==="fulfilled").map(result=>result.value);
+   if(!available.length)throw Error("No "+source+" snapshot available");
+   return {stamp:available.map(result=>result.stamp).sort().at(-1),papers:merge(...available.map(result=>result.papers))};
+  }).catch(error=>{if(snapshots.get(source)?.promise===loaded)snapshots.delete(source);throw error});
   snapshots.set(source,{at:Date.now(),promise:loaded});
  }
  return snapshots.get(source).promise;
@@ -245,7 +258,7 @@ function dataCiteArxiv(item){
  return normalize("arxiv",{id:id.base,title:p.titles?.[0]?.title,date:submitted?.date,doi:p.doi,
   authors:list(p.creators).map(a=>a.name),affiliations:list(p.creators).flatMap(a=>list(a.affiliation).map(x=>x.name)),categories,primary_category:categories[0],
   abstract:list(p.descriptions).find(d=>d.descriptionType==="Abstract")?.description,
-  citations:Number.isFinite(p.citationCount)?p.citationCount:null,provenance:"arXiv DOI metadata via DataCite"});
+  citations:p.citationCount,provenance:"arXiv DOI metadata via DataCite"});
 }
 async function arxivLive(c,signal,cursor){
  const id=identifier(c.q).arxiv;
@@ -292,15 +305,15 @@ async function arxivLive(c,signal,cursor){
 async function bioNative(c,signal,cursor){
  const doi=parseDOI(c.q);
  const start=Number(cursor)||0;
- // Honour an explicit end date without accidentally expanding to the whole archive.
- const startDate=c.from||(c.to?c.to:(c.category?.legacy?"2013-11-01":daysAgo(c.category?7:2)));
+ // An upper bound includes all earlier dates. Recent browsing uses a shorter window.
+ const startDate=c.from||(c.to||c.category?.legacy?"2013-11-01":daysAgo(c.category?7:2));
  const interval=startDate+"/"+(c.to||today());
  const query=c.category?("?"+new URLSearchParams({category:c.category.code.toLowerCase()})):"";
  const url=endpoints.bio+(doi?doi+"/na/json":interval+"/"+start+"/json")+query;
  const data=await request(url,signal);
  const meta=data.messages?.[0];
- if(!Array.isArray(data.collection)||(!data.collection.length&&!/^(ok|no results found)$/i.test(meta?.status||"")))throw Error("bioRxiv response unavailable");
- const papers=data.collection.filter(p=>!p.server||p.server.toLowerCase()==="biorxiv").map(p=>normalize("biorxiv",{...p,provenance:"bioRxiv API"})).filter(Boolean);
+ if(!Array.isArray(data.collection)||(!data.collection.length&&!/^(ok|no (?:results|posts) found)$/i.test(clean(meta?.status))))throw Error("bioRxiv response unavailable");
+ const papers=data.collection.filter(p=>!p.server||clean(p.server).toLowerCase()==="biorxiv").map(p=>normalize("biorxiv",{...p,provenance:"bioRxiv API"})).filter(Boolean);
  const declared=meta?.total;
  const total=declared!==undefined&&Number.isFinite(Number(declared))?Number(declared):null;
  return {papers,total:total??papers.length,provider:"bioRxiv API",
@@ -315,7 +328,8 @@ async function bioIndex(c,signal,cursor){
  if(words(c.author))parts.push("AUTH:"+quoted(c.author));
  if(c.from||c.to)parts.push("FIRST_PDATE:["+ (c.from||"2013-11-01")+" TO "+(c.to||today())+"]");
  const query=new URLSearchParams({query:parts.join(" AND "),format:"json",pageSize:"50",resultType:"core",cursorMark:cursor||"*"});
- if(c.sort==="recent")query.set("sort","FIRST_PDATE_D desc");
+ if(c.sort==="recent"||c.sort==="oldest")query.set("sort","P_PDATE_D "+(c.sort==="oldest"?"asc":"desc"));
+ if(c.sort==="cited")query.set("sort","CITED desc");
  const data=await request(endpoints.pmc+query,signal);
  const rows=list(data.resultList?.result);
  const papers=rows.filter(p=>/^biorxiv$/i.test(clean(p.bookOrReportDetails?.publisher||p.journalTitle||p.journalInfo?.journal?.title))).map(p=>
@@ -333,7 +347,9 @@ async function chemLive(c,signal,cursor){
  const filters=["type:posted-content"];
  if(c.from)filters.push("from-posted-date:"+c.from);
  if(c.to)filters.push("until-posted-date:"+c.to);
- const query=new URLSearchParams({rows:"50",filter:filters.join(","),sort:c.sort==="recent"||(!c.q&&!c.category&&!c.topicTerms?.length)?"published":"score",order:"desc",cursor:cursor||"*"});
+ const orderBy=c.sort==="cited"?"is-referenced-by-count":
+  c.sort==="oldest"||c.sort==="recent"||(!c.q&&!c.category&&!c.topicTerms?.length)?"published":"score";
+ const query=new URLSearchParams({rows:"50",filter:filters.join(","),sort:orderBy,order:c.sort==="oldest"?"asc":"desc",cursor:cursor||"*"});
  const scope=c.topicTerms?.[0]||c.category?.name;
  const term=words([c.q,scope,c.refinement].filter(Boolean).join(" "));
  if(term)query.set("query.bibliographic",term);
@@ -349,8 +365,11 @@ async function chemLive(c,signal,cursor){
 }
 function live(source,criteria,signal,cursor){
  if(source==="arxiv")return arxivLive(criteria,signal,cursor);
- if(source==="biorxiv")return parseDOI(criteria.q)||(!criteria.q&&!criteria.author&&!criteria.refinement&&!criteria.topicTerms?.length)?
-  bioNative(criteria,signal,cursor):bioIndex(criteria,signal,cursor);
+ if(source==="biorxiv"){
+  const browse=!criteria.q&&!criteria.author&&!criteria.refinement&&!criteria.topicTerms?.length;
+  const orderedSearch=!criteria.category&&(criteria.sort==="oldest"||criteria.sort==="cited");
+  return parseDOI(criteria.q)||(browse&&!orderedSearch)?bioNative(criteria,signal,cursor):bioIndex(criteria,signal,cursor);
+ }
  return chemLive(criteria,signal,cursor);
 }
 function sourceLink(source,criteria={}){
@@ -368,8 +387,14 @@ function sourceLink(source,criteria={}){
  if(source==="chemrxiv"&&query)return "https://chemrxiv.org/action/doSearch?AllField="+encodeURIComponent(query);
  return official[source];
 }
+function storedId(source,item){
+ if(source==="arxiv")return parseArxiv(item)?.requested;
+ const doi=parseDOI(item?.doi);
+ return source==="biorxiv"&&item?.version?doi+"v"+Number(item.version):doi;
+}
 function saved(p){
- return list(read(keys[p.source],[])).some(item=>p.source==="arxiv"?item===p.recordId:item?.doi?.toLowerCase()===p.doi);
+ const id=storedId(p.source,p.source==="arxiv"?p.recordId:p);
+ return Boolean(id)&&list(read(keys[p.source],[])).some(item=>storedId(p.source,item)===id);
 }
 function save(p){
  const items=list(read(keys[p.source],[]));
@@ -382,9 +407,10 @@ function save(p){
  return true;
 }
 function unsave(p){
- const id=p.recordId||p.arxiv_id;
+ const id=storedId(p.source,p.source==="arxiv"?p.recordId||p.arxiv_id:p);
+ if(!id)return false;
  const items=list(read(keys[p.source],[]));
- if(!write(keys[p.source],items.filter(item=>p.source==="arxiv"?item!==id:item?.doi?.toLowerCase()!==p.doi)))return false;
+ if(!write(keys[p.source],items.filter(item=>storedId(p.source,item)!==id)))return false;
  if(p.source==="arxiv"){
   const meta=list(read(ARXIV_METADATA,[])).filter(item=>item.recordId!==id);
   write(ARXIV_METADATA,meta);
@@ -393,7 +419,9 @@ function unsave(p){
  return true;
 }
 function savedRecords(source){
- return list(read(source==="arxiv"?ARXIV_METADATA:keys[source],[])).map(p=>normalize(source,p)).filter(Boolean);
+ const entries=list(read(source==="arxiv"?ARXIV_METADATA:keys[source],[]));
+ const ids=source==="arxiv"?new Set(list(read(keys.arxiv,[])).map(item=>storedId("arxiv",item))):null;
+ return entries.map(p=>normalize(source,p)).filter(p=>p&&(!ids||ids.has(p.recordId)));
 }
 function recordKey(p){return p.source+":"+p.recordId+(p.source==="biorxiv"&&p.version?"v"+p.version:"")}
 function comparison(){
@@ -403,10 +431,14 @@ function addComparison(p){
  const papers=comparison();
  if(papers.some(item=>recordKey(item)===recordKey(p)))return "added";
  if(papers.length>=5)return "full";
- return write(COMPARISON,[...papers,p])?"added":"unavailable";
+ if(!write(COMPARISON,[...papers,p]))return "unavailable";
+ root.dispatchEvent(new Event("axiovo:comparison-change"));
+ return "added";
 }
 function removeComparison(p){
- return write(COMPARISON,comparison().filter(item=>recordKey(item)!==recordKey(p)));
+ if(!write(COMPARISON,comparison().filter(item=>recordKey(item)!==recordKey(p))))return false;
+ root.dispatchEvent(new Event("axiovo:comparison-change"));
+ return true;
 }
 root.AxiovoArchiveData={names,clean,simple,read,write,normalize,workKey,recordKey,merge,filter,topicHit,categoryMatch,identifier,snapshot,latestArxivAnnouncement,datedArxiv,live,sourceLink,
  saved,save,unsave,savedRecords,parseDOI,comparison,addComparison,removeComparison};
