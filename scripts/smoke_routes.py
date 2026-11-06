@@ -104,6 +104,17 @@ def main():
                     page.locator("#archive-latest").click()
                     page.wait_for_function("""() => !document.querySelector('#archive-sync-status')
                       ?.textContent.includes('Official arXiv release:')""",timeout=24000)
+                # Community actions must open the intended live pages, not a legacy redirect.
+                page.goto(base+"community.html",wait_until="domcontentloaded")
+                page.get_by_role("link",name="Find a paper").click()
+                page.wait_for_url(lambda url: urlsplit(url).path.endswith("/arxiv.html"))
+                page.goto(base+"community.html",wait_until="domcontentloaded")
+                page.get_by_role("link",name="Open Library").click()
+                page.wait_for_url(lambda url: urlsplit(url).path.endswith("/workspace.html"))
+                # Navigation labels should describe the destination and remain usable.
+                nav = page.locator(".rl-nav a")
+                assert nav.count()==4
+                assert all(nav.nth(i).get_attribute("title") for i in range(4))
                 page.goto(base+"desk.html",wait_until="domcontentloaded")
                 assert page.locator("#rd-search-form").count()==1
                 assert page.locator("#rd-query").count()==1
