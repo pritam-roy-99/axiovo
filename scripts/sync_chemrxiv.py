@@ -72,7 +72,7 @@ def fetch(fetcher=get_json,sleep=time.sleep,max_pages=8):
     prefix_exhausted=False
     for page in range(max_pages):
         url="https://api.crossref.org/prefixes/10.26434/works?"+urllib.parse.urlencode({
-            "cursor":cursor,"rows":250,"select":"DOI,title,author,publisher,institution,group-title,container-title,published,posted,subject,abstract"})
+            "cursor":cursor,"rows":250})
         try:
             payload=fetcher(url)
             message=payload.get("message") or {}
