@@ -57,22 +57,13 @@ function validateMessages(messages){
  }
  return JSON.stringify(result).length<=30000?result:null;
 }
-// Only audited zero-priced OpenRouter variants may be selected by visitors.
-const FREE_MODELS=new Set([
- "nvidia/nemotron-3-ultra-550b-a55b:free",
- "openai/gpt-oss-120b:free",
- "openrouter/free"
-]);
-async function providerRequest(messages,env,requestedModel){
+async function providerRequest(messages,env){
  const provider=String(env.PROVIDER||"openrouter").toLowerCase();
  if(!Object.hasOwn(UPSTREAM,provider))throw Error("Provider unavailable");
  if(provider!=="openrouter"&&env.ENABLE_PAID_PROVIDERS!=="EXPLICITLY_APPROVED"){
   throw Error("Paid providers are disabled until approved");
  }
- const defaultModel=String(env.MODEL||"nvidia/nemotron-3-ultra-550b-a55b:free");
- const model=provider==="openrouter"&&FREE_MODELS.has(requestedModel)
-   ?requestedModel:defaultModel;
- // openrouter/free is an automatic free-model router; never silently pay for a fallback.
+ const model=String(env.MODEL||"openrouter/free");
  if(!/^[a-zA-Z0-9][a-zA-Z0-9._:/-]{0,99}$/.test(model))throw Error("Invalid model configuration");
  if(provider==="openrouter"&&model!=="openrouter/free"&&!model.endsWith(":free")){
   throw Error("Non-free models are disabled by default");
@@ -102,7 +93,7 @@ async function providerRequest(messages,env,requestedModel){
  const value=await response.json();
  const text=provider==="gemini"?(value.candidates?.[0]?.content?.parts||[]).map(p=>p.text||"").join(""):value.choices?.[0]?.message?.content;
  if(typeof text!=="string"||!text.trim())return {status:502,answer:null};
- return {status:200,answer:text.slice(0,14000),model:provider==="gemini"?model:String(value.model||model)};
+ return {status:200,answer:text.slice(0,14000)};
 }
 export default {
  async fetch(request,env){
@@ -129,12 +120,9 @@ export default {
     return reply(403,{error:"Verification failed"},origin);
    }
    if(!(await allowRate(ip,env)))return reply(429,{error:"Daily request limit reached"},origin);
-   const requestedModel=typeof body.model==="string"?body.model:"";
-   if(requestedModel && !FREE_MODELS.has(requestedModel))
-     return reply(400,{error:"Model is not in the free allowlist"},origin);
-   const result=await providerRequest(messages,env,requestedModel);
+   const result=await providerRequest(messages,env);
    if(result.status!==200)return reply(result.status,{error:"Provider temporarily unavailable or quota reached"},origin);
-   return reply(200,{answer:result.answer,mode:"source-evidence-assisted",model:result.model,provider:String(env.PROVIDER||"openrouter")},origin);
+   return reply(200,{answer:result.answer,mode:"source-evidence-assisted",model:String(env.MODEL||"openrouter/free")},origin);
   }catch(_){
    // Never log private prompts, token values, API keys or provider response bodies.
    return reply(502,{error:"Research AI gateway unavailable"},origin);
