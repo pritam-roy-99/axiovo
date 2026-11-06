@@ -81,7 +81,10 @@ function recalculate(){
  const prefs=preferences();displayPrefs(prefs);
  state.items=core.build(state.papers,prefs);
  const current=core.select(state.items,state.view);
- const selected=current.filter(x=>$("feed-source").value==="all"||x.paper.source===$("feed-source").value)
+ const selected=window.AxiovoPaperSort?.sort(current.filter(x=>$("feed-source").value==="all"||x.paper.source===$("feed-source").value)
+  .filter(x=>{const range=Number($("feed-window").value);return !range||(x.days!==null&&x.days<=range)}),
+  $("feed-sort").value,
+  x=>x.score).map(x=>x)||current.filter(x=>$("feed-source").value==="all"||x.paper.source===$("feed-source").value)
   .filter(x=>{const range=Number($("feed-window").value);return !range||(x.days!==null&&x.days<=range)});
  $("feed-results").replaceChildren();
  for(const item of selected.slice(0,state.limit))renderCard(item);
@@ -95,6 +98,8 @@ function recalculate(){
   label(el,"span"," · ");
   link(el,"Explore research topics","./#axiovo-archive-title");
  }
+ if($("feed-sort-note"))$("feed-sort-note").textContent=
+  window.AxiovoPaperSort?.note(selected.map(x=>x.paper),$("feed-sort").value)||"";
  $("feed-match-count").textContent=selected.length+" matching";
  $("feed-pulse-count").textContent=String(state.items.length);
  $("feed-pulse-label").textContent="Personalized papers in cached source records";
@@ -133,6 +138,7 @@ $("feed-more").onclick=()=>{state.limit+=12;recalculate()};
 $("feed-refresh").onclick=refresh;
 $("feed-source").onchange=()=>{state.limit=12;recalculate()};
 $("feed-window").onchange=()=>{state.limit=12;recalculate()};
+$("feed-sort").onchange=()=>{state.limit=12;recalculate()};
 for(const tab of document.querySelectorAll("[data-view]"))tab.onclick=()=>{
  state.view=tab.dataset.view;state.limit=12;
  for(const button of document.querySelectorAll("[data-view]"))
