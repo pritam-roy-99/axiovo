@@ -174,6 +174,7 @@ async function loadBrowserModel(){
  */
 const hostedConfig=window.AxiovoHostedAIConfig||{};
 let hostedChallengeToken="";
+let lastHostedModel="";
 function hostedConfigured(){
  return typeof hostedConfig.endpoint==="string" && /^https:\/\/[^\s?#]+$/i.test(hostedConfig.endpoint)
   && Boolean(hostedConfig.turnstileSiteKey);
@@ -186,8 +187,8 @@ function hostedProviderChange(){
  model.value=allowed?(hostedConfig.model||"openrouter/free"):"Not configured";
  model.readOnly=true;
  guide.textContent=allowed?
-  "Hosted model requests use the configured secure proxy and a verification challenge. No provider API key is exposed in Axiovo.":
-  "Hosted AI is disabled until the site owner configures a secure server. Local Ollama, WebGPU and source evidence remain available.";
+  "Free hosted AI is optional. Your question and paper excerpts are sent to an external model after verification. Do not send confidential research. No API key is exposed.":
+  "Free hosted AI requires the site owner to deploy a secure gateway and provide a free-provider key. Evidence, Ollama and WebGPU remain available.";
  const option=$("engine").querySelector('option[value="hosted"]');
  if(option)option.disabled=!allowed;
  if(!allowed && $("engine").value==="hosted")$("engine").value="evidence";
@@ -225,7 +226,7 @@ async function hostedCompletion(messages,deep){
  hostedChallengeToken="";
  try{window.turnstile?.reset()}catch{}
  if(response.status===429)throw Error("Hosted AI free quota or rate limit reached.");
- if(response.status===503)throw Error("Secure hosted model is temporarily unavailable.");
+ if(response.status===503)throw Error("Free hosted model is not configured or temporarily unavailable.");
  if(!response.ok)throw Error("Secure hosted AI returned HTTP "+response.status+".");
  const body=await response.json();
  if(typeof body.answer!=="string"||!body.answer.trim())throw Error("Hosted AI returned no usable answer.");
@@ -299,7 +300,7 @@ async function submit(){
    status($("engine").value==="hosted"?"Sending the selected source evidence to the chosen AI provider…":"Generating a response with the selected local model…");
    const output=await generate(question,draft,fallback);
    record("assistant",output+"\n\n[Model-generated. Verify claims and references at the original sources.]",sources);
-   status($("engine").value==="hosted"?"Provider response ready. Verify all source citations.":"Local model response ready.");
+   status($("engine").value==="hosted"?"Response from "+(lastHostedModel||"free hosted model")+". Verify all source citations.":"Local model response ready.");
   }
  }catch(err){record("assistant","Could not complete the request. "+String(err.message||err).slice(0,200),sources);status("Source evidence mode is available.")}
  finally{busy=false;$("ask").disabled=$("search-openalex").disabled=false;$("busy").textContent=""}
