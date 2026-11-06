@@ -90,8 +90,11 @@ function renderQueue(){
   remove.setAttribute("aria-label","Remove "+p.title+" from comparison");row.append(title,remove);root.append(row);
  }
  $("rd-open-comparison").disabled=papers.length<2;
+ $("rd-open-comparison").title=papers.length<2?"Select at least two papers to compare evidence":"Compare the selected papers side by side";
  $("rd-export").disabled=!papers.length;
+ $("rd-export").title=papers.length?"Download the selected citations as RIS":"Add papers to enable citation export";
  $("rd-save-queue").disabled=!papers.length;
+ $("rd-save-queue").title=papers.length?"Save the shortlist in this browser Library":"Add at least one paper to the shortlist";
  $("rd-listen-queue").hidden=!window.AxiovoAbstractAudio;
  $("rd-listen-queue").disabled=!papers.some(p=>p.abstract);
 }
@@ -162,7 +165,7 @@ function recordCard(p){
   const result=data.addComparison(p);
   if(result==="added"){
    compare.textContent="In comparison";renderQueue();status("Paper added to the shortlist.");
-  }else status(result==="full"?"The shortlist holds three papers. Remove one to add another.":"Browser storage is unavailable.");
+  }else status(result==="full"?"The shortlist holds five papers. Remove one to add another.":"Browser storage is unavailable.");
  });
  if(p.abstract&&window.AxiovoAbstractAudio)actions.append(button("Listen to abstract",()=>window.AxiovoAbstractAudio.play([p])));
  actions.append(save,compare);article.append(actions);window.AxiovoAuthorFollow?.attach(article,p.authors);return article;
