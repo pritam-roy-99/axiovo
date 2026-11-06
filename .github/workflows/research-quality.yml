@@ -21,6 +21,7 @@ on:
       - 'docs/archive-data.js'
       - 'docs/paper-sort.js'
       - 'tests/paper-sort.test.js'
+      - 'tests/test_paper_sort_ui.py'
       - 'docs/copilot.js'
       - 'docs/index.html'
       - 'docs/feed.html'
@@ -64,6 +65,8 @@ jobs:
           python -m unittest discover -s tests -p test_literature_coverage.py -v
           python -m unittest discover -s tests -p test_arxiv_daily_archive.py -v
           python -m unittest discover -s tests -p test_source_harvest.py -v
+      - name: Check sorting controls on all public research lists
+        run: python -m unittest discover -s tests -p test_paper_sort_ui.py -v
       - name: Verify consistent source-first sorting and missing citations
         run: |
           node --check docs/paper-sort.js
