@@ -37,6 +37,15 @@ class PaperSortUITests(unittest.TestCase):
         self.assertIn('src="./paper-sort.js"',html)
         self.assertIn('const i=sources.indexOf(s)',code)
         self.assertIn('AxiovoPaperSort?.sort(sources,mode)',code)
+    def test_feed_source_search_and_author_follow_reuse_existing_settings(self):
+        script=(DOCS/"feed.js").read_text(encoding="utf8")
+        self.assertIn('const sources=$("feed-source").value==="all"?["arxiv","biorxiv","chemrxiv"]',script)
+        self.assertIn('discoverAuthors(AbortSignal.timeout(17000),name)',script)
+        self.assertIn('button.disabled=false;button.textContent="Search more literature"',script)
+        self.assertIn('archive.unsave(p)',script)
+        self.assertIn('updateHidden(state.lastHidden,false)',script)
+        self.assertIn('window.AxiovoFeedPreferences',script)
+
     def test_source_filtering_remains_before_sorting(self):
         data=(DOCS/"archive-data.js").read_text(encoding="utf8")
         self.assertIn('score:matchScore(p,criteria)',data)
