@@ -64,12 +64,13 @@ def get_json(url, opener=None, sleep=time.sleep):
             sleep((6,15,35)[attempt])
     raise RuntimeError("Crossref unavailable")
 
-def fetch(fetcher=get_json,sleep=time.sleep,max_pages=8):
+def fetch(fetcher=get_json,sleep=time.sleep,max_pages=8,cursor_start="*"):
     """Cursor-paginate the ChemRxiv DOI prefix, then check recent labelled records."""
     index={}
     checks=[]
-    cursor="*"
+    cursor=cursor_start if isinstance(cursor_start,str) and 0<len(cursor_start)<1024 else "*"
     prefix_exhausted=False
+    saw_success=False
     for page in range(max_pages):
         url="https://api.crossref.org/prefixes/10.26434/works?"+urllib.parse.urlencode({
             "cursor":cursor,"rows":250})
@@ -81,6 +82,7 @@ def fetch(fetcher=get_json,sleep=time.sleep,max_pages=8):
             for row in rows:
                 if isinstance(row,dict) and is_chemrxiv(row):
                     index[row["DOI"].lower()]=row
+            saw_success=True
             checks.append({"provider":"Crossref ChemRxiv DOI prefix","page":page+1,"returned":len(rows)})
             if len(rows)<250:
                 prefix_exhausted=True
@@ -106,15 +108,21 @@ def fetch(fetcher=get_json,sleep=time.sleep,max_pages=8):
         checks.append({"provider":"Crossref labelled preprints","returned":len(rows)})
     except (OSError,ValueError) as error:
         checks.append({"provider":"Crossref labelled preprints","error":str(error)[:150]})
+    next_cursor="*" if prefix_exhausted or not saw_success else cursor
     return list(index.values()), {"prefix_pages_checked":len([x for x in checks if x.get("page")]),
-        "prefix_exhausted":prefix_exhausted, "checks":checks}
+        "prefix_exhausted":prefix_exhausted, "prefix_cursor_start":cursor_start,
+        "prefix_next_cursor":next_cursor, "checks":checks}
 
 
 def main():
     previous={}
     try:previous=json.loads(TARGET.read_text(encoding="utf-8"))
     except (ValueError,OSError):pass
-    records, status=fetch()
+    start=previous.get("prefix_next_cursor") or "*"
+    # A completed prefix sweep starts over to detect new DOI registrations.
+    if previous.get("prefix_exhausted") is True:
+       start="*"
+    records, status=fetch(cursor_start=start)
     index={p["doi"].lower():p for p in previous.get("papers",[]) if isinstance(p,dict) and p.get("doi")}
     fresh=0
     for row in records:
