@@ -63,8 +63,8 @@
 @media(max-width:740px){
  .ex-picker-popup {position:relative;inset:auto;margin-top:5px}
 }
-.ex-guide-actions {display:flex;flex-wrap:wrap;gap:5px;margin-top:12px}
-.ex-guide-actions .rd-button {flex:1}
+.ex-guide-actions {display:grid;grid-template-columns:minmax(0,1fr);gap:8px;margin-top:12px}
+.ex-guide-actions .rd-secondary {justify-self:start;min-height:44px}
 .ex-personal {border-top:1px solid var(--rd-border);margin-top:13px;padding-top:9px}
 .ex-personal summary {font-size:.84rem;color:var(--rd-link);font-weight:730;cursor:pointer}
 .ex-personal form {display:grid;gap:6px;margin:8px 0}
@@ -115,8 +115,9 @@
  background:var(--axiovo-accent,#126f9c)!important;
  border:1px solid var(--axiovo-accent,#126f9c)!important;
  opacity:1!important;
- font-size:clamp(14px,1rem,17px)!important;
+ font-size:clamp(.875rem,1.4vw,1rem)!important;
  font-weight:750!important;
+ padding:8px 10px!important;
  text-align:center;
  white-space:normal;
  overflow-wrap:normal;
@@ -128,7 +129,7 @@
  outline-offset:3px;
 }
 @media(max-width:740px){
- .axiovo-explore .ex-guide-actions .ex-show-papers {padding:12px 8px!important;}
+ .axiovo-explore .ex-guide-actions .ex-show-papers {font-size:1rem!important;}
 }
 
 /* Explicit, privacy-preserving topic correction workflow. */

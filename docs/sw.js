@@ -1,6 +1,6 @@
 /* Axiovo offline shell. Scholarly metadata, video and PDFs stay network-only. */
 "use strict";
-const CACHE = "axiovo-shell-v55";
+const CACHE = "axiovo-shell-v56";
 const SHELL = [
   "./", "./index.html", "./desk.html", "./feed.html", "./workspace.html", "./arxiv.html", "./biorxiv.html", "./chemrxiv.html",
   "./theme.css", "./axiovo-shell.css", "./theme.js", "./research-entry.css", "./research-entry.js",
