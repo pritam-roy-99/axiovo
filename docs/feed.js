@@ -212,16 +212,17 @@ async function liveAuthor(name,signal){
  }
  return records;
 }
-async function discoverAuthors(signal){
+async function discoverAuthors(signal,requestedName=""){
  const prefs=preferences(),known=core.build(state.papers,{...prefs,references:[]});
- const followed=prefs.authors.filter(name=>!known.some(item=>item.paper.authors?.some(x=>prefs.matchesAuthor(name,x))));
- if(!followed.length)return;
- const pool=followed.slice(0,3);
+ const missing=prefs.authors.filter(name=>!known.some(item=>item.paper.authors?.some(x=>prefs.matchesAuthor(name,x))));
+ const list=requestedName?[requestedName,...missing.filter(x=>x!==requestedName)]:missing;
+ const pool=list.slice(0,3);
+ if(!pool.length)return;
  const batch=await Promise.allSettled(pool.map(name=>liveAuthor(name,signal)));
  if(signal.aborted)return;
  const found=batch.filter(x=>x.status==="fulfilled").flatMap(x=>x.value);
  if(found.length)updatePapers(found);
- else $("feed-status").textContent+=" No verified additional author-linked records returned.";
+ else notify("No additional verified arXiv-linked author papers were found in the available metadata.");
 }
 async function refresh(){
  if(state.loading)return;
@@ -249,22 +250,40 @@ async function refresh(){
 }
 async function searchMore(){
  if(state.expanded)return;
+ const pref=preferences(),terms=pref.topics.filter(x=>core.terms(x).length>=2).slice(0,3);
+ if(!terms.length){
+  notify("Follow a specific topic to search additional public source records.");
+  return;
+ }
  state.expanded=true;
  const button=$("feed-search-more");button.disabled=true;button.textContent="Searching source metadata…";
- const pref=preferences(),terms=pref.topics.filter(x=>core.terms(x).length>=2).slice(0,2);
- const results=await Promise.allSettled(terms.map(async q=>{
-  const found=await archive.live("arxiv",{q,sort:"relevance"});
-  return found.papers.filter(p=>core.overlaps(q,p.title,p.abstract).matched);
- }));
- const merged=results.filter(x=>x.status==="fulfilled").flatMap(x=>x.value);
- if(merged.length)updatePapers(merged);
- else $("feed-status").textContent+=" No additional strong matches from this source check.";
- button.disabled=false;button.textContent="Search more literature";state.expanded=false;
+ try{
+  const sources=$("feed-source").value==="all"?["arxiv","biorxiv","chemrxiv"]:[$("feed-source").value];
+  // Bound network work so mobile data usage remains predictable.
+  const queries=sources.flatMap(source=>terms.slice(0,2).map(q=>({source,q}))).slice(0,6);
+  const results=await Promise.allSettled(queries.map(async ({source,q})=>{
+   const found=await archive.live(source,{q,sort:"relevance"});
+   return (found.papers||[]).filter(p=>core.overlaps(q,p.title,p.abstract).matched);
+  }));
+  const merged=results.filter(x=>x.status==="fulfilled").flatMap(x=>x.value);
+  if(merged.length){
+   updatePapers(merged);
+   notify("Checked public source metadata and added "+merged.length+" relevant candidate records.");
+  }else notify("No additional strong matches returned from the selected public metadata services.");
+ }catch(error){
+  notify("The expanded source search is unavailable. Your indexed feed remains usable.");
+ }finally{
+  button.disabled=false;button.textContent="Search more literature";state.expanded=false;
+ }
 }
 $("feed-author-form").addEventListener("submit",e=>{
  e.preventDefault();const field=$("feed-author-input"),name=field.value.trim();
  if(!name)return;
- if(follow?.setFollowing(name,true)){field.value="";notify("Following "+name+". Checking source records…");recalculate();refresh()}
+ if(follow?.setFollowing(name,true)){
+  field.value="";notify("Following "+name+". Checking source records…");recalculate();
+  discoverAuthors(AbortSignal.timeout(17000),name).catch(()=>notify(
+   "Author followed. Public author lookup is temporarily unavailable; existing indexed papers remain visible."));
+ }
  else notify("Could not follow this author on this device.");
 });
 $("feed-topic-form").addEventListener("submit",e=>{
