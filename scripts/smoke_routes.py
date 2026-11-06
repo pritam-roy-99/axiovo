@@ -86,6 +86,21 @@ def main():
                     assert page.evaluate("document.activeElement?.id")=="archive-results-heading",(source,"Results not focused")
                     page.locator(".axiovo-home-link").click()
                     page.wait_for_url(lambda url: urlsplit(url).path.endswith("/"))
+                if width==390:
+                    # A user in India should see the latest arXiv release under
+                    # its verified US Eastern announcement date, not the UTC
+                    # first-submission shard of the previous calendar day.
+                    page.goto(base+"arxiv.html?announced=latest",wait_until="domcontentloaded")
+                    page.wait_for_function("""() => document.querySelector('#archive-sync-status')
+                      ?.textContent.includes('Official arXiv release:')""",timeout=24000)
+                    assert page.locator("#archive-announced").count()==1
+                    assert page.locator(".ex-paper").count()>0, "Latest announced arXiv records missing"
+                    assert "all arXiv categories" in page.locator("#archive-scope-label").inner_text()
+                    first=page.locator(".ex-paper").first
+                    assert "Announced" in first.locator(".rd-small").first.inner_text()
+                    page.locator("#archive-latest").click()
+                    page.wait_for_function("""() => !document.querySelector('#archive-sync-status')
+                      ?.textContent.includes('Official arXiv release:')""",timeout=24000)
                 page.goto(base+"desk.html",wait_until="domcontentloaded")
                 assert page.locator("#rd-search-form").count()==1
                 assert page.locator("#rd-query").count()==1
