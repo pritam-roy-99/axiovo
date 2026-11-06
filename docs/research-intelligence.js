@@ -22,7 +22,7 @@ function persistProjects(){if(write(PROJECTS,projects))window.dispatchEvent(new 
 function persistSettings(){write(META,settings)}
 function link(parent,url,label){if(!/^https:\/\//.test(url||""))return;const a=texts(parent,"a",label);a.href=url;a.target="_blank";a.rel="noopener noreferrer"}
 function projectName(p){return p.title+(p.status==="completed"?" (completed)":"")}
-function allInterests(){const p=read("axiovo-field-explorer-v1",{});const topics=read("axiovo-followed-topics",[]);const API=window.AxiovoInterests;const specialized=API?.get(read(API.KEY,{}),p.field||"quantum",p.topic||"")||[];return [...new Set([...settings.interests,...specialized,...(Array.isArray(topics)?topics:[]),p.topic,p.subtopic].filter(x=>typeof x==="string"&&x.trim()))].slice(0,20)}
+function allInterests(){const followed=window.AxiovoFeedPreferences?.derive(localStorage);if(followed)return followed.topics.slice(0,45);const p=read("axiovo-field-explorer-v1",{});return [...new Set([...settings.interests,p.topic,p.subtopic].filter(x=>typeof x==="string"&&x.trim()))].slice(0,20)}
 function drawSettings(){
  const p=read("axiovo-field-explorer-v1",{});
  $("research-interest").value=settings.interests.join(", ");
