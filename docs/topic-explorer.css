@@ -63,7 +63,7 @@
 @media(max-width:740px){
  .ex-picker-popup {position:relative;inset:auto;margin-top:5px}
 }
-.ex-guide-actions {display:grid;grid-template-columns:minmax(0,1fr);gap:8px;margin-top:12px}
+.ex-guide-actions {display:grid;grid-template-columns:minmax(0,1fr);gap:8px;margin-top:12px;container-type:inline-size}
 .ex-guide-actions .rd-secondary {justify-self:start;min-height:44px}
 .ex-personal {border-top:1px solid var(--rd-border);margin-top:13px;padding-top:9px}
 .ex-personal summary {font-size:.84rem;color:var(--rd-link);font-weight:730;cursor:pointer}
@@ -130,6 +130,10 @@
 }
 @media(max-width:740px){
  .axiovo-explore .ex-guide-actions .ex-show-papers {font-size:1rem!important;}
+}
+@container (max-width:230px){
+ .axiovo-explore .ex-guide-actions .ex-show-papers {padding-inline:6px!important;}
+ .ex-show-papers > [aria-hidden="true"] {display:none}
 }
 
 /* Explicit, privacy-preserving topic correction workflow. */
