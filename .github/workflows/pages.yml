@@ -247,10 +247,9 @@ jobs:
         if: steps.chromium_deps.outcome == 'success'
         id: smoke_full
         run: python scripts/smoke_routes.py
-      - name: Exercise all three dedicated source Discover pages
+      - name: Exercise all three dedicated source Discover pages (deployment gate)
         if: steps.chromium_deps.outcome == 'success'
         id: smoke_archives
-        continue-on-error: true
         run: python scripts/smoke_archive_pages.py
       - name: Report browser test results
         if: always()
