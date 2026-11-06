@@ -20,6 +20,10 @@ on:
       - 'tests/author-name-aliases.test.js'
       - 'docs/archive-data.js'
       - 'docs/copilot.js'
+      - 'docs/index.html'
+      - 'scripts/build_tutorial_video.py'
+      - 'scripts/build_intro_video.py'
+      - 'tests/test_axiovo_name_origin.py'
       - 'docs/assistant-core.js'
       - 'docs/copilot.html'
       - 'docs/research-workspace.css'
@@ -71,6 +75,8 @@ jobs:
           node --check docs/following-authors.js
           node --check docs/author-follow.js
           node tests/author-name-aliases.test.js
+      - name: Verify homepage name meaning and video intro
+        run: python -m unittest discover -s tests -p test_axiovo_name_origin.py -v
       - name: Validate browser scripts and source links
         run: |
           python -m scripts.validate_site
