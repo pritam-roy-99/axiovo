@@ -14,6 +14,26 @@
   try{const v=JSON.parse(localStorage.getItem(KEY)||"[]");return Array.isArray(v)?v.filter(x=>typeof x==="string").slice(0,1000):[]}catch{return []}
  }
  const nameKey=name=>String(name||"").trim().toLowerCase().replace(/\s+/g," ");
+ const nameTokens=name=>String(name||"").normalize("NFKD")
+  .replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z]+/g," ").trim()
+  .split(/\s+/).filter(Boolean);
+ function matchesName(left,right){
+  function ordered(name){
+   const tokens=nameTokens(name);if(tokens.length<2)return tokens;
+   // "Majumdar, A. S." is a common reverse-indexed name form.
+   if(String(name).includes(","))return [...tokens.slice(1),tokens[0]];
+   return tokens;
+  }
+  const a=ordered(left),b=ordered(right);
+  if(a.length<2||b.length<2)return false;
+  if(a.at(-1)!==b.at(-1))return false;
+  const g=a.slice(0,-1),h=b.slice(0,-1);
+  if(g.length!==h.length)return false;
+  return g.every((part,i)=>part===h[i]||
+    (part.length===1&&h[i].startsWith(part))||
+    (h[i].length===1&&part.startsWith(h[i])));
+ }
+
  function isFollowing(name){const key=nameKey(name);return Boolean(key)&&list().some(item=>nameKey(item)===key)}
  function setFollowing(name,following){
   name=String(name||"").trim().slice(0,120);if(!name)return false;
@@ -67,5 +87,5 @@
    }
   });
  }
- return {KEY,list,isFollowing,setFollowing,toggle,mount,attach};
+ return {KEY,list,isFollowing,setFollowing,toggle,mount,attach,matchesName};
 });
