@@ -64,6 +64,7 @@ async function providerRequest(messages,env){
   throw Error("Paid providers are disabled until approved");
  }
  const model=String(env.MODEL||"openrouter/free");
+ // openrouter/free is an automatic free-model router; never silently pay for a fallback.
  if(!/^[a-zA-Z0-9][a-zA-Z0-9._:/-]{0,99}$/.test(model))throw Error("Invalid model configuration");
  if(provider==="openrouter"&&model!=="openrouter/free"&&!model.endsWith(":free")){
   throw Error("Non-free models are disabled by default");
@@ -93,7 +94,7 @@ async function providerRequest(messages,env){
  const value=await response.json();
  const text=provider==="gemini"?(value.candidates?.[0]?.content?.parts||[]).map(p=>p.text||"").join(""):value.choices?.[0]?.message?.content;
  if(typeof text!=="string"||!text.trim())return {status:502,answer:null};
- return {status:200,answer:text.slice(0,14000)};
+ return {status:200,answer:text.slice(0,14000),model:provider==="gemini"?model:String(value.model||model)};
 }
 export default {
  async fetch(request,env){
@@ -122,7 +123,7 @@ export default {
    if(!(await allowRate(ip,env)))return reply(429,{error:"Daily request limit reached"},origin);
    const result=await providerRequest(messages,env);
    if(result.status!==200)return reply(result.status,{error:"Provider temporarily unavailable or quota reached"},origin);
-   return reply(200,{answer:result.answer,mode:"source-evidence-assisted",model:String(env.MODEL||"openrouter/free")},origin);
+   return reply(200,{answer:result.answer,mode:"source-evidence-assisted",model:result.model,provider:String(env.PROVIDER||"openrouter")},origin);
   }catch(_){
    // Never log private prompts, token values, API keys or provider response bodies.
    return reply(502,{error:"Research AI gateway unavailable"},origin);
