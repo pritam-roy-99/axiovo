@@ -41,9 +41,36 @@
     score+=idf*(tf*2.2)/(tf+1.2*(.25+.75*row.length/Math.max(1,avg)));
     matched.push(t);
    }
+   // An isolated generic word is not evidence for a multi-concept question.
+   // Require at least two distinct meaningful terms (or all terms if only one).
+   // The threshold is bounded for long, detailed questions.
+   const coverage=matched.length/qt.length;
+   const required=qt.length===1?1:Math.min(4,Math.max(2,Math.ceil(qt.length*0.45)));
+   if(matched.length<required)return {paper:row.p,score:0,matched};
+   const titleText=" "+words(row.p.title).join(" ")+" ";
+   const phrase=qt.length>=2&&titleText.includes(" "+qt.join(" ")+" ")?1:0;
+   score+=matched.length*0.7+coverage*3+phrase*10;
    return {paper:row.p,score,matched};
   }).filter(x=>x.score>0).sort((a,b)=>b.score-a.score||
    String(b.paper.published).localeCompare(String(a.paper.published))||xid(a.paper).localeCompare(xid(b.paper))).slice(0,limit)
+ }
+ function evidenceAnswer(query,records){
+  const list=(records||[]).slice(0,4).filter(p=>p&&p.title&&p.url);
+  if(!list.length)return "No sufficiently relevant papers were found in the checked metadata for this question. This is not evidence that the topic has no literature. Try a more precise phrase, an author, or Search more arXiv records.";
+  const lines=["Evidence related to: "+query,""];
+  const split=text=>String(text||"").split(/(?<=[.!?])\\s+/).map(s=>s.trim()).filter(Boolean);
+  for(const [i,p] of list.entries()){
+   const q=new Set(words(query)),sentences=split(p.abstract);
+   const ranked=sentences.map(s=>({text:s,count:[...new Set(words(s))].filter(t=>q.has(t)).length}))
+     .filter(x=>x.count>0).sort((a,b)=>b.count-a.count);
+   const excerpt=ranked[0]?.text||sentences[0]||"No abstract text in this record.";
+   lines.push("["+(i+1)+"] "+p.title);
+   lines.push("The source abstract says: "+excerpt.slice(0,470)+(excerpt.length>470?"…":""));
+   lines.push("");
+  }
+  lines.push("Interpretation: These are source-reported statements, not a complete answer to the research question. No causal explanation, proof, or comparison has been independently established from the abstracts.");
+  lines.push("Next step: Open the most relevant original paper and inspect its assumptions, methodology and references.");
+  return lines.join("\\n");
  }
  function xid(p){return p.id}
  function compare(a,b){
@@ -66,5 +93,5 @@
   header.push("Limits: retrieved abstracts are not complete proofs. No established novelty, correctness or theorem equivalence.");
   return header.join("\n")
  }
- return {words,arxivId,normalize,unique,rank,compare,evidenceReport};
+ return {words,arxivId,normalize,unique,rank,evidenceAnswer,compare,evidenceReport};
 });
