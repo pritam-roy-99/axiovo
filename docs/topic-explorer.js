@@ -213,6 +213,7 @@ function paperCard(p,c){
    [p.date?"First submitted "+p.date+" (UTC)":p.announcementDate?"Announced "+p.announcementDate:"Date unavailable"]),
   p.category].filter(Boolean).join(" · ");
  card.append(element("p",meta,"rd-small"));
+ if(Number.isFinite(p.citations)&&p.citations>=0)card.append(element("p","Cited by "+p.citations.toLocaleString()+" (available source metadata)","rd-small"));
  const title=element("h3"),a=link("",p.url);
  highlight(a,p.title,tokens);title.append(a);card.append(title);
  if(p.authors.length)card.append(element("p",p.authors.slice(0,8).join(", ")+(p.authors.length>8?" et al.":""),"rd-small"));
