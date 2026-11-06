@@ -17,7 +17,13 @@
    lexicalRank=bm.score(bm.create(valid),q.q,()=>true);
   }
   const hybridEnabled=q.mode==="hybrid" && !q.identity && semanticResults.length>0;
-  const semantic=hybridEnabled?semanticResults.filter(p=>filters.eligible(p.paper||p,q)):[];
+  // Semantic candidates may rank but never introduce unverified bibliography.
+  // Only exact identities already present in the source-validated candidate corpus are eligible.
+  const validById=new Map(valid.map(p=>[rrf.identity(p),p]));
+  const semantic=hybridEnabled?semanticResults.map(row=>{
+   const p=row.paper||row,verified=validById.get(rrf.identity(p));
+   return verified?{paper:verified,id:rrf.identity(verified)}:null;
+  }).filter(Boolean):[];
   const ranked=hybridEnabled?rrf.fuse({lexical:lexicalRank,semantic}):lexicalRank;
   const getDate=p=>String(p.date||p.submitted_date||p.published||"");
   const getCite=p=>p.citations===null||p.citations===undefined||p.citations===""?null:(Number.isFinite(Number(p.citations))?Number(p.citations):null);
