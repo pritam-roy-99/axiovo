@@ -271,6 +271,12 @@ function drawResults(state){
   results.append(element("p",note,"rd-panel rd-small"));
   if(c.from||c.to)actions.append(button("Search any date",()=>{$("from").value=$("to").value="";runSearch()}));
   if(leaf)actions.append(button("Search the parent topic",()=>selectPath({...selected,subtopic:"",refine:""})));
+  if(subject||topic||selected.refine)actions.append(button("Broaden across all "+name+" subjects",()=>{
+   selected=pathFrom({});
+   drawPath();
+   datePreset++;
+   runSearch();
+  }));
  }
  if(rows.length>state.visible)actions.append(button("Show more matches",()=>{
   const previous=state.visible;state.visible+=12;drawResults(state);results.children[previous]?.querySelector("h3 a")?.focus();
