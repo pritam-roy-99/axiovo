@@ -234,7 +234,7 @@ function startup(){
      continue;
     }
     existing.set(parsed.base,{...record,id:parsed.base,
-     published:record.published||"",announcement_date:record.announcement_date||"",
+     published:record.published||record.created||"",announcement_date:record.announcement_date||"",
      authors:Array.isArray(record.authors)?record.authors:[],
      categories:Array.isArray(record.categories)?record.categories:[]});
     added++;
