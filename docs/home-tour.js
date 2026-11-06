@@ -12,6 +12,8 @@
  ];
  function initialize(){
   const root=document.getElementById("axiovo-tour");if(!root)return;
+  const video=document.getElementById("axiovo-home-video");
+  if(video){video.addEventListener("loadedmetadata",()=>{root.hidden=true;video.hidden=false;});video.addEventListener("error",()=>{video.hidden=true;root.hidden=false;});}
   const overline=document.getElementById("axiovo-tour-overline"),title=document.getElementById("axiovo-tour-title"),description=document.getElementById("axiovo-tour-description"),illustration=document.getElementById("axiovo-tour-illustration"),counter=document.getElementById("axiovo-tour-counter"),progress=document.getElementById("axiovo-tour-progress"),action=document.getElementById("axiovo-tour-action"),prev=document.getElementById("axiovo-tour-prev"),next=document.getElementById("axiovo-tour-next");
   let current=0;const dots=[];
   steps.forEach((step,i)=>{
