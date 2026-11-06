@@ -8,7 +8,7 @@
  const STOP=new Set("the and for with from into onto this that those these study studies using based via new paper papers research quantum science physics chemistry biology method methods models model analysis results approach their which what where how why".split(" "));
  function terms(value){return [...new Set(String(value||"").toLowerCase().normalize("NFKD").replace(/[\u0300-\u036f]/g,"").match(/[a-z][a-z0-9-]{2,}/g)||[])].filter(x=>!STOP.has(x)).slice(0,45)}
  function key(p){const raw=String(p?.id||p?.doi||p?.recordId||"");return String(p?.source||"arxiv")+":"+raw.toLowerCase().replace(/(?:\/v|v)\d+$/,"")}
- function date(p){const raw=p.announcement_date||p.published||p.date||"";const ms=Date.parse(raw);return Number.isFinite(ms)?ms:0}
+ function date(p){const raw=p.announcementDate||p.announcement_date||p.published||p.date||"";const ms=Date.parse(raw);return Number.isFinite(ms)?ms:0}
  function overlaps(query,title,abstract){
   const words=terms(query), t=new Set(terms(title)),a=new Set(terms(abstract));
   const main=words.filter(x=>t.has(x)),support=words.filter(x=>a.has(x));
