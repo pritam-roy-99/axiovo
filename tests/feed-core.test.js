@@ -32,4 +32,8 @@ assert.equal(feed.select(ranked,"latest").length,2);
 const hidden=feed.build(papers,{...options,hidden:["arxiv:2611.00001"]},NOW);
 assert.equal(hidden.length,1,"Not relevant hides only chosen paper");
 assert.equal(feed.build(papers,{authors:[],topics:[]},NOW).length,0,"No followed interests means no fabricated recommendations");
+assert(!feed.overlaps("Quantum information","A history of information systems","Data systems and algorithms").matched,
+  "A domain-specific topic must not match by a broad fragment");
+assert(feed.overlaps("Quantum information","A new study in quantum information","").matched,
+  "Exact scientific field phrases remain available for topical following");
 console.log("PASS: personalized feed ranking, names, topic coverage, dedup, exclusions, sources and freshness");
