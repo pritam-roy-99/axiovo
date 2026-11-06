@@ -23,11 +23,11 @@ const root={
  fetch:async url=>{
   const u=new URL(String(url));requests.push(u);
   assert.equal(u.hostname,"api.datacite.org");
-  const cursor=u.searchParams.get("page[cursor]");
-  const data=cursor==="SECOND"?[second,other,invalid]:[first];
+  const cursor=u.searchParams.get("page[number]");
+  const data=cursor==="2"?[second,other,invalid]:[first];
   return {ok:true,json:async()=>({
-   data,meta:{total:4},links:{next:cursor==="SECOND"?null:
-    "https://api.datacite.org/dois?page%5Bcursor%5D=SECOND"}
+   data,meta:{total:4},links:{next:cursor==="2"?null:
+    "https://api.datacite.org/dois?page%5Bnumber%5D=2"}
   })};
  }
 };
@@ -42,7 +42,7 @@ const api=root.AxiovoArchiveData;
  assert.equal(one.papers[0].recordId,"2611.12001");
  assert.deepEqual([...one.papers[0].categories],["quant-ph"]);
  assert.equal(one.papers[0].date,"2026-11-01");
- assert.equal(one.next,"SECOND");
+ assert.equal(one.next,"2");
  const two=await api.live("arxiv",query,undefined,one.next);
  assert.equal(two.papers.length,2,"Reject contradictory arXiv URLs without losing valid records");
  assert.equal(two.next,null);
@@ -53,7 +53,14 @@ const api=root.AxiovoArchiveData;
  assert.equal(api.filter([...one.papers,...two.papers],{category}).length,2,
   "Both arXiv subject encoding variants must survive official category filtering");
  assert.equal(api.filter([...one.papers,...two.papers],{category:{code:"cs.CV",name:"Computer Vision"}}).length,1);
- assert.equal(requests[0].searchParams.get("page[cursor]"),"1");
- assert.equal(requests[1].searchParams.get("page[cursor]"),"SECOND");
- console.log("PASS: DataCite canonical arXiv ID, subject labels and cursor pagination");
+ assert.equal(requests[0].searchParams.get("page[number]"),"1");
+ assert.equal(requests[0].searchParams.get("sort"),"-published");
+ assert.equal(requests[1].searchParams.get("page[number]"),"2");
+ await api.live("arxiv",{q:"prepare-and-measure",sort:"relevance"});
+ assert.equal(requests.at(-1).searchParams.get("sort"),"relevance");
+ await api.live("arxiv",{q:"",sort:"cited"});
+ assert.equal(requests.at(-1).searchParams.get("sort"),"-citation-count");
+ await api.live("arxiv",{q:"",sort:"oldest"});
+ assert.equal(requests.at(-1).searchParams.get("sort"),"published");
+ console.log("PASS: DataCite canonical arXiv ID, category codes, source-ranked pagination and requested sort modes");
 })().catch(err=>{console.error(err);process.exitCode=1});
