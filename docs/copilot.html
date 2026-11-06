@@ -46,14 +46,14 @@
   </div>
   <p class="rd-small assistant-privacy">The main action starts with the indexed papers. Search more sends the text above to public metadata services.</p>
   <details class="rd-advanced assistant-advanced">
-   <summary>Optional text and local model</summary>
+   <summary>Optional text and AI model</summary>
    <label for="draft">Paste an abstract or claim to inspect</label>
-   <textarea id="draft" rows="3" maxlength="7500" placeholder="Pasted text stays in this tab or goes to your selected local model."></textarea>
+   <textarea id="draft" rows="3" maxlength="7500" placeholder="Pasted text stays in this tab unless you select local or hosted AI."></textarea>
    <button class="rd-button rd-secondary" id="clear-draft" type="button">Clear pasted text</button>
    <label for="retrieval-scope">Search scope for public questions</label>
    <select id="retrieval-scope"><option value="local">Indexed arXiv records</option><option value="all">Also search public arXiv metadata</option></select>
    <label for="engine">Answer mode</label>
-   <select id="engine"><option value="evidence">Source evidence</option><option value="ollama">Local Ollama model</option><option value="browser">On-device WebGPU model</option><option value="hosted">Hosted AI (bring your own API key)</option></select>
+   <select id="engine"><option value="evidence">Source evidence</option><option value="ollama">Local Ollama model</option><option value="browser">On-device WebGPU model</option><option value="hosted">Free cloud AI (requires server setup)</option></select>
    <div id="ollama-settings" hidden>
     <label for="model">Ollama model</label><select id="model"><option value="qwen3.5:9b">Qwen3.5 9B</option><option value="qwen3.5:27b">Qwen3.5 27B</option><option value="qwen3.5:35b">Qwen3.5 35B</option><option value="qwen3.5:4b">Qwen3.5 4B</option></select>
     <div class="rd-actions"><button class="rd-button rd-secondary" id="detect-models" type="button">Detect installed models</button><button class="rd-button rd-secondary" id="test-ollama" type="button">Check connection</button></div>
@@ -62,10 +62,10 @@
     <p class="rd-small">Run Ollama locally and allow the Axiovo origin. <a href="./lab.html">Open Research Tools</a>.</p>
    </div>
    <div id="hosted-settings" hidden>
-    <p class="rd-small">Hosted AI requires a separately deployed secure server. Axiovo never asks you to type a provider API key into this public website.</p>
+    <p class="rd-small">Hosted AI uses a free model through the site's secure server when enabled. It sends your question and selected paper excerpts to the model provider. Never paste confidential work. No personal API key is requested.</p>
     <label for="hosted-provider">Configured provider</label>
     <select id="hosted-provider">
-     <option value="openrouter">OpenRouter free routing (only if enabled by site administrator)</option>
+     <option value="openrouter">OpenRouter free models (enabled by site administrator)</option>
      <option value="openai">OpenAI (disabled unless explicitly configured)</option>
      <option value="moonshot">Kimi / Moonshot (disabled unless explicitly configured)</option>
      <option value="gemini">Gemini (disabled unless explicitly configured)</option>
@@ -73,7 +73,7 @@
     <label for="hosted-model">Allowed server model</label>
     <input id="hosted-model" type="text" maxlength="100" readonly value="Not configured" aria-describedby="hosted-guide">
     <div id="axiovo-ai-challenge" aria-label="AI request verification" hidden></div>
-    <p class="rd-small" id="hosted-guide" role="status">Secure hosted AI is not configured. Source evidence, local Ollama and browser WebGPU remain available without an Axiovo server.</p>
+    <p class="rd-small" id="hosted-guide" role="status">Free hosted AI requires server setup. Source evidence, local Ollama and WebGPU remain available.</p>
    </div>
    <div id="browser-settings" hidden>
     <label for="browser-model">WebGPU model</label><select id="browser-model"><option value="Qwen2.5-0.5B-Instruct-q4f16_1-MLC">Qwen2.5 0.5B</option><option value="Qwen2.5-1.5B-Instruct-q4f16_1-MLC">Qwen2.5 1.5B</option></select>
