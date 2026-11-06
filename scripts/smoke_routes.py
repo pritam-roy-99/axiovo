@@ -114,8 +114,8 @@ def main():
                 page.wait_for_url(lambda url: urlsplit(url).path.endswith("/workspace.html"))
                 # Navigation labels should describe the destination and remain usable.
                 nav = page.locator(".rl-nav a")
-                assert nav.count()==4
-                assert all(nav.nth(i).get_attribute("title") for i in range(4))
+                assert nav.count()==5, "Expected Explore, Research Desk, My Feed, Library and Research Assistant"
+                assert all(nav.nth(i).get_attribute("title") for i in range(5))
                 page.goto(base+"desk.html",wait_until="domcontentloaded")
                 assert page.locator("#rd-search-form").count()==1
                 assert page.locator("#rd-query").count()==1
