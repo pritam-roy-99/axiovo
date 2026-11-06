@@ -53,6 +53,7 @@ function renderCard(item){
  const top=label(card,"div","","feed-card-top");
  label(top,"span",archive.names[p.source]||p.source,"feed-source");
  label(top,"span",paperDate(p)||"Date not verified","feed-date");
+ if(Number.isFinite(p.citations)&&p.citations>=0)label(card,"p","Cited by "+p.citations.toLocaleString()+" (available source metadata)","feed-date");
  const h=label(card,"h3","");
  link(h,p.title,p.url);
  label(card,"p",(p.authors||[]).slice(0,5).join(", ")+((p.authors||[]).length>5?" et al.":""),"feed-authors");
