@@ -93,7 +93,7 @@ def main():
     # Every frame is captured from the real Axiovo HTML/CSS/JS, not a mockup.
     # Each scene points to a real page and a meaningful control or feature.
     steps=[
-        ("Welcome", "Choose your research workflow.", "Welcome to Axiovo. Here is a practical tour of its research discovery and reading tools.", "", ".rd-home-hero", None),
+        ("Axiovo: From knowledge to discovery", "Connect your questions, original papers and evidence.", "Namaste, and welcome to Axiovo. Axiovo means from knowledge to discovery. It helps researchers connect questions with original papers and source evidence, then save and revisit the work that matters. Let me show you how.", "", ".axiovo-brand-meaning", None),
         ("Three preprint archives", "Select arXiv, bioRxiv or ChemRxiv.", "The homepage offers three independent preprint archives. Choose the one that matches your research discipline.", "", ".axiovo-archive-grid", None),
         ("arXiv subject directory", "Choose the official arXiv category.", "On arXiv Discover, first select an official subject category, such as mathematical physics.", "arxiv.html?category=math-ph", "#archive-field", None),
         ("Linked research topics", "Refine a subject to a topic and subtopic.", "Then refine your subject into a research topic and subtopic. The selected path controls the paper search.", "arxiv.html?category=math-ph&topic=quantum-many-body-theory&subtopic=lieb-robinson-bounds", "#archive-subfield", None),
