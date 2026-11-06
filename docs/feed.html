@@ -8,7 +8,7 @@
 <link rel="stylesheet" href="./feed.css?v=1">
 <script defer src="./theme.js"></script><script defer src="./navigation.js"></script>
 <script defer src="./pwa.js"></script><script defer src="./arxiv-versions.js"></script>
-<script defer src="./archive-data.js"></script><script defer src="./author-follow.js"></script>
+<script defer src="./archive-data.js"></script><script defer src="./paper-sort.js"></script><script defer src="./author-follow.js"></script>
 <script defer src="./interests.js"></script><script defer src="./feed-core.js"></script><script defer src="./feed.js"></script>
 </head><body class="axiovo-research axiovo-feed-page"><header></header>
 <main class="rd-page feed-page">
@@ -30,12 +30,14 @@
  <div class="feed-filters">
   <label for="feed-source">Archive</label><select id="feed-source"><option value="all">All archives</option><option value="arxiv">arXiv</option><option value="biorxiv">bioRxiv</option><option value="chemrxiv">ChemRxiv</option></select>
   <label for="feed-window">Date range</label><select id="feed-window"><option value="0">All indexed dates</option><option value="7">Last 7 days</option><option value="30" selected>Last 30 days</option><option value="90">Last 90 days</option></select>
+  <label for="feed-sort">Order papers</label><select id="feed-sort"><option value="relevance">Most relevant</option><option value="recent">Newest first</option><option value="oldest">Oldest first</option><option value="cited">Most cited (known counts)</option></select>
   <button type="button" id="feed-refresh">Refresh</button>
  </div>
 </section>
 <div class="feed-layout">
  <section class="feed-stream" aria-labelledby="feed-stream-heading">
   <div class="feed-section-head"><div><h2 id="feed-stream-heading">Papers for you</h2><p id="feed-status" role="status" aria-live="polite">Loading source metadata…</p></div><span id="feed-match-count" aria-label="Matching papers"></span></div>
+  <p id="feed-sort-note" role="status" class="feed-sort-note"></p>
   <div id="feed-results" class="feed-results" aria-live="off"></div>
   <button type="button" id="feed-more" class="feed-more" hidden>Show more papers</button>
  </section>
