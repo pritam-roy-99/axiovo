@@ -8,9 +8,9 @@ workers_dev = true
 
 [vars]
 PROVIDER = "openrouter"
-MODEL = "nvidia/nemotron-3-ultra-550b-a55b:free"
+MODEL = "openrouter/free"
 DAILY_LIMIT_PER_IP = "8"
-# Free endpoint only. Can use MODEL = "openrouter/free" as a free routing fallback.\n# Paid-model providers are intentionally disabled.
+# Paid-model providers are intentionally disabled.
 
 [[kv_namespaces]]
 binding = "RATE_LIMIT_KV"
