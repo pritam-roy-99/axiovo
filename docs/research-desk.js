@@ -186,7 +186,11 @@ function makeLane(source,criteria){
 }
 function redraw(lane,{focus=false}={}){
  const before=lane.list.childElementCount;
- lane.list.replaceChildren(...lane.items.slice(0,lane.visible).map(recordCard));
+ const sorter=window.AxiovoPaperSort;
+ const mode=$("rd-results-sort")?.value||lane.criteria.sort||"relevance";
+ const displayed=sorter?.sort(lane.items,mode,p=>lane.items.length-lane.items.indexOf(p))||lane.items;
+ lane.list.replaceChildren(...displayed.slice(0,lane.visible).map(recordCard));
+ if($("rd-sort-note"))$("rd-sort-note").textContent=sorter?.note(displayed,mode)||"";
  lane.summary.textContent=lane.message+" · "+lane.items.length+" matching record"+(lane.items.length===1?"":"s");
  lane.footer.replaceChildren();
  if(lane.items.length>lane.visible){
@@ -268,6 +272,18 @@ async function runSearch(){
  message.textContent=[...lanes.values()].reduce((n,lane)=>n+lane.items.length,0)+" matching records shown across "+sources.length+" "+(sources.length===1?"archive":"archives")+". Check each source for coverage.";
 }
 $("rd-search-form").addEventListener("submit",e=>{e.preventDefault();runSearch()});
+const resultSort=$("rd-results-sort");
+if(resultSort){
+ resultSort.value=$("rd-sort").value;
+ resultSort.addEventListener("change",()=>{
+  $("rd-sort").value=resultSort.value;
+  for(const lane of lanes.values()){lane.criteria.sort=resultSort.value;redraw(lane)}
+ });
+ $("rd-sort").addEventListener("change",()=>{
+  resultSort.value=$("rd-sort").value;
+  for(const lane of lanes.values()){lane.criteria.sort=resultSort.value;redraw(lane)}
+ });
+}
 $("rd-range").addEventListener("change",showDates);
 $("rd-save-search").onclick=addWatch;
 $("rd-open-comparison").onclick=openComparison;
