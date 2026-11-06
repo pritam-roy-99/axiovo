@@ -86,11 +86,13 @@
      <label class="rd-label" for="archive-query">Keywords, title or paper identifier</label>
      <div class="rd-searchbar"><input id="archive-query" type="search" maxlength="220" placeholder="Search within the selected path"><button class="rd-button rd-primary" type="submit">Search papers</button></div>
      <div class="ex-date-presets" role="group" aria-label="Date shortcuts">
-      <button class="rd-button rd-secondary" id="archive-latest" type="button">Latest papers</button>
-      <button class="rd-button rd-secondary" id="archive-latest-verified" type="button">Latest verified day</button>
+      <button class="rd-button rd-primary" id="archive-announced" type="button" aria-describedby="archive-announced-help">Today’s announced papers (all arXiv)</button>
+      <button class="rd-button rd-secondary" id="archive-latest" type="button">Latest indexed papers</button>
+      <button class="rd-button rd-secondary" id="archive-latest-verified" type="button">Latest verified submission day</button>
       <button class="rd-button rd-secondary" id="archive-week" type="button">Past 7 days</button>
       <button class="rd-button rd-secondary" id="archive-date-open" type="button">Choose dates</button>
      </div>
+     <p id="archive-announced-help" class="rd-small">arXiv releases papers at 8 PM US Eastern, which is the next calendar day in India. Announcement dates and first-submission dates are different.</p>
      <details class="rd-advanced" id="archive-advanced"><summary>Author, dates and other filters</summary>
       <div class="rd-filter-grid">
        <label>Author<input id="archive-author" type="search" maxlength="100" placeholder="Given name and surname" list="archive-author-options"></label>
