@@ -12,6 +12,8 @@ const collections=require("../docs/collection-export.js");
 const feedPlan=require("../docs/feed-retrieval-plan.js");
 const personal=require("../docs/personal-migration.js");
 const authorIdentity=require("../docs/author-identity.js");
+const retriever=require("../docs/evidence-retriever.js");
+const pdfEvidence=require("../docs/pdf-evidence.js");
 
 const a={source:"arxiv",id:"arxiv:2611.00001",source_id:"2611.00001",recordId:"2611.00001v2",version:2,
  title:"Quantum contextuality in sequential measurements",abstract:"A nonclassical measurement test.",
@@ -88,4 +90,21 @@ assert.equal(unresolved.confirmed,false);
 assert.equal(authorIdentity.sameResearcher(unresolved,unresolved),false);
 assert.throws(()=>citation.normalize({...a,url:"https://example.com/not-the-paper"}),/original source/);
 assert.throws(()=>citation.normalize({...a,url:"https://arxiv.org/abs/2611.00001v1"}),/revision mismatch/);
-console.log("Phases 2-5: strict search, evidence, portability, fair follow plan and opt-in migration tests passed.");
+const evidenceAnswer=retriever.answer("sequential quantum contextuality",[a],{index:evidence,verifier:claims});
+assert(evidenceAnswer.answered);
+assert.equal(evidenceAnswer.citations[0].source_url,a.url);
+const abstain=retriever.answer("unanswerable black hole topology",[a],{index:evidence,verifier:claims});
+assert.equal(abstain.answered,false);
+(async()=>{
+ const testFile={size:8,arrayBuffer:async()=>new ArrayBuffer(8)};
+ const stub={getDocument:()=>({promise:Promise.resolve({
+  numPages:1,
+  getPage:async()=>({getTextContent:async()=>({items:[{str:"Qubit"},{str:"measurement"}]})}),
+  destroy:async()=>{}
+ })})};
+ const result=await pdfEvidence.extract(testFile,{pdfjs:stub,paper:{id:a.id,version:2},maxPages:1});
+ assert.equal(result.uploaded,false);
+ assert.equal(result.passages[0].extraction_status,"layout-uncertain");
+ console.log("Phases 2-5: strict search, evidence, portability, fair follow plan and opt-in migration tests passed.");
+})().catch(error=>{console.error(error);process.exitCode=1});
+
