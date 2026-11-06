@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>My Feed | Axiovo</title>
+<meta name="description" content="Your personal, source-linked research feed from followed authors and topics across arXiv, bioRxiv and ChemRxiv.">
+<link rel="icon" type="image/svg+xml" href="./icons/axiovo.svg"><link rel="manifest" href="./manifest.webmanifest">
+<link rel="stylesheet" href="./theme.css"><link rel="stylesheet" href="./research-desk.css">
+<link rel="stylesheet" href="./axiovo-shell.css?v=20261106-brand">
+<link rel="stylesheet" href="./feed.css?v=1">
+<script defer src="./theme.js"></script><script defer src="./navigation.js"></script>
+<script defer src="./pwa.js"></script><script defer src="./arxiv-versions.js"></script>
+<script defer src="./archive-data.js"></script><script defer src="./author-follow.js"></script>
+<script defer src="./interests.js"></script><script defer src="./feed-core.js"></script><script defer src="./feed.js"></script>
+</head><body class="axiovo-research axiovo-feed-page"><header></header>
+<main class="rd-page feed-page">
+<section class="feed-hero" aria-labelledby="feed-title">
+ <div><p class="rd-kicker">YOUR RESEARCH, AS IT HAPPENS</p>
+ <h1 id="feed-title">My Feed</h1>
+ <p>New literature from your followed researchers and research topics, with the source and reason for every recommendation.</p>
+ <div class="feed-hero-actions"><a href="./workspace.html#following">Manage followed authors</a><a href="./arxiv.html">Follow research topics</a></div>
+ </div>
+ <div class="feed-insight" aria-label="Feed coverage summary"><span>YOUR RESEARCH PULSE</span><strong id="feed-pulse-count">—</strong><small id="feed-pulse-label">Matching source-linked papers</small><small id="feed-pulse-synced">Checking published snapshots…</small></div>
+</section>
+<section class="feed-toolbar" aria-label="Feed filters">
+ <div class="feed-tabs" role="group" aria-label="Feed view">
+  <button type="button" data-view="for-you" aria-pressed="true">For You</button>
+  <button type="button" data-view="following" aria-pressed="false">Following</button>
+  <button type="button" data-view="latest" aria-pressed="false">Latest</button>
+  <button type="button" data-view="related" aria-pressed="false">Related</button>
+ </div>
+ <div class="feed-filters">
+  <label for="feed-source">Archive</label><select id="feed-source"><option value="all">All archives</option><option value="arxiv">arXiv</option><option value="biorxiv">bioRxiv</option><option value="chemrxiv">ChemRxiv</option></select>
+  <label for="feed-window">Date range</label><select id="feed-window"><option value="0">All indexed dates</option><option value="7">Last 7 days</option><option value="30" selected>Last 30 days</option><option value="90">Last 90 days</option></select>
+  <button type="button" id="feed-refresh">Refresh</button>
+ </div>
+</section>
+<div class="feed-layout">
+ <section class="feed-stream" aria-labelledby="feed-stream-heading">
+  <div class="feed-section-head"><div><h2 id="feed-stream-heading">Papers for you</h2><p id="feed-status" role="status" aria-live="polite">Loading source metadata…</p></div><span id="feed-match-count" aria-label="Matching papers"></span></div>
+  <div id="feed-results" class="feed-results" aria-live="off"></div>
+  <button type="button" id="feed-more" class="feed-more" hidden>Show more papers</button>
+ </section>
+ <aside class="feed-sidebar">
+  <section class="feed-side-card" aria-labelledby="feed-followed-heading"><h2 id="feed-followed-heading">Your research interests</h2>
+   <p class="feed-side-label">Followed authors</p><div id="feed-followed-authors" class="feed-chips"></div>
+   <p class="feed-side-label">Followed topics</p><div id="feed-followed-topics" class="feed-chips"></div>
+   <a class="feed-side-link" href="./workspace.html#following">Edit followed authors</a>
+  </section>
+  <section class="feed-side-card" aria-labelledby="feed-about-heading"><h2 id="feed-about-heading">About this feed</h2>
+  <p>Recommendations are calculated locally from published source metadata. No paid AI, account or tracking is required.</p>
+  <p>Latest means newest within the available indexed records. Missing source batches and incomplete historical coverage are possible.</p>
+  <a class="feed-side-link" href="./methodology.html">Data coverage and methodology</a></section>
+ </aside>
+</div>
+</main></body></html>
