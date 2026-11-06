@@ -98,6 +98,9 @@ def main():
                     assert "all arXiv categories" in page.locator("#archive-scope-label").inner_text()
                     first=page.locator(".ex-paper").first
                     assert "Announced" in first.locator(".rd-small").first.inner_text()
+                    page.locator("#archive-field").select_option("quant-ph")
+                    assert "Quantum Physics" in page.locator("#archive-scope-label").inner_text()
+                    assert "Official arXiv release:" in page.locator("#archive-sync-status").inner_text()
                     page.locator("#archive-latest").click()
                     page.wait_for_function("""() => !document.querySelector('#archive-sync-status')
                       ?.textContent.includes('Official arXiv release:')""",timeout=24000)
