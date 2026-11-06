@@ -93,7 +93,7 @@ def main():
     # Every frame is captured from the real Axiovo HTML/CSS/JS, not a mockup.
     # Each scene points to a real page and a meaningful control or feature.
     steps=[
-        ("Axiovo = Axiom + Novo", "From established knowledge to new discoveries.", "Welcome to Axiovo. Its name combines axiom, a foundational starting point for reasoning, and novo, meaning new. Axiovo stands for moving from established knowledge toward new scientific discoveries. Let us see how its research tools work.", "", ".axiovo-name-meaning", None),
+        ("Axiovo = Axiom + Novo", "From established knowledge to new discoveries.", "Welcome to Axiovo. Its name combines axiom, a foundational starting point for reasoning, and novo, meaning new. Axiovo stands for moving from established knowledge toward new scientific discoveries. Let us see how its research tools work.", "", ".axiovo-welcome", None),
         ("Three preprint archives", "Select arXiv, bioRxiv or ChemRxiv.", "The homepage offers three independent preprint archives. Choose the one that matches your research discipline.", "", ".axiovo-archive-grid", None),
         ("Search the arXiv subject list", "Type part of a subject name or category code.", "On arXiv Discover, open Archive subject and type part of a name or code. Typing quant brings up Quantum Physics and other matching categories.", "arxiv.html", "#archive-field-input", ("archive-field-input", "quant")),
         ("Linked research topics", "Refine a subject to a subfield and subtopic.", "You can also type in the research subfield and subtopic dropdowns. Each dropdown offers choices within the path you have selected.", "arxiv.html?category=math-ph&topic=quantum-many-body-theory&subtopic=lieb-robinson-bounds", "#archive-subfield-input", None),
@@ -122,7 +122,7 @@ def main():
         ("PDF Research Tools", "Read a PDF and use the research utilities.", "Open Research Tools to read local PDFs, use available annotations and explore research utilities.", "lab.html", "#lab-local-pdf", None),
         ("Paper workspace", "Inspect arXiv versions and private notes.", "The paper workspace preserves version-exact arXiv links and supports personal research notes.", "paper.html?id=2608.13942v2", "#axiovo-paper-notes", None),
         ("Settings and themes", "Choose appearance and research preferences.", "Use Settings for preferences. Switch Night and Day appearance with the same accessible controls on every page.", "profiles.html", ".axiovo-header-appearance", None),
-        ("Explore Axiovo", "Return home, browse, search and organize.", "You've now seen the main Axiovo workflows. Search broadly, save carefully, and always open the original research record to verify technical claims.", "", ".rd-home-hero", None),
+        ("Explore Axiovo", "Return home, browse, search and organize.", "You've now seen the main Axiovo workflows. Search broadly, save carefully, and always open the original research record to verify technical claims.", "", ".axiovo-welcome", None),
     ]
     try:
         with tempfile.TemporaryDirectory() as temp:
