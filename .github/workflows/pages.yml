@@ -206,6 +206,8 @@ jobs:
           assert taxonomy["entries"]
           print("Phase 1 coverage, review queue and taxonomy counts validated")
           PY
+      - name: Verify every static navigation link and destination
+        run: python -m unittest discover -s tests -p test_navigation_integrity.py -v
       - name: Audit internal routes and HTML assets
         id: audit_internal_routes_and_html_assets
         continue-on-error: true
