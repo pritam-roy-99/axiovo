@@ -53,16 +53,21 @@ async function show(){
  const details=document.getElementById("axiovo-arxiv-day-health");
  if(details){
   try{
+   const audit=await load("./data/literature-health.json");
+   const arxiv=audit.arxiv||{};
+   const bio=audit.biorxiv||{};
+   const chem=audit.chemrxiv||{};
+   details.textContent="Independent source audit: arXiv "+Number(arxiv.verified_days||0)+
+    " count-checked UTC dates, "+Number(arxiv.queue_total||0)+" unchecked or invalid recent dates queued for re-harvest."+
+    " bioRxiv: "+(bio.status||"unverified")+". ChemRxiv: "+(chem.status||"unverified")+
+    ". None of these counts establishes complete historical archive coverage.";
+  }catch(error){
+   // Older deployments may not yet include the independent audit.
    const manifest=await load("./data/arxiv-days/manifest.json");
    const rows=Object.entries(manifest.days||{});
    const verified=rows.filter(([,v])=>v.complete===true&&Number.isInteger(v.count)&&v.count>0);
-   const invalid=rows.filter(([,v])=>v.count===0||v.complete!==true);
-   const latest=verified.map(([d])=>d).sort().at(-1)||"none";
-   details.textContent="arXiv UTC submission days: "+verified.length+
-    " verified positive-count dates; "+invalid.length+" empty/unverified dates; latest verified day "+latest+
-    ". Other dates must not be presented as complete.";
-  }catch{
-   details.textContent="arXiv date-archive manifest unavailable. No completeness claim can be made.";
+   details.textContent="arXiv has "+verified.length+
+    " manifest-listed positive-count dates. Independent shard audit not published yet; completeness is unverified.";
   }
  }
 }
