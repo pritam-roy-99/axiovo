@@ -46,7 +46,7 @@ function normalize(source,p){
  }
  const doi=record.doi;
  if(source==="biorxiv"&&!/^10\.(?:1101|64898)\//.test(doi))return null;
- if(source==="chemrxiv"&&!/^10\.26434\//.test(doi))return null;
+ if(source==="chemrxiv"&&!/^10\.26434\/chemrxiv(?:[.\/-]|$)/.test(doi))return null;
  const versioned=source==="biorxiv"&&Number.isInteger(version)&&version>0&&version<10000;
  const url=source==="biorxiv"?"https://www.biorxiv.org/content/"+doi+(versioned?"v"+version:""):"https://doi.org/"+doi;
  return {...record,id:doi,recordId:doi,version:versioned?version:null,url,pdf:source==="biorxiv"?url+".full.pdf":null};
@@ -334,7 +334,7 @@ async function chemLive(c,signal,cursor){
  const endpoint=doi?"https://api.crossref.org/works/"+doi:endpoints.chem+query;
  const message=(await request(endpoint,signal)).message;
  const rows=doi?[message]:list(message?.items);
- const papers=rows.filter(p=>/^10\.26434\/chemrxiv[./]/i.test(p?.DOI||"")).map(p=>
+ const papers=rows.filter(p=>/^10\.26434\/chemrxiv(?:[.\/-]|$)/i.test(p?.DOI||"")).map(p=>
   normalize("chemrxiv",{doi:p.DOI,title:p.title?.[0],authors:p.author,abstract:p.abstract,date:dateParts(p.posted)||dateParts(p.published),
    categories:p.subject,affiliations:list(p.author).flatMap(a=>list(a.affiliation).map(x=>x.name)),citations:p["is-referenced-by-count"],
    provenance:c.category?"Crossref subject query":"Crossref"})).filter(Boolean);
