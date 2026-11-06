@@ -58,7 +58,7 @@
   const list=(records||[]).slice(0,4).filter(p=>p&&p.title&&p.url);
   if(!list.length)return "No sufficiently relevant papers were found in the checked metadata for this question. This is not evidence that the topic has no literature. Try a more precise phrase, an author, or Search more arXiv records.";
   const lines=["Evidence related to: "+query,""];
-  const split=text=>String(text||"").split(/(?<=[.!?])\\s+/).map(s=>s.trim()).filter(Boolean);
+  const split=text=>String(text||"").split(/(?<=[.!?])\s+/).map(s=>s.trim()).filter(Boolean);
   for(const [i,p] of list.entries()){
    const q=new Set(words(query)),sentences=split(p.abstract);
    const ranked=sentences.map(s=>({text:s,count:[...new Set(words(s))].filter(t=>q.has(t)).length}))
@@ -70,7 +70,7 @@
   }
   lines.push("Interpretation: These are source-reported statements, not a complete answer to the research question. No causal explanation, proof, or comparison has been independently established from the abstracts.");
   lines.push("Next step: Open the most relevant original paper and inspect its assumptions, methodology and references.");
-  return lines.join("\\n");
+  return lines.join("\n");
  }
  function xid(p){return p.id}
  function compare(a,b){
