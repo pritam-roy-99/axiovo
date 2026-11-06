@@ -74,5 +74,28 @@ class SourceHarvestTests(unittest.TestCase):
         self.assertTrue(finished["prefix_exhausted"])
         self.assertEqual(finished["prefix_next_cursor"],"*")
 
+    def test_chemrxiv_persists_checkpoint_without_matching_new_papers(self):
+        import tempfile
+        import json
+        from pathlib import Path
+        from unittest.mock import patch
+        with tempfile.TemporaryDirectory() as temp:
+            target=Path(temp)/"chemrxiv.json"
+            previous={"papers":[{"doi":"10.26434/chemrxiv.cached","title":"Cached verified work",
+                "date":"2026-10-01"}],"prefix_next_cursor":"PAGE-2",
+                "prefix_exhausted":False}
+            target.write_text(json.dumps(previous))
+            def empty_page(fetcher=chem.get_json,sleep=None,max_pages=8,cursor_start="*"):
+                self.assertEqual(cursor_start,"PAGE-2")
+                return [],{"prefix_pages_checked":1,"prefix_exhausted":False,
+                   "prefix_scan_error":False,"prefix_cursor_start":"PAGE-2",
+                   "prefix_next_cursor":"PAGE-3","checks":[{"page":1,"returned":250}]}
+            with patch.object(chem,"TARGET",target),patch.object(chem,"fetch",empty_page):
+                chem.main()
+            result=json.loads(target.read_text())
+            self.assertEqual(result["prefix_next_cursor"],"PAGE-3")
+            self.assertEqual(result["count"],1)
+            self.assertEqual(result["papers"][0]["doi"],"10.26434/chemrxiv.cached")
+
 if __name__=="__main__":
     unittest.main()
