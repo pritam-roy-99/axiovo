@@ -59,3 +59,27 @@
  .assistant-results {grid-template-columns:minmax(0,1fr)}
  .assistant-task-row>a {margin-left:0}
 }
+
+/* Research Assistant: compact citations and readable on mobile screens. */
+.axiovo-assistant .assistant-results .assistant-source-details {margin-top:6px}
+.axiovo-assistant .assistant-results .assistant-source-details>summary {
+ font-size:.8rem;color:var(--rd-link);cursor:pointer;font-weight:700;
+ padding:6px 0;list-style-position:inside;
+}
+.axiovo-assistant .assistant-results .source>a {
+ overflow-wrap:anywhere;word-break:normal;line-height:1.35;
+}
+.axiovo-assistant .assistant-more-sources {margin-top:10px;width:100%;white-space:normal}
+.axiovo-assistant .assistant-results .source>p {margin-top:5px}
+.axiovo-assistant .assistant-source-details p {margin:6px 0}
+.axiovo-assistant .assistant-results .source {padding:11px 0}
+@media (max-width:690px) {
+ .axiovo-assistant .assistant-results :is(#conversation,#evidence-list) {
+  max-height:none;overflow:visible;min-width:0;
+ }
+ .axiovo-assistant .assistant-panel-head {align-items:baseline}
+ .axiovo-assistant .assistant-compose .rd-actions button {white-space:normal}
+ .axiovo-assistant .assistant-results .message {font-size:.91rem}
+ .axiovo-assistant .assistant-results .source {font-size:.91rem}
+ .axiovo-assistant .assistant-results .source .tiny {font-size:.75rem}
+}
