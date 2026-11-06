@@ -150,7 +150,7 @@ async function loadLiveArxiv(){
  const interest=String(prefs.subtopic||prefs.topic||settings.interests[0]||"quantum information").trim();
  if(!interest)return;
  const params=new URLSearchParams({search:interest,filter:"locations.source.id:S4306400194",per_page:"40",
-  select:"id,display_name,publication_date,authorships,locations,primary_location,best_oa_location,abstract_inverted_index"});
+  select:"id,display_name,publication_date,cited_by_count,authorships,locations,primary_location,best_oa_location,abstract_inverted_index"});
  const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),17000);
  try{
   const response=await fetch("https://api.openalex.org/works?"+params,{signal:controller.signal,headers:{Accept:"application/json"}});
@@ -161,7 +161,7 @@ async function loadLiveArxiv(){
     incoming.push({id:arxiv.requested,title:work.display_name,
       abstract:abstractFromInverted(work.abstract_inverted_index),
       authors:(work.authorships||[]).map(a=>a.author?.display_name).filter(Boolean),
-      published:work.publication_date||"",provider:"OpenAlex arXiv-linked metadata"});
+      published:work.publication_date||"",citations:Number.isInteger(work.cited_by_count)?work.cited_by_count:null,provider:"OpenAlex arXiv-linked metadata"});
   }
   const unique=new Map();
   for(const paper of [...incoming,...feed]){const key=Arxiv?.base(paper.id)||paper.id;if(!key||unique.has(key))continue;unique.set(key,paper)}
