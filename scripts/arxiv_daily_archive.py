@@ -156,9 +156,9 @@ def select_days(today: dt.date, existing: dict, count: int = 5) -> list[dt.date]
     # can be updated between successive checks. A day is only complete for the
     # API snapshot at fetched_at, not a promise that arXiv will never change it.
     # Never mark an in-progress UTC day as fully covered.
-    # Two recently closed days are checked again for late metadata revisions.
+    # Three recently closed days are checked again for late metadata revisions.
     selected = [today - dt.timedelta(days=i) for i in (1, 2, 3)]
-    for age in range(3, BACKFILL_DAYS + 1):
+    for age in range(4, BACKFILL_DAYS + 1):
         day = today - dt.timedelta(days=age)
         record = existing.get("days", {}).get(day.isoformat(), {})
         if not record.get("complete") or not isinstance(record.get("count"), int) or record["count"] <= 0:
