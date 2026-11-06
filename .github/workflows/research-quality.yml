@@ -12,6 +12,9 @@ on:
       - 'docs/paper-relations.js'
       - 'docs/topic-explorer.js'
       - 'docs/research-intelligence.js'
+      - 'docs/paper-card-polish.css'
+      - 'docs/workspace.html'
+      - 'tests/test_recommendation_save_ui.py'
       - 'docs/following-authors.js'
       - 'docs/archive-data.js'
       - 'docs/copilot.js'
@@ -59,6 +62,8 @@ jobs:
           node --check docs/assistant-core.js
           node tests/assistant-core.test.js
           node tests/assistant-grounding-50.test.js
+      - name: Verify mobile Library save button and persistent storage compatibility
+        run: python -m unittest discover -s tests -p test_recommendation_save_ui.py -v
       - name: Validate browser scripts and source links
         run: |
           python -m scripts.validate_site
