@@ -53,3 +53,66 @@
 @media(max-width:880px){.feed-layout{grid-template-columns:minmax(0,1fr)}.feed-sidebar{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.feed-side-card{margin:0}}
 @media(max-width:600px){.feed-page{padding:16px 12px 55px}.feed-hero{grid-template-columns:1fr;gap:14px}.feed-insight{min-height:100px;padding:16px}.feed-insight strong{font-size:34px}.feed-toolbar,.feed-filters{align-items:stretch}.feed-tabs{width:100%;justify-content:space-between}.feed-tabs button{padding:8px 11px;flex:1 0 auto}.feed-filters{width:100%}.feed-filters select{flex:1 1 110px;min-width:0}.feed-sidebar{grid-template-columns:1fr}.feed-card{padding:14px}.feed-card-actions>a,.feed-card-actions>button{flex:1 1 auto}.feed-card-actions .feed-dismiss{margin-left:0}}
 @media(prefers-reduced-motion:reduce){.feed-tabs button,.feed-card-actions button{transition:none}}
+
+/* Research-social feed: familiar conversational timeline, grounded paper metadata. */
+.axiovo-feed-page .feed-page{max-width:1120px}
+.axiovo-feed-page .feed-hero{grid-template-columns:minmax(0,1fr) 215px;gap:20px;background:var(--rl-panel,#fff)}
+.axiovo-feed-page .feed-layout{grid-template-columns:minmax(0,690px) minmax(235px,1fr);justify-content:center;gap:20px}
+.axiovo-feed-page .feed-stream{background:transparent;border:0;padding:0}
+.axiovo-feed-page .feed-section-head{border:1px solid var(--rl-border,#cbdde9);border-radius:16px;padding:17px;background:var(--rl-panel,#fff)}
+.axiovo-feed-page .feed-card{border-radius:17px;padding:0;overflow:hidden;box-shadow:0 2px 12px rgba(12,40,62,.055)}
+.feed-post-header{display:flex;align-items:center;gap:11px;padding:17px 19px 7px}
+.feed-avatar{width:42px;height:42px;flex:0 0 42px;display:grid;place-items:center;border-radius:50%;font-size:14px;font-weight:850;letter-spacing:.01em;background:var(--axiovo-accent,#126f9c);color:#fff}
+.feed-post-identity{display:grid;gap:3px;flex:1;min-width:0}
+.feed-post-identity strong{font-size:14px;color:var(--rl-text,#17324a);overflow-wrap:anywhere}
+.feed-post-identity small{font-size:12px;color:var(--rl-muted,#607a91);line-height:1.4}
+.feed-post-header .feed-source{flex:0 0 auto}
+.axiovo-feed-page .feed-card h3{margin:8px 19px 6px;font-size:clamp(18px,2.2vw,21px);line-height:1.45}
+.axiovo-feed-page .feed-authors{margin:6px 19px}
+.axiovo-feed-page .feed-why{margin:12px 19px}
+.feed-summary{margin:5px 19px 16px;font-size:13px;color:var(--rl-muted,#607a91)}
+.feed-summary summary,.feed-follow-details summary{color:var(--axiovo-accent,#126f9c);font-weight:750;cursor:pointer;padding:6px 0;list-style-position:inside}
+.feed-summary p{line-height:1.7;margin:8px 0 0;overflow-wrap:anywhere}
+.feed-citations{display:block;margin:5px 19px 10px;color:var(--rl-muted,#607a91)}
+.axiovo-feed-page .feed-card-actions{padding:12px 19px;border-top:1px solid var(--rl-border,#cbdde9);margin:0;display:flex;gap:8px}
+.axiovo-feed-page .feed-card-actions>a,.axiovo-feed-page .feed-card-actions>button{font-size:12px;flex:0 1 auto;min-height:42px;padding:8px 13px;white-space:normal;text-align:center}
+.axiovo-feed-page .feed-card-actions>.feed-save{background:var(--rl-soft,#edf5fa)}
+.axiovo-feed-page .feed-card-actions>.feed-save[aria-pressed="true"]{background:var(--axiovo-accent,#126f9c);color:#fff}
+.axiovo-feed-page .feed-card-actions>.feed-dismiss{margin-left:auto}
+.feed-share-link{box-sizing:border-box;display:block;width:calc(100% - 38px);margin:10px 19px;padding:9px 12px;border:1px solid var(--rl-border,#cbdde9);border-radius:9px;background:var(--rl-panel,#fff);color:var(--rl-text,#17324a)}
+.feed-follow-details{margin:0 19px 15px;font-size:12px}
+.feed-follow-details .axiovo-author-follow{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.feed-follow-details :is(select,button){min-height:40px;border:1px solid var(--rl-border,#cbdde9);border-radius:9px;padding:7px 10px;background:var(--rl-soft,#edf5fa);color:var(--rl-text,#17324a)}
+.feed-stream-actions{display:flex;gap:10px;flex-wrap:wrap}
+.feed-stream-actions .feed-more{flex:1 1 170px}
+.feed-deep-search{background:var(--axiovo-accent,#126f9c)!important;border-color:var(--axiovo-accent,#126f9c)!important;color:#fff!important}
+.feed-undo{position:sticky;bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 17px;border-radius:13px;background:var(--rl-text,#17324a);color:var(--rl-panel,#fff);font-size:13px;font-weight:650;z-index:4}
+.feed-undo[hidden]{display:none}
+.feed-undo button{border:1px solid currentColor;border-radius:8px;padding:7px 11px;background:transparent;color:inherit;cursor:pointer;font:inherit;font-weight:800}
+.feed-follow-form{display:grid;gap:6px;margin:15px 0}
+.feed-follow-form>label{font-size:12px;font-weight:800;color:var(--rl-text,#17324a)}
+.feed-follow-form>div{display:flex;align-items:center;gap:7px}
+.feed-follow-form input{width:100%;min-width:0;min-height:42px;flex:1;padding:9px;border:1px solid var(--rl-border,#cbdde9);border-radius:9px;background:var(--rl-panel,#fff);color:var(--rl-text,#17324a);font:inherit;font-size:13px}
+.feed-follow-form button{min-height:42px;padding:9px 11px;border:0;border-radius:9px;background:var(--axiovo-accent,#126f9c);color:#fff;font-size:12px;font-weight:800;cursor:pointer}
+.feed-follow-status{font-size:12px!important;min-height:12px}
+.feed-chip{display:inline-flex;align-items:center;gap:7px;min-width:0;max-width:100%}
+.feed-chip>span{overflow-wrap:anywhere}
+.feed-chips .feed-chip-remove{border:0;border-radius:50%;background:transparent;color:inherit;font-size:19px;line-height:1;cursor:pointer;padding:2px 4px;min-height:28px;min-width:28px}
+.feed-sidebar-links{display:flex;gap:12px;flex-wrap:wrap;margin-top:13px}
+.feed-sort-note{font-size:12px;color:var(--rl-muted,#607a91);line-height:1.5}
+@media(max-width:900px){.axiovo-feed-page .feed-layout{grid-template-columns:minmax(0,1fr)}
+ .axiovo-feed-page .feed-sidebar{grid-template-columns:1fr 1fr}
+}
+@media(max-width:620px){.axiovo-feed-page .feed-hero{grid-template-columns:minmax(0,1fr)}
+ .axiovo-feed-page .feed-sidebar{grid-template-columns:1fr}
+ .feed-post-header{padding:13px 13px 6px}
+ .feed-avatar{width:38px;height:38px;flex-basis:38px}
+ .axiovo-feed-page .feed-card h3{margin:8px 13px 6px}
+ .axiovo-feed-page .feed-authors,.axiovo-feed-page .feed-why,.feed-summary,.feed-follow-details{margin-left:13px;margin-right:13px}
+ .axiovo-feed-page .feed-card-actions{padding:11px 13px;gap:7px}
+ .axiovo-feed-page .feed-card-actions>a,.axiovo-feed-page .feed-card-actions>button{flex:1 1 calc(33% - 9px);padding:8px 7px;min-width:0}
+ .axiovo-feed-page .feed-card-actions>.feed-dismiss{margin-left:0}
+ .feed-share-link{margin:10px 13px;width:calc(100% - 26px)}
+ .feed-follow-form>div{flex-wrap:wrap}
+ .feed-follow-form input{flex:1 1 180px}
+}
