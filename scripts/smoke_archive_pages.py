@@ -57,6 +57,7 @@ def main():
       page.get_by_text(title,exact=False).first.wait_for(timeout=12000)
       checks+=1
       page.goto(base+path,wait_until="domcontentloaded")
+      page.locator("#archive-advanced").evaluate("el=>el.open=true")
       page.locator("#archive-from").fill("2025-01-10")
       page.locator("#archive-to").fill("2025-01-01")
       page.locator("#archive-search-form").evaluate("(form)=>form.requestSubmit()")
