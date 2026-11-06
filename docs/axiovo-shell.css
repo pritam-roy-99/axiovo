@@ -399,3 +399,133 @@ body.axiovo-home .axiovo-brand-meaning strong {
 .paper-sort-toolbar select:focus-visible{outline:3px solid var(--axiovo-brand,#157ba7);outline-offset:2px}
 @media(max-width:520px){.paper-sort-toolbar{align-items:stretch}
 .paper-sort-toolbar label{width:100%}.paper-sort-toolbar select{flex:1 1 100%}}
+
+
+/* Axiovo design system 2026-11: restrained, responsive, accessible.
+   Visual only: existing data services, event listeners and storage remain unchanged. */
+:root {
+ --axiovo-ui-radius:14px;
+ --axiovo-ui-shadow:0 5px 22px rgba(15,42,65,.065);
+ --axiovo-ui-border:#d6e3ee;
+ --axiovo-ui-focus:#14a9cd;
+}
+html {scroll-behavior:smooth}
+body {text-rendering:optimizeLegibility;-webkit-font-smoothing:antialiased}
+body .rl-global-header {position:relative;z-index:20}
+body .rl-global-header .rl-nav a {
+ transition:background-color .16s ease,color .16s ease,box-shadow .16s ease;
+}
+body .rl-global-header .rl-nav a[aria-current="page"] {
+ box-shadow:inset 0 -2px 0 #7de7ec!important;
+}
+.axiovo-research .rd-page {
+ width:min(100%,1320px);
+ padding-inline:clamp(16px,2.8vw,38px);
+}
+.axiovo-research .rd-section-heading {gap:16px}
+.axiovo-research .rd-section-heading h2 {letter-spacing:-.025em;line-height:1.2}
+.axiovo-research :is(.rd-panel,.rd-archive-card,.rd-side-panel,.ex-sidebar section,.ex-result-summary) {
+ border-radius:var(--axiovo-ui-radius);
+}
+.axiovo-research .rd-panel,
+.axiovo-research .rd-archive-card {
+ box-shadow:var(--axiovo-ui-shadow);
+}
+.axiovo-research :is(.rd-button,.ex-archives a,.library-tabs a) {
+ min-height:44px;border-radius:11px;
+ transition:background-color .15s ease,border-color .15s ease,box-shadow .15s ease,transform .15s ease;
+}
+.axiovo-research :is(.rd-button,.ex-archives a,.library-tabs a):hover:not(:disabled) {
+ transform:translateY(-1px);
+}
+.axiovo-research :is(input:not([type="checkbox"]):not([type="radio"]),select,textarea) {
+ max-width:100%;border-radius:10px;
+}
+.axiovo-research :is(button,input,select,textarea,summary,a):focus-visible,
+body :is(button,input,select,textarea,summary,a):focus-visible {
+ outline:3px solid var(--axiovo-ui-focus);outline-offset:3px;
+}
+.axiovo-research :is(.rd-searchbar,.rd-filter-grid,.rl-library-controls,.ex-finder) {min-width:0}
+.axiovo-research :is(.rd-searchbar,.rd-filter-grid,.rl-library-controls,.ex-finder) > * {min-width:0}
+body.axiovo-home .rd-home-hero {
+ padding:clamp(22px,3.4vw,42px);
+ gap:clamp(16px,3vw,38px);
+ border-radius:20px;
+}
+body.axiovo-home .rd-home-hero h1 {font-size:clamp(2.05rem,4vw,3.8rem);line-height:1.05}
+body.axiovo-home .rd-home-hero .axiovo-name-meaning {
+ margin-block:12px 14px;padding:10px 15px;
+}
+body.axiovo-home .rd-home-hero .axiovo-name-meaning strong {font-size:clamp(16px,1.7vw,19px)}
+body.axiovo-home .rd-home-hero .rd-lead {margin-bottom:14px}
+body.axiovo-home .axiovo-video-top {
+ margin-top:18px;
+ display:grid;grid-template-columns:minmax(240px,.78fr) minmax(0,1.45fr);
+ align-items:start;gap:clamp(14px,2vw,28px);
+ padding:clamp(16px,2.5vw,28px);
+ border:1px solid var(--rd-border,#cfdce7);
+ background:var(--rd-surface,#fff);
+ border-radius:18px;
+ box-shadow:var(--axiovo-ui-shadow);
+}
+body.axiovo-home .axiovo-video-top .rd-tour-copy {margin:0}
+body.axiovo-home .axiovo-video-top h2 {font-size:clamp(1.45rem,2.35vw,2.15rem);letter-spacing:-.04em}
+body.axiovo-home .axiovo-video-top p {line-height:1.65}
+body.axiovo-home .axiovo-video-top .rl-home-demo {min-width:0;margin:0}
+body.axiovo-home .axiovo-video-top video {
+ display:block;width:100%;height:auto;max-height:none;aspect-ratio:16/9;
+ object-fit:contain;border-radius:12px;background:#07192d;
+}
+body.axiovo-home .axiovo-video-top figcaption {margin-top:8px;font-size:.78rem;color:var(--rd-muted,#4f6578)}
+body.axiovo-home .axiovo-tour-fallback {
+ border:1px solid var(--rd-border,#cfdce7);
+ border-radius:12px;padding:clamp(16px,3vw,25px);
+ background:var(--rd-soft,#edf3f8);color:var(--rd-ink,#152d42);
+}
+body.axiovo-home .axiovo-tour-fallback[hidden] {display:none!important}
+body.axiovo-home .axiovo-tour-fallback strong {font-size:1.18rem}
+body.axiovo-home .axiovo-tour-fallback p {margin:8px 0 15px}
+body.axiovo-home .axiovo-guide-links {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+body.axiovo-home .axiovo-guide-links a {
+ display:flex;align-items:center;min-height:48px;padding:10px 12px;
+ border:1px solid var(--rd-border,#cfdce7);border-radius:10px;
+ background:var(--rd-surface,#fff);font-weight:700;text-decoration:none;
+}
+body.axiovo-home #axiovo-video-error {font-size:.82rem;color:var(--rd-muted,#4f6578)}
+body.axiovo-home .rd-home-section {margin-top:24px}
+:root[data-theme="dark"] {
+ --axiovo-ui-border:#37536e;
+ --axiovo-ui-shadow:0 5px 24px rgba(0,0,0,.18);
+}
+@media(max-width:900px) {
+ body.axiovo-home .axiovo-video-top {grid-template-columns:minmax(0,1fr)}
+ body.axiovo-home .axiovo-video-top .rd-tour-copy {max-width:75ch}
+}
+@media(max-width:760px) {
+ html body header.rl-global-header {gap:8px!important}
+ html body header.rl-global-header > .rl-nav {
+  scroll-snap-type:x proximity;scroll-padding-inline:12px;
+  padding:4px 0 6px!important;gap:6px!important;
+ }
+ html body header.rl-global-header > .rl-nav a {
+  scroll-snap-align:start;min-height:42px!important;
+ }
+ html body header.rl-global-header > .axiovo-nav-return {
+  justify-content:flex-start!important;gap:8px!important;
+ }
+ html body header.rl-global-header .axiovo-header-appearance {gap:5px!important}
+ .axiovo-research .rd-page {padding:18px 14px 42px!important}
+ body.axiovo-home .rd-home-hero {padding:22px 18px}
+ body.axiovo-home .rd-home-hero h1 {font-size:clamp(2rem,8vw,3rem)}
+ body.axiovo-home .axiovo-video-top {padding:14px;gap:15px;margin-top:14px}
+ body.axiovo-home .axiovo-guide-links {grid-template-columns:1fr}
+ .axiovo-research .rd-searchbar {flex-wrap:wrap}
+ .axiovo-research .rd-searchbar input {flex:1 1 100%}
+ .axiovo-research .rd-searchbar button {flex:1 1 100%}
+ .axiovo-research :is(.rd-archive-card,.rd-panel,.ex-guide) {min-width:0}
+}
+@media(prefers-reduced-motion:reduce) {
+ html {scroll-behavior:auto}
+ .axiovo-research :is(.rd-button,.ex-archives a,.library-tabs a) {transition:none}
+ .axiovo-research :is(.rd-button,.ex-archives a,.library-tabs a):hover:not(:disabled) {transform:none}
+}
