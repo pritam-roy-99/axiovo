@@ -23,6 +23,7 @@ on:
       - 'tests/author-name-aliases.test.js'
       - 'docs/archive-data.js'
       - 'tests/search-provider-contract.test.js'
+      - 'tests/chemrxiv-doi-forms.test.js'
       - 'docs/paper-sort.js'
       - 'tests/paper-sort.test.js'
       - 'tests/test_paper_sort_ui.py'
@@ -84,6 +85,7 @@ jobs:
           node tests/paper-relations.test.js
           node tests/search-accuracy.test.js
           node tests/search-provider-contract.test.js
+          node tests/chemrxiv-doi-forms.test.js
           node tests/search-recall.test.js
       - name: Verify research assistant question relevance and citations
         run: |
