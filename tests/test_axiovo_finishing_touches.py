@@ -20,13 +20,17 @@ class FinishingTouchesTests(unittest.TestCase):
   recs=(ROOT/"research-intelligence.js").read_text()
   self.assertIn('window.addEventListener("axiovo:projects-updated"',recs)
   self.assertIn("axiovo-reading-list",code)
- def test_video_remains_optional_on_mobile(self):
+ def test_video_is_inside_unified_hero_and_optional_on_mobile(self):
      html=(ROOT/"index.html").read_text()
-     self.assertLess(html.index('id="axiovo-archive-title"'),html.index('id="axiovo-home-demo-heading"'))
-     self.assertIn("Read video transcript",html)
+     self.assertLess(html.index('id="axiovo-home-video"'),html.index('id="axiovo-archive-title"'))
+     self.assertIn('class="axiovo-welcome"',html)
+     self.assertIn('id="axiovo-tour" hidden',html)
+     self.assertIn('Full step-by-step guide',html)
      self.assertIn('kind="captions"',html)
      self.assertIn("playsinline",html)
      self.assertNotIn("autoplay",html)
+     css=(ROOT/"home-landing.css").read_text()
+     self.assertIn("@media(max-width:650px)",css)
 
  def test_offline_app_caches_library(self):
      worker=(ROOT/"sw.js").read_text()
