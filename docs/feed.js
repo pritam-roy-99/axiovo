@@ -23,15 +23,15 @@ function anchor(parent,title,url,cls=""){
 function notify(message){$("feed-follow-status").textContent=message}
 function preferences(){
  const data=prefsAPI.derive(localStorage);
- const saved=asArray(read("axiovo-reading-list",[])).map(x=>"arxiv:"+String(x).toLowerCase().replace(/v\d+$/,""));
  const refs=["arxiv","biorxiv","chemrxiv"].flatMap(source=>archive.savedRecords(source));
+ const saved=[...refs.map(core.key),...asArray(read("axiovo-reading-list",[])).map(x=>"arxiv:"+String(x).toLowerCase().replace(/v\d+$/,""))];
  return {...data,saved,hidden:read(HIDDEN,[]),references:refs.slice(0,20),
   matchesAuthor:(a,b)=>Boolean(follow?.matchesName(a,b))||String(a).toLowerCase()===String(b).toLowerCase()};
 }
 function displayPreferences(prefs){
  for(const [id,values,placeholder] of [
   ["feed-followed-authors",prefs.authors,"No authors followed yet"],
-  ["feed-followed-topics",prefs.topics,"No topics followed yet"]
+  ["feed-followed-topics",prefs.directTopics,"No topics followed yet"]
  ]){
   const root=$(id);root.replaceChildren();
   if(!values.length){el(root,"span",placeholder);continue}
@@ -54,7 +54,15 @@ function displayPreferences(prefs){
   }
   if(values.length>13)el(root,"span","+"+(values.length-13)+" more","feed-chip");
  }
+ const paths=$("feed-followed-paths");paths.replaceChildren();
+ if(!prefs.paths.length)el(paths,"span","No Discover paths saved yet");
+ for(const path of prefs.paths){
+  const params=new URLSearchParams(Object.entries({category:path.category,topic:path.topic,subtopic:path.subtopic,refine:path.refine})
+   .filter(([,value])=>value));
+  anchor(paths,path.label,"./"+path.source+".html?"+params,"feed-chip");
+ }
 }
+const personalized=prefs=>prefs.authors.length||prefs.directTopics.length||prefs.paths.length||prefs.references.length;
 function statusText(papers){
  return papers.length+" source-linked paper"+(papers.length===1?"":"s")+" indexed for this feed. Coverage is partial.";
 }
@@ -93,10 +101,26 @@ function actionsFor(card,item){
   saveState();
  };
  saveState();
- const original=anchor(actions,"Read paper ↗",p.url,"feed-original");
+ anchor(actions,"Read paper ↗",p.url,"feed-original");
  if(p.source==="arxiv"){
-  anchor(actions,"Research AI","./copilot.html?id="+encodeURIComponent(p.recordId||p.id),"feed-assistant");
-  anchor(actions,"Compare","./desk.html?q="+encodeURIComponent(p.recordId||p.id),"feed-compare");
+  anchor(actions,"Research Assistant","./copilot.html?id="+encodeURIComponent(p.recordId||p.id),"feed-assistant");
+ }
+ const queued=archive.comparison().some(item=>archive.recordKey(item)===archive.recordKey(p));
+ if(queued)anchor(actions,"In comparison →","./desk.html#rd-queue-heading","feed-compare");
+ else{
+  const compare=el(actions,"button","Add to comparison","feed-compare");compare.type="button";
+  compare.onclick=()=>{
+   const result=archive.addComparison(p);
+   if(result==="added"){
+    const link=anchor(actions,"In comparison →","./desk.html#rd-queue-heading","feed-compare");
+    compare.replaceWith(link);link.focus();
+    notify("Added to your Research Desk comparison.");
+   }else notify(result==="full"?"The comparison holds up to five papers. Remove one in Research Desk.":"Could not save to the comparison.");
+  };
+ }
+ if(p.abstract&&window.AxiovoAbstractAudio){
+  const listen=el(actions,"button","Listen to abstract","feed-listen");listen.type="button";
+  listen.onclick=()=>window.AxiovoAbstractAudio.play([p]);
  }
  const share=el(actions,"button","Share","feed-share");share.type="button";
  share.setAttribute("aria-label","Share source link for "+p.title);
@@ -115,7 +139,6 @@ function actionsFor(card,item){
  const hide=el(actions,"button","Not interested","feed-dismiss");hide.type="button";
  hide.setAttribute("aria-label","Hide "+p.title+" from recommendations");
  hide.onclick=()=>hidePaper(item);
- return {original};
 }
 function renderCard(item){
  const p=item.paper,card=el($("feed-results"),"article","","feed-card");
@@ -156,8 +179,8 @@ function recalculate(){
  for(const item of selected.slice(0,state.limit))renderCard(item);
  if(!selected.length){
   const area=el($("feed-results"),"div","","feed-empty");
-  el(area,"strong",prefs.authors.length||prefs.topics.length?"No matching papers in the selected window.":"Build your research feed");
-  el(area,"p",prefs.authors.length||prefs.topics.length?
+  el(area,"strong",personalized(prefs)?"No matching papers in the selected window.":"Build your research feed");
+  el(area,"p",personalized(prefs)?
    "Try All indexed dates, Search more literature, or follow an additional topic. This does not mean the author has no publications.":
    "Follow an author or a precise research subtopic in the panel below. Your interests automatically connect with Discover and Library.");
   anchor(area,"Follow researchers and topics","#feed-follow-tools");
@@ -227,11 +250,15 @@ async function discoverAuthors(signal,requestedName=""){
 }
 async function refresh(){
  if(state.loading)return;
+ if(!personalized(preferences())){
+  $("feed-pulse-synced").textContent="Follow an author or topic to get started";
+  recalculate();return;
+ }
  state.loading=true;$("feed-refresh").disabled=true;
  const run=++state.refreshId;
  const signal=AbortSignal.timeout(22000);
  $("feed-status").textContent="Checking source snapshots; matching papers appear as each archive responds…";
- let received=0;const missing=[],timestamps=[],collected=[];
+ let received=0;const missing=[],timestamps=[];
  try{
   const sources=["arxiv","biorxiv","chemrxiv"];
   await Promise.all(sources.map(async source=>{
@@ -239,7 +266,6 @@ async function refresh(){
     const snap=await archive.snapshot(source,{force:true});
     if(run!==state.refreshId)return;
     const rows=Array.isArray(snap?.papers)?snap.papers:[];
-    collected.push(...rows);
     received++;
     if(snap.stamp)timestamps.push(snap.stamp);
     state.papers=archive.merge(state.papers,rows);
@@ -270,9 +296,9 @@ async function refresh(){
 }
 async function searchMore(){
  if(state.expanded)return;
- const pref=preferences(),terms=pref.topics.filter(x=>core.terms(x).length>=2).slice(0,3);
- if(!terms.length){
-  notify("Follow a specific topic to search additional public source records.");
+ const pref=preferences();
+ if(!pref.topics.length&&!pref.authors.length&&!pref.paths.length){
+  notify("Follow an author or topic to search additional source records.");
   return;
  }
  state.expanded=true;
@@ -280,16 +306,23 @@ async function searchMore(){
  try{
   const sources=$("feed-source").value==="all"?["arxiv","biorxiv","chemrxiv"]:[$("feed-source").value];
   // Bound network work so mobile data usage remains predictable.
-  const queries=sources.flatMap(source=>terms.slice(0,2).map(q=>({source,q}))).slice(0,6);
-  const results=await Promise.allSettled(queries.map(async ({source,q})=>{
-   const found=await archive.live(source,{q,sort:"relevance"});
-   return (found.papers||[]).filter(p=>core.overlaps(q,p.title,p.abstract).matched);
+  const queries=sources.flatMap(source=>[
+   ...pref.authors.slice(0,1).map(author=>({source,author})),
+   ...[...pref.directTopics,...pref.paths.filter(path=>path.source===source).flatMap(path=>path.terms)]
+    .filter(q=>core.terms(q).length).slice(0,pref.authors.length?1:2).map(q=>({source,q}))
+  ]);
+  if(!queries.length){notify("Open the saved Discover path to browse its archive and subject.");return}
+  const results=await Promise.allSettled(queries.map(async ({source,q,author})=>{
+   const found=await archive.live(source,{q,author,sort:"relevance"});
+   return core.build(found.papers,{...pref,references:[]}).map(item=>item.paper);
   }));
   const merged=results.filter(x=>x.status==="fulfilled").flatMap(x=>x.value);
   if(merged.length){
    updatePapers(merged);
    notify("Checked public source metadata and added "+merged.length+" relevant candidate records.");
-  }else notify("No additional strong matches returned from the selected public metadata services.");
+  }else notify(results.some(result=>result.status==="rejected")?
+   "Some public sources were unavailable. Your indexed feed is still available.":
+   "No additional strong matches returned from the selected public metadata services.");
  }catch(error){
   notify("The expanded source search is unavailable. Your indexed feed remains usable.");
  }finally{
@@ -301,7 +334,8 @@ $("feed-author-form").addEventListener("submit",e=>{
  if(!name)return;
  if(follow?.setFollowing(name,true)){
   field.value="";notify("Following "+name+". Checking source records…");recalculate();
-  discoverAuthors(AbortSignal.timeout(17000),name).catch(()=>notify(
+  if(!state.refreshId)refresh();
+  else discoverAuthors(AbortSignal.timeout(17000),name).catch(()=>notify(
    "Author followed. Public author lookup is temporarily unavailable; existing indexed papers remain visible."));
  }
  else notify("Could not follow this author on this device.");
@@ -310,6 +344,7 @@ $("feed-topic-form").addEventListener("submit",e=>{
  e.preventDefault();const field=$("feed-topic-input"),topic=field.value.trim();
  if(prefsAPI.updateTopic(localStorage,topic,true)){
   field.value="";notify("Following "+topic+". Search more if no results are indexed.");recalculate();
+  if(!state.refreshId)refresh();
  }else notify("Enter a specific research topic of at least three characters.");
 });
 $("feed-more").onclick=()=>{state.limit+=12;recalculate()};
@@ -326,6 +361,6 @@ for(const tab of document.querySelectorAll("[data-view]"))tab.onclick=()=>{
 };
 window.addEventListener("axiovo:author-follow-change",recalculate);
 window.addEventListener("axiovo-library-change",recalculate);
-window.addEventListener("storage",recalculate);
+window.addEventListener("storage",()=>{if(!state.refreshId)refresh();else recalculate()});
 refresh();
 })();

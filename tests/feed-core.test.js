@@ -36,4 +36,10 @@ assert(!feed.overlaps("Quantum information","A history of information systems","
   "A domain-specific topic must not match by a broad fragment");
 assert(feed.overlaps("Quantum information","A new study in quantum information","").matched,
   "Exact scientific field phrases remain available for topical following");
+const scoped=feed.build([
+ {...papers[0],categories:["quant-ph"]},
+ {...papers[4],title:papers[0].title},
+ {...papers[2],title:papers[0].title,categories:["cs.CV"]}
+],{directTopics:[],paths:[{source:"arxiv",category:"quant-ph",terms:["preparation contextuality"]}]},NOW);
+assert.deepEqual(scoped.map(x=>x.paper.id),[papers[0].id],"Saved paths stay in their selected archive and category");
 console.log("PASS: personalized feed ranking, names, topic coverage, dedup, exclusions, sources and freshness");

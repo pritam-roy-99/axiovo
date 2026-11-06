@@ -5,18 +5,19 @@
 <link rel="icon" type="image/svg+xml" href="./icons/axiovo.svg"><link rel="manifest" href="./manifest.webmanifest">
 <link rel="stylesheet" href="./theme.css"><link rel="stylesheet" href="./research-desk.css">
 <link rel="stylesheet" href="./axiovo-shell.css?v=20261106-brand">
-<link rel="stylesheet" href="./feed.css?v=20261106-mobile3">
+<link rel="stylesheet" href="./feed.css">
+<link rel="stylesheet" href="./paper-actions.css">
 <script defer src="./theme.js"></script><script defer src="./navigation.js"></script>
 <script defer src="./pwa.js"></script><script defer src="./arxiv-versions.js"></script>
 <script defer src="./archive-data.js"></script><script defer src="./paper-sort.js"></script><script defer src="./author-follow.js"></script>
-<script defer src="./interests.js"></script><script defer src="./feed-preferences.js?v=20261106-mobile3"></script><script defer src="./feed-core.js?v=20261106-mobile3"></script><script defer src="./feed.js?v=20261106-mobile3"></script>
+<script defer src="./abstract-audio.js"></script><script defer src="./feed-preferences.js"></script><script defer src="./feed-core.js"></script><script defer src="./feed.js"></script>
 </head><body class="axiovo-research axiovo-feed-page"><header></header>
 <main class="rd-page feed-page">
 <section class="feed-hero" aria-labelledby="feed-title">
  <div><p class="rd-kicker">YOUR RESEARCH, AS IT HAPPENS</p>
  <h1 id="feed-title">My Feed</h1>
  <p>A living research timeline for followed authors, subfields and related papers. Every update links to its original source.</p>
- <div class="feed-hero-actions"><a href="#feed-follow-tools">Follow researchers &amp; topics</a><a href="./workspace.html#following">Manage author following</a><a href="./arxiv.html">Explore topics</a></div>
+ <div class="feed-hero-actions"><a href="#feed-follow-tools">Follow researchers &amp; topics</a><a href="./workspace.html#following">Manage author following</a><a href="./#axiovo-archive-title">Explore archives</a></div>
  </div>
  <div class="feed-insight" aria-label="Feed coverage summary"><span>YOUR RESEARCH PULSE</span><strong id="feed-pulse-count">—</strong><small id="feed-pulse-label">Matching source-linked papers</small><small id="feed-pulse-synced">Checking published snapshots…</small></div>
 </section>
@@ -46,12 +47,13 @@
   <section class="feed-side-card" id="feed-follow-tools" aria-labelledby="feed-followed-heading">
    <h2 id="feed-followed-heading">Tune your feed</h2>
    <p>Follow a researcher or a precise topic. Your changes also appear across Axiovo.</p>
-   <form id="feed-author-form" class="feed-follow-form"><label for="feed-author-input">Follow a researcher</label><div><input id="feed-author-input" type="search" placeholder="e.g. A. S. Majumdar" maxlength="120" required><button type="submit">Follow</button></div></form>
-   <form id="feed-topic-form" class="feed-follow-form"><label for="feed-topic-input">Follow a research subtopic</label><div><input id="feed-topic-input" type="search" placeholder="e.g. preparation contextuality" maxlength="120" required><button type="submit">Follow</button></div></form>
+   <form id="feed-author-form" class="feed-follow-form"><label for="feed-author-input">Follow a researcher</label><div><input id="feed-author-input" type="search" placeholder="Enter an author’s name" maxlength="120" required><button type="submit">Follow</button></div></form>
+   <form id="feed-topic-form" class="feed-follow-form"><label for="feed-topic-input">Follow a research subtopic</label><div><input id="feed-topic-input" type="search" placeholder="Enter a topic you want to follow" maxlength="120" required><button type="submit">Follow</button></div></form>
    <p id="feed-follow-status" role="status" class="feed-follow-status"></p>
    <p class="feed-side-label">Followed authors</p><div id="feed-followed-authors" class="feed-chips"></div>
-   <p class="feed-side-label">Followed topics and saved paths</p><div id="feed-followed-topics" class="feed-chips"></div>
-   <div class="feed-sidebar-links"><a class="feed-side-link" href="./workspace.html#following">Manage authors</a><a class="feed-side-link" href="./arxiv.html">Discover subfields</a></div>
+   <p class="feed-side-label">Followed topics</p><div id="feed-followed-topics" class="feed-chips"></div>
+   <p class="feed-side-label">Saved Discover paths</p><div id="feed-followed-paths" class="feed-chips"></div>
+   <div class="feed-sidebar-links"><a class="feed-side-link" href="./workspace.html#following">Manage authors</a><a class="feed-side-link" href="./#axiovo-archive-title">Discover subfields</a></div>
   </section>
   <section class="feed-side-card" aria-labelledby="feed-about-heading"><h2 id="feed-about-heading">About this feed</h2>
   <p>Your follow settings and feedback stay in your browser. Papers are retrieved from source-linked snapshots and targeted public metadata. No paid AI or account is required.</p>

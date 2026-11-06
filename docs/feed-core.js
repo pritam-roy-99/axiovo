@@ -17,9 +17,18 @@
   const found=new Set([...main,...support]);
   return {matched:words.length>0&&found.size>=needed,score:Math.round((main.length*7+support.length*2)*Math.min(1,found.size/Math.max(1,words.length))),words:[...found]};
  }
+ function pathMatches(path,paper){
+  if(path.source!==(paper.source||"arxiv"))return [];
+  const category=path.category.toLowerCase();
+  const tags=(paper.categories||[]).map(tag=>String(tag).toLowerCase());
+  const inCategory=tags.some(tag=>tag===category||tag.startsWith(category+"."));
+  if(!path.terms.length)return inCategory?[{topic:path.label,score:0,matched:true}]:[];
+  if(tags.length&&!inCategory)return [];
+  return path.terms.map(topic=>({topic,...overlaps(topic,paper.title,paper.abstract)}));
+ }
  function build(papers,prefs={},now=Date.now()){
   const authors=(prefs.authors||[]).filter(Boolean);
-  const interests=[...new Set((prefs.topics||[]).filter(Boolean))].slice(0,40);
+  const interests=[...new Set((prefs.directTopics||prefs.topics||[]).filter(Boolean))].slice(0,40);
   const saved=new Set((prefs.saved||[]).map(x=>String(x).toLowerCase()));
   const references=(prefs.references||[]).filter(x=>x?.title).slice(0,20);
   const hidden=new Set((prefs.hidden||[]).map(x=>String(x).toLowerCase()));
@@ -28,7 +37,9 @@
    if(!paper?.title||!paper?.url||!/^https:\/\//.test(paper.url))continue;
    const id=key(paper);if(seen.has(id)||hidden.has(id))continue;seen.add(id);
    const authorHit=(paper.authors||[]).filter(x=>authors.some(y=>prefs.matchesAuthor?prefs.matchesAuthor(y,x):String(y).toLowerCase()===String(x).toLowerCase()));
-   const topicMatches=interests.map(topic=>({topic,...overlaps(topic,paper.title,paper.abstract||"")})).filter(x=>x.matched);
+   const matches=[...interests.map(topic=>({topic,...overlaps(topic,paper.title,paper.abstract)})),
+    ...(prefs.paths||[]).flatMap(path=>pathMatches(path,paper))];
+   const topicMatches=[...new Map(matches.filter(x=>x.matched).map(x=>[x.topic.toLowerCase(),x])).values()];
    const related=references.filter(x=>key(x)!==id).map(x=>({paper:x,...overlaps(x.title,paper.title,paper.abstract||"")})).filter(x=>x.matched).sort((a,b)=>b.score-a.score).slice(0,1);
    if(!authorHit.length&&!topicMatches.length&&!related.length)continue;
    const then=date(paper),days=then>0&&then<=now?(now-then)/86400000:null;
