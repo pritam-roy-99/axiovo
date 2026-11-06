@@ -243,6 +243,29 @@ jobs:
           python -m playwright install --with-deps chromium
       - name: Record the actual Axiovo step-by-step tutorial
         run: python scripts/build_tutorial_video.py
+      - name: Validate actual MP4 playback streams and caption file (required)
+        run: |
+          python - <<'PY'
+          import json, subprocess
+          from pathlib import Path
+          directory=Path("docs/assets")
+          video=directory/"axiovo-tour.mp4"
+          caption=directory/"axiovo-tour.vtt"
+          chapter=directory/"axiovo-tour-build.json"
+          assert video.is_file() and video.stat().st_size > 100000, "Tutorial video missing/empty"
+          assert caption.is_file() and caption.read_text().startswith("WEBVTT"), "Captions missing"
+          assert chapter.is_file() and len(json.loads(chapter.read_text()).get("chapters",[])) >= 20, "Video chapter index missing"
+          probe=json.loads(subprocess.check_output([
+              "ffprobe","-v","error","-show_streams","-show_format",
+              "-of","json",str(video)],text=True))
+          tracks=probe["streams"]
+          assert any(t.get("codec_type")=="video" and t.get("codec_name")=="h264" for t in tracks), "No H264 video track"
+          assert any(t.get("codec_type")=="audio" and t.get("codec_name")=="aac" for t in tracks), "No AAC audio track"
+          assert float(probe["format"]["duration"]) > 90, "Tutorial video truncated"
+          subprocess.run(["ffmpeg","-v","error","-i",str(video),"-t","4","-f","null","-"],check=True)
+          print("Verified HTML5-compatible H264/AAC video, decodable frames, captions and chapters")
+          PY
+
       - name: Exercise all current routes and mobile interactions (deployment gate)
         if: steps.chromium_deps.outcome == 'success'
         id: smoke_full
