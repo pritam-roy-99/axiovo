@@ -70,6 +70,13 @@
      <option value="moonshot">Kimi / Moonshot (disabled unless explicitly configured)</option>
      <option value="gemini">Gemini (disabled unless explicitly configured)</option>
     </select>
+    <label for="free-hosted-model">Choose a free AI model</label>
+    <select id="free-hosted-model">
+     <option value="nvidia/nemotron-3-ultra-550b-a55b:free">Nemotron 3 Ultra (free, advanced reasoning)</option>
+     <option value="openai/gpt-oss-120b:free">OpenAI gpt-oss 120B (free)</option>
+     <option value="openrouter/free">Automatic free model (variable)</option>
+    </select>
+    <p class="rd-small">Provider rate limits apply. The selected model's actual name is shown after answering. AI is not guaranteed to verify proofs or citations.</p>
     <label for="hosted-model">Allowed server model</label>
     <input id="hosted-model" type="text" maxlength="100" readonly value="Not configured" aria-describedby="hosted-guide">
     <div id="axiovo-ai-challenge" aria-label="AI request verification" hidden></div>
