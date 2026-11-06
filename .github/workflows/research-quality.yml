@@ -1,0 +1,52 @@
+name: Research search and literature quality gates
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/research-quality.yml'
+      - 'scripts/audit_literature_coverage.py'
+      - 'scripts/arxiv_daily_archive.py'
+      - 'docs/paper-relations.js'
+      - 'docs/topic-explorer.js'
+      - 'docs/research-intelligence.js'
+      - 'docs/following-authors.js'
+      - 'docs/archive-data.js'
+      - 'docs/source-health.js'
+      - 'tests/research-ranking-benchmark.test.js'
+      - 'tests/paper-relations.test.js'
+      - 'tests/test_literature_coverage.py'
+      - 'tests/test_arxiv_daily_archive.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate official source counts and repair priority
+        run: |
+          python -m unittest discover -s tests -p test_literature_coverage.py -v
+          python -m unittest discover -s tests -p test_arxiv_daily_archive.py -v
+      - name: Evaluate five research disciplines and related-paper provenance
+        run: |
+          node tests/research-ranking-benchmark.test.js
+          node tests/paper-relations.test.js
+          node tests/search-accuracy.test.js
+          node tests/search-recall.test.js
+      - name: Validate browser scripts and source links
+        run: |
+          python -m scripts.validate_site
+          python scripts/audit_internal_links.py
+      - name: Describe evaluation scope
+        run: |
+          echo '### Research quality gate' >> "$GITHUB_STEP_SUMMARY"
+          echo 'Automated tests include five research questions with **synthetic candidate records**. This is a regression check, not a measured full-archive recall rate.' >> "$GITHUB_STEP_SUMMARY"
+          echo 'arXiv verified days are checked against recorded official Atom counts and date shards. bioRxiv and ChemRxiv are explicitly partial historical collections.' >> "$GITHUB_STEP_SUMMARY"
