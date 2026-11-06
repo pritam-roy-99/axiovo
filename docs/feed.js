@@ -305,24 +305,43 @@ async function searchMore(){
  const button=$("feed-search-more");button.disabled=true;button.textContent="Searching source metadata…";
  try{
   const sources=$("feed-source").value==="all"?["arxiv","biorxiv","chemrxiv"]:[$("feed-source").value];
-  // Bound network work so mobile data usage remains predictable.
-  const queries=sources.flatMap(source=>[
-   ...pref.authors.slice(0,1).map(author=>({source,author})),
-   ...[...pref.directTopics,...pref.paths.filter(path=>path.source===source).flatMap(path=>path.terms)]
-    .filter(q=>core.terms(q).length).slice(0,pref.authors.length?1:2).map(q=>({source,q}))
-  ]);
-  if(!queries.length){notify("Open the saved Discover path to browse its archive and subject.");return}
+  // A bounded rotating scan covers all follows across successive requests.
+  const scheduler=window.AxiovoFeedRetrievalPlan;
+  if(!scheduler){notify("Follow scheduler unavailable; saved feed remains available.");return}
+  state.followScanCursors=state.followScanCursors||{};
+  const plans=sources.map(source=>{
+   const topics=[
+    ...pref.directTopics.map(x=>({name:typeof x==="string"?x:x.name,source})),
+    ...pref.paths.filter(x=>x.source===source).flatMap(x=>
+      (x.terms||[]).map(term=>({name:term,source})))
+   ];
+   const authors=pref.authors.map(x=>({name:typeof x==="string"?x:x.name,source}));
+   return {source,scan:scheduler.plan({source,authors,topics,
+     cursor:state.followScanCursors[source]||0,
+     budget:Math.max(1,Math.floor(9/sources.length))})};
+  });
+  const queries=plans.flatMap(({source,scan})=>scan.queries.map(item=>({
+   source,q:item.kind==="author"?"":item.value,
+   author:item.kind==="author"?item.value:""
+  })));
+  if(!queries.length){notify("Follow a topic or author to expand the source search.");return}
   const results=await Promise.allSettled(queries.map(async ({source,q,author})=>{
    const found=await archive.live(source,{q,author,sort:"relevance"});
    return core.build(found.papers,{...pref,references:[]}).map(item=>item.paper);
   }));
+  for(const {source,scan} of plans){
+   const positions=queries.map((q,i)=>q.source===source?i:-1).filter(i=>i>=0);
+   if(positions.length&&positions.every(i=>results[i].status==="fulfilled"))
+    state.followScanCursors[source]=scan.nextCursor;
+  }
   const merged=results.filter(x=>x.status==="fulfilled").flatMap(x=>x.value);
-  if(merged.length){
-   updatePapers(merged);
-   notify("Checked public source metadata and added "+merged.length+" relevant candidate records.");
-  }else notify(results.some(result=>result.status==="rejected")?
-   "Some public sources were unavailable. Your indexed feed is still available.":
-   "No additional strong matches returned from the selected public metadata services.");
+  if(merged.length)updatePapers(merged);
+  const checked=queries.length,total=plans.reduce((sum,p)=>sum+p.scan.total,0);
+  const unavailable=results.filter(x=>x.status==="rejected").length;
+  notify("Checked "+checked+" of "+total+" scheduled follows; "+
+   (merged.length?"added "+merged.length+" source-linked candidate records.":"no further matches in this partial scan.")+
+   (total>checked?" Search again to check the remaining follows.":"")+
+   (unavailable?" "+unavailable+" source request(s) unavailable; earlier results retained.":""));
  }catch(error){
   notify("The expanded source search is unavailable. Your indexed feed remains usable.");
  }finally{
