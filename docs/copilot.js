@@ -315,11 +315,19 @@ async function submit(){
    found.unshift(paper?{...paper,url:arxivUrl(id),provider:paper.provenance||"arXiv indexed metadata"}:
     {id,title:"arXiv:"+id,abstract:"",authors:[],date:"",url:arxivUrl(id),provider:"Original arXiv record",score:0});
   }
-  addSources(found,false);
-  rstatus(sources.length+" sources shown.");
-  if($("retrieval-scope").value==="all"&&question.length>=3&&!draft&&!id){
-   try{await widerArxiv(question)}catch{rstatus("Indexed sources are available. The public metadata lookup failed.")}
+  // Match sources to the whole question, not to a single broad word.
+  let candidates=found;
+  if(mode!=="claims"&&!id&&question.length>=3&&!draft&&
+     (!candidates.length||$("retrieval-scope").value==="all")){
+   try{candidates=[...candidates,...await widerArxiv(question)]}
+   catch{rstatus("Public metadata lookup failed; showing only relevant indexed papers.")}
   }
+  if(mode!=="claims"&&Core){
+   candidates=Core.rank(query,candidates,12).map(x=>({...x.paper,score:x.score}));
+  }
+  addSources(candidates,false);
+  rstatus(sources.length+" relevant source"+(sources.length===1?"":"s")+
+   " from available metadata; historical coverage is not guaranteed.");
   const fallback=mode==="claims"?paperSummary(paper,draft):evidenceText(query);
   if($("engine").value==="evidence"){record("assistant",fallback,sources);status("");}
   else{
@@ -338,7 +346,9 @@ async function globalSearch(){
  busy=true;$("search-openalex").disabled=true;
  try{
   const found=await widerArxiv(q);
-  record("assistant","Retrieved "+found.length+" candidates from public arXiv-linked metadata. The list under Sources includes their original links.",sources);
+  const combined=Core?.rank(q,[...sources,...found],12).map(x=>({...x.paper,score:x.score}))||found;
+  addSources(combined,false);
+  record("assistant",evidenceText(q),sources);
  }catch{rstatus("The public metadata lookup is unavailable. Use the indexed papers or Research Desk.")}
  finally{busy=false;$("search-openalex").disabled=false}
 }
