@@ -237,7 +237,13 @@ async function arxivLive(c,signal,cursor){
  const keywordField=c.match==="title"?"titles.title:":"";
  clauses.push(...queryWords([c.q,c.refinement].filter(Boolean).join(" ")).map(term=>keywordField+quoted(term)));
  if(c.topicTerms?.length)clauses.push("("+c.topicTerms.map(quoted).join(" OR ")+")");
- if(words(c.author))clauses.push(...queryWords(c.author).map(part=>"creators.name:"+quoted(part)));
+ if(words(c.author)){
+   // Search the surname to avoid losing records indexed with expanded initials.
+   // Full author names are validated after retrieval by matchesAuthor().
+   const authorParts=simple(c.author).split(" ").filter(Boolean);
+   const surname=authorParts.at(-1);
+   if(surname)clauses.push("creators.name:"+quoted(surname));
+  }
  if(c.from||c.to)clauses.push("publicationYear:["+(c.from?.slice(0,4)||"1991")+" TO "+(c.to?.slice(0,4)||today().slice(0,4))+"]");
  if(clauses.length)q.set("query",clauses.join(" AND "));
  if(c.sort==="recent"||(!c.q&&!c.topicTerms?.length))q.set("sort","-published,-registered");
