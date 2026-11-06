@@ -218,10 +218,23 @@ const endpoints={
 function dataCiteArxiv(item){
  const p=item?.attributes;
  if(!p||!/^10\.48550\/arxiv\./i.test(p.doi||""))return null;
- const id=parseArxiv(p.url);
- if(!id||p.doi.toLowerCase()!=="10.48550/arxiv."+id.base.toLowerCase())return null;
+ // The DOI suffix is the canonical arXiv identifier. The landing URL may
+ // be a DOI resolver or a rewritten publisher URL, so never require it to
+ // contain /abs/<id>. Reject a conflicting explicit arXiv URL if present.
+ const doi=clean(p.doi),suffix=doi.match(/^10\.48550\/arxiv\.(.+)$/i);
+ const id=suffix?parseArxiv(suffix[1]):null,linked=parseArxiv(p.url);
+ if(!id||(linked&&linked.base.toLowerCase()!==id.base.toLowerCase()))return null;
  const submitted=list(p.dates).find(d=>d.dateType==="Submitted"&&d.dateInformation==="v1");
- const categories=list(p.subjects).filter(s=>s.subjectScheme==="arXiv").map(s=>s.subject?.match(/\(([^()]*)\)$/)?.[1]).filter(Boolean);
+ // DataCite arXiv subjects occur both as "Quantum Physics (quant-ph)" and
+ // as literal category codes. Only accept codes explicitly carried by the
+ // arXiv scheme, not guessed keyword mappings.
+ const arxivCode=/^(?:[a-z-]+(?:\.[A-Z]{2})?|[a-z]+\.[A-Z]{2})$/i;
+ const categories=[...new Set(list(p.subjects).filter(s=>/^arxiv$/i.test(clean(s.subjectScheme)))
+  .map(s=>clean(s.subject)).map(subject=>{
+   const parenthesized=subject.match(/\(([^()]*)\)\s*$/);
+   const code=parenthesized?parenthesized[1].trim():subject;
+   return arxivCode.test(code)?code:"";
+  }).filter(Boolean))];
  return normalize("arxiv",{id:id.base,title:p.titles?.[0]?.title,date:submitted?.date,doi:p.doi,
   authors:list(p.creators).map(a=>a.name),affiliations:list(p.creators).flatMap(a=>list(a.affiliation).map(x=>x.name)),categories,primary_category:categories[0],
   abstract:list(p.descriptions).find(d=>d.descriptionType==="Abstract")?.description,provenance:"arXiv DOI metadata via DataCite"});
