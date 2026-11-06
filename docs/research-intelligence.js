@@ -94,38 +94,76 @@ function renderRecommendations(){
  for(const hit of list){
   const pp=hit.paper;
   const item=texts(root,"article","","rl-paper axiovo-rec-card");
+  const head=texts(item,"div","","axiovo-rec-head");
+  const sourceBadge=texts(head,"span","arXiv · Research recommendation","axiovo-rec-source");
+  const published=String(pp.published||"").slice(0,10);
+  if(published)texts(head,"time",published,"axiovo-rec-date").dateTime=published;
   const title=texts(item,"h3","");
-  const a=texts(title,"a",pp.title||"Untitled paper");a.href=Arxiv?.abs(pp.id)||"https://arxiv.org/";a.target="_blank";a.rel="noopener noreferrer";
-  texts(item,"p",(pp.authors||[]).slice(0,4).join(", ")+(pp.published?" · "+pp.published.slice(0,10):""),"rl-paper-meta");
-  texts(item,"p",hit.reasons.filter(x=>x!=="Already saved").slice(0,3).join(" · "),"rl-relevance-reason");
-  window.AxiovoAuthorFollow?.attach(item,(pp.authors||[]).filter(x=>typeof x==="string"));
-  if(hit.reasons.includes("Already saved"))texts(item,"span","In your reading list","rl-counter");
+  const paperUrl=Arxiv?.abs(pp.id)||"https://arxiv.org/";
+  const a=texts(title,"a",pp.title||"Untitled paper");a.href=paperUrl;a.target="_blank";a.rel="noopener noreferrer";
+  const authors=(pp.authors||[]).filter(x=>typeof x==="string"&&x.trim());
+  texts(item,"p",authors.slice(0,5).join(", ")+(authors.length>5?" et al.":""),"rl-paper-meta");
+  const reasons=hit.reasons.filter(x=>x!=="Already saved").slice(0,3);
+  if(reasons.length){
+   const tags=texts(item,"div","","axiovo-rec-reasons");
+   for(const reason of reasons)texts(tags,"span",reason,"axiovo-rec-reason");
+  }
+  const abstractText=String(pp.abstract||pp.summary||"").trim();
+  if(abstractText){
+   const preview=texts(item,"p",abstractText.slice(0,235)+(abstractText.length>235?"…":""),"axiovo-rec-abstract");
+   const expand=texts(item,"details","","axiovo-rec-abstract-full");
+   texts(expand,"summary","Read full abstract");
+   texts(expand,"p",abstractText);
+  }else texts(item,"p","Abstract not available in the indexed source record.","axiovo-rec-abstract");
   const row=texts(item,"div","","rl-paper-actions axiovo-rec-actions");
   const parsed=Arxiv?.parse(pp.id),sourceId=parsed?.requested||String(pp.id||"");
-  const original=Arxiv?.abs(sourceId)||"https://arxiv.org/";
-  if(parsed){const details=texts(row,"a","Paper details");details.href="./paper.html?id="+encodeURIComponent(sourceId);details.className="axiovo-paper-detail-action";}
-  const readLink=texts(row,"a","↗ Read on arXiv");readLink.href=original;readLink.target="_blank";readLink.rel="noopener noreferrer";readLink.className="rl-paper-primary axiovo-rec-read";
-  const cop=texts(row,"a","✦ Research Assistant");cop.href="./copilot.html?id="+encodeURIComponent(sourceId);cop.className="axiovo-rec-assistant";
+  const original=Arxiv?.abs(sourceId)||paperUrl;
+  const readLink=texts(row,"a","↗ Read paper");readLink.href=original;
+  readLink.target="_blank";readLink.rel="noopener noreferrer";readLink.className="axiovo-rec-read";
+  const listen=texts(row,"button","▶ Listen","axiovo-rec-listen");
+  listen.type="button";listen.disabled=!abstractText;
+  listen.title=abstractText?"Listen to the source abstract":"Abstract unavailable";
+  listen.setAttribute("aria-label","Listen to abstract of "+pp.title);
+  listen.onclick=()=>{
+   if(!abstractText)return;
+   const player=window.AxiovoAbstractAudio;
+   if(player?.play)player.play([{title:pp.title,abstract:abstractText}]);
+   else message($("research-rec-status"),"Audio is not available on this browser. The abstract remains readable above.");
+  };
+  const cop=texts(row,"a","✦ Research AI");cop.href="./copilot.html?id="+encodeURIComponent(sourceId);
+  cop.className="axiovo-rec-assistant";
   const current=read(OLD_SAVED,[]);
   const savedHere=Array.isArray(current)&&current.some(id=>R.normalizeId(id)===R.normalizeId(sourceId));
-  const save=texts(row,"button","","axiovo-rec-save");
-  save.type="button";save.classList.add("paper-save-btn");
+  const save=texts(row,"button","","axiovo-rec-save paper-save-btn");
+  save.type="button";
   const saveIcon=texts(save,"span",savedHere?"★":"☆","paper-save-btn__icon");
   saveIcon.setAttribute("aria-hidden","true");
-  texts(save,"span",savedHere?"Saved":"Save paper","paper-save-btn__label");
-  save.setAttribute("aria-pressed",String(savedHere));
-  save.setAttribute("aria-label",(savedHere?"Remove ":"Save ")+pp.title+(savedHere?" from":" to")+" your reading list");
-  save.title=savedHere?"Remove from Library":"Save to Library";
+  const saveLabel=texts(save,"span",savedHere?"Saved":"Save","paper-save-btn__label");
+  function updateSave(isSaved){
+   save.setAttribute("aria-pressed",String(isSaved));
+   save.setAttribute("aria-label",(isSaved?"Remove ":"Save ")+pp.title+(isSaved?" from":" to")+" your reading list");
+   save.title=isSaved?"Remove from Library":"Save to Library";
+   saveIcon.textContent=isSaved?"★":"☆";saveLabel.textContent=isSaved?"Saved":"Save";
+  }
+  updateSave(savedHere);
   save.onclick=()=>{
-    const current=read(OLD_SAVED,[]);const ids=Array.isArray(current)?current:[];
+    const current=read(OLD_SAVED,[]),ids=Array.isArray(current)?current:[];
     const present=ids.some(id=>R.normalizeId(id)===R.normalizeId(sourceId));
     const next=present?ids.filter(id=>R.normalizeId(id)!==R.normalizeId(sourceId)):[...ids,sourceId];
     if(write(OLD_SAVED,next)){
+      updateSave(!present);
       window.dispatchEvent(new CustomEvent("axiovo-library-change"));
-      message($("research-rec-status"),(present?"Removed ":"Saved ")+"arXiv:"+sourceId+(present?" from":" to")+" your reading list.");
-      renderRecommendations()
-    }else message($("research-rec-status"),"Could not save. Browser storage may be unavailable.")
+      message($("research-rec-status"),(present?"Removed ":"Saved ")+pp.title+(present?" from":" to")+" your reading list.");
+    }else message($("research-rec-status"),"Could not save. Browser storage may be unavailable.");
   };
+  const more=texts(item,"details","","axiovo-rec-more");
+  texts(more,"summary","More paper tools");
+  const extra=texts(more,"div","","axiovo-rec-extra");
+  if(parsed){
+   const details=texts(extra,"a","Paper details");details.href="./paper.html?id="+encodeURIComponent(sourceId);
+  }
+  const followDetails=texts(more,"div","","axiovo-rec-author-tools");
+  if(authors.length)window.AxiovoAuthorFollow?.attach(followDetails,authors);
   if(projects.length){
    const selector=document.createElement("select");selector.setAttribute("aria-label","Choose a research question for "+pp.title);
    let option=document.createElement("option");option.value="";option.textContent="Attach to a question…";selector.append(option);
@@ -135,7 +173,7 @@ function renderRecommendations(){
      const id=R.normalizeId(pp.id);if(!q.paper_ids.includes(id)){q.paper_ids.push(id);q.updated_at=new Date().toISOString();persistProjects()}
      message($("research-rec-status"),"Paper attached to "+q.title);renderProjects();selector.value="";
    };
-   row.append(selector)
+   extra.append(selector)
   }
  }
 }
