@@ -309,7 +309,9 @@ jobs:
       - name: Exercise all current routes and mobile interactions (deployment gate)
         if: steps.chromium_deps.outcome == 'success'
         id: smoke_full
-        run: python scripts/smoke_routes.py
+        run: |
+          python scripts/smoke_routes.py
+          python scripts/smoke_feed.py
       - name: Exercise all three dedicated source Discover pages (deployment gate)
         if: steps.chromium_deps.outcome == 'success'
         id: smoke_archives
