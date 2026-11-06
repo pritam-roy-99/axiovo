@@ -33,6 +33,7 @@ function preferences(){
   for(const p of archive.savedRecords(source))saved.push(core.key(p));
  return {authors:[...new Set(authors)],topics:topics(),
   saved,hidden:read(HIDDEN,[]),
+  references:["arxiv","biorxiv","chemrxiv"].flatMap(source=>archive.savedRecords(source)).slice(0,20),
   matchesAuthor:(a,b)=>follow?.matchesName(a,b)||String(a).toLowerCase()===String(b).toLowerCase()};
 }
 function displayPrefs(prefs){
