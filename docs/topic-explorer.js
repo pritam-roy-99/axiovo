@@ -153,7 +153,7 @@ function drawPath(){
  drawChoices("topic-options",topics,topic,row=>selectPath({category:selected.category,topic:row.id}));
  drawChoices("subtopic-options",topic?.leaves||[],leaf,row=>selectPath({category:selected.category,topic:selected.topic,subtopic:row.id}));
  $("clear-path").disabled=!subject&&!selected.refine;
- $("scope-label").textContent=pathText()?"Scope: "+pathText():"Scope: the whole archive.";
+ $("scope-label").textContent=search?.announcementOnly?"Scope: latest official announcement · all arXiv categories.":pathText()?"Scope: "+pathText():"Scope: the whole archive.";
  drawPersonal();
 }
 function rebuildIndex(){index=atlas.makeIndex(source,catalog,personal)}
