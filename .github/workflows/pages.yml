@@ -95,6 +95,8 @@ jobs:
         run: |
           node tests/cached-arxiv-search.test.js
           node tests/arxiv-daily-archive.test.js
+      - name: Verify three-source metadata harvester regression tests (required)
+        run: python -m unittest discover -s tests -p test_source_harvest.py -v
       - name: Refresh free bioRxiv metadata
         if: github.event_name != 'push'
         id: biorxiv
@@ -110,6 +112,25 @@ jobs:
         id: chemrxiv
         continue-on-error: true
         run: python scripts/sync_chemrxiv.py
+      - name: Summarize bioRxiv and ChemRxiv source coverage
+        if: always()
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          with open(__import__('os').environ['GITHUB_STEP_SUMMARY'],'a') as out:
+              out.write("### Source metadata coverage (cached snapshots, not full archives)\\n")
+              for name in ("biorxiv","chemrxiv"):
+                  path=Path("docs/data")/(name+".json")
+                  try:
+                      doc=json.loads(path.read_text())
+                      count=len(doc.get("papers",[]))
+                      stamp=doc.get("generated_at","unknown")
+                      complete=doc.get("complete_window") if name=="biorxiv" else doc.get("prefix_exhausted")
+                      out.write(f"- {name}: {count} cached records; last success {stamp}; current window/prefix exhausted: {complete}\\n")
+                  except (OSError,ValueError) as error:
+                      out.write(f"- {name}: unavailable; {error}\\n")
+          PY
       - name: Report unavailable ChemRxiv metadata
         if: steps.chemrxiv.outcome == 'failure'
         run: echo '::warning::ChemRxiv DOI metadata source unavailable; no unverified papers will be displayed.'
