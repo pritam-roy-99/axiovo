@@ -149,12 +149,15 @@ function filter(papers,criteria){
 }
 async function request(url,signal,json=true){
  const timeout=AbortSignal.timeout(11000);
- const response=await fetch(url,{signal:signal?AbortSignal.any([signal,timeout]):timeout});
+ const response=await fetch(url,{signal:signal?AbortSignal.any([signal,timeout]):timeout,cache:url.startsWith("./data/")?"no-store":"default"});
  if(!response.ok)throw Error("HTTP "+response.status);
  return json?response.json():response.text();
 }
 const snapshots=new Map();
+const SNAPSHOT_TTL_MS=5*60*1000;
 async function snapshot(source){
+ const cached=snapshots.get(source);
+ if(cached&&Date.now()-cached.at>=SNAPSHOT_TTL_MS)snapshots.delete(source);
  if(!snapshots.has(source)){
   const load=async path=>{
    const data=await request("./data/"+path);
@@ -166,11 +169,12 @@ async function snapshot(source){
   // Keep announcementDate distinct from the first-submission date, and never
   // treat a missing first-submission date as verified date-filter coverage.
   const announced=source==="arxiv"?load("announcements.json").catch(()=>({papers:[]})):Promise.resolve({papers:[]});
-  snapshots.set(source,Promise.all([main,recent,announced]).then(([primary,extra,latest])=>({
+  const loaded=Promise.all([main,recent,announced]).then(([primary,extra,latest])=>({
    stamp:primary.stamp,papers:merge(extra.papers,primary.papers,latest.papers)
-  })));
+  })).catch(error=>{snapshots.delete(source);throw error});
+  snapshots.set(source,{at:Date.now(),promise:loaded});
  }
- return snapshots.get(source);
+ return snapshots.get(source).promise;
 }
 /* Official announcement batch. A released paper may have been first submitted
  * on another UTC date, so NEVER filter this by p.date or silently treat a
