@@ -81,11 +81,10 @@ function recalculate(){
  const prefs=preferences();displayPrefs(prefs);
  state.items=core.build(state.papers,prefs);
  const current=core.select(state.items,state.view);
- const selected=window.AxiovoPaperSort?.sort(current.filter(x=>$("feed-source").value==="all"||x.paper.source===$("feed-source").value)
-  .filter(x=>{const range=Number($("feed-window").value);return !range||(x.days!==null&&x.days<=range)}),
-  $("feed-sort").value,
-  x=>x.score).map(x=>x)||current.filter(x=>$("feed-source").value==="all"||x.paper.source===$("feed-source").value)
+ const filtered=current.filter(x=>$("feed-source").value==="all"||x.paper.source===$("feed-source").value)
   .filter(x=>{const range=Number($("feed-window").value);return !range||(x.days!==null&&x.days<=range)});
+ const mode=$("feed-sort").value;
+ const selected=window.AxiovoPaperSort?.sort(filtered,mode,x=>x.score)||filtered;
  $("feed-results").replaceChildren();
  for(const item of selected.slice(0,state.limit))renderCard(item);
  if(!selected.length){
@@ -141,6 +140,7 @@ $("feed-window").onchange=()=>{state.limit=12;recalculate()};
 $("feed-sort").onchange=()=>{state.limit=12;recalculate()};
 for(const tab of document.querySelectorAll("[data-view]"))tab.onclick=()=>{
  state.view=tab.dataset.view;state.limit=12;
+ $("feed-sort").value=state.view==="latest"||state.view==="following"?"recent":"relevance";
  for(const button of document.querySelectorAll("[data-view]"))
   button.setAttribute("aria-pressed",String(button===tab));
  recalculate();
