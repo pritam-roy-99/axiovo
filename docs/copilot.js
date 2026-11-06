@@ -184,7 +184,14 @@ function hostedProviderChange(){
  const provider=$("hosted-provider"),model=$("hosted-model"),guide=$("hosted-guide");
  provider.value=hostedConfig.provider||"openrouter";
  provider.disabled=true;
- model.value=allowed?(hostedConfig.model||"openrouter/free"):"Not configured";
+ model.value=allowed?(hostedConfig.model||"nvidia/nemotron-3-ultra-550b-a55b:free"):"Not configured";
+ const choice=$("free-hosted-model");
+ if(choice){
+  const defaultModel=hostedConfig.model||"nvidia/nemotron-3-ultra-550b-a55b:free";
+  if([...choice.options].some(x=>x.value===defaultModel))choice.value=defaultModel;
+  choice.disabled=!allowed;
+  choice.onchange=()=>{if(allowed)model.value=choice.value;};
+ }
  model.readOnly=true;
  guide.textContent=allowed?
   "Free hosted AI is optional. Your question and paper excerpts are sent to an external model after verification. Do not send confidential research. No API key is exposed.":
@@ -220,7 +227,7 @@ async function hostedCompletion(messages,deep){
  const controller=AbortSignal.timeout(deep?120000:90000);
  const response=await fetch(hostedConfig.endpoint,{
   method:"POST",headers:{"Content-Type":"application/json"},
-  body:JSON.stringify({messages,turnstile_token:hostedChallengeToken}),
+  body:JSON.stringify({messages,model:$("free-hosted-model")?.value||hostedConfig.model,turnstile_token:hostedChallengeToken}),
   signal:controller,cache:"no-store",credentials:"omit",referrerPolicy:"no-referrer"
  });
  hostedChallengeToken="";
