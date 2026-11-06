@@ -190,7 +190,32 @@ function init(){
  form.requestSubmit();
 });
  $("export-library").onclick=()=>{const papers=library();if(!papers.length){$("library-count").textContent="No papers to export";return}download("axiovo-library.json",JSON.stringify({version:2,exported_at:new Date().toISOString(),papers,metadata,collections:collections(),research_projects:read(PROJECT_KEY,[])},null,2),"application/json")};
- $("export-citations").onclick=()=>{const papers=library();if(!papers.length){$("library-count").textContent="No papers to export";return}download("axiovo-library.bib",papers.map(bib).join("\n"),"text/plain")};
+ $("export-citations").onclick=()=>{
+  const papers=library();if(!papers.length){libraryStatus("No saved papers to export.");return}
+  const format=$("axiovo-citation-format")?.value||"bibtex";
+  const adapter=window.AxiovoCitationFormats;
+  if(!adapter){libraryStatus("Citation exporter is unavailable. Try reloading.");return}
+  const validated=[],skipped=[];
+  for(const p of papers){
+   try{
+    const source=String(p.source||"").toLowerCase();
+    const input={...p,source,source_id:p.arxiv_id||p.doi||p.id||p.recordId,
+      version:p.version??(p.arxiv_id?.match(/v(\\d+)$/)?.[1]?Number(p.arxiv_id.match(/v(\\d+)$/)[1]):null),
+      landing_url:p.url,submitted_date:p.date};
+    adapter.normalize(input);validated.push(input);
+   }catch(_error){skipped.push(p.title||p.key||"Unidentified paper")}
+  }
+  if(!validated.length){libraryStatus("No source-verified archive records available for citation export.");return}
+  try{
+   const content=adapter.exportAs(validated,format);
+   const formats={bibtex:["bib","text/plain"],ris:["ris","application/x-research-info-systems"],
+     "csl-json":["json","application/json"]};
+   const [extension,mime]=formats[format]||formats.bibtex;
+   download("axiovo-library."+extension,content,mime);
+   libraryStatus("Exported "+validated.length+" source-linked papers as "+format+
+     (skipped.length?"; "+skipped.length+" unsupported records were not invented.":"."));
+  }catch(error){libraryStatus("Citation export unavailable: "+String(error.message||error))}
+ };
  renderLibrary();
  let feedRequested=false;
  function resolveLegacyPaperTitles(){
