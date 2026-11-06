@@ -116,3 +116,22 @@
  .feed-follow-form>div{flex-wrap:wrap}
  .feed-follow-form input{flex:1 1 180px}
 }
+
+/* Mobile feed usability: make Follow controls discoverable and keep actions touchable. */
+@media(max-width:620px){
+ .axiovo-feed-page .feed-layout{display:flex;flex-direction:column;gap:14px;min-width:0}
+ .axiovo-feed-page .feed-sidebar{order:-1;display:block;width:100%;min-width:0}
+ .axiovo-feed-page .feed-sidebar .feed-side-card:first-child{margin-bottom:0}
+ .axiovo-feed-page .feed-sidebar .feed-side-card:last-child{display:none}
+ .axiovo-feed-page .feed-stream{width:100%;min-width:0}
+ .axiovo-feed-page .feed-toolbar{min-width:0;max-width:100%}
+ .axiovo-feed-page .feed-tabs{display:flex;max-width:100%;min-width:0;overflow-x:auto;
+  -webkit-overflow-scrolling:touch;scrollbar-width:thin;gap:3px}
+ .axiovo-feed-page .feed-tabs button{min-height:44px;flex:0 0 auto;white-space:nowrap}
+ .axiovo-feed-page .feed-filters{min-width:0;max-width:100%}
+ .axiovo-feed-page .feed-filters select{min-width:0;max-width:100%}
+ .axiovo-feed-page .feed-follow-form input{font-size:16px}
+ .axiovo-feed-page .feed-card-actions>a,.axiovo-feed-page .feed-card-actions>button{
+  min-height:44px;overflow-wrap:anywhere}
+ .axiovo-feed-page :is(.feed-card,.feed-stream,.feed-follow-tools,.feed-follow-form){min-width:0}
+}
