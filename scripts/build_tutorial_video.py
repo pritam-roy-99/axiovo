@@ -117,7 +117,7 @@ def main():
         ("Research Assistant", "Ask a specific literature question.", "Open Research Assistant and ask a focused question to retrieve source-linked evidence from indexed literature.", "copilot.html", "#question", ("question", "What are Lieb-Robinson bounds?")),
         ("Inspect paper claims", "Choose Inspect a paper to examine its abstract.", "Choose Inspect a paper and provide an arXiv ID or original link. The assistant distinguishes abstract claims from what still needs proof verification.", "copilot.html", ".assistant-task-row", None),
         ("Choose AI options", "Use source evidence, local models or provider APIs.", "Under Optional text and local model, choose evidence-only analysis, an on-device model, Ollama, or your own hosted API provider.", "copilot.html", "#engine", ("openclass", ".assistant-advanced")),
-        ("Hosted models", "OpenRouter, OpenAI, Kimi and Gemini require your own keys.", "Hosted AI choices include OpenRouter, OpenAI, Kimi and Gemini. Some have free quotas and others require payment. Your provider key is never included in public site code.", "copilot.html", "#hosted-provider", ("hosted", "hosted")),
+        ("Optional hosted AI", "Hosted AI is disabled until a secure server is configured.", "For privacy, Axiovo does not ask for provider API keys in your browser. Hosted models require an administrator configured server. Until then, use source evidence or local models.", "copilot.html", "#engine", ("hosted", "hosted")),
         ("Evidence and export", "Inspect original citations and export the report.", "Use the Sources panel to open original records, verify citations, and export a research session or evidence report.", "copilot.html", "#evidence-list", None),
         ("PDF Research Tools", "Read a PDF and use the research utilities.", "Open Research Tools to read local PDFs, use available annotations and explore research utilities.", "lab.html", "#lab-local-pdf", None),
         ("Paper workspace", "Inspect arXiv versions and private notes.", "The paper workspace preserves version-exact arXiv links and supports personal research notes.", "paper.html?id=2608.13942v2", "#axiovo-paper-notes", None),
@@ -147,7 +147,10 @@ def main():
                             page.locator(action[1]).first.evaluate("el=>el.open=true")
                         elif action[0]=="hosted":
                             page.locator(".assistant-advanced").first.evaluate("el=>el.open=true")
-                            page.locator("#engine").select_option("hosted")
+                            if page.locator("#engine option[value=hosted]").is_enabled():
+                                page.locator("#engine").select_option("hosted")
+                            # Otherwise show the genuine disabled option instead
+                            # of staging an unavailable API integration.
                         else:
                             page.locator("#"+action[0]).fill(action[1])
                             if path.startswith("arxiv.html"):
