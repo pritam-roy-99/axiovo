@@ -96,7 +96,7 @@ assert.equal(unresolved.confirmed,false);
 assert.equal(authorIdentity.sameResearcher(unresolved,unresolved),false);
 assert.throws(()=>citation.normalize({...a,url:"https://example.com/not-the-paper"}),/original source/);
 assert.throws(()=>citation.normalize({...a,url:"https://arxiv.org/abs/2611.00001v1",landing_url:"https://arxiv.org/abs/2611.00001v1"}),/revision mismatch/);
-const evidenceAnswer=retriever.answer("sequential quantum contextuality",[a],{index:evidence,verifier:claims});
+const evidenceAnswer=retriever.answer("nonclassical measurement",[a],{index:evidence,verifier:claims});
 assert(evidenceAnswer.answered);
 assert.equal(evidenceAnswer.citations[0].source_url,a.url);
 const abstain=retriever.answer("unanswerable black hole topology",[a],{index:evidence,verifier:claims});
