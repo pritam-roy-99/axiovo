@@ -71,6 +71,7 @@ def fetch(fetcher=get_json,sleep=time.sleep,max_pages=8,cursor_start="*"):
     cursor=cursor_start if isinstance(cursor_start,str) and 0<len(cursor_start)<1024 else "*"
     prefix_exhausted=False
     saw_success=False
+    attempted_error=False
     for page in range(max_pages):
         url="https://api.crossref.org/prefixes/10.26434/works?"+urllib.parse.urlencode({
             "cursor":cursor,"rows":250})
@@ -89,10 +90,13 @@ def fetch(fetcher=get_json,sleep=time.sleep,max_pages=8,cursor_start="*"):
                 break
             new_cursor=message.get("next-cursor")
             if not new_cursor or new_cursor==cursor:
+                attempted_error=True
+                checks.append({"provider":"Crossref ChemRxiv DOI prefix","error":"Missing or repeated pagination cursor"})
                 break
             cursor=new_cursor
             sleep(1.1)
         except (OSError,ValueError) as error:
+            attempted_error=True
             checks.append({"provider":"Crossref ChemRxiv DOI prefix","error":str(error)[:150]})
             break
     # Secondary recent search catches publisher/hosting changes outside prefix.
@@ -110,8 +114,8 @@ def fetch(fetcher=get_json,sleep=time.sleep,max_pages=8,cursor_start="*"):
         checks.append({"provider":"Crossref labelled preprints","error":str(error)[:150]})
     next_cursor="*" if prefix_exhausted or not saw_success else cursor
     return list(index.values()), {"prefix_pages_checked":len([x for x in checks if x.get("page")]),
-        "prefix_exhausted":prefix_exhausted, "prefix_cursor_start":cursor_start,
-        "prefix_next_cursor":next_cursor, "checks":checks}
+        "prefix_exhausted":prefix_exhausted, "prefix_scan_error":attempted_error,
+        "prefix_cursor_start":cursor_start, "prefix_next_cursor":next_cursor, "checks":checks}
 
 
 def main():
@@ -130,11 +134,13 @@ def main():
        if item:
           index[item["doi"].lower()]=item
           fresh+=1
-    if not fresh:
-       if previous.get("papers"):
-          print("WARNING: no newly verified ChemRxiv metadata, preserving snapshot")
-          return
+    if not fresh and not previous.get("papers"):
        raise RuntimeError("No verified ChemRxiv DOI records returned from Crossref; leave feed unavailable")
+    # Persist successful cursor progress even when a page has no ChemRxiv
+    # matches. Otherwise the same nonmatching Crossref page is fetched forever.
+    # A transient failure before a successful page must never advance the cursor.
+    if not fresh:
+       print("WARNING: no newly verified ChemRxiv metadata; preserving existing papers")
     papers=sorted(index.values(),key=lambda p:(p.get("date",""),p["doi"]),reverse=True)[:3000]
     payload={"generated_at":dt.datetime.now(dt.timezone.utc).isoformat(),
        "source":"Crossref records explicitly identifying ChemRxiv",
