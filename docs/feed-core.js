@@ -39,7 +39,11 @@
   const seen=new Set(),out=[];
   for(const paper of papers||[]){
    if(!paper?.title||!paper?.url||!/^https:\/\//.test(paper.url))continue;
-   const id=key(paper);if(seen.has(id)||hidden.has(id))continue;seen.add(id);
+   const id=key(paper);
+   // Older Feed builds left a trailing hyphen when hiding a ChemRxiv revision.
+   const hiddenEarlier=paper.source==="chemrxiv"&&hidden.has(id+"-");
+   if(seen.has(id)||hidden.has(id)||hiddenEarlier)continue;
+   seen.add(id);
    const authorHit=(paper.authors||[]).filter(x=>authors.some(y=>prefs.matchesAuthor?prefs.matchesAuthor(y,x):String(y).toLowerCase()===String(x).toLowerCase()));
    const matches=[...interests.map(topic=>({topic,...overlaps(topic,paper.title,paper.abstract)})),
     ...(prefs.paths||[]).flatMap(path=>pathMatches(path,paper))];

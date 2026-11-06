@@ -42,4 +42,9 @@ const scoped=feed.build([
  {...papers[2],title:papers[0].title,categories:["cs.CV"]}
 ],{directTopics:[],paths:[{source:"arxiv",category:"quant-ph",terms:["preparation contextuality"]}]},NOW);
 assert.deepEqual(scoped.map(x=>x.paper.id),[papers[0].id],"Saved paths stay in their selected archive and category");
+const chemistry={...papers[0],source:"chemrxiv",id:"10.26434/chemrxiv-2026-fixture-v3"};
+assert.equal(feed.key(chemistry),"chemrxiv:10.26434/chemrxiv-2026-fixture");
+assert.equal(feed.build([chemistry],{
+ topics:["preparation contextuality"],hidden:["chemrxiv:10.26434/chemrxiv-2026-fixture-"]
+},NOW).length,0,"A previously hidden ChemRxiv work stays hidden across revisions");
 console.log("PASS: personalized feed ranking, names, topic coverage, dedup, exclusions, sources and freshness");
