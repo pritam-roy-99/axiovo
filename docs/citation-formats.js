@@ -9,6 +9,8 @@
   if(!p||!p.title)throw Error("Missing citation title");
   const source=clean(p.source).toLowerCase(),id=clean(p.source_id||p.recordId||p.id);
   if(!["arxiv","biorxiv","chemrxiv"].includes(source))throw Error("Unsupported source");
+  if(p.landing_url&&p.url&&clean(p.landing_url)!==clean(p.url))
+   throw Error("Conflicting original source URLs");
   let url=clean(p.landing_url||p.url),doi=clean(p.doi).toLowerCase().replace(/^https?:\/\/doi.org\//,"");
   if(!/^https:\/\//i.test(url))throw Error("Verified source URL required");
   if(!doi)doi=null;
