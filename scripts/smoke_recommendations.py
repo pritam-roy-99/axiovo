@@ -55,7 +55,7 @@ def main():
                 assert page.evaluate("JSON.parse(localStorage.getItem('axiovo-reading-list')).length")==0
                 card.locator(".axiovo-rec-abstract-full summary").click()
                 assert card.locator(".axiovo-rec-abstract-full").get_attribute("open") is not None
-                card.locator(".axiovo-rec-more summary").click()
+                card.locator(".axiovo-rec-more > summary").click()
                 assert card.locator(".axiovo-rec-more").get_attribute("open") is not None
                 listen=card.locator(".axiovo-rec-listen")
                 assert listen.is_enabled()
