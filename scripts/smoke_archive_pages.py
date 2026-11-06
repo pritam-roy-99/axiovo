@@ -86,6 +86,17 @@ def check_searchable_path(page,base,source,touch):
  assert [params.get(key,[None])[0] for key in ("category","topic","subtopic")]==selected
  page.reload(wait_until="domcontentloaded")
  expect(page.locator("#archive-subfield-input")).to_have_value(PICKER_CASES[source][-1][1])
+ if touch:
+  subject=page.locator("#archive-field-input")
+  topic=page.locator("#archive-topic-input")
+  subject.tap()
+  expect(subject).to_have_attribute("aria-expanded","true")
+  topic.tap()
+  expect(subject).to_have_attribute("aria-expanded","false")
+  expect(topic).to_have_attribute("aria-expanded","true")
+  page.locator("#ex-guide-title").tap()
+  expect(topic).to_have_attribute("aria-expanded","false")
+  expect(page.locator("#archive-subfield")).to_have_value(selected[-1])
 
 def main():
  server=ThreadingHTTPServer(("127.0.0.1",0),functools.partial(Quiet,directory=str(DOCS)))

@@ -176,7 +176,8 @@ function showSuggestions(){
  $("topic-find-status").textContent=hasQuery?matches.length+" topic suggestions":"";
  for(const row of matches){
   const hit=button("",()=>{
-   input.value="";showSuggestions();selectPath(row);$("field").focus();
+   input.value="";showSuggestions();selectPath(row);
+   if(researchPickers.length)researchPickers[0].focus();else $("field").focus();
   },"ex-suggestion");
   hit.append(element("strong",row.label),element("span",row.detail||row.category));
   target.append(hit);

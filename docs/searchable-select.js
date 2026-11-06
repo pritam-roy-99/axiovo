@@ -104,12 +104,12 @@ function mount(select,placeholder){
   select.value=option.value;close();
   if(changed)select.dispatchEvent(new Event("change",{bubbles:true}));
  }
- input.addEventListener("focus",()=>open());
  input.addEventListener("click",()=>open());
  input.addEventListener("input",event=>{
   if(event.isComposing)return;
   if(opened)render();else open(input.value);
  });
+ input.addEventListener("compositionstart",()=>open());
  input.addEventListener("compositionend",()=>{if(opened)render();else open(input.value)});
  input.addEventListener("keydown",event=>{
   if(event.isComposing)return;
@@ -123,7 +123,6 @@ function mount(select,placeholder){
   else if(!opened&&!event.ctrlKey&&!event.metaKey&&!event.altKey&&
    (event.key.length===1||event.key==="Backspace"||event.key==="Delete"))open();
  });
- input.addEventListener("blur",event=>{if(event.relatedTarget&&!picker.contains(event.relatedTarget))close()});
  picker.addEventListener("mousedown",event=>{
   if(event.target===toggle||event.target.closest("[role=option]"))event.preventDefault();
  });
@@ -132,9 +131,9 @@ function mount(select,placeholder){
   const row=event.target.closest("[role=option]");
   if(row)choose(Number(row.dataset.index));
  });
- document.addEventListener("pointerdown",event=>{if(!picker.contains(event.target))close()});
+ document.addEventListener("click",event=>{if(!picker.contains(event.target))close()},true);
  sync();
- return {sync};
+ return {sync,focus:()=>input.focus()};
 }
 window.AxiovoSearchableSelect={mount};
 })();
