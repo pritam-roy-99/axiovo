@@ -1,6 +1,6 @@
 /* Source-linked citation exports. No journal status inferred from preprints. */
 (function(root,factory){
- const api=factory();if(typeof module==="object"&&module.exports=api;
+ const api=factory();if(typeof module==="object"&&module.exports)module.exports=api;
  if(root)root.AxiovoCitationFormats=api;
 })(typeof window!=="undefined"?window:null,function(){
  "use strict";
