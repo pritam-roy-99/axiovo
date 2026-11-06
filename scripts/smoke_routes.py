@@ -14,7 +14,7 @@ from urllib.parse import urlsplit
 from playwright.sync_api import sync_playwright
 
 DOCS = Path(__file__).resolve().parents[1] / "docs"
-ROUTES = ("", "arxiv.html", "biorxiv.html", "chemrxiv.html", "desk.html",
+ROUTES = ("", "arxiv.html", "biorxiv.html", "chemrxiv.html", "desk.html", "feed.html",
           "workspace.html", "copilot.html", "profiles.html", "lab.html",
           "paper.html", "compare.html", "methodology.html", "privacy.html",
           "community.html")
