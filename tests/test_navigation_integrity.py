@@ -36,6 +36,8 @@ class NavigationTests(unittest.TestCase):
                 target=(origin.parent / (unquote(uri.path) or origin.name)).resolve()
                 if target.is_dir():
                     target=target / "index.html"
+                if target.suffix.lower() not in (".html", ""):
+                    continue  # Generated media are checked by the built-asset audit.
                 self.assertTrue(target.is_file(),f"{origin.name}: missing {href}")
                 if uri.fragment and target.suffix==".html":
                     self.assertIn(unquote(uri.fragment),pages[target].ids,
