@@ -44,6 +44,12 @@ jobs:
       - name: Validate website scripts (deployment required)
         id: validate_website_scripts
         run: python -m scripts.validate_site
+      - name: Research Assistant relevance and cited-answer regression gate
+        run: |
+          node --check docs/copilot.js
+          node --check docs/assistant-core.js
+          node tests/assistant-core.test.js
+          node tests/assistant-grounding-50.test.js
       - name: Test source identity, announcement freshness and precision ranking
         run: |
           node tests/archive-data.test.js
