@@ -97,6 +97,7 @@
 .feed-follow-status{font-size:12px!important;min-height:12px}
 .feed-chip{display:inline-flex;align-items:center;gap:7px;min-width:0;max-width:100%}
 .feed-chip>span{overflow-wrap:anywhere}
+.feed-chips a.feed-chip{font-size:12px;color:var(--rl-text,#17324a);background:var(--rl-soft,#edf5fa);border:1px solid var(--rl-border,#cbdde9);padding:8px 10px;border-radius:14px;overflow-wrap:anywhere}
 .feed-chips .feed-chip-remove{border:0;border-radius:50%;background:transparent;color:inherit;font-size:19px;line-height:1;cursor:pointer;padding:2px 4px;min-height:28px;min-width:28px}
 .feed-sidebar-links{display:flex;gap:12px;flex-wrap:wrap;margin-top:13px}
 .feed-sort-note{font-size:12px;color:var(--rl-muted,#607a91);line-height:1.5}

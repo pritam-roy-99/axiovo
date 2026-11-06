@@ -125,6 +125,7 @@ def build():
     selected = {}
     stats = {}
     source_stamp = {}
+    announcement = None
     for source, files in sources.items():
         counts = collections.Counter()
         failures = 0
@@ -133,6 +134,12 @@ def build():
             if not isinstance(snapshot, dict):
                 failures += 1
                 continue
+            if filename == "announcements.json" and snapshot.get("date_type") == "announcement":
+                day = date(snapshot.get("announcement_date"))
+                if day and isinstance(snapshot.get("papers"), list):
+                    count = len(snapshot["papers"])
+                    announcement = {"date": day, "count": count, "checked_at": snapshot.get("checked_at"),
+                                    "complete": snapshot.get("complete") is True and snapshot.get("count") == count}
             checked = snapshot.get("checked_at") or snapshot.get("generated_at")
             if checked:
                 source_stamp[source] = max(source_stamp.get(source, ""), str(checked))
@@ -170,7 +177,7 @@ def build():
     OUTPUT.mkdir(parents=True, exist_ok=True)
     manifest = {"schema_version": 1, "source": "Axiovo official-source snapshots",
                 "note": "Counts describe indexed records only, not archive-wide totals.",
-                "archives": stats, "shards": {}, "record_count": len(selected)}
+                "archives": stats, "shards": {}, "record_count": len(selected), "latest_arxiv_announcement": announcement}
     for (source, month), papers in sorted(buckets.items()):
         papers.sort(key=lambda p: (p["submitted_date"] or p["announced_date"] or "", p["id"]), reverse=True)
         rel = f"{source}/{month}.json"

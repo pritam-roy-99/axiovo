@@ -32,7 +32,6 @@ jobs:
           python-version: '3.12'
       - name: Test metadata processing
         id: test_metadata_processing
-        continue-on-error: true
         run: python -m unittest discover -s tests -v
       - name: Security and privacy baseline gate (deployment required)
         id: security_and_privacy_baseline_gate

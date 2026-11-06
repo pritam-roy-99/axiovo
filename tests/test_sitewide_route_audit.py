@@ -1,4 +1,4 @@
-"""Regression checks for source-first, consistent ResearchLens public routes.
+"""Regression checks for source-first, consistent Axiovo public routes.
 
 These tests inspect source and do NOT replace browser end-to-end tests.
 """
@@ -28,11 +28,10 @@ class RouteAuditTests(unittest.TestCase):
 
     def test_canonical_search_redirect_retains_input(self):
         html=self.read("search.html")
-        self.assertIn('old.forEach',html) if False else None
-        self.assertIn('previous.forEach',html)
-        self.assertIn('next.searchParams.set("view","scholarly")',html)
-        self.assertIn('location.replace(next.href)',html)
-        self.assertNotIn('https://api.openalex.org/works?',html)
+        self.assertIn("previous.forEach",html)
+        self.assertIn("next.searchParams",html)
+        self.assertIn("location.replace(next.href)",html)
+        self.assertNotIn("https://api.openalex.org/works?",html)
 
     def test_all_public_routes_have_valid_script_order(self):
         pages=("index.html","workspace.html","copilot.html","lab.html","paper.html",
@@ -66,10 +65,9 @@ class RouteAuditTests(unittest.TestCase):
         lab=self.read("lab.js")
         cop=self.read("copilot.js")
         self.assertIn('filter:"locations.source.id:S4306400194"',lab)
-        self.assertIn('filter:"locations.source.id:S4306400194"',cop)
-        self.assertIn('window.ResearchLensArxiv.pdf(value.requested)',lab)
-        self.assertIn('window.ResearchLensArxiv?.candidates(w)',cop)
-        self.assertIn('window.ResearchLensArxiv?.base(id)',cop)
+        self.assertIn("window.AxiovoArxiv.pdf(value.requested)",lab)
+        self.assertIn("window.AxiovoArxiv?.candidates(w).length",cop)
+        self.assertIn('Archive.live("arxiv",{q})',cop)
 
     def test_bookmarks_remain_visible_outside_local_feed(self):
         profiles=self.read("profiles.js")

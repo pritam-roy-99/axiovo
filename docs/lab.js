@@ -229,10 +229,10 @@ function keywordMatch(p,terms){
  return terms.some(t=>text.includes(t))
 }
 function checkAlerts(){
- const prefs=read("axiovo-research-interest-settings-v1",{});
- const field=read("axiovo-field-explorer-v1",{});
+ const prefs=window.AxiovoFeedPreferences?.derive(localStorage);
  const projects=read("axiovo-research-projects-v1",[]);
- const terms=[...(Array.isArray(prefs.interests)?prefs.interests:[]),field.topic,field.subtopic,...(Array.isArray(projects)?projects.map(p=>p.keywords):[])].filter(Boolean)
+ const topics=[...(prefs?.directTopics||[]),...(prefs?.paths||[]).filter(path=>path.source==="arxiv").flatMap(path=>path.terms)];
+ const terms=[...topics,...(Array.isArray(projects)?projects.map(p=>p.keywords):[])].filter(Boolean)
   .flatMap(x=>String(x).toLowerCase().split(/[,;]/)).map(x=>x.trim()).filter(x=>x.length>4).slice(0,40);
  const seen=read(SEEN,{});
  const matches=documents.filter(p=>keywordMatch(p,terms)).filter(p=>!seen[p.id])

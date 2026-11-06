@@ -37,7 +37,14 @@ def main():
             page.route("**/data/feed.json",lambda r:r.fulfill(status=200,content_type="application/json",body=json.dumps(fixture)))
             for path in ("oai-recent.json","announcements.json","biorxiv.json","chemrxiv.json"):
                 page.route("**/data/"+path,lambda r:r.fulfill(status=200,content_type="application/json",body='{"papers":[]}'))
+            # Browsing a topic does not subscribe the device to that topic.
+            page.add_init_script("""() => {
+              localStorage.setItem("axiovo-field-explorer-v1", JSON.stringify({topic:"Numerical relativity"}));
+            }""")
             page.goto(base+"feed.html",wait_until="domcontentloaded")
+            assert page.locator("#feed-results").get_by_text("Build your research feed").is_visible()
+            assert "No authors followed yet" in page.locator("#feed-followed-authors").inner_text()
+            assert "No topics followed yet" in page.locator("#feed-followed-topics").inner_text()
             page.evaluate("""() => {
                localStorage.setItem("axiovo-author-follows",JSON.stringify(["A.S. Majumdar"]));
                localStorage.setItem("axiovo-topic-explorer-arxiv-v1",
@@ -49,7 +56,7 @@ def main():
             titles=page.locator(".feed-card h3").all_inner_texts()
             assert len(titles)==2,(titles,"source-only topic and author matching")
             assert all("robotics" not in title.lower() for title in titles)
-            assert "preparation contextuality" in page.locator("#feed-followed-topics").inner_text().lower()
+            assert "preparation contextuality" in page.locator("#feed-followed-paths").inner_text().lower()
             assert page.locator("#feed-followed-authors").inner_text().find("Majumdar")>=0
             first=page.locator(".feed-card").first
             button=first.locator(".feed-save")
@@ -72,6 +79,14 @@ def main():
             assert page.locator(".feed-card").count()==1
             page.locator("#feed-undo-button").click()
             assert page.locator(".feed-card").count()==2
+            card=page.locator(".feed-card").first
+            title=card.locator("h3").inner_text()
+            card.get_by_role("button",name="Add to comparison").click()
+            card.get_by_role("link",name="In comparison").click()
+            page.wait_for_url("**/desk.html#rd-queue-heading")
+            assert title in page.locator("#rd-queue").inner_text()
+            page.go_back(wait_until="domcontentloaded")
+            page.locator(".feed-card").first.wait_for()
             assert not errors,errors
             overflow=page.evaluate("document.documentElement.scrollWidth-window.innerWidth")
             assert overflow<=7,("Mobile horizontal overflow",overflow)

@@ -7,6 +7,14 @@ const store={
  setItem:(key,value)=>entries.set(key,String(value))
 };
 const put=(key,value)=>store.setItem(key,JSON.stringify(value));
+assert.deepEqual(p.derive(store),{directTopics:[],topics:[],authors:[],paths:[]});
+put("axiovo-field-explorer-v1",{topic:"Numerical relativity",subtopic:"Binary merger simulations"});
+put("axiovo-topic-explorer-arxiv-v1",{last:{category:"gr-qc",topic:"numerical-relativity"}});
+assert.deepEqual(p.derive(store),{directTopics:[],topics:[],authors:[],paths:[]},
+ "Browsing any subject must not enroll it as a follow");
+assert(p.updateTopic(store,"Numerical relativity",true));
+assert(p.derive(store).topics.includes("Numerical relativity"),"An explicit follow remains available");
+assert(p.updateTopic(store,"Numerical relativity",false));
 put("axiovo-author-follows",["A.S. Majumdar"]);
 put("axiovo-research-interest-settings-v1",{authors:["Archan S Majumdar"],interests:["preparation contextuality"]});
 put("axiovo-topic-explorer-arxiv-v1",{followed:[
@@ -24,9 +32,10 @@ for(const term of ["quantum dimension witnessing","single cell genomics","molecu
 }
 assert(derived.authors.includes("A.S. Majumdar"));
 assert.equal(derived.paths.length,3);
+assert(!derived.topics.includes("quantum information"),"A saved subtopic must not also follow its parent");
 assert(p.updateTopic(store,"non-Markovianity",true));
 assert(p.derive(store).topics.includes("non-Markovianity"));
 assert(p.updateTopic(store,"non-Markovianity",false));
 assert(!p.derive(store).topics.includes("non-Markovianity"));
-assert(p.derive(store).topics.includes("quantum dimension witnessing"),"Unfollowing manual topic must preserve Discover paths");
+assert(p.derive(store).topics.some(term=>term.toLowerCase()==="quantum dimension witnessing"),"Unfollowing manual topic must preserve Discover paths");
 console.log("PASS: existing author follows, all three Discover paths, specialized field interests and reversible feed follows");

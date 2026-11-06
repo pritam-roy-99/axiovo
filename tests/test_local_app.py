@@ -30,7 +30,7 @@ class InstallableAppTests(unittest.TestCase):
         self.assertIsNotNone(shell)
         for item in re.findall(r'"(\./[^"]+)"', shell.group(1)):
             with self.subTest(url=item):
-                path = DOCS / item.removeprefix("./")
+                path = DOCS / item.split("?",1)[0].removeprefix("./")
                 if item == "./":
                     path = DOCS / "index.html"
                 self.assertTrue(path.is_file(), str(path))
@@ -40,10 +40,11 @@ class InstallableAppTests(unittest.TestCase):
         self.assertIn('"127.0.0.1"', script)
         self.assertIn('ThreadingHTTPServer', script)
 
-    def test_worker_precaches_snapshot_but_not_remote_apis(self):
+    def test_worker_precaches_routes_and_not_remote_metadata(self):
         worker = (DOCS / "sw.js").read_text()
         shell = re.search(r"const SHELL = \[(.*?)\];", worker, re.S).group(1)
-        self.assertIn("feed.json", shell)
+        self.assertIn("workspace.html", shell)
+        self.assertNotIn("feed.json", shell)
         self.assertNotIn("openalex.org", shell)
 
 

@@ -13,23 +13,26 @@ class FinishingTouchesTests(unittest.TestCase):
   self.assertIn("not automatically published",page)
  def test_saved_paper_attaches_to_research_question(self):
   code=(ROOT/"workspace.js").read_text()
-  self.assertIn('const PROJECT_KEY="researchlens-research-projects-v1"',code)
+  self.assertIn('const PROJECT_KEY="axiovo-research-projects-v1"',code)
   self.assertIn('found.paper_ids=[...new Set([...ids,base])]',code)
   self.assertIn('new Event("axiovo:projects-updated")',code)
   self.assertIn('window.addEventListener("axiovo:projects-updated"',code)
   recs=(ROOT/"research-intelligence.js").read_text()
   self.assertIn('window.addEventListener("axiovo:projects-updated"',recs)
-  self.assertIn("researchlens-reading-list",code)
+  self.assertIn("axiovo-reading-list",code)
  def test_video_remains_optional_on_mobile(self):
-  html=(ROOT/"index.html").read_text()
-  self.assertIn('id="axiovo-video-details"',html)
-  self.assertIn("Read video transcript",html)
-  self.assertIn('kind="captions"',html)
-  onboard=(ROOT/"onboarding.js").read_text()
-  self.assertIn('tour.open=false',onboard)
- def test_offline_app_caches_community(self):
-  worker=(ROOT/"sw.js").read_text()
-  self.assertRegex(worker, r'const CACHE = "axiovo-shell-v\d+";')
-  self.assertIn("community.html",worker)
+     html=(ROOT/"index.html").read_text()
+     self.assertLess(html.index('id="axiovo-archive-title"'),html.index('id="axiovo-home-demo-heading"'))
+     self.assertIn("Read video transcript",html)
+     self.assertIn('kind="captions"',html)
+     self.assertIn("playsinline",html)
+     self.assertNotIn("autoplay",html)
+
+ def test_offline_app_caches_library(self):
+     worker=(ROOT/"sw.js").read_text()
+     self.assertRegex(worker, r'const CACHE = "axiovo-shell-v\d+";')
+     self.assertIn("./workspace.html",worker)
+     self.assertIn("./workspace.js",worker)
+
 if __name__=="__main__":
  unittest.main()

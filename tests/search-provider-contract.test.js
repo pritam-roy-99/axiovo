@@ -10,7 +10,7 @@ const make=(id,{url,subjects=[],title="Synthetic source record",doi}={})=>({
   url:url||"https://doi.org/10.48550/arXiv."+id,
   titles:[{title}],subjects,creators:[{name:"Researcher, A."}],
   descriptions:[{descriptionType:"Abstract",description:"Preparation contextuality and operational tests."}],
-  dates:[{dateType:"Submitted",dateInformation:"v1",date:"2026-11-01"}]
+  dates:[{dateType:"Submitted",dateInformation:"v1",date:"2026-11-01"}],citationCount:"7"
  }
 });
 const first=make("2611.12001",{subjects:[{subjectScheme:"arXiv",subject:"Quantum Physics (quant-ph)"}]});
@@ -42,6 +42,8 @@ const api=root.AxiovoArchiveData;
  assert.equal(one.papers[0].recordId,"2611.12001");
  assert.deepEqual([...one.papers[0].categories],["quant-ph"]);
  assert.equal(one.papers[0].date,"2026-11-01");
+ assert.equal(one.papers[0].citations,7);
+ assert.equal(api.merge(one.papers,[{...one.papers[0],citations:null}])[0].citations,7);
  assert.equal(one.next,"2");
  const two=await api.live("arxiv",query,undefined,one.next);
  assert.equal(two.papers.length,2,"Reject contradictory arXiv URLs without losing valid records");

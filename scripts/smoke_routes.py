@@ -183,6 +183,27 @@ def main():
                     assert "Macroscopic energy gaps" not in page.locator("#evidence-list").inner_text()
                     assert page.locator("#evidence-list .assistant-source-details").count()==1
                     assert page.locator("#evidence-list .assistant-source-details").first.get_attribute("open") is None
+                    attempted=[]
+                    def external_lookup(route):
+                        attempted.append(route.request.url)
+                        route.abort()
+                    for provider in ("https://api.openalex.org/**","https://api.datacite.org/**"):
+                        page.route(provider,external_lookup)
+                    page.locator("#question").fill("Microbial resistance in tropical river sediments")
+                    page.locator("#ask").click()
+                    page.wait_for_function("document.querySelector('#retrieval-status').textContent.includes('0 relevant sources')")
+                    assert not attempted,("Indexed-only search sent a query to a public provider",attempted)
+                    for requested in ("2611.11003v9","2611.11999"):
+                        page.goto(base+"copilot.html?id="+requested,wait_until="domcontentloaded")
+                        assert page.locator("#question").input_value()==requested
+                        page.locator("#ask").click()
+                        original=page.locator("#retrieval-status a")
+                        original.wait_for()
+                        assert original.get_attribute("href")=="https://arxiv.org/abs/"+requested
+                        assert page.locator("#evidence-list .source").count()==0
+                    assert not attempted,("Unverified arXiv ID looked up in indexed-only mode",attempted)
+                    for provider in ("https://api.openalex.org/**","https://api.datacite.org/**"):
+                        page.unroute(provider,external_lookup)
                 if width==390:
                     # Followed-author identity regression: abbreviated A. S. Majumdar
                     # must reveal work indexed as Archan S Majumdar, while an
@@ -222,6 +243,22 @@ def main():
                 page.reload(wait_until="domcontentloaded")
                 assert page.evaluate("document.documentElement.dataset.theme") != before
                 ctx.close()
+            context=browser.new_context(viewport={"width":390,"height":850})
+            page=context.new_page()
+            page.goto(base+"workspace.html",wait_until="load")
+            page.wait_for_function("Boolean(navigator.serviceWorker.controller)",timeout=25000)
+            page.evaluate("""() => {
+                const paper=AxiovoArchiveData.normalize("arxiv",{
+                    id:"2611.11333v2", title:"Synthetic pinned paper for the offline Library"
+                });
+                AxiovoArchiveData.save(paper);
+            }""")
+            context.set_offline(True)
+            page.goto(base+"workspace.html?view=saved",wait_until="domcontentloaded")
+            saved=page.locator("#library-list").get_by_role("link",name="Synthetic pinned paper for the offline Library")
+            saved.wait_for()
+            assert saved.get_attribute("href")=="https://arxiv.org/abs/2611.11333v2"
+            context.close()
             browser.close()
     finally:
         server.shutdown()

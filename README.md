@@ -57,9 +57,9 @@ the SciRate-style announcement date.
 
 ## Axiovo: from knowledge to discovery
 
-Axiovo combines **axiom** (a foundational starting point for reasoning) with **novo** (new). Its purpose is to help researchers turn established scientific knowledge into new ideas through source-linked literature discovery, organized reading and research questions.
+Axiovo combines **axiom** (a foundational starting point for reasoning) with **novo** (new). Axiovo helps researchers find relevant preprints across arXiv, bioRxiv and ChemRxiv, verify them at the original source, and organize their reading in a private workspace.
 
-**One continuous workflow:** Discover papers and open **My workspace** on the same homepage. Older workspace URLs redirect to the unified research interface; browser-local saved papers and notes remain under their existing keys.
+Choose an archive from Home or search all three in **Research Desk**. Save papers to **Library**, compare abstracts against the originals, and follow the authors, topics or Discover paths you choose in **My Feed**. Library data and follows are stored on this device.
 
 ## Research fields and local AI
 

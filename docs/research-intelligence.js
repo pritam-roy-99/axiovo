@@ -19,16 +19,18 @@ settings.authors=Array.isArray(settings.authors)?settings.authors.slice(0,20):[]
 let feed=[],filtered=[],pickedProject="";
 const Arxiv=window.AxiovoArxiv;
 function persistProjects(){if(write(PROJECTS,projects))window.dispatchEvent(new Event("axiovo:projects-updated"))}
-function persistSettings(){write(META,settings)}
 function link(parent,url,label){if(!/^https:\/\//.test(url||""))return;const a=texts(parent,"a",label);a.href=url;a.target="_blank";a.rel="noopener noreferrer"}
 function projectName(p){return p.title+(p.status==="completed"?" (completed)":"")}
-function allInterests(){const followed=window.AxiovoFeedPreferences?.derive(localStorage);if(followed)return followed.topics.slice(0,45);const p=read("axiovo-field-explorer-v1",{});return [...new Set([...settings.interests,p.topic,p.subtopic].filter(x=>typeof x==="string"&&x.trim()))].slice(0,20)}
+function allInterests(){
+ const followed=window.AxiovoFeedPreferences?.derive(localStorage);
+ if(!followed)return settings.interests;
+ return [...new Set([...followed.directTopics,...followed.paths.filter(path=>path.source==="arxiv")
+  .flatMap(path=>path.terms)])].slice(0,45);
+}
 function drawSettings(){
- const p=read("axiovo-field-explorer-v1",{});
  $("research-interest").value=settings.interests.join(", ");
  $("research-authors").value=settings.authors.join(", ");
- message($("interest-summary"),"Using "+allInterests().length+" interests. "+
-   (p.subtopic?"Current specialized interest: "+p.subtopic+". ":p.topic?"Current research area: "+p.topic+". ":"")+"Scores show matching terms, not scientific importance.");
+ message($("interest-summary"),"Using "+allInterests().length+" interests chosen on this device. Add interests here or save a path in arXiv Discover.");
 }
 function renderProjects(){
  const root=$("research-project-list");root.replaceChildren();
@@ -185,8 +187,7 @@ function abstractFromInverted(index){
  return words.filter(Boolean).join(" ").slice(0,2000)
 }
 async function loadLiveArxiv(){
- const prefs=read("axiovo-field-explorer-v1",{});
- const interest=String(prefs.subtopic||prefs.topic||settings.interests[0]||"quantum information").trim();
+ const interest=allInterests()[0];
  if(!interest)return;
  const params=new URLSearchParams({search:interest,filter:"locations.source.id:S4306400194",per_page:"40",
   select:"id,display_name,publication_date,cited_by_count,authorships,locations,primary_location,best_oa_location,abstract_inverted_index"});
@@ -216,9 +217,14 @@ function startup(){
  drawSettings();
  $("research-interest-form").onsubmit=e=>{
    e.preventDefault();
-   settings.interests=[...new Set($("research-interest").value.split(/[,\n;]/).map(x=>x.trim()).filter(x=>x.length>=3))].slice(0,15);
-   settings.authors=[...new Set($("research-authors").value.split(/[,\n;]/).map(x=>x.trim()).filter(x=>x.length>=3))].slice(0,20);
-   persistSettings();drawSettings();renderRecommendations();message($("interest-status"),"Research interests saved on this device.")
+   const next={
+    ...settings,
+    interests:[...new Set($("research-interest").value.split(/[,\n;]/).map(x=>x.trim()).filter(x=>x.length>=3))].slice(0,15),
+    authors:[...new Set($("research-authors").value.split(/[,\n;]/).map(x=>x.trim()).filter(x=>x.length>=3))].slice(0,20)
+   };
+   if(!write(META,next)){message($("interest-status"),"Could not save interests on this device.");return}
+   settings=next;drawSettings();renderRecommendations();message($("interest-status"),"Research interests saved on this device.");
+   loadLiveArxiv();
  };
  $("research-project-form").onsubmit=e=>{
    e.preventDefault();
@@ -263,7 +269,9 @@ function startup(){
  window.addEventListener("storage",e=>{
    if(e.key===PROJECTS){projects=(Array.isArray(read(PROJECTS,[]))?read(PROJECTS,[]):[]).map(R.cleanProject).filter(Boolean);render()}
    if(e.key===META){settings=read(META,{interests:[],authors:[]});drawSettings();renderRecommendations()}
-    if(e.key==="axiovo-author-follows")renderRecommendations();
+    if(["axiovo-author-follows","axiovo-followed-topics","axiovo-topic-explorer-arxiv-v1","axiovo-interests-by-field-v1"].includes(e.key)){
+     drawSettings();renderRecommendations();
+    }
  });
  async function mergeRecentlyVerifiedMetadata(){
   // Preserve arXiv v1 publication dates; announcement dates are separate.

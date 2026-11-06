@@ -8,7 +8,7 @@
  const MODES=["relevance","recent","oldest","cited","title"];
  function when(p){
   p=p?.paper||p;
-  const v=p?.announcementDate||p?.announcement_date||p?.published||p?.date||p?.created||"";
+  const v=p?.published||p?.date||p?.created||p?.announcementDate||p?.announcement_date||"";
   const t=Date.parse(v);return Number.isFinite(t)?t:null;
  }
  function cited(p){p=p?.paper||p;const c=p?.citations;return typeof c==="number"&&Number.isFinite(c)&&c>=0?c:null}

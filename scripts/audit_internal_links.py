@@ -79,8 +79,8 @@ def audit():
     archives = re.findall(r'data-archive="(arxiv|biorxiv|chemrxiv)"\s+href="([^"]+)"', home)
     if archives != [("arxiv", "./arxiv.html"), ("biorxiv", "./biorxiv.html"), ("chemrxiv", "./chemrxiv.html")]:
         errors.append("Homepage must contain exactly three correctly linked archive choices")
-    if "<video" not in home or home.find("<video") > home.find('class="axiovo-archive-grid'):
-        errors.append("Homepage tour must precede the three equal archive choices")
+    if "<video" not in home or home.find("<video") < home.find('class="axiovo-archive-grid'):
+        errors.append("Homepage must offer the three archive choices before the optional tutorial")
     # Standalone archives must use the same designed application shell as Home.
     stylesheet = (DOCS / "theme.css").read_text(encoding="utf-8")
     required = [

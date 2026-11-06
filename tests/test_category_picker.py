@@ -12,20 +12,15 @@ class Picker(HTMLParser):
         a=dict(attrs)
         if a.get("id"):self.nodes[a["id"]]=(tag,a)
 class CategoryPickerTests(unittest.TestCase):
-    def test_inline_category_menu_and_filter_state(self):
-        html=(ROOT/"docs/index.html").read_text(encoding="utf8")
-        p=Picker();p.feed(html)
-        for key in ("category-picker","category-trigger","category-menu","category"):
-            self.assertIn(key,p.nodes)
-        self.assertEqual(p.nodes["category-trigger"][0],"button")
-        self.assertEqual(p.nodes["category-trigger"][1]["aria-expanded"],"false")
-        self.assertIn("hidden",p.nodes["category-menu"][1])
-        self.assertEqual(p.nodes["category"][0],"input")
-        self.assertEqual(p.nodes["category"][1]["type"],"hidden")
-        self.assertNotIn('<select id="category"',html)
-        self.assertIn('selected.dispatchEvent(new Event("change",{bubbles:true}))',html)
-        self.assertIn('data-category="physics.optics"',html)
-        self.assertIn('data-category="cond-mat.mes-hall"',html)
-        self.assertIn('.rl-category-menu[hidden]{display:none!important}',html)
+    def test_archive_category_picker_has_labels_and_neutral_default(self):
+        for source in ("arxiv","biorxiv","chemrxiv"):
+            html=(ROOT/"docs"/(source+".html")).read_text(encoding="utf8")
+            parser=Picker();parser.feed(html)
+            self.assertEqual(parser.nodes["archive-field"][0],"select")
+            self.assertIn('for="archive-field"',html)
+            self.assertIn('for="archive-topic"',html)
+            self.assertIn('for="archive-subfield"',html)
+            self.assertRegex(html,r'<option value="">[^<]*[Aa]ll')
+
 if __name__=="__main__":
     unittest.main()
