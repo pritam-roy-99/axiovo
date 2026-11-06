@@ -6,6 +6,9 @@ on:
       - '.github/workflows/research-quality.yml'
       - 'scripts/audit_literature_coverage.py'
       - 'scripts/arxiv_daily_archive.py'
+      - 'scripts/sync_chemrxiv.py'
+      - 'scripts/sync_biorxiv.py'
+      - 'tests/test_source_harvest.py'
       - 'docs/paper-relations.js'
       - 'docs/topic-explorer.js'
       - 'docs/research-intelligence.js'
@@ -35,6 +38,7 @@ jobs:
         run: |
           python -m unittest discover -s tests -p test_literature_coverage.py -v
           python -m unittest discover -s tests -p test_arxiv_daily_archive.py -v
+          python -m unittest discover -s tests -p test_source_harvest.py -v
       - name: Evaluate five research disciplines and related-paper provenance
         run: |
           node tests/research-ranking-benchmark.test.js
