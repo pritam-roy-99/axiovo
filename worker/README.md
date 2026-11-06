@@ -44,7 +44,7 @@ The current evidence-only, Ollama and WebGPU modes remain the default.
 ## Model selection and free-only policy (November 2026)
 
 - Preferred model: `nvidia/nemotron-3-ultra-550b-a55b:free`, via OpenRouter. Model availability is not guaranteed; provider free limits apply.
-- Optional alternative: `openrouter/free`, a free model router, which may select different models between requests. The Worker reports the actual returned model to the UI.
+- OpenAI option: `openai/gpt-oss-120b:free`, an OpenAI-developed open-weight model hosted through OpenRouter. This is not ChatGPT or an OpenAI API subscription.\n- Optional alternative: `openrouter/free`, a free model router, which may select different models between requests. The Worker reports the actual returned model to the UI.
 - `API_KEY` must be a server-side OpenRouter key. Never put it in GitHub Pages files.
 - `ENABLE_PAID_PROVIDERS` must remain unset. OpenAI is **not** a free alternative simply because the administrator subscribes to ChatGPT. To add OpenAI in the future requires separate API billing, explicit owner approval and infrastructure configuration.
 - Do not deploy a public unmetered AI endpoint: the Turnstile verification, KV-based per-IP limit, origin restriction and provider account quotas are mandatory.
