@@ -18,7 +18,7 @@ function score(q,p){const input=freq(q),title=freq(p.title||""),abstract=freq(p.
 function isSourceURL(url){try{const u=new URL(url);return u.protocol==="https:"}catch(e){return false}}
 function append(tag,text,parent,cls){const e=document.createElement(tag);e.textContent=text;if(cls)e.className=cls;parent.append(e);return e}
 function arxivUrl(id){return window.AxiovoArxiv?.abs(id)||"https://arxiv.org/"}
-function normSource(rec){return {id:String(rec.id||""),title:String(rec.title||"Untitled").slice(0,380),abstract:String(rec.abstract||"").slice(0,2300),date:String(rec.date||""),authors:(rec.authors||[]).map(x=>String(x).slice(0,90)).slice(0,10),url:String(rec.url||""),provider:String(rec.provider||"arXiv"),citations:rec.citations??null,score:Number(rec.score||0)}}
+function normSource(rec){return {id:String(rec.recordId||rec.id||""),title:String(rec.title||"Untitled").slice(0,380),abstract:String(rec.abstract||"").slice(0,2300),date:String(rec.date||""),authors:(rec.authors||[]).map(x=>String(x).slice(0,90)).slice(0,10),url:String(rec.url||""),provider:String(rec.provider||"arXiv"),citations:rec.citations??null,score:Number(rec.score||0)}}
 function addSources(records,appendMode=false){
  const existing=appendMode?[...sources]:[],keys=new Set(existing.map(s=>s.url));
  for(const raw of records){const p=normSource(raw);if(!isSourceURL(p.url)||keys.has(p.url))continue;keys.add(p.url);existing.push(p);if(existing.length>=15)break}
@@ -92,7 +92,7 @@ function evidenceText(query){
  return Core?.evidenceAnswer?Core.evidenceAnswer(query,sources):
   "Source evidence could not be summarized. Check the original records.";
 }
-async function findPaper(id){
+async function findPaper(id,allowPublicLookup=false){
  const parsed=window.AxiovoArxiv?.parse(id);
  if(!parsed)return null;
  for(const record of index){
@@ -100,7 +100,7 @@ async function findPaper(id){
   const cached=Archive?.normalize("arxiv",record);
   if(cached&&(!parsed.explicit||cached.recordId===parsed.requested))return cached;
  }
- if(!parsed.explicit&&Archive){
+ if(allowPublicLookup&&!parsed.explicit&&Archive){
   try{return (await Archive.live("arxiv",{q:parsed.base})).papers[0]||null}catch{}
  }
  return null;
@@ -319,7 +319,7 @@ async function submit(){
  record("user",question||"Inspect the supplied abstract");
  try{
   await indexReady;
-  const paper=id?await findPaper(id):null;
+  const paper=id?await findPaper(id,$("retrieval-scope").value==="all"):null;
   const found=mode==="claims"?[]:retrieved(paper?.title||query,draft);
   // Match sources to the whole question, not to a single broad word.
   let candidates=found;
@@ -334,10 +334,7 @@ async function submit(){
   addSources(candidates,false);
   rstatus(sources.length+" relevant source"+(sources.length===1?"":"s")+
    " from available metadata; historical coverage is not guaranteed.");
-  if(id&&!paper){
-   const original=append("a"," Check arXiv for "+id+" ↗",$("retrieval-status"));
-   original.href=arxivUrl(id);original.target="_blank";original.rel="noopener noreferrer";
-  }
+  if(id&&!paper)showOriginalLink(id);
   const fallback=mode==="claims"?paperSummary(paper,draft):evidenceText(query);
   if($("engine").value==="evidence"){record("assistant",fallback,sources);status("");}
   else{
@@ -348,6 +345,10 @@ async function submit(){
   }
  }catch(err){record("assistant","Could not complete the request. "+String(err.message||err).slice(0,200),sources);status("Source evidence mode is available.")}
  finally{setBusy(false)}
+}
+function showOriginalLink(id){
+ const original=append("a"," Check arXiv for "+id+" ↗",$("retrieval-status"));
+ original.href=arxivUrl(id);original.target="_blank";original.rel="noopener noreferrer";
 }
 function setBusy(active){
  busy=active;
@@ -361,6 +362,16 @@ async function globalSearch(){
  if(q.length<3){rstatus("Enter a public search query to look up more papers.");return}
  setBusy(true);
  try{
+  const id=window.AxiovoArxiv?.parse(q)?.requested;
+  if(id){
+   await indexReady;
+   const paper=await findPaper(id,true);
+   addSources(paper?[{...paper,provider:paper.provenance||"arXiv indexed metadata"}]:[],false);
+   rstatus(paper?"Source metadata found.":"Source metadata unavailable for this identifier.");
+   if(!paper)showOriginalLink(id);
+   record("assistant",paperSummary(paper,""),sources);
+   return;
+  }
   const found=await widerArxiv(q);
   const combined=Core?.rank(q,[...sources,...found],12).map(x=>({...x.paper,score:x.score}))||found;
   addSources(combined,false);

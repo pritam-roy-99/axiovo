@@ -193,14 +193,15 @@ def main():
                     page.locator("#ask").click()
                     page.wait_for_function("document.querySelector('#retrieval-status').textContent.includes('0 relevant sources')")
                     assert not attempted,("Indexed-only search sent a query to a public provider",attempted)
-                    page.goto(base+"copilot.html?id=2611.11003v9",wait_until="domcontentloaded")
-                    assert page.locator("#question").input_value()=="2611.11003v9"
-                    page.locator("#ask").click()
-                    original=page.locator("#retrieval-status a")
-                    original.wait_for()
-                    assert original.get_attribute("href")=="https://arxiv.org/abs/2611.11003v9"
-                    assert page.locator("#evidence-list .source").count()==0
-                    assert not attempted,("Unverified pinned revision queried a base-record provider",attempted)
+                    for requested in ("2611.11003v9","2611.11999"):
+                        page.goto(base+"copilot.html?id="+requested,wait_until="domcontentloaded")
+                        assert page.locator("#question").input_value()==requested
+                        page.locator("#ask").click()
+                        original=page.locator("#retrieval-status a")
+                        original.wait_for()
+                        assert original.get_attribute("href")=="https://arxiv.org/abs/"+requested
+                        assert page.locator("#evidence-list .source").count()==0
+                    assert not attempted,("Unverified arXiv ID looked up in indexed-only mode",attempted)
                     for provider in ("https://api.openalex.org/**","https://api.datacite.org/**"):
                         page.unroute(provider,external_lookup)
                 if width==390:
