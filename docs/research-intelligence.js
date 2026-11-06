@@ -83,7 +83,11 @@ function renderRecommendations(){
    ...settings.authors,...(Array.isArray(authorFollowing)?authorFollowing:[])
  ],saved:Array.isArray(saved)?saved:[],hidden:Array.isArray(hidden)?hidden:[],now:new Date().toISOString()});
  filtered=scored;
- const list=scored.slice(0,12);
+ const sortMode=$("research-results-sort")?.value||"relevance";
+ const ordered=window.AxiovoPaperSort?.sort(scored,sortMode,x=>x.score)||scored;
+ const list=ordered.slice(0,12);
+ if($("research-sort-note"))$("research-sort-note").textContent=
+  window.AxiovoPaperSort?.note(ordered.map(x=>x.paper),sortMode)||"";
  message($("research-rec-count"),list.length+" of "+scored.length+" matching papers");
  if(!feed.length){texts(root,"div","No arXiv metadata available yet. Search any historical arXiv identifier directly in Discover.","rl-empty");return}
  if(!list.length){texts(root,"div","No matching arXiv-linked papers among the retrieved candidates. Broaden the research interest or search arXiv history directly.","rl-empty");return}
@@ -213,6 +217,7 @@ function startup(){
      projects=[...map.values()].slice(0,30);persistProjects();render();message($("project-status"),"Imported "+incoming.length+" research questions.")
    }catch(err){message($("project-status"),"Import failed: "+err.message)}finally{e.target.value=""}
  };
+ $("research-results-sort")?.addEventListener("change",renderRecommendations);
  window.addEventListener("axiovo:workspace-activated",()=>{drawSettings();renderRecommendations()});
   window.addEventListener("axiovo:author-follow-change",()=>renderRecommendations());
  window.addEventListener("axiovo:projects-updated",()=>{projects=(Array.isArray(read(PROJECTS,[]))?read(PROJECTS,[]):[]).map(R.cleanProject).filter(Boolean);render()});
