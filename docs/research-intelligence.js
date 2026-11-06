@@ -102,13 +102,20 @@ function renderRecommendations(){
   if(parsed){const details=texts(row,"a","Paper details");details.href="./paper.html?id="+encodeURIComponent(sourceId);details.className="axiovo-paper-detail-action";}
   const readLink=texts(row,"a","↗ Read on arXiv");readLink.href=original;readLink.target="_blank";readLink.rel="noopener noreferrer";readLink.className="rl-paper-primary axiovo-rec-read";
   const cop=texts(row,"a","✦ Research Assistant");cop.href="./copilot.html?id="+encodeURIComponent(sourceId);cop.className="axiovo-rec-assistant";
-  const current=read(OLD_SAVED,[]);const savedHere=Array.isArray(current)&&current.includes(sourceId);
-  const save=texts(row,"button",savedHere?"✓ Saved":"☆ Save paper");save.type="button";save.className="axiovo-rec-save";
-  save.setAttribute("aria-pressed",String(savedHere));save.setAttribute("aria-label",(savedHere?"Remove ":"Save ")+"arXiv:"+sourceId+" from your reading list");
+  const current=read(OLD_SAVED,[]);
+  const savedHere=Array.isArray(current)&&current.some(id=>R.normalizeId(id)===R.normalizeId(sourceId));
+  const save=texts(row,"button","","axiovo-rec-save");
+  save.type="button";save.classList.add("paper-save-btn");
+  const saveIcon=texts(save,"span",savedHere?"★":"☆","paper-save-btn__icon");
+  saveIcon.setAttribute("aria-hidden","true");
+  texts(save,"span",savedHere?"Saved":"Save paper","paper-save-btn__label");
+  save.setAttribute("aria-pressed",String(savedHere));
+  save.setAttribute("aria-label",(savedHere?"Remove ":"Save ")+pp.title+(savedHere?" from":" to")+" your reading list");
+  save.title=savedHere?"Remove from Library":"Save to Library";
   save.onclick=()=>{
     const current=read(OLD_SAVED,[]);const ids=Array.isArray(current)?current:[];
-    const present=ids.includes(sourceId);
-    const next=present?ids.filter(x=>x!==sourceId):[...ids,sourceId];
+    const present=ids.some(id=>R.normalizeId(id)===R.normalizeId(sourceId));
+    const next=present?ids.filter(id=>R.normalizeId(id)!==R.normalizeId(sourceId)):[...ids,sourceId];
     if(write(OLD_SAVED,next)){
       window.dispatchEvent(new CustomEvent("axiovo-library-change"));
       message($("research-rec-status"),(present?"Removed ":"Saved ")+"arXiv:"+sourceId+(present?" from":" to")+" your reading list.");
