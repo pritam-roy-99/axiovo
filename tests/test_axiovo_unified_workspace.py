@@ -16,39 +16,36 @@ class Nodes(HTMLParser):
             self.ids.setdefault(attrs["id"], []).append(tag)
 
 class UnifiedWorkspaceTests(unittest.TestCase):
-    def test_dedicated_discover_has_discover_and_workspace(self):
-        html = (DOCS / "discover.html").read_text()
-        parser = Nodes()
-        parser.feed(html)
-        for required in ("discover-shell", "workspace-panel", "workflow-discover",
-                         "workflow-workspace", "scholar-results", "rl-focus-bar"):
-            self.assertEqual(len(parser.ids.get(required, [])), 1, required)
-        self.assertIn('src="./unified-workspace.js"', html)
-        self.assertIn('href="./discover.html#workspace"', html)
+    def test_archives_and_workspace_are_separate_destinations(self):
+        home=(DOCS/"index.html").read_text()
+        for source in ("arxiv","biorxiv","chemrxiv"):
+            self.assertIn(f'href="./{source}.html"',home)
+        self.assertIn('href="./workspace.html"',home)
+        redirect=(DOCS/"discover.html").read_text()
+        self.assertIn('isLibrary?"workspace.html"',redirect)
+        self.assertNotIn('id="library-list"',home)
 
-    def test_legacy_workspace_still_supplies_markup_and_redirects(self):
-        legacy = (DOCS / "workspace.html").read_text()
-        self.assertIn('location.replace("./discover.html#workspace")', legacy)
-        for elem in ("library-list", "library-search", "research-project-form",
-                     "research-recommendations", "research-project-list"):
-            self.assertIn(f'id="{elem}"', legacy)
+    def test_workspace_supplies_reading_and_research_controls(self):
+        parser=Nodes();parser.feed((DOCS/"workspace.html").read_text())
+        for elem in ("library-list","library-search","research-project-form",
+                     "research-recommendations","research-project-list"):
+            self.assertEqual(parser.ids.get(elem) and len(parser.ids[elem]),1,elem)
 
     def test_shared_data_and_no_duplicated_persistence_schema(self):
-        js = (DOCS / "unified-workspace.js").read_text()
-        self.assertIn('fetch("./workspace.html"', js)
-        self.assertIn('loadScript("./workspace.js")', js)
-        self.assertIn('loadScript("./research-intelligence.js")', js)
-        original = (DOCS / "workspace.js").read_text()
-        self.assertIn("researchlens-library-change", original)
-        self.assertIn("researchlens-reading-list", original)
-        self.assertIn("researchlens:workspace-activated", original)
+        page=(DOCS/"workspace.html").read_text()
+        self.assertLess(page.index('src="./archive-data.js"'),page.index('src="./workspace.js"'))
+        workspace=(DOCS/"workspace.js").read_text()
+        archive=(DOCS/"archive-data.js").read_text()
+        self.assertIn("archive?.savedRecords",workspace)
+        self.assertIn("axiovo-reading-list",archive)
+        self.assertIn("axiovo-library-change",workspace)
+        self.assertIn("axiovo-library-change",archive)
 
     def test_tour_explains_name_and_steps(self):
-        script = (ROOT / "scripts" / "build_intro_video.py").read_text()
-        for phrase in ("What does Axiovo mean?", "Axiom: foundations",
-                       "NOVO", "Step 1: Open Discover",
-                       "Step 4: Open My workspace", "Step 6: Record research questions"):
-            self.assertIn(phrase, script)
+        script=(ROOT/"scripts"/"build_tutorial_video.py").read_text()
+        for phrase in ("Axiovo = Axiom + Novo","Three preprint archives",
+                       "Cross-archive Research Desk","workspace.html","copilot.html"):
+            self.assertIn(phrase,script)
 
 if __name__ == "__main__":
     unittest.main()

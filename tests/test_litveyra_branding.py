@@ -21,14 +21,17 @@ class AxiovoBrandingTests(unittest.TestCase):
         self.assertIn('document.createTextNode(" Axiovo")', (DOCS / "navigation.js").read_text())
 
     def test_keep_existing_browser_data_keys(self):
-        workspace = (DOCS / "workspace.js").read_text()
-        self.assertIn("researchlens-reading-list", workspace)
-        self.assertIn("researchlens-library-metadata-v1", workspace)
+        workspace=(DOCS/"workspace.js").read_text()
+        archive=(DOCS/"archive-data.js").read_text()
+        for key in ("reading-list","library-metadata-v1"):
+            self.assertIn("axiovo-"+key,workspace)
+            self.assertIn('"'+key+'"',archive)
+        self.assertIn('read("researchlens-"+suffix',archive)
 
     def test_pwa_cache_migrates_old_shell(self):
         worker = (DOCS / "sw.js").read_text()
         self.assertRegex(worker, r'const CACHE = "axiovo-shell-v\d+";')
-        self.assertIn("researchlens-shell-", worker)
+        self.assertIn("researchlens|litveyra|axiovo", worker)
 
 
 if __name__ == "__main__":

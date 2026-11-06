@@ -13,22 +13,23 @@ class SourceAndPaletteTests(unittest.TestCase):
   self.assertNotIn('Choose a quantum topic to personalize your feed',html)
   self.assertNotIn('((p.categories||[]).includes("quant-ph")?1:0)',html)
  def test_crosslisting_is_from_real_secondary_arxiv_metadata(self):
-  page=(DOCS/"index.html").read_text()
-  self.assertIn('id="crosslist-only"',page)
-  self.assertIn('Cross-listed:',page)
-  self.assertIn('(p.categories||[]).filter(c=>c!==p.primary_category)',page)
-  self.assertIn('el("crosslist-only").checked',page)
-  source=(ROOT/"scripts"/"sync.py").read_text()
-  self.assertIn('"categories": categories',source)
-  self.assertIn('"primary_category":',source)
+     page=(DOCS/"arxiv.html").read_text()
+     self.assertIn('id="archive-crosslisted"',page)
+     self.assertIn('type="checkbox"',page)
+     archive=(DOCS/"archive-data.js").read_text()
+     self.assertIn('c.crosslisted&&(p.source!=="arxiv"||p.categories.length<2)',archive)
+     source=(ROOT/"scripts"/"sync.py").read_text()
+     self.assertIn('"categories": categories',source)
+     self.assertIn('"primary_category":',source)
+
  def test_biorxiv_source_works_without_credentials(self):
-  page=(DOCS/"index.html").read_text()
-  for value in ('id="biorxiv-discovery"','id="rl-source-biorxiv"','id="axiovo-biorxiv-query"'):
-   self.assertIn(value,page)
-  self.assertIn('biorxiv:document.getElementById("biorxiv-discovery")',(DOCS/"discover.js").read_text())
-  self.assertIn('fetch("./data/biorxiv.json"',(DOCS/"biorxiv.js").read_text())
-  lib=(DOCS/"workspace.html").read_text()
-  self.assertIn('id="axiovo-biorxiv-library"',lib)
+     page=(DOCS/"biorxiv.html").read_text()
+     self.assertIn('data-explore-source="biorxiv"',page)
+     self.assertIn('id="archive-query"',page)
+     self.assertIn('src="./archive-data.js"',page)
+     self.assertIn("https://api.biorxiv.org/details/biorxiv/",(DOCS/"archive-data.js").read_text())
+     self.assertIn('<option value="biorxiv">bioRxiv</option>',(DOCS/"workspace.html").read_text())
+
  def test_palette_settings_and_small_nav(self):
   nav=(DOCS/"navigation.js").read_text()
   self.assertNotIn('["./community.html","Community"]',nav)

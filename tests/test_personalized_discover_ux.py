@@ -7,29 +7,24 @@ ROOT=Path(__file__).resolve().parents[1]/"docs"
 class ResearchUXTests(unittest.TestCase):
     def test_navigation_order(self):
         nav=(ROOT/"navigation.js").read_text(encoding="utf8")
-        self.assertLess(nav.index('["./discover.html#discover","Discover"]'),nav.index('["./discover.html#workspace","Library"]'))
+        self.assertLess(nav.index('"Explore"'),nav.index('"My Feed"'))
+        self.assertLess(nav.index('"My Feed"'),nav.index('"Library"'))
 
     def test_unified_ai_link_and_bookmark_buttons(self):
-        home=(ROOT/"index.html").read_text(encoding="utf8")
-        scholar=(ROOT/"scholarly.js").read_text(encoding="utf8")
-        self.assertIn('ai.textContent="✦ Research Assistant"',home)
-        self.assertIn('const cop=node("a","✦ Research Assistant")',scholar)
-        self.assertNotIn("✦ Analyze / Ask AI",home)
-        self.assertIn('saved.includes(p.id)?"Saved":"Save paper"',home)
-        self.assertIn('isSaved?"Saved":"Save paper"',scholar)
-        self.assertIn('aria-pressed',home)
+        feed=(ROOT/"feed.js").read_text(encoding="utf8")
+        desk=(ROOT/"research-desk.js").read_text(encoding="utf8")
+        self.assertIn("./copilot.html?id=",feed)
+        self.assertIn("archive.save(p)",feed)
+        self.assertIn("archive.unsave(p)",feed)
+        self.assertIn('save.setAttribute("aria-pressed"',feed)
+        self.assertIn("data.save(p)",desk)
 
     def test_field_aware_discovery_preferences(self):
-        home=(ROOT/"index.html").read_text(encoding="utf8")
-        scholar=(ROOT/"scholarly.js").read_text(encoding="utf8")
-        core=(ROOT/"interests.js").read_text(encoding="utf8")
-        self.assertIn('src="./interests.js"',home)
-        self.assertIn('config.FIELDS[key].name.toLowerCase()',home)
-        self.assertIn('rl-source-scholarly',home)
-        self.assertIn('interestsAPI.toggle',scholar)
-        self.assertIn('interest-follow',scholar)
-        self.assertIn('researchlens-interests-by-field-v1',core)
-        self.assertIn('function fieldTopics', (ROOT/"research-fields.js").read_text(encoding="utf8"))
+        prefs=(ROOT/"feed-preferences.js").read_text(encoding="utf8")
+        for page in ("index","feed","workspace"):
+            self.assertIn("./feed-preferences.js",(ROOT/(page+".html")).read_text())
+        self.assertIn("saved?.followed",prefs)
+        self.assertNotIn("axiovo-field-explorer-v1",prefs)
 
 if __name__=="__main__":
     unittest.main()
