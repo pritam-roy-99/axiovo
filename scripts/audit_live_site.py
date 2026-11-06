@@ -131,7 +131,8 @@ def main():
             if not check(page,""):continue
             page.locator(f'[data-archive="{src}"]').click(timeout=12000)
             page.wait_for_url(f"**/{src}.html",timeout=12000)
-            if page.locator("#archive-field").count()!=1:failures.append(f"Archive click failed {src}")
+            picker=page.get_by_role("combobox",name="Archive subject",exact=True)
+            if picker.count()!=1:failures.append(f"Searchable archive subject missing on {src}")
             note("CLICK homepage -> "+src)
             details=page.locator(".ex-personal")
             if details.count():

@@ -94,7 +94,7 @@ def main():
                 for source in ("arxiv","biorxiv","chemrxiv"):
                     page.locator('[data-archive="%s"]'%source).click()
                     page.wait_for_url(lambda url: urlsplit(url).path.endswith("/"+source+".html"))
-                    page.locator("#archive-field").wait_for()
+                    page.get_by_role("combobox",name="Archive subject",exact=True).wait_for()
                     assert page.locator("#archive-topic").count()==1
                     show = page.locator("#archive-show-results")
                     assert show.count()==1,(source,"Results CTA missing")
@@ -121,7 +121,9 @@ def main():
                     assert "all arXiv categories" in page.locator("#archive-scope-label").inner_text()
                     first=page.locator(".ex-paper").first
                     assert "Announced" in first.locator(".rd-small").first.inner_text()
-                    page.locator("#archive-field").select_option("quant-ph")
+                    subject=page.get_by_role("combobox",name="Archive subject",exact=True)
+                    subject.fill("quant-ph")
+                    page.get_by_role("option",name="Quantum Physics · quant-ph",exact=True).click()
                     assert "Quantum Physics" in page.locator("#archive-scope-label").inner_text()
                     assert "Official arXiv release:" in page.locator("#archive-sync-status").inner_text()
                     page.locator("#archive-latest").click()
