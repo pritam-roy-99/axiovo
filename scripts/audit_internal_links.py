@@ -36,9 +36,14 @@ def audit():
     errors = []
     visited = 0
     pages = list(DOCS.glob("*.html"))
+    # Parse HTML once, so fragment links can be checked against destination IDs.
+    parsed = {}
     for html in pages:
         doc = References()
         doc.feed(html.read_text(encoding="utf-8"))
+        parsed[html.resolve()] = doc
+    for html in pages:
+        doc = parsed[html.resolve()]
         duplicate = {x for x in doc.ids if doc.ids.count(x) > 1}
         if duplicate:
             errors.append(f"{html.name}: duplicate HTML IDs: {sorted(duplicate)}")
@@ -46,12 +51,13 @@ def audit():
             url = urlsplit(raw)
             if url.scheme or url.netloc or raw.startswith("//"):
                 continue
-            if not url.path or raw.startswith(("data:", "mailto:", "tel:", "javascript:")):
+            if raw.startswith(("data:", "mailto:", "tel:", "javascript:")):
                 continue
+            # Fragment-only links point to the current document. ./ points to index.html.
             path = unquote(url.path)
             if path.startswith("/"):
                 continue
-            resolved = (html.parent / path).resolve()
+            resolved = (html.parent / (path or html.name)).resolve()
             if not resolved.is_relative_to(DOCS.resolve()):
                 errors.append(f"{html.name}:{line}: unsafe local path {raw}")
                 continue
@@ -63,6 +69,12 @@ def audit():
             visited += 1
             if not resolved.is_file():
                 errors.append(f"{html.name}:{line}: missing {attr} {raw}")
+            elif attr == "href" and url.fragment and resolved.suffix.lower() == ".html":
+                destination = parsed.get(resolved)
+                # Do not invent a target for a valid page with a mistyped anchor.
+                anchor = unquote(url.fragment)
+                if destination is not None and anchor not in destination.ids:
+                    errors.append(f"{html.name}:{line}: missing anchor #{anchor} in {rel}")
     home = (DOCS / "index.html").read_text(encoding="utf-8")
     archives = re.findall(r'data-archive="(arxiv|biorxiv|chemrxiv)"\s+href="([^"]+)"', home)
     if archives != [("arxiv", "./arxiv.html"), ("biorxiv", "./biorxiv.html"), ("chemrxiv", "./chemrxiv.html")]:
