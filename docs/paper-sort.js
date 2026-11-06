@@ -7,10 +7,11 @@
  "use strict";
  const MODES=["relevance","recent","oldest","cited"];
  function when(p){
+  p=p?.paper||p;
   const v=p?.announcementDate||p?.announcement_date||p?.published||p?.date||p?.created||"";
   const t=Date.parse(v);return Number.isFinite(t)?t:null;
  }
- function cited(p){const c=p?.citations;return typeof c==="number"&&Number.isFinite(c)&&c>=0?c:null}
+ function cited(p){p=p?.paper||p;const c=p?.citations;return typeof c==="number"&&Number.isFinite(c)&&c>=0?c:null}
  function sort(items,mode="relevance",score=()=>0){
   if(!MODES.includes(mode))mode="relevance";
   const records=[...(items||[])];
@@ -35,9 +36,9 @@
     const dx=when(a),dy=when(b);
     if(dx!==null&&dy!==null&&dx!==dy)return dy-dx;
    }
-   return String(a?.source||"").localeCompare(String(b?.source||""))||
-     String(a?.id||a?.recordId||"").localeCompare(String(b?.id||b?.recordId||""))||
-     String(a?.title||"").localeCompare(String(b?.title||""));
+   return String((a?.paper||a)?.source||"").localeCompare(String((b?.paper||b)?.source||""))||
+     String((a?.paper||a)?.id||(a?.paper||a)?.recordId||"").localeCompare(String((b?.paper||b)?.id||(b?.paper||b)?.recordId||""))||
+     String((a?.paper||a)?.title||"").localeCompare(String((b?.paper||b)?.title||""));
   });
  }
  function note(items,mode){
