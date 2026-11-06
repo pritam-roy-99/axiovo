@@ -57,13 +57,21 @@ function validateMessages(messages){
  }
  return JSON.stringify(result).length<=30000?result:null;
 }
-async function providerRequest(messages,env){
+// Only audited zero-priced OpenRouter variants may be selected by visitors.
+const FREE_MODELS=new Set([
+ "nvidia/nemotron-3-ultra-550b-a55b:free",
+ "openai/gpt-oss-120b:free",
+ "openrouter/free"
+]);
+async function providerRequest(messages,env,requestedModel){
  const provider=String(env.PROVIDER||"openrouter").toLowerCase();
  if(!Object.hasOwn(UPSTREAM,provider))throw Error("Provider unavailable");
  if(provider!=="openrouter"&&env.ENABLE_PAID_PROVIDERS!=="EXPLICITLY_APPROVED"){
   throw Error("Paid providers are disabled until approved");
  }
- const model=String(env.MODEL||"openrouter/free");
+ const defaultModel=String(env.MODEL||"nvidia/nemotron-3-ultra-550b-a55b:free");
+ const model=provider==="openrouter"&&FREE_MODELS.has(requestedModel)
+   ?requestedModel:defaultModel;
  // openrouter/free is an automatic free-model router; never silently pay for a fallback.
  if(!/^[a-zA-Z0-9][a-zA-Z0-9._:/-]{0,99}$/.test(model))throw Error("Invalid model configuration");
  if(provider==="openrouter"&&model!=="openrouter/free"&&!model.endsWith(":free")){
@@ -121,7 +129,10 @@ export default {
     return reply(403,{error:"Verification failed"},origin);
    }
    if(!(await allowRate(ip,env)))return reply(429,{error:"Daily request limit reached"},origin);
-   const result=await providerRequest(messages,env);
+   const requestedModel=typeof body.model==="string"?body.model:"";
+   if(requestedModel && !FREE_MODELS.has(requestedModel))
+     return reply(400,{error:"Model is not in the free allowlist"},origin);
+   const result=await providerRequest(messages,env,requestedModel);
    if(result.status!==200)return reply(result.status,{error:"Provider temporarily unavailable or quota reached"},origin);
    return reply(200,{answer:result.answer,mode:"source-evidence-assisted",model:result.model,provider:String(env.PROVIDER||"openrouter")},origin);
   }catch(_){
