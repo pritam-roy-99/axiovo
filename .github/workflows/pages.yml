@@ -47,6 +47,7 @@ jobs:
       - name: Test source identity, announcement freshness and precision ranking
         run: |
           node tests/archive-data.test.js
+          node tests/search-recall.test.js
           node tests/search-accuracy.test.js
           node tests/topic-report.test.js
       - name: Check source-backed five-paper comparison extraction
