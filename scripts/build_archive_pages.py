@@ -33,6 +33,7 @@ TEMPLATE = """<!doctype html>
 <script defer src="./archive-data.js"></script>
 <script defer src="./abstract-audio.js"></script>
 <script defer src="./author-follow.js"></script>
+<script defer src="./searchable-select.js"></script>
 <script defer src="./topic-explorer.js"></script>
 <script defer src="./pwa.js"></script>
 </head>
@@ -59,6 +60,7 @@ TEMPLATE = """<!doctype html>
      <p id="archive-topic-find-status" class="rd-sr-only" role="status"></p>
      <div id="archive-topic-suggestions" class="ex-suggestions" hidden></div>
     </form>
+    <p class="rd-small ex-picker-hint">Open a dropdown and type to filter its choices.</p>
     <div class="ex-steps">
      <label for="archive-field"><span class="ex-step-number" aria-hidden="true">1</span> Archive subject</label>
      <select id="archive-field"><option value="">All subjects</option></select>

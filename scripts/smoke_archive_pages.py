@@ -9,8 +9,8 @@ import functools
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from threading import Thread
-from urllib.parse import urlsplit
-from playwright.sync_api import sync_playwright
+from urllib.parse import parse_qs, urlsplit
+from playwright.sync_api import expect, sync_playwright
 
 DOCS=Path(__file__).resolve().parents[1]/"docs"
 PATHS=(
@@ -18,9 +18,85 @@ PATHS=(
  ("biorxiv","biorxiv.html?category=Genomics&topic=transcriptomics&subtopic=spatial-transcriptomics","spatial-transcriptomics"),
  ("chemrxiv","chemrxiv.html?category=Catalysis&topic=electrocatalysis&subtopic=electrochemical-co2-reduction","electrochemical-co2-reduction"),
 )
+PICKER_CASES={
+ "arxiv":(
+  ("q","Quantum Physics · quant-ph","quant-ph"),
+  ("hard","Quantum hardware","quantum-hardware"),
+  ("neutral atom","Neutral atom quantum computing","neutral-atom-quantum-computing"),
+ ),
+ "biorxiv":(
+  ("genom","Genomics","Genomics"),
+  ("transcri","Transcriptomics","transcriptomics"),
+  ("spatial trans","Spatial transcriptomics","spatial-transcriptomics"),
+ ),
+ "chemrxiv":(
+  ("catal","Catalysis","Catalysis"),
+  ("electrocat","Electrocatalysis","electrocatalysis"),
+  ("co2 reduc","Electrochemical CO2 reduction","electrochemical-co2-reduction"),
+ ),
+}
 
 class Quiet(SimpleHTTPRequestHandler):
  def log_message(self,*args):pass
+
+def check_searchable_path(page,base,source,touch):
+ page.goto(base+source+".html?sort=relevance",wait_until="domcontentloaded")
+ expect(page.locator("#archive-topic-input")).to_be_disabled()
+ expect(page.locator("#archive-subfield-input")).to_be_disabled()
+ for field,(query,label,value) in zip(("field","topic","subfield"),PICKER_CASES[source]):
+  native=page.locator("#archive-"+field)
+  picker=page.locator("#archive-"+field+"-input")
+  expect(picker).to_be_enabled()
+  assert not native.is_visible()
+  original=native.input_value()
+  picker.tap() if touch else picker.click()
+  expect(picker).to_have_attribute("aria-expanded","true")
+  popup=page.locator("#archive-"+field+"-listbox")
+  unfiltered=popup.get_by_role("option").count()
+  original_url=page.url
+  picker.fill(query)
+  option=popup.get_by_role("option",name=label,exact=True)
+  expect(option).to_be_visible()
+  assert popup.get_by_role("option").count()<unfiltered,(source,field,query,"Unfiltered menu")
+  assert native.input_value()==original and page.url==original_url,(source,field,"Typing changed the selected path")
+  if touch:
+   option.tap()
+  else:
+   if source=="arxiv" and field=="field":
+    assert popup.get_by_role("option",name="Mathematical Physics · math-ph",exact=True).count()==0
+    active=picker.get_attribute("aria-activedescendant")
+    picker.press("ArrowDown")
+    assert picker.get_attribute("aria-activedescendant")!=active
+    picker.fill("zzzz-no-such-choice")
+    expect(page.get_by_text("No matching choices.")).to_be_visible()
+    picker.press("Enter")
+    assert native.input_value()==original
+    picker.press("Escape")
+    expect(picker).to_have_value("All subjects")
+    expect(picker).to_have_attribute("aria-expanded","false")
+   picker.fill(value.upper())
+   expect(option).to_be_visible()
+   picker.press("Enter")
+  expect(native).to_have_value(value)
+  expect(picker).to_have_value(label)
+  expect(picker).to_have_attribute("aria-expanded","false")
+  assert page.evaluate("document.documentElement.scrollWidth<=innerWidth+7")
+ selected=[choice[2] for choice in PICKER_CASES[source]]
+ params=parse_qs(urlsplit(page.url).query)
+ assert [params.get(key,[None])[0] for key in ("category","topic","subtopic")]==selected
+ page.reload(wait_until="domcontentloaded")
+ expect(page.locator("#archive-subfield-input")).to_have_value(PICKER_CASES[source][-1][1])
+ if touch:
+  subject=page.locator("#archive-field-input")
+  topic=page.locator("#archive-topic-input")
+  subject.tap()
+  expect(subject).to_have_attribute("aria-expanded","true")
+  topic.tap()
+  expect(subject).to_have_attribute("aria-expanded","false")
+  expect(topic).to_have_attribute("aria-expanded","true")
+  page.locator("#ex-guide-title").tap()
+  expect(topic).to_have_attribute("aria-expanded","false")
+  expect(page.locator("#archive-subfield")).to_have_value(selected[-1])
 
 def main():
  server=ThreadingHTTPServer(("127.0.0.1",0),functools.partial(Quiet,directory=str(DOCS)))
@@ -31,7 +107,7 @@ def main():
   with sync_playwright() as pw:
    browser=pw.chromium.launch(headless=True,args=["--no-sandbox","--disable-dev-shm-usage"])
    for width in (390,1360):
-    context=browser.new_context(viewport={"width":width,"height":850},service_workers="block")
+    context=browser.new_context(viewport={"width":width,"height":850},service_workers="block",has_touch=width==390)
     page=context.new_page()
     page.set_default_timeout(15000)
     for source,path,subtopic in PATHS:
@@ -63,11 +139,13 @@ def main():
       page.locator("#archive-search-form").evaluate("(form)=>form.requestSubmit()")
       page.get_by_text("The start must be on or before the end",exact=False).first.wait_for()
       checks+=1
+     check_searchable_path(page,base,source,touch=width==390)
+     checks+=1
     context.close()
    browser.close()
  finally:
   server.shutdown()
- print("PASS: %s archive workflow checks across three sources, with saving and date validation."%checks,flush=True)
+ print("PASS: %s archive workflow checks across three sources, including typed filters, touch, keyboard, saving and dates."%checks,flush=True)
 
 if __name__=="__main__":
  main()
