@@ -16,7 +16,7 @@
 <script defer src="./navigation.js"></script>
 <script defer src="./arxiv-versions.js"></script>
 <script defer src="./arxiv-daily-archive.js"></script>
-<script defer src="./archive-data.js"></script>
+<script defer src="./archive-data.js"></script><script defer src="./paper-sort.js"></script>
 <script defer src="./author-follow.js"></script><script defer src="./abstract-audio.js"></script>
 <script defer src="./zotero-ris.js"></script>
 <script defer src="./evidence-extract.js"></script>
@@ -49,7 +49,7 @@
     <div class="rd-filter-grid">
      <label>Author<input id="rd-author" type="search" maxlength="100" placeholder="Given name or surname"></label>
      <label>Date range<select id="rd-range"><option value="any">Any indexed date</option><option value="week">Past 7 days</option><option value="custom">Specific dates</option></select></label>
-     <label>Sort<select id="rd-sort"><option value="relevance">Relevance</option><option value="recent">Newest first</option></select></label>
+     <label>Sort<select id="rd-sort"><option value="relevance">Relevance</option><option value="recent">Newest first</option><option value="oldest">Oldest first</option><option value="cited">Most cited (known counts)</option></select></label>
     </div>
     <div class="rd-filter-grid" id="rd-custom-dates" hidden>
      <label>From<input id="rd-from" type="date"></label>
@@ -63,7 +63,8 @@
  <div class="rd-layout">
   <section class="rd-results" aria-labelledby="rd-results-heading">
    <div class="rd-section-heading"><div><p class="rd-kicker">SOURCE BY SOURCE</p><h2 id="rd-results-heading">Results</h2></div><a class="rd-text-link" href="./methodology.html">How coverage works ↗</a></div>
-   <div id="rd-source-jumps" class="rd-source-jumps"></div>
+   <div class="paper-sort-toolbar"><label for="rd-results-sort">Order displayed papers</label><select id="rd-results-sort" aria-label="Order Research Desk results"><option value="relevance">Most relevant</option><option value="recent">Newest first</option><option value="oldest">Oldest first</option><option value="cited">Most cited (known counts)</option></select><span id="rd-sort-note" class="rd-small" role="status"></span></div>
+    <div id="rd-source-jumps" class="rd-source-jumps"></div>
    <div id="rd-results" class="rd-results-stack">
     <div class="rd-panel rd-empty"><strong>Start with a research question</strong><p>Search across archives, or browse a subject directly.</p><div class="rd-source-jumps"><a href="./arxiv.html">arXiv</a><a href="./biorxiv.html">bioRxiv</a><a href="./chemrxiv.html">ChemRxiv</a></div></div>
    </div>
