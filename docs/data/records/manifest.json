@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "source": "Axiovo official-source snapshots",
+  "note": "Counts describe indexed records only, not archive-wide totals.",
+  "archives": {
+    "arxiv": {
+      "input_records": 6009,
+      "invalid_or_unavailable": 0,
+      "last_sync": "2026-11-06T00:15:21.600725+00:00",
+      "coverage": "available source snapshots, not a complete historical archive"
+    },
+    "biorxiv": {
+      "input_records": 60,
+      "invalid_or_unavailable": 0,
+      "last_sync": "2026-11-05T10:49:53+00:00",
+      "coverage": "available source snapshots, not a complete historical archive"
+    },
+    "chemrxiv": {
+      "input_records": 305,
+      "invalid_or_unavailable": 0,
+      "last_sync": "2026-11-06T00:13:52.606736+00:00",
+      "coverage": "available source snapshots, not a complete historical archive"
+    }
+  },
+  "shards": {
+    "arxiv/2026-11.json": 3657,
+    "biorxiv/2026-10.json": 60,
+    "chemrxiv/2018-10.json": 1,
+    "chemrxiv/2020-06.json": 1,
+    "chemrxiv/2022-08.json": 1,
+    "chemrxiv/2023-01.json": 1,
+    "chemrxiv/2026-09.json": 1,
+    "chemrxiv/2026-11.json": 300
+  },
+  "record_count": 4022
+}
