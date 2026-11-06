@@ -10,7 +10,7 @@ const fixture={
   published:"2026-11-05",categories:["quant-ph"]
  }]},
  "oai-recent.json":{papers:[]},
- "announcements.json":{announcement_date:"2026-11-06",checked_at:"2026-11-06T05:00:00Z",
+ "announcements.json":{date_type:"announcement",announcement_date:"2026-11-06",checked_at:"2026-11-06T05:00:00Z",count:1,
   complete:true,papers:[{id:"2611.00002",title:"Lieb-Robinson bounds for information propagation",
    abstract:"Rigorous spin propagation bounds",categories:["math-ph"],announcement_date:"2026-11-06",
    metadata_source:"official arXiv RSS"}]}
@@ -29,6 +29,13 @@ for(const file of ["arxiv-versions.js","archive-data.js"])
 const data=root.AxiovoArchiveData;
 (async()=>{
  const snapshot=await data.snapshot("arxiv");
+ const latest=await data.latestArxivAnnouncement();
+ assert.equal(latest.date,"2026-11-06");
+ assert.equal(latest.papers.length,1);
+ assert.equal(latest.papers[0].announcementDate,"2026-11-06");
+ assert.equal(latest.papers[0].date,"","Announcement date cannot be used as first submission date");
+ assert.equal(latest.complete,true,"Official batch completeness must require exact record count");
+
  assert.equal(snapshot.papers.length,2,"Announcements must be searchable alongside earlier indexed metadata");
  const announced=snapshot.papers.find(x=>x.id==="2611.00002");
  assert.equal(announced.announcementDate,"2026-11-06");
