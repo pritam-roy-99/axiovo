@@ -230,7 +230,7 @@ async function refresh(){
  $("feed-status").textContent="Checking current archive snapshots…";
  try{
   const names=["arxiv","biorxiv","chemrxiv"];
-  const outcomes=await Promise.allSettled(names.map(source=>archive.snapshot(source)));
+  const outcomes=await Promise.allSettled(names.map(source=>archive.snapshot(source,{force:true})));
   if(run!==state.refreshId)return;
   state.sourceErrors=[];const records=[],timestamps=[];
   outcomes.forEach((entry,i)=>{
