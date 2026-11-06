@@ -133,7 +133,10 @@ class DailyArchiveTests(unittest.TestCase):
             ar.manual_days(dt.datetime.now(dt.timezone.utc).date().isoformat(), dt.datetime.now(dt.timezone.utc).date().isoformat())
 
     def test_next_missing_days_backfilled(self):
-        days=ar.select_days(dt.date(2026,11,5),{"days":{"2026-11-02":{"complete":True}}},count=5)
+        # Isolate the historical-scanning test from a live published repair
+        # queue. Repair priority is tested separately in test_literature_coverage.
+        with tempfile.TemporaryDirectory() as tmp, patch.object(ar,"ROOT",Path(tmp)):
+            days=ar.select_days(dt.date(2026,11,5),{"days":{"2026-11-02":{"complete":True}}},count=5)
         self.assertEqual(days[:4],[dt.date(2026,11,4),dt.date(2026,11,3),dt.date(2026,11,2),dt.date(2026,11,1)])
         self.assertEqual(len(days),5)
 
