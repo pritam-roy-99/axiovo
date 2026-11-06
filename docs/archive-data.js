@@ -145,7 +145,7 @@ function matchScore(p,c){
 function filter(papers,criteria){
  return papers.map(p=>({p,score:matchScore(p,criteria)})).filter(row=>row.score!==null).sort(({p:a,score:x},{p:b,score:y})=>
   (criteria.sort==="cited"?(b.citations??-1)-(a.citations??-1):criteria.sort==="recent"?0:y-x)
-  ||(b.date||b.announcementDate||"").localeCompare(a.date||a.announcementDate||"")||a.title.localeCompare(b.title)).map(row=>row.p);
+  ||(criteria.sort==="recent"?(b.announcementDate||b.date||"").localeCompare(a.announcementDate||a.date||""):(b.date||b.announcementDate||"").localeCompare(a.date||a.announcementDate||""))||a.title.localeCompare(b.title)).map(row=>row.p);
 }
 async function request(url,signal,json=true){
  const timeout=AbortSignal.timeout(11000);
@@ -171,6 +171,25 @@ async function snapshot(source){
   })));
  }
  return snapshots.get(source);
+}
+/* Official announcement batch. A released paper may have been first submitted
+ * on another UTC date, so NEVER filter this by p.date or silently treat a
+ * submission-day shard as the announced release.
+ */
+async function latestArxivAnnouncement(signal){
+ const response=await fetch("./data/announcements.json",{
+  cache:"no-store",signal:signal?AbortSignal.any([signal,AbortSignal.timeout(18000)]):AbortSignal.timeout(18000)
+ });
+ if(!response.ok)throw Error("arXiv announcement HTTP "+response.status);
+ const payload=await response.json();
+ if(payload.date_type!=="announcement"||!/^\\d{4}-\\d{2}-\\d{2}$/.test(payload.announcement_date)||
+    !Array.isArray(payload.papers))throw Error("Invalid official announcement snapshot");
+ // The latest date is a US Eastern announcement date, not the v1 UTC date.
+ const papers=payload.papers.filter(p=>p.announcement_date===payload.announcement_date)
+  .map(p=>normalize("arxiv",p)).filter(Boolean);
+ return {date:payload.announcement_date,checkedAt:clean(payload.checked_at),
+  total:payload.count,complete:payload.complete===true&&papers.length===payload.count,
+  papers,source:clean(payload.source)};
 }
 async function datedArxiv(criteria,signal){
  if(!criteria.from||!criteria.to||!root.AxiovoDailyArchive)return null;
@@ -332,6 +351,6 @@ function addComparison(p){
 function removeComparison(p){
  return write(COMPARISON,comparison().filter(item=>recordKey(item)!==recordKey(p)));
 }
-root.AxiovoArchiveData={names,clean,simple,read,write,normalize,workKey,recordKey,merge,filter,topicHit,categoryMatch,identifier,snapshot,datedArxiv,live,sourceLink,
+root.AxiovoArchiveData={names,clean,simple,read,write,normalize,workKey,recordKey,merge,filter,topicHit,categoryMatch,identifier,snapshot,latestArxivAnnouncement,datedArxiv,live,sourceLink,
  saved,save,unsave,savedRecords,parseDOI,comparison,addComparison,removeComparison};
 })(window);
