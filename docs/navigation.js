@@ -9,9 +9,14 @@
   const nav=document.createElement("nav");nav.className="rl-nav";nav.setAttribute("aria-label","Main navigation");
   const file=location.pathname.split("/").pop()||"index.html";
   const archivePage=["arxiv.html","biorxiv.html","chemrxiv.html"].includes(file);
-  const links=[["./#axiovo-archive-title","Explore"],["./desk.html","Research Desk"],["./workspace.html","Library"],["./copilot.html","Research Assistant"]];
-  for(const [href,label] of links){
-   const a=document.createElement("a");a.href=href;a.textContent=label;
+  const links=[
+   ["./#axiovo-archive-title","Explore","Browse research subjects and preprint archives"],
+   ["./desk.html","Research Desk","Search arXiv, bioRxiv and ChemRxiv together"],
+   ["./workspace.html","Library","View saved papers, notes and research collections"],
+   ["./copilot.html","Research Assistant","Inspect papers and compare source-linked evidence"]
+  ];
+  for(const [href,label,purpose] of links){
+   const a=document.createElement("a");a.href=href;a.textContent=label;a.title=purpose;a.setAttribute("aria-label",label+": "+purpose);
    const target=href.split("#")[0].slice(2);
    if((archivePage&&href.includes("#"))||file===target)a.setAttribute("aria-current","page");
    nav.append(a);
@@ -35,7 +40,12 @@
    back.textContent="← Back";back.setAttribute("aria-label","Go to previous page, or Axiovo homepage");
    back.onclick=()=>{
     let sameOrigin=false;
-    try{sameOrigin=Boolean(document.referrer)&&new URL(document.referrer).origin===location.origin}catch{}
+    try{
+     const previous=new URL(document.referrer);
+     const appBase=new URL("./",location.href);
+     sameOrigin=Boolean(document.referrer)&&previous.origin===appBase.origin
+      &&previous.pathname.startsWith(appBase.pathname);
+    }catch{}
     if(sameOrigin&&history.length>1)history.back();
     else location.assign(new URL("./",location.href).href);
    };
