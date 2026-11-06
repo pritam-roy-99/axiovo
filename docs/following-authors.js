@@ -58,7 +58,7 @@ async function openAlexAuthorPapers(name,signal){
    const query=new URLSearchParams({
     filter:"authorships.author.id:"+identifier,per_page:"100",page:String(page),
     sort:"publication_date:desc",
-    select:"id,display_name,publication_date,authorships,locations,primary_location,best_oa_location,abstract_inverted_index"});
+    select:"id,display_name,publication_date,cited_by_count,authorships,locations,primary_location,best_oa_location,abstract_inverted_index"});
    const works=await fetch(endpoint+"/works?"+query,{headers:{Accept:"application/json"},signal});
    if(!works.ok)break;
    const published=(await works.json()).results||[];
@@ -75,7 +75,7 @@ async function openAlexAuthorPapers(name,signal){
     // Publication dates reported by OpenAlex are not necessarily arXiv v1 dates.
     const paper=data.normalize("arxiv",{
      id:arxiv.requested,title:work.display_name,authors:authorNames,
-     date:work.publication_date,
+     date:work.publication_date,citations:Number.isInteger(work.cited_by_count)?work.cited_by_count:null,
      abstract:positioned.filter(Boolean).join(" ").slice(0,5000),
      provenance:"OpenAlex author identity, arXiv-linked work"});
     if(paper)papers.push(paper);
