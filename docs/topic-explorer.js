@@ -294,6 +294,49 @@ async function loadLive(state,more=false){
  }
  state.loading=false;drawResults(state);
 }
+/* Announced releases are explicitly separate from UTC first-submission
+ * search. This view shows all official arXiv announcement records across
+ * categories, not an empty/older first-submission day.
+ */
+async function showLatestAnnouncement(){
+ if(source!=="arxiv")return;
+ const stamp=++datePreset;
+ search?.controller.abort();
+ selected=pathFrom({});
+ drawPath();
+ $("query").value="";$("author").value="";$("affiliation").value="";
+ $("from").value="";$("to").value="";
+ if($("crosslisted"))$("crosslisted").checked=false;
+ $("sort").value="recent";
+ $("scope-label").textContent="Scope: latest official announcement · all arXiv categories.";
+ const c=criteriaFromForm();
+ const state=search={controller:new AbortController(),criteria:c,local:[],batch:[],remote:[],visible:12,next:null,
+  loading:true,failed:false,complete:false,announcementOnly:true,
+  coverage:"",message:"Loading the latest official arXiv announcement (all categories)…"};
+ const url=new URL(location.href);url.search=new URLSearchParams({announced:"latest"});
+ history.replaceState(null,"",url);
+ drawResults(state);
+ try{
+  const batch=await data.latestArxivAnnouncement(state.controller.signal);
+  if(stamp!==datePreset||state!==search||state.controller.signal.aborted)return;
+  state.local=batch.papers;
+  state.loading=false;
+  state.complete=false;
+  const indiaDay=new Date(Date.parse(batch.date+"T00:00:00Z")+86400000).toISOString().slice(0,10);
+  state.message="Official arXiv release: "+batch.date+" (US Eastern), shown as "+indiaDay+
+    " in India · "+batch.papers.length.toLocaleString()+" source-linked records."+
+    (batch.complete?" All official archive RSS feeds were verified.":" Partial source coverage; not all archive feeds were verified.")+
+    " This is the announcement date, not the first-submission date.";
+  drawResults(state);
+  $("results-heading").scrollIntoView({behavior:"smooth",block:"start"});
+ }catch(e){
+  if(stamp!==datePreset||state!==search||state.controller.signal.aborted)return;
+  state.loading=false;state.failed=false;
+  state.message="Could not load the official announced release. Please retry or open the original arXiv listing.";
+  drawResults(state);
+  $("result-actions").prepend(button("Retry today's release",showLatestAnnouncement));
+ }
+}
 async function runSearch({persist=true}={}){
  const c=criteriaFromForm();
  search?.controller.abort();
@@ -368,6 +411,7 @@ $("topic-find").onkeydown=e=>{
 $("search-form").onsubmit=e=>{e.preventDefault();datePreset++;runSearch()};
 $("sort").onchange=()=>{datePreset++;runSearch()};
 $("date-open").onclick=()=>{$("advanced").open=true;$("from").focus()};
+$("announced")?.addEventListener("click",showLatestAnnouncement);
 $("latest").onclick=()=>{
  datePreset++;$("from").value=$("to").value="";$("sort").value="recent";runSearch();
 };
@@ -424,7 +468,8 @@ fetch("./data/topics/"+source+".tsv",{signal:AbortSignal.timeout(6500)})
  .catch(()=>{$("taxonomy-count").textContent="Topic directory unavailable · subject search is still available";$("topic").options[0].textContent="Topic directory unavailable"})
  .finally(()=>{
   const needsBioScope=source==="biorxiv"&&selected.category&&($("query").value||$("author").value);
-  if(!search||selected.topic||selected.refine||needsBioScope)runSearch({persist:false});
+  if(!(source==="arxiv"&&params.get("announced")==="latest")&&(!search||selected.topic||selected.refine||needsBioScope))runSearch({persist:false});
  });
-if(!selected.topic&&!selected.refine)runSearch({persist:false});
+if(source==="arxiv"&&params.get("announced")==="latest")showLatestAnnouncement();
+else if(!selected.topic&&!selected.refine)runSearch({persist:false});
 })();
