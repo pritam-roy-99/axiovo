@@ -8,7 +8,8 @@ if(!core||!archive||!prefsAPI||!$("feed-results"))return;
 const HIDDEN="axiovo-feed-hidden-v1";
 const state={papers:[],items:[],view:"for-you",limit:12,loading:false,expanded:false,
  lastHidden:null,sourceErrors:[],refreshId:0};
-const read=(key,fallback)=>prefsAPI.read(localStorage,key,fallback);
+const read=(key,fallback)=>{try{return prefsAPI.read(localStorage,key,fallback)}catch{return fallback}};
+const asArray=value=>Array.isArray(value)?value:[];
 const write=(key,val)=>{try{localStorage.setItem(key,JSON.stringify(val));return true}catch{return false}};
 function el(parent,tag,text="",cls=""){
  const n=document.createElement(tag);n.textContent=String(text||"");
@@ -22,7 +23,7 @@ function anchor(parent,title,url,cls=""){
 function notify(message){$("feed-follow-status").textContent=message}
 function preferences(){
  const data=prefsAPI.derive(localStorage);
- const saved=[...read("axiovo-reading-list",[])].map(x=>"arxiv:"+String(x).toLowerCase().replace(/v\d+$/,""));
+ const saved=asArray(read("axiovo-reading-list",[])).map(x=>"arxiv:"+String(x).toLowerCase().replace(/v\d+$/,""));
  const refs=["arxiv","biorxiv","chemrxiv"].flatMap(source=>archive.savedRecords(source));
  return {...data,saved,hidden:read(HIDDEN,[]),references:refs.slice(0,20),
   matchesAuthor:(a,b)=>Boolean(follow?.matchesName(a,b))||String(a).toLowerCase()===String(b).toLowerCase()};
@@ -39,8 +40,8 @@ function displayPreferences(prefs){
    el(row,"span",value);
    // A saved Discover path is managed in Discover, while a directly followed
    // topic is reversible here. Never silently delete another page's setting.
-   const manual=(id==="feed-followed-topics"&&read(prefsAPI.TOPICS,[]).some(x=>x.toLowerCase()===value.toLowerCase()));
-   const directAuthor=(id==="feed-followed-authors"&&follow?.list().some(x=>x.toLowerCase()===value.toLowerCase()));
+   const manual=(id==="feed-followed-topics"&&asArray(read(prefsAPI.TOPICS,[])).some(x=>typeof x==="string"&&x.toLowerCase()===value.toLowerCase()));
+   const directAuthor=(id==="feed-followed-authors"&&asArray(follow?.list()).some(x=>typeof x==="string"&&x.toLowerCase()===value.toLowerCase()));
    if(!manual&&!directAuthor)continue;
    const button=el(row,"button","×","feed-chip-remove");button.type="button";
    button.setAttribute("aria-label","Unfollow "+value);
@@ -60,7 +61,7 @@ function statusText(papers){
 function dateString(p){
  return p.announcementDate?("Announced "+p.announcementDate):p.date?("Posted "+p.date):"Date unverified";
 }
-function getHidden(){return read(HIDDEN,[])}
+function getHidden(){return asArray(read(HIDDEN,[]))}
 function updateHidden(id,hide){
  const set=new Set(getHidden());
  if(hide)set.add(id);else set.delete(id);
@@ -239,11 +240,14 @@ async function refresh(){
    records.push(...(entry.value.papers||[]));
    if(entry.value.stamp)timestamps.push(entry.value.stamp);
   });
-  state.papers=archive.merge(records);
+  if(records.length)state.papers=archive.merge(records);
   $("feed-pulse-synced").textContent=timestamps.length?
    "Last indexed snapshot: "+timestamps.sort().at(-1).slice(0,16).replace("T"," "):"Published snapshot dates unavailable";
   recalculate();
   try{await discoverAuthors(signal)}catch{ /* Source snapshots remain usable. */ }
+ }catch(error){
+  notify("Could not refresh all source snapshots. Existing personalized papers are preserved.");
+  state.sourceErrors=["Temporary refresh error"];
  }finally{
   if(run===state.refreshId){state.loading=false;$("feed-refresh").disabled=false;recalculate()}
  }
