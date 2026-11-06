@@ -109,6 +109,7 @@ def harvest(from_date: str, max_pages: int = 6) -> tuple[list[dict], bool]:
     """Returns (records, completed). Partial pages aren't mistaken for a full crawl."""
     collected = []
     token = ""
+    seen_tokens = set()
     for page in range(max_pages):
         params = {"verb": "ListRecords", "resumptionToken": token} if token else {
             "verb": "ListRecords", "metadataPrefix": "arXiv", "from": from_date
@@ -119,6 +120,9 @@ def harvest(from_date: str, max_pages: int = 6) -> tuple[list[dict], bool]:
         collected.extend(records)
         if not token:
             return collected, True
+        if len(token) > 4096 or token in seen_tokens:
+            raise RuntimeError("Repeated or invalid OAI continuation token; verified snapshot preserved")
+        seen_tokens.add(token)
         time.sleep(3.5)
     return collected, False
 
