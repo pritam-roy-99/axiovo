@@ -26,12 +26,29 @@ function addSources(records,appendMode=false){
 }
 function renderSources(){
  const root=$("evidence-list");root.replaceChildren();$("source-count").textContent=String(sources.length);
- sources.forEach((s,i)=>{const item=append("article","",root,"source");const n=append("span","["+(i+1)+"]",item,"number");append("span"," "+s.provider+" · "+(s.date||"undated"),item,"tiny");
- const a=append("a",s.title,item);a.href=s.url;a.target="_blank";a.rel="noopener noreferrer";
- if(s.authors.length)append("p",s.authors.slice(0,4).join(", ")+(s.authors.length>4?", et al.":""),item);
- if(s.abstract)append("p",s.abstract.slice(0,240)+(s.abstract.length>240?"…":""),item);
- window.AxiovoAuthorFollow?.attach(item,s.authors);
- });
+ function render(limit){
+  root.replaceChildren();
+  sources.slice(0,limit).forEach((s,i)=>{
+   const item=append("article","",root,"source");
+   append("span","["+(i+1)+"]",item,"number");
+   append("span"," "+s.provider+" · "+(s.date||"date unknown").slice(0,10),item,"tiny");
+   const a=append("a",s.title,item);a.href=s.url;a.target="_blank";a.rel="noopener noreferrer";
+   if(s.authors.length)append("p",s.authors.slice(0,3).join(", ")+(s.authors.length>3?" et al.":""),item);
+   const details=document.createElement("details");details.className="assistant-source-details";
+   append("summary","Abstract and author actions",details);
+   if(s.abstract)append("p",s.abstract.slice(0,900)+(s.abstract.length>900?"…":""),details);
+   window.AxiovoAuthorFollow?.attach(details,s.authors);
+   item.append(details);
+  });
+  if(limit<sources.length){
+   const more=append("button","Show all "+sources.length+" sources",root,"rd-button rd-secondary assistant-more-sources");
+   more.type="button";more.onclick=()=>render(sources.length);
+  }else if(sources.length>4){
+   const less=append("button","Show fewer sources",root,"rd-button rd-secondary assistant-more-sources");
+   less.type="button";less.onclick=()=>render(4);
+  }
+ }
+ render(Math.min(sources.length,4));
 }
 function message(role,content){
  const box=append("div","",$("conversation"),"message "+role);
@@ -66,8 +83,8 @@ function validateCitations(value){
  return unknown.length?text+"\n\nWarning: model cited unknown source numbers "+[...new Set(unknown)].join(", ")+". Verify its citations.":text
 }
 function evidenceText(query){
- if(!sources.length)return "No papers matched the indexed records for this query. Try a more specific term or search more arXiv records.";
- return sources.length+" candidate papers for “"+query+"”. Open the source records to compare methods, assumptions and results.";
+ return Core?.evidenceAnswer?Core.evidenceAnswer(query,sources):
+  "Source evidence could not be summarized. Check the original records.";
 }
 async function findPaper(id){
  const parsed=window.AxiovoArxiv?.parse(id);
