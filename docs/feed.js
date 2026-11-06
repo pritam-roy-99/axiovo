@@ -228,28 +228,44 @@ async function discoverAuthors(signal,requestedName=""){
 async function refresh(){
  if(state.loading)return;
  state.loading=true;$("feed-refresh").disabled=true;
- const run=++state.refreshId,signal=AbortSignal.timeout(18000);
- $("feed-status").textContent="Checking current archive snapshots…";
+ const run=++state.refreshId;
+ const signal=AbortSignal.timeout(22000);
+ $("feed-status").textContent="Checking source snapshots; matching papers appear as each archive responds…";
+ let received=0;const missing=[],timestamps=[],collected=[];
  try{
-  const names=["arxiv","biorxiv","chemrxiv"];
-  const outcomes=await Promise.allSettled(names.map(source=>archive.snapshot(source,{force:true})));
+  const sources=["arxiv","biorxiv","chemrxiv"];
+  await Promise.all(sources.map(async source=>{
+   try{
+    const snap=await archive.snapshot(source,{force:true});
+    if(run!==state.refreshId)return;
+    const rows=Array.isArray(snap?.papers)?snap.papers:[];
+    collected.push(...rows);
+    received++;
+    if(snap.stamp)timestamps.push(snap.stamp);
+    state.papers=archive.merge(state.papers,rows);
+    state.sourceErrors=[...missing];
+    recalculate();
+    $("feed-status").textContent="Loaded "+received+" of 3 archives; "+state.items.length+
+      " personalized matches. Additional source metadata may still be loading.";
+   }catch{
+    missing.push(source);
+    if(run===state.refreshId){
+     state.sourceErrors=[...missing];
+     recalculate();
+    }
+   }
+  }));
   if(run!==state.refreshId)return;
-  state.sourceErrors=[];const records=[],timestamps=[];
-  outcomes.forEach((entry,i)=>{
-   if(entry.status!=="fulfilled"){state.sourceErrors.push(names[i]);return}
-   records.push(...(entry.value.papers||[]));
-   if(entry.value.stamp)timestamps.push(entry.value.stamp);
-  });
-  if(records.length)state.papers=archive.merge(records);
   $("feed-pulse-synced").textContent=timestamps.length?
-   "Last indexed snapshot: "+timestamps.sort().at(-1).slice(0,16).replace("T"," "):"Published snapshot dates unavailable";
-  recalculate();
-  try{await discoverAuthors(signal)}catch{ /* Source snapshots remain usable. */ }
- }catch(error){
-  notify("Could not refresh all source snapshots. Existing personalized papers are preserved.");
-  state.sourceErrors=["Temporary refresh error"];
+   "Latest indexed snapshot: "+timestamps.sort().at(-1).slice(0,16).replace("T"," "):
+   "Published snapshot date unavailable";
+  try{await discoverAuthors(signal)}catch{ /* Locally indexed metadata remains useful. */ }
+ }catch{
+  notify("The source refresh encountered a network problem. Your existing feed remains available.");
  }finally{
-  if(run===state.refreshId){state.loading=false;$("feed-refresh").disabled=false;recalculate()}
+  if(run===state.refreshId){
+   state.loading=false;$("feed-refresh").disabled=false;recalculate();
+  }
  }
 }
 async function searchMore(){
