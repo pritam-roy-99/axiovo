@@ -39,6 +39,21 @@ class ContractTests(unittest.TestCase):
         with self.assertRaisesRegex(InvalidRecord,"conflicting_arxiv_versions"):
             normalize_record("arxiv",{"id":"2611.00001v1","version":2,"title":"Paper"},provider="oai")
 
+
+    def test_same_revision_dates_are_complementary_but_conflicts_are_visible(self):
+        one=normalize_record("arxiv",{"id":"2611.00001v2","title":"Paper",
+            "published":"2026-11-05"},provider="atom")
+        two=normalize_record("arxiv",{"id":"2611.00001v2","title":"Paper",
+            "announcement_date":"2026-11-06"},provider="rss")
+        combined=choose_same_revision(one,two)
+        self.assertEqual(combined["submitted_date"],"2026-11-05")
+        self.assertEqual(combined["announced_date"],"2026-11-06")
+        conflicting=normalize_record("arxiv",{"id":"2611.00001v2","title":"Changed paper",
+            "published":"2026-11-04"},provider="oai")
+        flagged=choose_same_revision(combined,conflicting)
+        self.assertIn("source_disagreement:submitted_date",flagged["validation"]["warnings"])
+        self.assertIn("source_disagreement:title",flagged["validation"]["warnings"])
+
     def test_invalid_identifiers_rejected(self):
         for source,raw in [
             ("arxiv",{"id":"arxiv:invented","title":"Paper"}),
