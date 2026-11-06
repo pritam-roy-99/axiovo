@@ -7,7 +7,7 @@
  if(root)root.AxiovoRelevance=api;
 })(typeof globalThis!=="undefined"?globalThis:null,function(){
  "use strict";
- const STOP=new Set(["the","and","with","for","from","into","this","that","these","those","using","based","under","over","between","through","toward","towards","study","studies","paper","new","via","our","their","are","was","were","has","have","how","can","does","when","which","what","quantum","research"]);
+ const STOP=new Set(["the","and","with","for","from","into","this","that","these","those","using","based","under","over","between","through","toward","towards","study","studies","paper","new","via","our","their","are","was","were","has","have","how","can","does","when","which","what","research"]);
  function tokens(value){return [...new Set(String(value||"").toLowerCase().normalize("NFKC").match(/[a-z0-9]+/g)||[])].filter(t=>t.length>2&&!STOP.has(t)).slice(0,45)}
  function phrase(value){return String(value||"").toLowerCase().replace(/[^a-z0-9]+/g," ").trim()}
  function matches(terms,text){const bag=new Set(tokens(text));return terms.filter(t=>bag.has(t))}
@@ -18,7 +18,10 @@
    const projects=Array.isArray(settings.projects)?settings.projects.filter(Boolean):[];
    const saved=new Set((settings.saved||[]).map(normalizeId));
    const excluded=new Set((settings.hidden||[]).map(normalizeId));
-   const authors=(settings.authors||[]).map(x=>phrase(x)).filter(Boolean);
+   const namedAuthors=Array.isArray(settings.authors)?settings.authors.filter(Boolean):[];
+   const authors=namedAuthors.map(phrase);
+   // Do not allow one incidental word to qualify a multi-concept topic.
+   const sufficient=(found,terms)=>found.size>=(terms.length===1?1:Math.max(2,Math.ceil(terms.length*.6)));
    const now=Date.parse(settings.now||new Date().toISOString());
    return (papers||[]).filter(p=>p&&p.id&&!excluded.has(normalizeId(p.id))).map(p=>{
      const title=String(p.title||"");
@@ -29,7 +32,7 @@
        const ts=tokens(interest);if(!ts.length)continue;
        const a=matches(ts,title),b=matches(ts,abstract),c=matches(ts,(p.topics||[]).join(" "));
        const found=new Set([...a,...b,...c]);
-       if(!found.size)continue;
+       if(!sufficient(found,ts))continue;
        const weight=found.size/ts.length;
        score+=Math.round(10*weight+(a.length?5:0)+(c.length?4:0));
        reasons.push("Matches interest: "+interest);
@@ -38,12 +41,14 @@
        const value=project.keywords||project.title||"";
        const ts=tokens(value);if(!ts.length)continue;
        const overlap=new Set([...matches(ts,title),...matches(ts,abstract)]);
-       if(overlap.size){
+       if(sufficient(overlap,ts)){
          score+=Math.round(15*overlap.size/ts.length+(matches(ts,title).length?5:0));
          reasons.push("Related terms: "+project.title);
        }
      }
-     const named=(p.authors||[]).some(name=>authors.some(a=>phrase(name)===a));
+     const named=(p.authors||[]).some(name=>namedAuthors.some((author,i)=>
+       phrase(name)===authors[i]||
+       (typeof settings.matchesAuthor==="function"&&settings.matchesAuthor(author,name))));
      if(named){score+=15;reasons.push("Followed author")}
      const id=normalizeId(p.id);
      if(saved.has(id)){score-=25;reasons.push("Already saved")}
