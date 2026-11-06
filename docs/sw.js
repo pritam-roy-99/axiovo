@@ -1,9 +1,9 @@
 /* Axiovo offline shell. Scholarly metadata, video and PDFs stay network-only. */
 "use strict";
-const CACHE = "axiovo-shell-v56";
+const CACHE = "axiovo-shell-v57";
 const SHELL = [
   "./", "./index.html", "./desk.html", "./feed.html", "./workspace.html", "./arxiv.html", "./biorxiv.html", "./chemrxiv.html",
-  "./theme.css", "./axiovo-shell.css", "./theme.js", "./research-entry.css", "./research-entry.js",
+  "./theme.css", "./axiovo-shell.css", "./home-landing.css?v=20261107-unified2", "./home-tour.js?v=20261107-unified2", "./theme.js", "./research-entry.css", "./research-entry.js",
   "./navigation.js", "./pwa.js", "./paper-sort.js", "./feed.js", "./feed-core.js", "./feed-preferences.js", "./feed-preview.js", "./feed.css", "./topic-explorer.css", "./topic-explorer.js", "./topic-atlas.js",
   "./archive-taxonomy.js", "./archive-data.js", "./arxiv-daily-archive.js", "./arxiv-versions.js", "./searchable-select.js",
   "./data/topics/arxiv.tsv", "./data/topics/biorxiv.tsv", "./data/topics/chemrxiv.tsv",
