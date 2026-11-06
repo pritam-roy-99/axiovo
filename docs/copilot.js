@@ -107,15 +107,27 @@ function paperSummary(p,draft){
   ...(claims.length?claims.map(sentence=>"• "+sentence):[abstract.slice(0,2000)]),"",
   "Read the full paper to check the stated assumptions, how the results were obtained, and which regimes the conclusions cover."].join("\n");
 }
-async function openalex(query,keep=false){
- rstatus("Searching OpenAlex scholarly metadata…");
- const params=new URLSearchParams({search:query.slice(0,220),filter:"locations.source.id:S4306400194",per_page:"12",select:"id,display_name,publication_year,publication_date,doi,authorships,locations,primary_location,best_oa_location,abstract_inverted_index"});
- const res=await fetch("https://api.openalex.org/works?"+params.toString(),{headers:{Accept:"application/json"},signal:AbortSignal.timeout(18000)});
+async function openalex(query){
+ rstatus("Searching public scholarly metadata for relevant papers…");
+ const params=new URLSearchParams({search:query.slice(0,220),per_page:"30",
+  select:"id,display_name,publication_year,publication_date,doi,authorships,locations,primary_location,best_oa_location,abstract_inverted_index"});
+ const res=await fetch("https://api.openalex.org/works?"+params.toString(),{
+  headers:{Accept:"application/json"},signal:AbortSignal.timeout(18000)});
  if(!res.ok)throw Error("OpenAlex returned HTTP "+res.status);
- const data=await res.json();
- const records=(data.results||[]).filter(w=>w.id&&w.display_name&&window.AxiovoArxiv?.candidates(w).length).map(w=>({id:w.id,title:w.display_name,date:w.publication_date||String(w.publication_year||""),authors:(w.authorships||[]).slice(0,6).map(a=>a.author?.display_name||""),url:window.AxiovoArxiv.abs(window.AxiovoArxiv.candidates(w)[0].requested),abstract:abstractFromIndex(w.abstract_inverted_index),provider:"OpenAlex arXiv-linked bibliography"}));
- addSources(records,keep);rstatus("OpenAlex returned "+records.length+" additional bibliographic candidates. Source records may contain missing or incomplete abstracts.");
- return records;
+ const payload=await res.json();
+ const records=(payload.results||[])
+  .filter(w=>w.id&&w.display_name&&window.AxiovoArxiv?.candidates(w).length)
+  .map(w=>({id:window.AxiovoArxiv.candidates(w)[0].base,
+   title:w.display_name,date:w.publication_date||String(w.publication_year||""),
+   authors:(w.authorships||[]).slice(0,6).map(a=>a.author?.display_name||""),
+   url:window.AxiovoArxiv.abs(window.AxiovoArxiv.candidates(w)[0].requested),
+   abstract:abstractFromIndex(w.abstract_inverted_index),
+   provider:"OpenAlex arXiv-linked bibliography"}));
+ const ranked=Core?.rank(query,records,12)||[];
+ const filtered=ranked.map(x=>({...x.paper,score:x.score}));
+ rstatus("Checked "+records.length+" arXiv-linked candidates; "+filtered.length+
+  " passed question-relevance checks. This is partial bibliography coverage.");
+ return filtered;
 }
 function abstractFromIndex(terms){if(!terms||typeof terms!=="object")return "";const all=[];for(const [word,positions] of Object.entries(terms)){if(!Array.isArray(positions))continue;for(const pos of positions){if(Number.isInteger(pos)&&pos>=0&&pos<2000)all.push([pos,word])}}return all.sort((a,b)=>a[0]-b[0]).slice(0,350).map(x=>x[1]).join(" ")}
 function updateMode(next){
@@ -274,18 +286,16 @@ async function generate(question,draft,localResult){
 }
 async function widerArxiv(query){
  try{
-  const rows=await openalex(query,true);
+  const rows=await openalex(query);
   if(rows.length)return rows;
  }catch{}
  if(!Archive)throw Error("Public metadata unavailable");
  const q=(Core?.words(query)||query.split(/\s+/)).slice(0,7).join(" ");
  if(!q)return [];
  const result=await Archive.live("arxiv",{q});
- const rows=Archive.filter(result.papers,{q}).slice(0,12).map(p=>({
-  ...p,provider:result.provider
- }));
- addSources(rows,true);
- rstatus(rows.length+" additional arXiv candidates from DataCite.");
+ const normalized=result.papers.map(p=>({...p,provider:result.provider}));
+ const rows=(Core?.rank(query,normalized,12)||[]).map(x=>({...x.paper,score:x.score}));
+ rstatus("DataCite: "+rows.length+" relevant records. Results may be incomplete.");
  return rows;
 }
 async function submit(){
