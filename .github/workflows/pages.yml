@@ -272,10 +272,10 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y -qq ffmpeg espeak-ng fonts-dejavu-core
           python -m pip install --disable-pip-version-check Pillow edge-tts
-      - name: Build new Axiovo feature tour
-        run: |
-          python scripts/build_intro_video.py
-          echo 'Generated a fresh illustrated tour of current Axiovo features.' >> "$GITHUB_STEP_SUMMARY"
+      # The older illustrated-video generator depends on narration .opus files
+      # which are not all present. It is redundant: the recorded current-site
+      # tutorial below generates the final MP4, captions and chapter index.
+      # Do not run it as a mandatory deployment gate.
       - name: Install Chromium for independent interaction checks
         id: chromium_deps
         run: |
