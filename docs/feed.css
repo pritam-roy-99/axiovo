@@ -135,3 +135,35 @@
   min-height:44px;overflow-wrap:anywhere}
  .axiovo-feed-page :is(.feed-card,.feed-stream,.feed-follow-tools,.feed-follow-form){min-width:0}
 }
+
+/* Mobile feed usability: controls must not sit below a long timeline. */
+@media(max-width:900px){
+ .axiovo-feed-page .feed-layout{display:flex;flex-direction:column;gap:12px}
+ .axiovo-feed-page .feed-sidebar{order:-1;display:block;width:100%;min-width:0}
+ .axiovo-feed-page .feed-stream{order:0;width:100%;min-width:0}
+ .axiovo-feed-page #feed-follow-tools{margin:0 0 12px}
+ .axiovo-feed-page #feed-about-heading{font-size:16px}
+}
+@media(max-width:620px){
+ .axiovo-feed-page .feed-page{width:100%;max-width:100%;box-sizing:border-box;overflow-x:clip}
+ .axiovo-feed-page .feed-sidebar .feed-side-card:not(#feed-follow-tools){display:none}
+ .axiovo-feed-page .feed-hero{padding:16px;border-radius:14px}
+ .axiovo-feed-page .feed-hero h1{font-size:30px}
+ .axiovo-feed-page .feed-insight{min-height:0}
+ .axiovo-feed-page .feed-toolbar{margin:12px 0;gap:8px}
+ .axiovo-feed-page .feed-tabs{display:flex;flex-wrap:nowrap;width:100%;max-width:100%;box-sizing:border-box;overflow-x:auto;scrollbar-width:thin;justify-content:flex-start}
+ .axiovo-feed-page .feed-tabs button{flex:0 0 auto;min-width:82px;min-height:44px}
+ .axiovo-feed-page .feed-filters{display:grid;grid-template-columns:1fr 1fr;gap:7px;width:100%}
+ .axiovo-feed-page .feed-filters label{align-self:end;min-width:0}
+ .axiovo-feed-page .feed-filters select{width:100%;min-width:0;max-width:100%;box-sizing:border-box}
+ .axiovo-feed-page .feed-filters #feed-refresh{grid-column:1/-1;width:100%;min-height:44px}
+ .axiovo-feed-page #feed-follow-tools{padding:15px}
+ .axiovo-feed-page .feed-follow-form input{min-width:0;flex:1 1 110px}
+ .axiovo-feed-page .feed-follow-form button{flex:0 0 auto}
+ .axiovo-feed-page .feed-results,.axiovo-feed-page .feed-card{min-width:0;max-width:100%}
+ .axiovo-feed-page .feed-card-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+ .axiovo-feed-page .feed-card-actions>a,.axiovo-feed-page .feed-card-actions>button{display:flex;width:100%;min-width:0;max-width:100%;box-sizing:border-box;min-height:44px;overflow-wrap:anywhere}
+ .axiovo-feed-page .feed-post-header{min-width:0}
+ .axiovo-feed-page .feed-post-identity{min-width:0}
+ .axiovo-feed-page .feed-post-header .feed-source{max-width:80px;white-space:normal;text-align:center}
+}
