@@ -14,6 +14,12 @@ on:
       - 'docs/research-intelligence.js'
       - 'docs/following-authors.js'
       - 'docs/archive-data.js'
+      - 'docs/copilot.js'
+      - 'docs/assistant-core.js'
+      - 'docs/copilot.html'
+      - 'docs/research-workspace.css'
+      - 'tests/assistant-core.test.js'
+      - 'scripts/smoke_routes.py'
       - 'docs/source-health.js'
       - 'tests/research-ranking-benchmark.test.js'
       - 'tests/research-ranking-source-benchmark.test.js'
@@ -47,6 +53,12 @@ jobs:
           node tests/paper-relations.test.js
           node tests/search-accuracy.test.js
           node tests/search-recall.test.js
+      - name: Verify research assistant question relevance and citations
+        run: |
+          node --check docs/copilot.js
+          node --check docs/assistant-core.js
+          node tests/assistant-core.test.js
+          node tests/assistant-grounding-50.test.js
       - name: Validate browser scripts and source links
         run: |
           python -m scripts.validate_site
