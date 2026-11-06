@@ -4,7 +4,7 @@
  if(root)root.AxiovoAssistantCore=api;
 })(typeof globalThis!=="undefined"?globalThis:null,function(){
  "use strict";
- const STOP=new Set("the and are was were from with under above into for not this that those about using novel results study research paper papers have has more than also based method methods approach quantum their between through our which what how when where then".split(" "));
+ const STOP=new Set("the and are was were from with under above into for not this that those about using novel results study research paper papers have has more than also based method methods approach quantum their between through our which what how when where why should could would need needs we then".split(" "));
  const words=s=>(String(s||"").toLowerCase().match(/[a-z0-9][a-z0-9-]{2,}/g)||[]).filter(t=>!STOP.has(t));
  function arxivId(s){const m=String(s||"").trim().match(/^(?:https?:\/\/arxiv.org\/(?:abs|pdf)\/)?((?:\d{4}\.\d{4,5}|[a-z-]+(?:\.[a-z]{2})?\/\d{7}))(?:v\d+)?(?:\.pdf)?$/i);return m?m[1]:""}
  function normalize(item,provider="arXiv"){
