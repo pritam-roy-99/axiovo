@@ -161,6 +161,38 @@ def main():
                     assert "Macroscopic energy gaps" not in page.locator("#evidence-list").inner_text()
                     assert page.locator("#evidence-list .assistant-source-details").count()==1
                     assert page.locator("#evidence-list .assistant-source-details").first.get_attribute("open") is None
+                if width==390:
+                    # Followed-author identity regression: abbreviated A. S. Majumdar
+                    # must reveal work indexed as Archan S Majumdar, while an
+                    # unrelated S. N. Majumdar result must not be shown.
+                    page.route("https://api.datacite.org/dois?**",
+                        lambda route: route.fulfill(status=200,content_type="application/json",
+                            body='{"data":[],"meta":{"total":0},"links":{}}'))
+                    page.route("https://api.openalex.org/authors?**",
+                        lambda route: route.fulfill(status=200,content_type="application/json",
+                            body=json.dumps({"results":[
+                              {"id":"https://openalex.org/A12345","display_name":"Archan S Majumdar"},
+                              {"id":"https://openalex.org/A67890","display_name":"S. N. Majumdar"}]})))
+                    page.route("https://api.openalex.org/works?**",
+                        lambda route: route.fulfill(status=200,content_type="application/json",
+                            body=json.dumps({"results":[{"id":"https://openalex.org/W3333",
+                              "display_name":"Sharing quantum nonlocality and teleportation over long distance using optical hybrid states",
+                              "publication_date":"2025-02-02",
+                              "authorships":[{"author":{"display_name":"Archan S Majumdar"}}],
+                              "locations":[{"landing_page_url":"https://arxiv.org/abs/2502.00707"}]}]})))
+                    page.evaluate('localStorage.setItem("axiovo-author-follows",JSON.stringify(["A.S. Majumdar"]))')
+                    page.goto(base+"workspace.html#following",wait_until="domcontentloaded")
+                    page.locator("#following-source").select_option("arxiv")
+                    page.wait_for_function(
+                        "() => document.querySelector('#following-results').textContent.includes('Sharing quantum nonlocality')",
+                        timeout=25000)
+                    text=page.locator("#following-results").inner_text()
+                    assert "Sharing quantum nonlocality" in text
+                    assert "Archan S Majumdar" in text
+                    assert "S. N. Majumdar" not in text
+                    page.unroute("https://api.datacite.org/dois?**")
+                    page.unroute("https://api.openalex.org/authors?**")
+                    page.unroute("https://api.openalex.org/works?**")
                 page.goto(base+"profiles.html",wait_until="domcontentloaded")
                 before = page.evaluate("document.documentElement.dataset.theme")
                 page.locator(".axiovo-header-appearance .theme-toggle").click()
