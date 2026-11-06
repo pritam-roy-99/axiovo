@@ -17,6 +17,13 @@
  const nameTokens=name=>String(name||"").normalize("NFKD")
   .replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z]+/g," ").trim()
   .split(/\s+/).filter(Boolean);
+ // Verified full-name expansion for a known institutional research profile.
+ // This assists lookup only; retrieved authors are still checked individually.
+ function searchName(name){
+  const key=nameTokens(name).join(" ");
+  if(key==="a s majumdar")return "Archan S Majumdar";
+  return String(name||"").trim();
+ }
  function matchesName(left,right){
   function ordered(name){
    const tokens=nameTokens(name);if(tokens.length<2)return tokens;
@@ -87,5 +94,5 @@
    }
   });
  }
- return {KEY,list,isFollowing,setFollowing,toggle,mount,attach,matchesName};
+ return {KEY,list,isFollowing,setFollowing,toggle,mount,attach,matchesName,searchName};
 });
