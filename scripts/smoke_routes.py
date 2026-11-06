@@ -154,13 +154,13 @@ def main():
                     page.wait_for_function("document.getElementById('retrieval-status').textContent.includes('indexed arXiv records ready')")
                     page.locator("#question").fill("Why should we study macroscopic quantumness?")
                     page.locator("#ask").click()
-                    page.locator("#busy").wait_for(state="hidden",timeout=15000)
+                    page.wait_for_function("document.querySelector('#ask').disabled===false && document.querySelector('#conversation .message.assistant')",timeout=15000)
                     page.wait_for_function("document.querySelectorAll('#evidence-list .source').length===1")
                     assert "Experimental witnesses of macroscopic quantumness" in page.locator("#conversation").inner_text()
                     assert "[1]" in page.locator("#conversation").inner_text()
                     assert "Macroscopic energy gaps" not in page.locator("#evidence-list").inner_text()
                     assert page.locator("#evidence-list .assistant-source-details").count()==1
-                    assert not page.locator("#evidence-list .assistant-source-details").first.is_open()
+                    assert page.locator("#evidence-list .assistant-source-details").first.get_attribute("open") is None
                 page.goto(base+"profiles.html",wait_until="domcontentloaded")
                 before = page.evaluate("document.documentElement.dataset.theme")
                 page.locator(".axiovo-header-appearance .theme-toggle").click()
