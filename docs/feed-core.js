@@ -21,6 +21,7 @@
   const authors=(prefs.authors||[]).filter(Boolean);
   const interests=[...new Set((prefs.topics||[]).filter(Boolean))].slice(0,40);
   const saved=new Set((prefs.saved||[]).map(x=>String(x).toLowerCase()));
+  const references=(prefs.references||[]).filter(x=>x?.title).slice(0,20);
   const hidden=new Set((prefs.hidden||[]).map(x=>String(x).toLowerCase()));
   const seen=new Set(),out=[];
   for(const paper of papers||[]){
@@ -28,15 +29,18 @@
    const id=key(paper);if(seen.has(id)||hidden.has(id))continue;seen.add(id);
    const authorHit=(paper.authors||[]).filter(x=>authors.some(y=>prefs.matchesAuthor?prefs.matchesAuthor(y,x):String(y).toLowerCase()===String(x).toLowerCase()));
    const topicMatches=interests.map(topic=>({topic,...overlaps(topic,paper.title,paper.abstract||"")})).filter(x=>x.matched);
-   if(!authorHit.length&&!topicMatches.length)continue;
+   const related=references.filter(x=>key(x)!==id).map(x=>({paper:x,...overlaps(x.title,paper.title,paper.abstract||"")})).filter(x=>x.matched).sort((a,b)=>b.score-a.score).slice(0,1);
+   if(!authorHit.length&&!topicMatches.length&&!related.length)continue;
    const then=date(paper),days=then>0&&then<=now?(now-then)/86400000:null;
    const recency=days===null?0:days<=3?12:days<=7?9:days<=30?5:days<=90?2:0;
    const reasons=[...authorHit.slice(0,2).map(x=>"Following author: "+x),
-    ...topicMatches.slice(0,3).map(x=>"Following topic: "+x.topic)];
-   const score=authorHit.length*35+topicMatches.reduce((n,x)=>n+20+x.score,0)+recency-
+    ...topicMatches.slice(0,3).map(x=>"Following topic: "+x.topic),
+    ...related.map(x=>"Similar to saved: "+x.paper.title.slice(0,65))];
+   const score=authorHit.length*35+topicMatches.reduce((n,x)=>n+20+x.score,0)+
+    related.reduce((n,x)=>n+12+x.score,0)+recency-
     (saved.has(id)?12:0);
    out.push({paper,score,reasons,days,authorMatch:authorHit.length>0,topicMatch:topicMatches.length>0,
-    saved:saved.has(id),key:id});
+    relatedMatch:related.length>0,saved:saved.has(id),key:id});
   }
   return out.sort((a,b)=>b.score-a.score||date(b.paper)-date(a.paper)||a.key.localeCompare(b.key));
  }
@@ -44,7 +48,7 @@
   const pool=items||[];
   if(view==="following")return pool.filter(x=>x.authorMatch||x.topicMatch).sort((a,b)=>date(b.paper)-date(a.paper)||b.score-a.score);
   if(view==="latest")return [...pool].sort((a,b)=>date(b.paper)-date(a.paper)||b.score-a.score);
-  if(view==="related")return pool.filter(x=>x.topicMatch).sort((a,b)=>b.score-a.score);
+  if(view==="related")return pool.filter(x=>x.topicMatch||x.relatedMatch).sort((a,b)=>b.score-a.score);
   return pool;
  }
  return {terms,key,date,overlaps,build,select};
