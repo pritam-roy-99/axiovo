@@ -89,7 +89,7 @@ const unresolved=authorIdentity.candidate({name:"Alex Smith"},"OpenAlex search")
 assert.equal(unresolved.confirmed,false);
 assert.equal(authorIdentity.sameResearcher(unresolved,unresolved),false);
 assert.throws(()=>citation.normalize({...a,url:"https://example.com/not-the-paper"}),/original source/);
-assert.throws(()=>citation.normalize({...a,url:"https://arxiv.org/abs/2611.00001v1"}),/revision mismatch/);
+assert.throws(()=>citation.normalize({...a,url:"https://arxiv.org/abs/2611.00001v1",landing_url:"https://arxiv.org/abs/2611.00001v1"}),/revision mismatch/);
 const evidenceAnswer=retriever.answer("sequential quantum contextuality",[a],{index:evidence,verifier:claims});
 assert(evidenceAnswer.answered);
 assert.equal(evidenceAnswer.citations[0].source_url,a.url);
