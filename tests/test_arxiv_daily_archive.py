@@ -80,6 +80,12 @@ class DailyArchiveTests(unittest.TestCase):
             return Response(page(3,[item(1)]) if "start=0" in req.full_url else page(3,[]))
         with self.assertRaises(RuntimeError):
             ar.fetch_day(dt.date(2026,11,5),opener=opener,sleep=lambda *_:None)
+    def test_empty_arxiv_day_is_not_certified(self):
+        def opener(req,timeout):
+            return Response(page(0,[]))
+        with self.assertRaisesRegex(RuntimeError,"Zero records"):
+            ar.fetch_day(dt.date(2026,11,5),opener=opener,sleep=lambda *_:None)
+
     def test_no_fabricated_completed_dates_after_failure(self):
         with tempfile.TemporaryDirectory() as path:
             folder=Path(path)
@@ -91,10 +97,10 @@ class DailyArchiveTests(unittest.TestCase):
                     if day==dt.date(2026,11,4):raise OSError("API unavailable")
                     return fake(day)
                 r=ar.run(today=dt.date(2026,11,5),count=4,fetcher=sometimes)
-                self.assertEqual(r["complete_days"],3)
+                self.assertEqual(r["complete_days"],0)
                 self.assertNotIn("2026-11-04",r["manifest"]["days"])
-                self.assertEqual(r["manifest"]["days"]["2026-11-03"]["count"],0)
-                self.assertTrue((folder/"2026-11-03.json").exists())
+                self.assertNotIn("2026-11-03",r["manifest"]["days"])
+                self.assertFalse((folder/"2026-11-03.json").exists())
     def test_feed_sync_uses_all_verified_recent_day_papers(self):
         from scripts import sync
         with tempfile.TemporaryDirectory() as tmp:
@@ -128,7 +134,18 @@ class DailyArchiveTests(unittest.TestCase):
 
     def test_next_missing_days_backfilled(self):
         days=ar.select_days(dt.date(2026,11,5),{"days":{"2026-11-02":{"complete":True}}},count=5)
-        self.assertEqual(days[:3],[dt.date(2026,11,4),dt.date(2026,11,3),dt.date(2026,11,1)])
-        self.assertNotIn(dt.date(2026,11,2),days)
+        self.assertEqual(days[:4],[dt.date(2026,11,4),dt.date(2026,11,3),dt.date(2026,11,2),dt.date(2026,11,1)])
+        self.assertEqual(len(days),5)
+
+    def test_bad_legacy_zero_day_gets_revalidated(self):
+        with tempfile.TemporaryDirectory() as path:
+            folder=Path(path)
+            (folder/"manifest.json").write_text(json.dumps({"schema":1,"days":{
+                "2026-11-03":{"complete":True,"count":0},
+                "2026-11-02":{"complete":True,"count":7}}}))
+            with patch.object(ar,"ARCHIVE",folder),patch.object(ar,"MANIFEST",folder/"manifest.json"),patch.object(ar.time,"sleep",lambda *_:None):
+                result=ar.run(today=dt.date(2026,11,5),days=[],fetcher=lambda day:None)
+                self.assertFalse(result["manifest"]["days"]["2026-11-03"]["complete"])
+                self.assertTrue(result["manifest"]["days"]["2026-11-02"]["complete"])
 
 if __name__=="__main__": unittest.main()
