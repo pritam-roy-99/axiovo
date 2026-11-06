@@ -6,6 +6,6 @@ window.AxiovoHostedAIConfig=Object.freeze({
  endpoint:"",
  turnstileSiteKey:"",
  provider:"openrouter",
- model:"openrouter/free",
+ model:"nvidia/nemotron-3-ultra-550b-a55b:free",
  status:"not-configured"
 });
