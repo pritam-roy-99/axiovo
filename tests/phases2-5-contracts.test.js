@@ -52,6 +52,12 @@ assert.equal(hybrid.fuse({lexical:[x,a]},{eligible:p=>p.source==="arxiv"}).lengt
 const hits=core.search([a,b,c,x],{q:"quantum contextuality",sources:["arxiv"],sort:"relevance"},
  {lexical:bm,hybrid,contract});
 assert.equal(hits.method,"bm25");assert.equal(hits.items.length,2);
+const injected={...x,id:"chemrxiv:10.26434/chemrxiv-fake",title:"Invented fake entry",url:"https://doi.org/10.26434/chemrxiv-fake"};
+const protectedHybrid=core.search([a,b,c],{q:"quantum contextuality",sources:["arxiv"],mode:"hybrid"},
+ {lexical:bm,hybrid,contract,semanticResults:[injected,b]});
+assert.equal(protectedHybrid.items.some(row=>row.paper.id===injected.id),false);
+assert.equal(protectedHybrid.items.length,2);
+
 
 assert.equal(graph.edge({from:a.id,to:b.id,type:"cites"}),null);
 const verifiedEdge={from:a.id,to:b.id,type:"cites",provider:"OpenAlex",
