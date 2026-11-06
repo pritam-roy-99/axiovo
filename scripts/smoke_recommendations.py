@@ -20,7 +20,7 @@ def main():
             browser=pw.chromium.launch(headless=True,args=["--no-sandbox","--disable-dev-shm-usage"])
             for width in (390,1024):
                 context=browser.new_context(viewport={"width":width,"height":850},service_workers="block")
-                context.add_init_script("""() => {
+                context.add_init_script("""{
                   localStorage.setItem("axiovo-research-interest-settings-v1",
                     JSON.stringify({interests:["preparation contextuality"],authors:[]}));
                 }""")
