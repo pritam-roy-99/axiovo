@@ -30,6 +30,20 @@ class LiteratureHealthTests(unittest.TestCase):
             result=audit_arxiv(folder,dt.date(2026,11,6),recent_days=1)
             self.assertEqual(result["verified_days"],0)
             self.assertEqual(result["invalid_shards"][0]["issue"],"source_count_or_record_mismatch")
+    def test_repair_queue_prioritized_before_historical_backfill(self):
+        from unittest.mock import patch
+        from scripts import arxiv_daily_archive as archive
+        with tempfile.TemporaryDirectory() as temp:
+            root=Path(temp)
+            (root/"docs/data").mkdir(parents=True)
+            (root/"docs/data/literature-health.json").write_text(json.dumps({
+                "arxiv":{"repair_queue":["2026-10-16","bad-date","2027-01-01"]}}))
+            with patch.object(archive,"ROOT",root):
+                selected=archive.select_days(dt.date(2026,11,6),{"days":{}},count=5)
+            self.assertEqual(selected[0],dt.date(2026,11,5))
+            self.assertIn(dt.date(2026,10,16),selected)
+            self.assertNotIn(dt.date(2027,1,1),selected)
+
     def test_source_window_status_is_not_historical_completeness(self):
         with tempfile.TemporaryDirectory() as temp:
             folder=Path(temp)
