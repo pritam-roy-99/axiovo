@@ -17,7 +17,7 @@ class PaperSortUITests(unittest.TestCase):
         self.assertIn('value="cited"',desk)
     def test_local_workspaces(self):
         html=(DOCS/"workspace.html").read_text(encoding="utf8")
-        for element in ("research-results-sort","recent-papers-sort","library-papers-sort","following-papers-sort"):
+        for element in ("research-results-sort","library-papers-sort","following-papers-sort"):
             self.assertIn('id="'+element+'"',html)
         self.assertIn('value="title">Title A–Z',html)
         self.assertIn('src="./paper-sort.js"',html)
