@@ -91,7 +91,11 @@ async function checkLane(archive,criteria,signal){
  lane.append(make("h3",data.names[archive]),message,list,actions);results.append(lane);
  let records=[],cursor=null,visible=6;
  function render(){
-  list.replaceChildren(...records.slice(0,visible).map(paper));actions.replaceChildren();
+  const mode=$("following-papers-sort")?.value||"recent";
+   const ordered=window.AxiovoPaperSort?.sort(records,mode)||records;
+   list.replaceChildren(...ordered.slice(0,visible).map(paper));actions.replaceChildren();
+   if($("following-sort-note"))$("following-sort-note").textContent=
+    window.AxiovoPaperSort?.note(ordered,mode)||"";
   if(records.length>visible)actions.append(addButton("Show more",()=>{visible+=6;render()}));
   if(cursor!=null)actions.append(addButton("Load more from source",()=>load(cursor)));
   const explore=make("a","Open archive search →","rd-text-link");
@@ -179,6 +183,10 @@ $("following-unfollow").onclick=()=>{
 };
 $("following-refresh").onclick=refresh;author.onchange=refresh;source.onchange=refresh;
 window.addEventListener("hashchange",showTab);
+$("following-papers-sort")?.addEventListener("change",()=>{
+  for(const list of results.querySelectorAll(".rd-panel")){ /* Existing lanes rerender when next source refreshes. */ }
+  refresh();
+ });
 window.addEventListener("storage",e=>{if(e.key===follow.KEY){updateAuthors();refresh()}});
 updateAuthors();showTab();
 })();
