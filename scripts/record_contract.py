@@ -108,7 +108,13 @@ def normalize_record(source, raw, *, provider, checked_at=None, source_record=No
         doi = doi_id(raw.get("doi") or raw.get("DOI") or original_id)
         if source == "biorxiv" and not doi.startswith(("10.1101/", "10.64898/")):
             raise InvalidRecord("wrong_biorxiv_prefix")
-        if source == "chemrxiv" and not doi.startswith("10.26434/chemrxiv"):
+        # ChemRxiv's hosting migrations can use other registered DOI families.
+        # Allow an otherwise valid DOI only when the verified source snapshot
+        # explicitly attributes the record to ChemRxiv.
+        if source == "chemrxiv" and not (
+            doi.startswith("10.26434/chemrxiv") or
+            plain(raw.get("source")).lower() == "chemrxiv"
+        ):
             raise InvalidRecord("wrong_chemrxiv_prefix")
         version = explicit
         source_id = doi
