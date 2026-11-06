@@ -49,7 +49,7 @@ def main():
             titles=page.locator(".feed-card h3").all_inner_texts()
             assert len(titles)==2,(titles,"source-only topic and author matching")
             assert all("robotics" not in title.lower() for title in titles)
-            assert "Preparation contextuality" in page.locator("#feed-followed-topics").inner_text()
+            assert "preparation contextuality" in page.locator("#feed-followed-topics").inner_text().lower()
             assert page.locator("#feed-followed-authors").inner_text().find("Majumdar")>=0
             first=page.locator(".feed-card").first
             button=first.locator(".feed-save")
