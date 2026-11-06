@@ -135,7 +135,7 @@ def main():
     TARGET.parent.mkdir(parents=True,exist_ok=True)
     with tempfile.NamedTemporaryFile("w",dir=TARGET.parent,encoding="utf-8",delete=False) as stream:
        json.dump(payload,stream,ensure_ascii=False,separators=(",",":"))
-       stream.write("\\n")
+       stream.write("\n")
        temp=pathlib.Path(stream.name)
     temp.replace(TARGET)
     print("ChemRxiv indexed",len(papers),"verified DOI records; new matched",fresh)
