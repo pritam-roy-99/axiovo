@@ -28,6 +28,8 @@ on:
       - 'docs/feed.js'
       - 'docs/feed.css'
       - 'docs/feed-core.js'
+      - 'docs/feed-preferences.js'
+      - 'tests/feed-preferences.test.js'
       - 'docs/feed-preview.js'
       - 'docs/navigation.js'
       - 'tests/feed-core.test.js'
@@ -99,6 +101,8 @@ jobs:
           node --check docs/feed.js
           node --check docs/feed-preview.js
           node tests/feed-core.test.js
+          node --check docs/feed-preferences.js
+          node tests/feed-preferences.test.js
       - name: Validate browser scripts and source links
         run: |
           python -m scripts.validate_site
