@@ -123,7 +123,7 @@ async function checkLane(archive,criteria,signal){
  const cache=data.snapshot(archive).then(snapshot=>{
   if(signal.aborted)return;
   records=data.filter(data.merge(records,data.filter(snapshot.papers,criteria)),criteria);render();
- });
+ }).catch(()=>{if(!signal.aborted)render()});
  await Promise.all([cache,load()]);
  if(archive==="arxiv"&&!signal.aborted&&records.length<6){
   try{
