@@ -200,7 +200,7 @@ function init(){
    try{
     const source=String(p.source||"").toLowerCase();
     const input={...p,source,source_id:p.arxiv_id||p.doi||p.id||p.recordId,
-      version:p.version??(p.arxiv_id?.match(/v(\\d+)$/)?.[1]?Number(p.arxiv_id.match(/v(\\d+)$/)[1]):null),
+      version:p.version??(p.arxiv_id?.match(/v(\d+)$/)?.[1]?Number(p.arxiv_id.match(/v(\d+)$/)[1]):null),
       landing_url:p.url,submitted_date:p.date};
     adapter.normalize(input);validated.push(input);
    }catch(_error){skipped.push(p.title||p.key||"Unidentified paper")}
