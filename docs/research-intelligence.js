@@ -9,7 +9,7 @@ const OLD_SAVED="axiovo-reading-list";
 const META="axiovo-research-interest-settings-v1";
 function read(key,fallback){try{return JSON.parse(localStorage.getItem(key)||"null")??fallback}catch{return fallback}}
 function write(key,val){try{localStorage.setItem(key,JSON.stringify(val));return true}catch{return false}}
-const texts=(o,k,v)=>{const n=document.createElement(k);n.textContent=String(v||"");o.append(n);return n};
+const texts=(o,k,v,className="")=>{const n=document.createElement(k);n.textContent=String(v??"");if(className)n.className=className;o.append(n);return n};
 const message=(el,str)=>{if(el)el.textContent=str};
 let projects=(Array.isArray(read(PROJECTS,[]))?read(PROJECTS,[]):[]).map(R.cleanProject).filter(Boolean);
 let settings=read(META,{interests:[],authors:[]});
