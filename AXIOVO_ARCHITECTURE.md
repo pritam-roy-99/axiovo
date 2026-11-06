@@ -133,3 +133,65 @@ rate-limited search API. Those require separate verified work and in some
 cases a deployed backend. Optional prebuilt semantic indexing, publication
 status verification, citation graph, browser extension, and completed how-to
 video remain explicit project milestones.
+
+
+## Additive canonical metadata v2 (Phase 1 implementation branch)
+
+This is deliberately parallel to the existing `docs/data/index/v1` and
+`docs/data/records` outputs. The browser search interfaces and all local
+reading-list keys are unchanged.
+
+- `scripts/record_contract.py` validates source-specific IDs, exact arXiv
+  revisions, optional DOI metadata, dates and original source URLs.
+- `scripts/build_source_v2.py` reads official-source snapshots, preserves
+  revision-specific records, stages `docs/data/index/v2`, and verifies the
+  SHA-256 hash and count of every emitted shard before publishing a manifest.
+- `docs/source-records.js` is a **read-only compatibility adapter** for
+  canonical v2 and older stored objects. It is not yet the main query engine.
+- `docs/coverage-status.js` reports v2 revision-specific record counts as
+  supplemental information when the manifest is deployed, without claiming a
+  complete inventory of any archive.
+- The existing v1 builder and verified-record builder remain fully active.
+  There is no deletion, renaming, or automatic conversion of browser storage.
+
+### Source trust boundary
+
+A valid metadata ID confirms **identity formatting and provenance through an
+accepted source snapshot**, not peer review or scientific accuracy. Exact
+versions are preserved; unknown revisions remain `null`. Conflicting
+same-revision date/title claims are recorded as warnings. OAI datestamps are
+metadata-update times, not first submission dates.
+
+### Completeness and integrity
+
+Each v2 shard has a SHA-256 digest, byte count, record count, and explicit
+`partial-source-snapshot` status. `manifest.json` contains the observed
+source counts, source timestamps, rejected-record reasons, and missing inputs.
+An observed count never proves a day's completeness. The current index
+intentionally emits no `complete_dates` entries without an independent
+reconciliation source.
+
+Build and validate in isolation:
+
+```bash
+python -m unittest discover -s tests -p 'test_record_contract.py' -v
+python -m scripts.build_source_v2
+python -c "from scripts.build_source_v2 import verify_index; verify_index('docs/data/index/v2')"
+node tests/source-records.test.js
+node tests/library-preservation.test.js
+```
+
+### Safe rollout and rollback
+
+The v2 index must pass independent CI checks before its files are deployed.
+Until all Discover, Research Desk, Feed and Assistant readers have migrated,
+v1 and the legacy snapshots remain primary. Rollback is a revert of the v2
+deployment integration or return to a known-good GitHub Pages artifact.
+Never clear or migrate localStorage automatically.
+
+### Unfinished Phase 1 work
+
+Provider-wide retry/checkpoint standardization, independent complete-date
+reconciliation, full shared consumer migration, historical backfill, and
+production rollback rehearsal are **not yet certified**. No claim that all
+historical preprints have been indexed is warranted.

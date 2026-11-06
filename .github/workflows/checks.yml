@@ -16,6 +16,10 @@ jobs:
           python-version: '3.12'
       - name: Python regression tests
         run: python -m unittest discover -s tests -v
+      - name: Build v2 metadata from committed snapshots and verify integrity
+        run: |
+          python -m scripts.build_source_v2
+          python -c "from scripts.build_source_v2 import verify_index; assert verify_index('docs/data/index/v2')['record_count'] > 0"
       - name: Verify internal navigation and assets
         run: python scripts/audit_internal_links.py
       - name: Security and privacy baseline checks
