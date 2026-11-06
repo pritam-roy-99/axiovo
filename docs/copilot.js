@@ -109,7 +109,8 @@ function paperSummary(p,draft){
 }
 async function openalex(query){
  rstatus("Searching public scholarly metadata for relevant papers…");
- const params=new URLSearchParams({search:query.slice(0,220),per_page:"30",
+ const researchTerms=(Core?.words(query)||[]).slice(0,12).join(" ")||query;
+ const params=new URLSearchParams({search:researchTerms.slice(0,220),per_page:"30",
   select:"id,display_name,publication_year,publication_date,doi,authorships,locations,primary_location,best_oa_location,abstract_inverted_index"});
  const res=await fetch("https://api.openalex.org/works?"+params.toString(),{
   headers:{Accept:"application/json"},signal:AbortSignal.timeout(18000)});
