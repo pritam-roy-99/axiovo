@@ -249,7 +249,8 @@ async function arxivLive(c,signal,cursor){
 async function bioNative(c,signal,cursor){
  const doi=parseDOI(c.q);
  const start=Number(cursor)||0;
- const startDate=c.from||(c.to||c.category?.legacy?"2013-11-01":daysAgo(c.category?7:2));
+ // Honour an explicit end date without accidentally expanding to the whole archive.
+ const startDate=c.from||(c.to?c.to:(c.category?.legacy?"2013-11-01":daysAgo(c.category?7:2)));
  const interval=startDate+"/"+(c.to||today());
  const query=c.category?("?"+new URLSearchParams({category:c.category.code.toLowerCase()})):"";
  const url=endpoints.bio+(doi?doi+"/na/json":interval+"/"+start+"/json")+query;
@@ -257,8 +258,11 @@ async function bioNative(c,signal,cursor){
  const meta=data.messages?.[0];
  if(!Array.isArray(data.collection)||(!data.collection.length&&!/^(ok|no results found)$/i.test(meta?.status||"")))throw Error("bioRxiv response unavailable");
  const papers=data.collection.filter(p=>!p.server||p.server.toLowerCase()==="biorxiv").map(p=>normalize("biorxiv",{...p,provenance:"bioRxiv API"})).filter(Boolean);
- const total=Number(meta?.total||papers.length);
- return {papers,total,provider:"bioRxiv API",next:!doi&&data.collection.length&&start+data.collection.length<total?start+data.collection.length:null};
+ const declared=meta?.total;
+ const total=declared!==undefined&&Number.isFinite(Number(declared))?Number(declared):null;
+ return {papers,total:total??papers.length,provider:"bioRxiv API",
+  next:!doi&&total!==null&&data.collection.length&&start+data.collection.length<total
+   ?start+data.collection.length:null};
 }
 async function bioIndex(c,signal,cursor){
  const parts=['SRC:PPR AND PUBLISHER:"bioRxiv"'];
