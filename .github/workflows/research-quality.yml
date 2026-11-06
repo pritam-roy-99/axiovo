@@ -16,6 +16,7 @@ on:
       - 'docs/archive-data.js'
       - 'docs/source-health.js'
       - 'tests/research-ranking-benchmark.test.js'
+      - 'tests/research-ranking-source-benchmark.test.js'
       - 'tests/paper-relations.test.js'
       - 'tests/test_literature_coverage.py'
       - 'tests/test_arxiv_daily_archive.py'
@@ -42,6 +43,7 @@ jobs:
       - name: Evaluate five research disciplines and related-paper provenance
         run: |
           node tests/research-ranking-benchmark.test.js
+          node tests/research-ranking-source-benchmark.test.js
           node tests/paper-relations.test.js
           node tests/search-accuracy.test.js
           node tests/search-recall.test.js
@@ -52,5 +54,5 @@ jobs:
       - name: Describe evaluation scope
         run: |
           echo '### Research quality gate' >> "$GITHUB_STEP_SUMMARY"
-          echo 'Automated tests include five research questions with **synthetic candidate records**. This is a regression check, not a measured full-archive recall rate.' >> "$GITHUB_STEP_SUMMARY"
+          echo 'Automated tests include five synthetic regression cases and five source-linked known-item retrieval checks. Neither is a representative full-archive recall estimate.' >> "$GITHUB_STEP_SUMMARY"
           echo 'arXiv verified days are checked against recorded official Atom counts and date shards. bioRxiv and ChemRxiv are explicitly partial historical collections.' >> "$GITHUB_STEP_SUMMARY"
