@@ -49,6 +49,10 @@ const api=root.AxiovoArchiveData;
  assert.equal(two.papers[0].id,"2611.12002");
  assert.deepEqual([...two.papers[0].categories],["quant-ph"]);
  assert.deepEqual([...two.papers[1].categories],["cs.CV"]);
+ const parsedCitation=api.normalize("arxiv",{id:"2611.12005",title:"Synthetic cited source",citations:"17"});
+ const missingCitation=api.normalize("arxiv",{id:"2611.12006",title:"Synthetic unknown citation count",citations:""});
+ assert.equal(parsedCitation.citations,17,"Numeric source counts should sort correctly");
+ assert.equal(missingCitation.citations,null,"Missing citations must not be fabricated as zero");
  const category={code:"quant-ph",name:"Quantum Physics"};
  assert.equal(api.filter([...one.papers,...two.papers],{category}).length,2,
   "Both arXiv subject encoding variants must survive official category filtering");
