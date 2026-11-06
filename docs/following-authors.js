@@ -7,6 +7,7 @@ if(!follow||!data||!$("following"))return;
 const author=$("following-author"),source=$("following-source"),results=$("following-results");
 const names=Object.keys(data.names);
 let controller=null, active=false, selected="";
+const cachedLaneRenders=new Set();
 function make(tag,value,cls){
  const node=document.createElement(tag);
  if(value!==undefined)node.textContent=value;
@@ -94,6 +95,7 @@ async function checkLane(archive,criteria,signal){
   const mode=$("following-papers-sort")?.value||"recent";
    const ordered=window.AxiovoPaperSort?.sort(records,mode)||records;
    list.replaceChildren(...ordered.slice(0,visible).map(paper));actions.replaceChildren();
+  cachedLaneRenders.add(render);
    if($("following-sort-note"))$("following-sort-note").textContent=
     window.AxiovoPaperSort?.note(ordered,mode)||"";
   if(records.length>visible)actions.append(addButton("Show more",()=>{visible+=6;render()}));
@@ -150,7 +152,7 @@ async function checkLane(archive,criteria,signal){
  }
 }
 async function refresh(){
- controller?.abort();results.replaceChildren();
+ controller?.abort();cachedLaneRenders.clear();results.replaceChildren();
  if(!active||!author.value)return;
  selected=author.value;
  controller=new AbortController();const {signal}=controller;
@@ -183,10 +185,7 @@ $("following-unfollow").onclick=()=>{
 };
 $("following-refresh").onclick=refresh;author.onchange=refresh;source.onchange=refresh;
 window.addEventListener("hashchange",showTab);
-$("following-papers-sort")?.addEventListener("change",()=>{
-  for(const list of results.querySelectorAll(".rd-panel")){ /* Existing lanes rerender when next source refreshes. */ }
-  refresh();
- });
+$("following-papers-sort")?.addEventListener("change",()=>{for(const render of cachedLaneRenders)render();});
 window.addEventListener("storage",e=>{if(e.key===follow.KEY){updateAuthors();refresh()}});
 updateAuthors();showTab();
 })();
