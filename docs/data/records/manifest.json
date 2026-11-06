@@ -4,33 +4,56 @@
   "note": "Counts describe indexed records only, not archive-wide totals.",
   "archives": {
     "arxiv": {
-      "input_records": 6009,
+      "input_records": 6122,
       "invalid_or_unavailable": 0,
-      "last_sync": "2026-11-06T00:15:21.600725+00:00",
+      "last_sync": "2026-11-06T06:49:24.344235+00:00",
       "coverage": "available source snapshots, not a complete historical archive"
     },
     "biorxiv": {
-      "input_records": 60,
+      "input_records": 3345,
       "invalid_or_unavailable": 0,
-      "last_sync": "2026-11-05T10:49:53+00:00",
+      "last_sync": "2026-11-06T06:44:34.543931+00:00",
       "coverage": "available source snapshots, not a complete historical archive"
     },
     "chemrxiv": {
-      "input_records": 305,
+      "input_records": 2304,
       "invalid_or_unavailable": 0,
-      "last_sync": "2026-11-06T00:13:52.606736+00:00",
+      "last_sync": "2026-11-06T06:44:50.727291+00:00",
       "coverage": "available source snapshots, not a complete historical archive"
     }
   },
   "shards": {
-    "arxiv/2026-11.json": 3657,
-    "biorxiv/2026-10.json": 60,
-    "chemrxiv/2018-10.json": 1,
+    "arxiv/2026-11.json": 4532,
+    "biorxiv/2026-10.json": 2021,
+    "biorxiv/2026-11.json": 1324,
+    "chemrxiv/2017-08.json": 26,
+    "chemrxiv/2017-09.json": 52,
+    "chemrxiv/2017-10.json": 32,
+    "chemrxiv/2017-11.json": 21,
+    "chemrxiv/2017-12.json": 42,
+    "chemrxiv/2018-01.json": 41,
+    "chemrxiv/2018-02.json": 55,
+    "chemrxiv/2018-03.json": 54,
+    "chemrxiv/2018-04.json": 64,
+    "chemrxiv/2018-05.json": 70,
+    "chemrxiv/2018-06.json": 73,
+    "chemrxiv/2018-07.json": 69,
+    "chemrxiv/2018-08.json": 81,
+    "chemrxiv/2018-09.json": 116,
+    "chemrxiv/2018-10.json": 162,
+    "chemrxiv/2018-11.json": 151,
+    "chemrxiv/2018-12.json": 147,
+    "chemrxiv/2019-01.json": 132,
+    "chemrxiv/2019-02.json": 179,
+    "chemrxiv/2019-03.json": 161,
+    "chemrxiv/2019-04.json": 198,
+    "chemrxiv/2019-05.json": 73,
     "chemrxiv/2020-06.json": 1,
     "chemrxiv/2022-08.json": 1,
     "chemrxiv/2023-01.json": 1,
     "chemrxiv/2026-09.json": 1,
-    "chemrxiv/2026-11.json": 300
+    "chemrxiv/2026-11.json": 300,
+    "chemrxiv/undated.json": 1
   },
-  "record_count": 4022
+  "record_count": 10181
 }
