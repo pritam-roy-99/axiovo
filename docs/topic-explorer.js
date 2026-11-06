@@ -80,10 +80,17 @@ function currentPath(){
 }
 const pathId=path=>[path.category,path.topic,path.subtopic,path.refine].join("|");
 function selectPath(path){
- datePreset++;
+ // Keep selected subject/subtopic within the official release if that is
+ // what the researcher is browsing. Category selection is not a date change.
+ const inRelease=source==="arxiv"&&search?.announcementOnly;
+ if(!inRelease)datePreset++;
  selected=pathFrom(path);
  drawPath();
- runSearch();
+ if(inRelease){
+  search.criteria=criteriaFromForm();
+  search.visible=12;
+  drawResults(search);
+ }else runSearch();
 }
 function drawPersonal(){
  const item=currentPath();
@@ -153,7 +160,7 @@ function drawPath(){
  drawChoices("topic-options",topics,topic,row=>selectPath({category:selected.category,topic:row.id}));
  drawChoices("subtopic-options",topic?.leaves||[],leaf,row=>selectPath({category:selected.category,topic:selected.topic,subtopic:row.id}));
  $("clear-path").disabled=!subject&&!selected.refine;
- $("scope-label").textContent=search?.announcementOnly?"Scope: latest official announcement · all arXiv categories.":pathText()?"Scope: "+pathText():"Scope: the whole archive.";
+ $("scope-label").textContent=search?.announcementOnly?"Scope: latest official announcement · "+(pathText()||"all arXiv categories")+".":pathText()?"Scope: "+pathText():"Scope: the whole archive.";
  drawPersonal();
 }
 function rebuildIndex(){index=atlas.makeIndex(source,catalog,personal)}
@@ -252,7 +259,7 @@ function filtered(state){
 }
 function drawResults(state){
  if(state!==search)return;
- if(state.announcementOnly)$("scope-label").textContent="Scope: latest official announcement · all arXiv categories.";
+ if(state.announcementOnly)$("scope-label").textContent="Scope: latest official announcement · "+(pathText()||"all arXiv categories")+".";
  const rows=filtered(state),results=$("results"),actions=$("result-actions"),c=state.criteria;
  $("result-count").textContent=rows.length.toLocaleString()+" matching "+name+" record"+(rows.length===1?"":"s")+(state.loading?" · checking source…":"");
  $("sync-status").textContent=state.message;
@@ -414,8 +421,17 @@ $("topic-find").onkeydown=e=>{
  if(e.key==="Escape"){$("topic-find").value="";showSuggestions()}
  if(e.key==="ArrowDown"&&!$("topic-suggestions").hidden){e.preventDefault();$("topic-suggestions").querySelector("button")?.focus()}
 };
-$("search-form").onsubmit=e=>{e.preventDefault();datePreset++;runSearch()};
-$("sort").onchange=()=>{datePreset++;runSearch()};
+$("search-form").onsubmit=e=>{
+ e.preventDefault();
+ if(search?.announcementOnly&&!search.loading&&!$("from").value&&!$("to").value){
+  search.criteria=criteriaFromForm();search.visible=12;drawResults(search);
+ }else{datePreset++;runSearch()}
+};
+$("sort").onchange=()=>{
+ if(search?.announcementOnly&&!search.loading){
+  search.criteria=criteriaFromForm();drawResults(search);
+ }else{datePreset++;runSearch()}
+};
 $("date-open").onclick=()=>{$("advanced").open=true;$("from").focus()};
 $("announced")?.addEventListener("click",showLatestAnnouncement);
 $("latest").onclick=()=>{
