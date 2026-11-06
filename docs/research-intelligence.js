@@ -81,7 +81,8 @@ function renderRecommendations(){
  const authorFollowing=read("axiovo-author-follows",[]);
  const scored=R.rank(feed,{interests:allInterests(),projects:selected,authors:[
    ...settings.authors,...(Array.isArray(authorFollowing)?authorFollowing:[])
- ],saved:Array.isArray(saved)?saved:[],hidden:Array.isArray(hidden)?hidden:[],now:new Date().toISOString()});
+ ],matchesAuthor:(a,b)=>window.AxiovoAuthorFollow?.matchesName(a,b)===true,
+  saved:Array.isArray(saved)?saved:[],hidden:Array.isArray(hidden)?hidden:[],now:new Date().toISOString()});
  filtered=scored;
  const sortMode=$("research-results-sort")?.value||"relevance";
  const ordered=window.AxiovoPaperSort?.sort(scored,sortMode,x=>x.score)||scored;
