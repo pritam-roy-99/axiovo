@@ -49,5 +49,30 @@ class SourceHarvestTests(unittest.TestCase):
         self.assertEqual(len(requests),2)
         self.assertIsNone(chem.normalize({"DOI":"10.1234/unknown","title":["Other paper"]}))
 
+    def test_chemrxiv_checkpoint_advances_across_runs(self):
+        import urllib.parse
+        def fetch(url):
+            if "query.bibliographic=" in url:
+                return {"message":{"items":[]}}
+            q=urllib.parse.parse_qs(urllib.parse.urlsplit(url).query)
+            cursor=q.get("cursor",["*"])[0]
+            if cursor=="*":
+                return {"message":{"items":[
+                    {"DOI":f"10.26434/chemrxiv.checkpoint{i}/v1",
+                     "title":[f"Verified synthetic test {i}"],"publisher":"ChemRxiv"}
+                    for i in range(250)],"next-cursor":"PAGE-2"}}
+            self.assertEqual(cursor,"PAGE-2")
+            return {"message":{"items":[
+                {"DOI":"10.26434/chemrxiv.checkpoint250/v1",
+                 "title":["Last synthetic record"],"publisher":"ChemRxiv"}]}}
+        first,status=chem.fetch(fetcher=fetch,sleep=lambda *_:None,max_pages=1)
+        self.assertEqual(status["prefix_next_cursor"],"PAGE-2")
+        self.assertFalse(status["prefix_exhausted"])
+        second,finished=chem.fetch(fetcher=fetch,sleep=lambda *_:None,max_pages=1,
+                                    cursor_start=status["prefix_next_cursor"])
+        self.assertEqual(len(second),1)
+        self.assertTrue(finished["prefix_exhausted"])
+        self.assertEqual(finished["prefix_next_cursor"],"*")
+
 if __name__=="__main__":
     unittest.main()
