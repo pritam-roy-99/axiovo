@@ -162,7 +162,14 @@ def main():
                     stamp(shot,title,hint,index,target)
                     sound=work/f"{index:02d}.mp3"
                     try:
-                        asyncio.run(neural_speech(narration,sound))
+                        # The synchronous Playwright API already runs an event
+                        # loop, so isolate the neural TTS coroutine in its own
+                        # Python process. Calling asyncio.run() here would fail.
+                        subprocess.run([
+                            "python","-c",
+                            "import asyncio,edge_tts,sys; asyncio.run(edge_tts.Communicate(sys.argv[1],voice='en-IN-NeerjaNeural',rate='-7%',pitch='+4Hz').save(sys.argv[2]))",
+                            voice_text(narration),str(sound)
+                        ],check=True,timeout=28,stdout=subprocess.DEVNULL,stderr=subprocess.PIPE)
                         voice="Neerja neural Indian English"
                     except Exception as exc:
                         print(f"WARNING: Neural Indian voice unavailable for scene {index}: {exc}",flush=True)
