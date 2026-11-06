@@ -42,6 +42,37 @@ def normalize(item):
         "url": "https://www.biorxiv.org/content/" + doi,
     }
 
+def candidate_endpoints():
+    """Retained compatibility helper: official rolling-date API base."""
+    today = datetime.now(timezone.utc).date()
+    start = today - timedelta(days=14)
+    return [f"{BASE}/{start}/{today}/0/json"]
+
+def build(payload, prior=None):
+    """Validate a response and merge its records for legacy local callers."""
+    rows = payload.get("collection") if isinstance(payload, dict) else None
+    if not isinstance(rows, list):
+        raise ValueError("bioRxiv collection missing")
+    index = {p["doi"].lower(): p for p in (prior or {}).get("papers", [])
+             if isinstance(p, dict) and p.get("doi")}
+    accepted = 0
+    for row in rows:
+        if not isinstance(row, dict):
+            continue
+        item = normalize(row)
+        if not item:
+            continue
+        accepted += 1
+        prior_item = index.get(item["doi"].lower())
+        if prior_item is None or (int(item["version"]) if str(item["version"]).isdigit() else 0) >= (int(prior_item.get("version", 0)) if str(prior_item.get("version", 0)).isdigit() else 0):
+            index[item["doi"].lower()] = item
+    if not accepted:
+        raise ValueError("bioRxiv API returned no usable records")
+    papers = sorted(index.values(), key=lambda p:(p.get("date",""),p["doi"]),reverse=True)[:MAX_STORED]
+    return {"generated_at":datetime.now(timezone.utc).isoformat(),
+            "source":"Official bioRxiv API","papers":papers,"count":len(papers),
+            "complete_window":False}
+
 def get(url, opener=None, sleep=time.sleep):
     opener = opener or urllib.request.urlopen
     request = urllib.request.Request(url, headers={
