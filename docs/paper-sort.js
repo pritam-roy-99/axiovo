@@ -5,7 +5,7 @@
  if(root)root.AxiovoPaperSort=api;
 })(typeof window!=="undefined"?window:null,function(){
  "use strict";
- const MODES=["relevance","recent","oldest","cited"];
+ const MODES=["relevance","recent","oldest","cited","title"];
  function when(p){
   p=p?.paper||p;
   const v=p?.announcementDate||p?.announcement_date||p?.published||p?.date||p?.created||"";
@@ -15,6 +15,7 @@
  function sort(items,mode="relevance",score=()=>0){
   if(!MODES.includes(mode))mode="relevance";
   const records=[...(items||[])];
+  if(mode==="title")return records.sort((a,b)=>String((a?.paper||a)?.title||"").localeCompare(String((b?.paper||b)?.title||"")));
   return records.sort((a,b)=>{
    if(mode==="cited"){
     const x=cited(a),y=cited(b);
