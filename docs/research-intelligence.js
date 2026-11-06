@@ -211,13 +211,45 @@ function startup(){
    if(e.key===PROJECTS){projects=(Array.isArray(read(PROJECTS,[]))?read(PROJECTS,[]):[]).map(R.cleanProject).filter(Boolean);render()}
    if(e.key===META){settings=read(META,{interests:[],authors:[]});drawSettings();renderRecommendations()}
  });
+ async function mergeRecentlyVerifiedMetadata(){
+  // Preserve arXiv v1 publication dates; announcement dates are separate.
+  const paths=["./data/oai-recent.json","./data/announcements.json"];
+  const outcomes=await Promise.allSettled(paths.map(path=>fetch(path,{
+   cache:"no-store",signal:AbortSignal.timeout(9000)
+  }).then(res=>{if(!res.ok)throw Error("HTTP "+res.status);return res.json()})));
+  const existing=new Map(feed.map(p=>[Arxiv?.base(p.id)||p.id,p]));
+  let added=0;
+  for(const outcome of outcomes){
+   if(outcome.status!=="fulfilled"||!Array.isArray(outcome.value.papers))continue;
+   for(const record of outcome.value.papers){
+    const parsed=Arxiv?.parse(record.id||record.arxiv_id||"");
+    if(!parsed||typeof record.title!=="string"||!record.title.trim())continue;
+    const previous=existing.get(parsed.base);
+    if(previous){
+     if(!previous.abstract&&record.abstract)previous.abstract=record.abstract;
+     if(!previous.announcement_date&&record.announcement_date)previous.announcement_date=record.announcement_date;
+     continue;
+    }
+    existing.set(parsed.base,{...record,id:parsed.base,
+     published:record.published||"",announcement_date:record.announcement_date||"",
+     authors:Array.isArray(record.authors)?record.authors:[],
+     categories:Array.isArray(record.categories)?record.categories:[]});
+    added++;
+   }
+  }
+  feed=[...existing.values()];
+  message($("research-rec-status"),"Matching "+feed.length+" source-linked arXiv records"+
+   (added?" including "+added+" newly indexed official-source candidates":"")+
+   ". Snapshot coverage is partial; announcement dates are not first-submission dates.");
+  renderRecommendations();
+ }
  let loaded=false;
  function loadSuggestions(){
   if(loaded)return;
   loaded=true;
  fetch("./data/feed.json",{cache:"no-store"}).then(r=>{if(!r.ok)throw Error("HTTP "+r.status);return r.json()})
   .then(j=>{feed=Array.isArray(j.papers)?j.papers:[];message($("research-rec-status"),
-    "Scored "+feed.length+" locally indexed arXiv records. This is lexical matching, not a novelty assessment.");renderRecommendations();loadLiveArxiv()})
+    "Scored "+feed.length+" locally indexed arXiv records. This is lexical matching, not a novelty assessment.");renderRecommendations();mergeRecentlyVerifiedMetadata().finally(loadLiveArxiv)})
   .catch(()=>{message($("research-rec-status"),"Announcement snapshot unavailable; trying live arXiv-linked literature.");loadLiveArxiv()});
  }
  const tools=document.getElementById("library-research-tools");
