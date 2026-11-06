@@ -15,8 +15,7 @@ on:
     - cron: '37 9,15,21 * * 1-5'
 permissions:
   contents: write
-  pages: write
-  id-token: write
+  actions: write
 concurrency:
   group: axiovo-announcement-harvest
   cancel-in-progress: false
@@ -24,9 +23,6 @@ jobs:
   harvest:
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -58,23 +54,25 @@ jobs:
           assert len(set(x["id"] for x in j["papers"])) == j["count"]
           print("Verified", j["announcement_date"], j["count"], "papers, complete =", j["complete"])
           PY
-      - name: Commit new announcement snapshot and trigger Pages deployment
+      - name: Commit new announcement snapshot
+        id: announcement_commit
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add docs/data/announcements.json
           if ! git diff --cached --quiet; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
             git commit -m 'data: publish latest official arXiv announcements'
             git fetch origin main
             git rebase -X theirs origin/main
             git push origin HEAD:main
           fi
-      - name: Configure GitHub Pages
-        uses: actions/configure-pages@v5
-      - name: Package Axiovo with updated arXiv announcements
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: docs
-      - name: Deploy refreshed Axiovo pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+      # Never deploy raw docs/ from this job: the tutorial MP4 and captions
+      # are build artifacts, not tracked files. A direct deploy would delete
+      # them from the live site after every arXiv announcement update.
+      - name: Rebuild the complete site after announcement refresh
+        if: steps.announcement_commit.outputs.changed == 'true' || github.event_name == 'workflow_dispatch'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh workflow run pages.yml --repo "${{ github.repository }}" --ref main
