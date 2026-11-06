@@ -1,0 +1,43 @@
+name: Search and cross-page browser audit
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/search-smoke.yml'
+      - 'docs/archive-data.js'
+      - 'docs/research-desk.js'
+      - 'docs/topic-explorer.js'
+      - 'docs/paper-sort.js'
+      - 'docs/workspace.js'
+      - 'scripts/smoke_search_links.py'
+      - 'tests/search-provider-contract.test.js'
+      - 'tests/chemrxiv-doi-forms.test.js'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  search:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify publisher identities, ranking and source paging
+        run: |
+          node --check docs/archive-data.js
+          node --check docs/research-desk.js
+          node tests/search-provider-contract.test.js
+          node tests/chemrxiv-doi-forms.test.js
+          node tests/search-accuracy.test.js
+          node tests/paper-sort.test.js
+      - name: Install headless Chromium
+        run: |
+          python -m pip install playwright
+          python -m playwright install --with-deps chromium
+      - name: Test phone and desktop search to Library
+        run: python scripts/smoke_search_links.py
