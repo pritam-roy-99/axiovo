@@ -1,6 +1,6 @@
 /* Portable public collection view excludes all notes and personal settings. */
 (function(root,factory){
- const api=factory();if(typeof module==="object"&&module.exports=api;
+ const api=factory();if(typeof module==="object"&&module.exports)module.exports=api;
  if(root)root.AxiovoCollectionExport=api;
 })(typeof window!=="undefined"?window:null,function(){
  "use strict";
