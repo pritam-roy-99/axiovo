@@ -312,6 +312,7 @@ jobs:
         run: |
           python scripts/smoke_routes.py
           python scripts/smoke_feed.py
+          python scripts/smoke_recommendations.py
       - name: Exercise all three dedicated source Discover pages (deployment gate)
         if: steps.chromium_deps.outcome == 'success'
         id: smoke_archives
