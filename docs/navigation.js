@@ -12,6 +12,7 @@
   const links=[
    ["./#axiovo-archive-title","Explore","Browse research subjects and preprint archives"],
    ["./desk.html","Research Desk","Search arXiv, bioRxiv and ChemRxiv together"],
+   ["./feed.html","My Feed","New papers from your followed authors and research subtopics"],
    ["./workspace.html","Library","View saved papers, notes and research collections"],
    ["./copilot.html","Research Assistant","Inspect papers and compare source-linked evidence"]
   ];
