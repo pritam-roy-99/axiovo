@@ -435,3 +435,76 @@
    flex:1 1 100%;
  }
 }
+
+/* Axiovo recommendation actions: modern save button across desktop/mobile.
+   Scoped selectors override earlier generic paper/button styles. */
+#research-recommendations .axiovo-rec-actions > button.paper-save-btn{
+  display:inline-flex!important;
+  justify-content:center!important;
+  align-items:center!important;
+  gap:8px!important;
+  min-height:44px!important;
+  padding:10px 16px!important;
+  border:1px solid var(--axiovo-paper-line,#cedde8)!important;
+  border-radius:999px!important;
+  background:var(--rl-soft,#eef5fa)!important;
+  color:var(--axiovo-paper-ink,#17354c)!important;
+  font:inherit!important;
+  font-size:13px!important;
+  font-weight:750!important;
+  line-height:1.25!important;
+  white-space:nowrap!important;
+  box-shadow:0 2px 7px rgba(12,43,69,.08)!important;
+  transition:background-color .16s ease,border-color .16s ease,
+    box-shadow .16s ease,transform .16s ease!important;
+  -webkit-appearance:none!important;
+  appearance:none!important;
+}
+#research-recommendations .paper-save-btn__icon{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  font-size:19px;
+  line-height:1;
+  min-width:19px;
+}
+#research-recommendations .paper-save-btn__label{white-space:nowrap}
+#research-recommendations .axiovo-rec-actions > button.paper-save-btn[aria-pressed="true"]{
+  background:var(--axiovo-paper-accent,#126f9c)!important;
+  color:#fff!important;
+  border-color:var(--axiovo-paper-accent,#126f9c)!important;
+  box-shadow:0 2px 9px rgba(18,111,156,.18)!important;
+}
+#research-recommendations .axiovo-rec-actions > button.paper-save-btn:hover{
+  border-color:var(--axiovo-paper-accent,#126f9c)!important;
+  box-shadow:0 4px 12px rgba(12,43,69,.13)!important;
+  filter:none!important;
+  transform:translateY(-1px)!important;
+}
+#research-recommendations .axiovo-rec-actions > button.paper-save-btn:active{
+  transform:translateY(0)!important;
+}
+#research-recommendations .axiovo-rec-actions > button.paper-save-btn:focus-visible{
+  outline:3px solid var(--axiovo-paper-accent,#126f9c)!important;
+  outline-offset:3px!important;
+}
+@media (prefers-reduced-motion:reduce){
+ #research-recommendations .axiovo-rec-actions > button.paper-save-btn{
+  transition:none!important;
+ }
+}
+@media(max-width:540px){
+ #research-recommendations .axiovo-rec-actions > button.paper-save-btn{
+  flex:1 1 calc(50% - 8px)!important;
+  min-width:0!important;
+  padding:11px 12px!important;
+ }
+ #research-recommendations .axiovo-rec-actions > a.axiovo-rec-assistant{
+  min-width:0!important;
+ }
+}
+@media(max-width:360px){
+ #research-recommendations .axiovo-rec-actions > button.paper-save-btn{
+  flex:1 1 100%!important;
+ }
+}
