@@ -8,7 +8,7 @@ const papers=[
  {id:"2501.00123v2",title:"Nonlocality and preparation contextuality",abstract:"An operational witness.",published:"2025-01-03T00:00:00Z",authors:["Researcher Three"],categories:["quant-ph"],topics:["contextuality"]}
 ];
 assert.equal(normalizeId("https://arxiv.org/abs/2501.00123v3"),"2501.00123");
-assert.deepEqual(tokens("The quantum steering and steering witness"),["steering","witness"]);
+assert.deepEqual(tokens("The quantum steering and steering witness"),["quantum","steering","witness"]);
 const opts={interests:["steering"],projects:[],now:"2026-11-03T00:00:00Z"};
 const a=rank(papers,opts);assert.equal(a.length,1);assert.equal(a[0].paper.id,"2601.00123");assert(a[0].reasons.some(x=>x.includes("steering")));
 const b=rank(papers,{projects:[{title:"Steering based sensing",keywords:"metrology sensing"}],now:"2026-11-03T00:00:00Z"});
@@ -18,4 +18,20 @@ const d=rank(papers,{authors:["Researcher Two"],saved:["2601.00124"]});
 assert.equal(d.length,1);assert(d[0].reasons.includes("Followed author"));assert(d[0].reasons.includes("Already saved"));
 assert.equal(cleanProject({id:"one",title:" Test ",keywords:" steering ",status:"unexpected",paper_ids:["2501.00123v2","2501.00123"]}).paper_ids.length,1);
 assert.equal(cleanProject({id:"",title:"Missing identifier"}),null);
+const noisy=[
+ {id:"2611.10001",title:"A Rigorous, Tractable Measure of Model Complexity",abstract:"We examine models of complex systems.",authors:["Researcher"]},
+ {id:"2611.10002",title:"Neural Collapse on Imbalanced Datasets and Open-Set Scenario",abstract:"Classification data distributions.",authors:["Researcher"]},
+ {id:"2611.10003",title:"Educational robotics beyond ROS",abstract:"Robotic controllers and training.",authors:["Researcher"]},
+ {id:"2611.10004",title:"Atomic Parity Violation: Standard Model Tests",abstract:"Tests of the standard model.",authors:["Researcher"]},
+ {id:"2611.10005",title:"Operational prepare and measure contextuality scenarios",abstract:"Prepare-and-measure experiments.",authors:["Researcher"]}
+];
+const corrected=rank(noisy,{interests:["Prepare and measure scenario","Beyond the Standard Model"]});
+assert.deepEqual(corrected.map(x=>x.paper.id).sort(),["2611.10004","2611.10005"],
+ "Multiword interests require multiple matching scientific concepts");
+const alias=rank([noisy[4]],{authors:["A. S. Majumdar"],
+ matchesAuthor:(a,b)=>a==="A. S. Majumdar"&&b==="Archan S Majumdar"});
+assert.equal(alias.length,0,"Must not claim followed author for other authors");
+const authorOnly=rank([{id:"2611.10006",title:"Different subject",authors:["Archan S Majumdar"]}],
+ {authors:["A. S. Majumdar"],matchesAuthor:(a,b)=>a==="A. S. Majumdar"&&b==="Archan S Majumdar"});
+assert.equal(authorOnly.length,1,"Verified abbreviated author following must work");
 console.log("Relevance and project data regression tests passed");
