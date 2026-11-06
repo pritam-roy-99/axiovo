@@ -6,6 +6,7 @@ missing upstream research provider as evidence of an application defect.
 """
 from __future__ import annotations
 import functools
+import json
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from threading import Thread
@@ -129,6 +130,37 @@ def main():
                 assert page.locator("#hosted-key").count()==0, "Browser must not collect API secrets"
                 assert page.locator("#clear-hosted-key").count()==0
                 assert page.locator("#engine").input_value()=="evidence"
+                if width==390:
+                    # Reproduce the reported mobile failure: an overbroad
+                    # "macroscopic quantumness" search used to display
+                    # unrelated energy gaps, thermodynamics and AI sources.
+                    example={"papers":[
+                        {"id":"2611.11001","title":"Macroscopic stochastic thermodynamics",
+                         "abstract":"Macroscopic thermodynamic fluctuations in many body matter.",
+                         "authors":["Sample Author"],"published":"2026-11-03"},
+                        {"id":"2611.11002","title":"Macroscopic energy gaps in quantum matter",
+                         "abstract":"How gaps remain stable in large quantum systems.",
+                         "authors":["Sample Author"],"published":"2026-11-03"},
+                        {"id":"2611.11003","title":"Experimental witnesses of macroscopic quantumness",
+                         "abstract":"We investigate witnesses of macroscopic quantumness by collective measurements.",
+                         "authors":["Sample Author"],"published":"2026-11-03"}]}
+                    page.route("**/data/feed.json",
+                        lambda route: route.fulfill(status=200,content_type="application/json",
+                            body=json.dumps(example)))
+                    page.route("**/data/oai-recent.json",
+                        lambda route: route.fulfill(status=200,content_type="application/json",
+                            body='{"papers":[]}'))
+                    page.reload(wait_until="domcontentloaded")
+                    page.wait_for_function("document.getElementById('retrieval-status').textContent.includes('indexed arXiv records ready')")
+                    page.locator("#question").fill("Why should we study macroscopic quantumness?")
+                    page.locator("#ask").click()
+                    page.locator("#busy").wait_for(state="hidden",timeout=15000)
+                    page.wait_for_function("document.querySelectorAll('#evidence-list .source').length===1")
+                    assert "Experimental witnesses of macroscopic quantumness" in page.locator("#conversation").inner_text()
+                    assert "[1]" in page.locator("#conversation").inner_text()
+                    assert "Macroscopic energy gaps" not in page.locator("#evidence-list").inner_text()
+                    assert page.locator("#evidence-list .assistant-source-details").count()==1
+                    assert not page.locator("#evidence-list .assistant-source-details").first.is_open()
                 page.goto(base+"profiles.html",wait_until="domcontentloaded")
                 before = page.evaluate("document.documentElement.dataset.theme")
                 page.locator(".axiovo-header-appearance .theme-toggle").click()
