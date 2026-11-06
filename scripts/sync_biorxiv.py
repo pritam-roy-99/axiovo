@@ -1,23 +1,32 @@
 #!/usr/bin/env python3
-"""Refresh public bioRxiv metadata without external dependencies or API keys.
+"""Bounded, paginated official bioRxiv metadata refresh.
 
-bioRxiv's public API returns up to 30 records per page. Keep the last
-successful snapshot on transient network failures, never fabricate papers.
+Harvest a rolling 14-day date window, follow cursor pages, preserve historical
+verified records, and report whether the requested source window was exhausted.
+No empty/failed request may masquerade as a successful synchronization.
 """
 from __future__ import annotations
 from datetime import datetime, timezone, timedelta
-import json
-import sys
 from pathlib import Path
+import json
+import os
 import re
+import sys
+import tempfile
+import time
+import urllib.error
 import urllib.request
 
-TARGET = Path(__file__).resolve().parents[1] / "docs" / "data" / "biorxiv.json"
-ENDPOINT = "https://api.biorxiv.org/details/biorxiv/100/0/json"
+TARGET = Path(__file__).resolve().parents[1] / "docs/data/biorxiv.json"
+BASE = "https://api.biorxiv.org/details/biorxiv"
+PAGE_SIZE = 100  # API may return fewer; advance by observed collection size
+MAX_PAGES = 150
+MAX_STORED = 5000
+RETRY = (5, 15, 35)
 
-def normalize(item: dict) -> dict | None:
+def normalize(item):
     doi = str(item.get("doi") or "").strip()
-    if not re.fullmatch(r"10\.\d{4,9}/[A-Za-z0-9._;()/:+-]+", doi):
+    if not re.fullmatch(r"10\.(?:1101|64898)/[A-Za-z0-9._;()/:+-]+", doi, re.I):
         return None
     title = " ".join(str(item.get("title") or "").split())
     if not title:
@@ -33,83 +42,100 @@ def normalize(item: dict) -> dict | None:
         "url": "https://www.biorxiv.org/content/" + doi,
     }
 
-def build(payload: dict, prior: dict | None = None) -> dict:
-    if not isinstance(payload, dict) or not isinstance(payload.get("collection"), list):
-        raise ValueError("bioRxiv API response lacks collection")
+def get(url, opener=None, sleep=time.sleep):
+    opener = opener or urllib.request.urlopen
+    request = urllib.request.Request(url, headers={
+        "User-Agent": os.getenv("ARXIV_USER_AGENT",
+            "Axiovo/1.1 (https://github.com/pritam-roy-99/axiovo; bioRxiv metadata index)"),
+        "Accept": "application/json",
+    })
+    for attempt in range(len(RETRY) + 1):
+        try:
+            with opener(request, timeout=45) as response:
+                return json.load(response)
+        except (OSError, ValueError, json.JSONDecodeError) as error:
+            if attempt == len(RETRY):
+                raise
+            if isinstance(error, urllib.error.HTTPError) and error.code not in (429, 500, 502, 503, 504):
+                raise
+            sleep(RETRY[attempt])
+    raise RuntimeError("bioRxiv source unavailable")
+
+def fetch_window(start, end, fetcher=get, sleep=time.sleep, max_pages=MAX_PAGES):
     index = {}
-    for item in ((prior or {}).get("papers") or []):
-        if isinstance(item, dict) and item.get("doi"):
-            index[item["doi"]] = item
-    count = 0
-    for raw in payload["collection"]:
-        if not isinstance(raw, dict):
-            continue
-        item = normalize(raw)
-        if item is not None:
-            count += 1
-            old = index.get(item["doi"])
-            if not old or (item["version"], item["date"]) >= (old.get("version", ""), old.get("date", "")):
-                index[item["doi"]] = item
-    if count == 0:
-        raise ValueError("bioRxiv API returned no usable records; preserve previous data")
-    papers = sorted(index.values(), key=lambda x: (x.get("date", ""), x.get("doi", "")), reverse=True)[:600]
-    return {
-        "generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
-        "source": "bioRxiv public API", "interval": "100 most recent records; cached records retained",
-        "papers": papers,
-        "note": "Recent cached metadata only. Search the official bioRxiv site for comprehensive historical coverage.",
-    }
+    cursor = 0
+    expected = None
+    pages = 0
+    while pages < max_pages:
+        url = f"{BASE}/{start}/{end}/{cursor}/json"
+        payload = fetcher(url)
+        if not isinstance(payload, dict) or not isinstance(payload.get("collection"), list):
+            raise ValueError("bioRxiv collection missing")
+        rows = payload["collection"]
+        messages = payload.get("messages") or []
+        if expected is None and messages and isinstance(messages[0], dict):
+            try:
+                expected = int(messages[0]["total"])
+            except (ValueError, KeyError, TypeError):
+                pass
+        if not rows:
+            if cursor == 0:
+                raise ValueError("bioRxiv returned an empty first page; no freshness claim")
+            break
+        for raw in rows:
+            if not isinstance(raw, dict):
+                continue
+            item = normalize(raw)
+            if item:
+                key = item["doi"].lower()
+                prior = index.get(key)
+                if prior is None or (int(item["version"]) if str(item["version"]).isdigit() else 0, item["date"]) >= (int(prior["version"]) if str(prior["version"]).isdigit() else 0, prior["date"]):
+                    index[key] = item
+        cursor += len(rows)
+        pages += 1
+        if expected is not None and cursor >= expected:
+            break
+        sleep(1.2)
+    complete = expected is not None and cursor >= expected
+    if not index:
+        raise ValueError("bioRxiv did not return valid DOI records")
+    return list(index.values()), {"complete_window": complete, "source_total": expected,
+        "records_paginated": cursor, "pages": pages, "requested_from": str(start), "requested_through": str(end)}
 
-def candidate_endpoints() -> list[str]:
-    """Use the documented official recent-post and interval APIs, then legacy mirror."""
+def atomic_write(payload):
+    TARGET.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.NamedTemporaryFile("w", dir=TARGET.parent, encoding="utf8", delete=False) as out:
+        json.dump(payload, out, ensure_ascii=False, separators=(",", ":"))
+        out.write("\n")
+        tmp = Path(out.name)
+    tmp.replace(TARGET)
+
+def main():
     today = datetime.now(timezone.utc).date()
-    start = today - timedelta(days=14)
-    return [
-        "https://api.biorxiv.org/details/biorxiv/7d/0/json",
-        "https://api.biorxiv.org/details/biorxiv/14d/0/json",
-        "https://api.biorxiv.org/details/biorxiv/100/0/json",
-        f"https://api.biorxiv.org/details/biorxiv/{start}/{today}/0/json",
-        "https://connect.biorxiv.org/api/detail/100/0/json",
-    ]
-
-
-def main() -> None:
-    previous = {}
+    days = max(2, min(30, int(os.getenv("AXIOVO_BIORXIV_LOOKBACK_DAYS", "14"))))
+    prior = {}
     try:
-        previous = json.loads(TARGET.read_text(encoding="utf8"))
+        prior = json.loads(TARGET.read_text(encoding="utf8"))
     except (OSError, ValueError):
         pass
-    errors = []
-    for url in candidate_endpoints():
-        request = urllib.request.Request(url, headers={
-            "User-Agent": "Axiovo/0.7 (+https://github.com/pritam-roy-99/axiovo; public scholarly metadata)",
-            "Accept": "application/json",
-        })
-        try:
-            with urllib.request.urlopen(request, timeout=18) as response:
-                payload = json.load(response)
-            entries = payload.get("collection") if isinstance(payload, dict) else None
-            if isinstance(entries, list) and entries:
-                sample = entries[0]
-                if isinstance(sample, dict):
-                    doi = str(sample.get("doi") or "")
-                    print("bioRxiv endpoint sample:", len(entries), "records; DOI prefix", doi.split("/")[0])
-            result = build(payload, previous)
-            result["interval"] = "Latest official bioRxiv records, limited to 30 per response; prior records retained"
-            result["endpoint"] = url
-            TARGET.parent.mkdir(parents=True, exist_ok=True)
-            TARGET.write_text(json.dumps(result, indent=2, ensure_ascii=False) + "\n", encoding="utf8")
-            print(f"bioRxiv: synchronized {len(result['papers'])} valid papers via {url}")
-            return
-        except (OSError, ValueError, TypeError, json.JSONDecodeError) as error:
-            errors.append(f"{url}: {str(error)[:160]}")
-            print("WARNING: bioRxiv source unavailable:", errors[-1])
-
-    if (previous.get("papers") or []):
-        print("WARNING: all official bioRxiv endpoints failed; retaining",len(previous["papers"]),"cached records")
-        return
-    print("ERROR: all bioRxiv endpoints failed, and cached bioRxiv data is empty", file=sys.stderr)
-    sys.exit(1)
+    try:
+        current, status = fetch_window(today - timedelta(days=days), today)
+    except (OSError, ValueError) as error:
+        print("ERROR: bioRxiv refresh failed; previously published snapshot unchanged:", error, file=sys.stderr)
+        raise SystemExit(1)
+    index = {p["doi"].lower(): p for p in prior.get("papers", []) if isinstance(p, dict) and p.get("doi")}
+    for paper in current:
+        old = index.get(paper["doi"].lower())
+        if old is None or str(paper["version"]).isdigit() and int(paper["version"]) >= int(old.get("version", 0) or 0):
+            index[paper["doi"].lower()] = paper
+    papers = sorted(index.values(), key=lambda p: (p.get("date", ""),p["doi"]), reverse=True)[:MAX_STORED]
+    payload = {"generated_at": datetime.now(timezone.utc).isoformat(),
+        "source": "Official bioRxiv API", "endpoint": BASE,
+        "coverage": "Paginated rolling date window; cached older source records retained, not a full historical archive",
+        "count": len(papers), "papers": papers, **status}
+    atomic_write(payload)
+    print("bioRxiv indexed",len(papers),"window records",status["records_paginated"],
+          "official total",status["source_total"],"complete",status["complete_window"])
 
 if __name__ == "__main__":
     main()
