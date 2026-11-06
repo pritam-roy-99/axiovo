@@ -19,6 +19,8 @@ on:
       - 'docs/author-follow.js'
       - 'tests/author-name-aliases.test.js'
       - 'docs/archive-data.js'
+      - 'docs/paper-sort.js'
+      - 'tests/paper-sort.test.js'
       - 'docs/copilot.js'
       - 'docs/index.html'
       - 'docs/feed.html'
@@ -62,6 +64,10 @@ jobs:
           python -m unittest discover -s tests -p test_literature_coverage.py -v
           python -m unittest discover -s tests -p test_arxiv_daily_archive.py -v
           python -m unittest discover -s tests -p test_source_harvest.py -v
+      - name: Verify consistent source-first sorting and missing citations
+        run: |
+          node --check docs/paper-sort.js
+          node tests/paper-sort.test.js
       - name: Evaluate five research disciplines and related-paper provenance
         run: |
           node tests/research-ranking-benchmark.test.js
