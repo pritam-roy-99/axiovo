@@ -108,6 +108,7 @@ function identifier(value){
 function matchesAuthor(authors,query){
  const words=simple(query).split(" ").filter(Boolean);
  return !words.length||authors.some(author=>{
+  if(root.AxiovoAuthorFollow?.matchesName(query,author))return true;
   const parts=simple(author).split(" ");
   return words.every(word=>parts.some(part=>part===word||(word.length===1&&part.startsWith(word))));
  });
