@@ -56,5 +56,11 @@ const data=root.AxiovoArchiveData;
   abstract:"We analyze quantum steering experiments",published:"2026-11-01",categories:["quant-ph"]});
  assert.equal(data.filter([abstract,title],{q:"quantum steering"})[0].id,"2611.00010",
   "Full title phrase should outrank the same query appearing only in an abstract");
+ const chemOther=data.normalize("chemrxiv",{doi:"10.26434/chemrxiv.12345",title:"Synthesis of organic catalysts",abstract:"Carbon bond activation",provenance:"Crossref subject query"});
+ assert.equal(data.filter([chemOther],{q:"",category:{name:"Quantum chemistry",code:"quantum chemistry"},categoryTerms:["quantum chemistry"]}).length,0,
+  "Crossref subject-query provenance alone must not qualify unrelated chemistry papers");
+ const chemMatch=data.normalize("chemrxiv",{doi:"10.26434/chemrxiv.12346",title:"Quantum chemistry of molecular excited states",provenance:"Crossref subject query"});
+ assert.equal(data.filter([chemMatch],{q:"",category:{name:"Quantum chemistry",code:"quantum chemistry"},categoryTerms:["quantum chemistry"]}).length,1,
+  "Evidence in a paper title may support a category when source tags are absent");
  console.log("PASS: arXiv announcements, exact dates, whole-term lexical relevance, and title-first ranking");
 })().catch(e=>{console.error(e);process.exitCode=1});
