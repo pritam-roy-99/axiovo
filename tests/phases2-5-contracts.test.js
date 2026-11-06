@@ -11,6 +11,7 @@ const citation=require("../docs/citation-formats.js");
 const collections=require("../docs/collection-export.js");
 const feedPlan=require("../docs/feed-retrieval-plan.js");
 const personal=require("../docs/personal-migration.js");
+const authorIdentity=require("../docs/author-identity.js");
 
 const a={source:"arxiv",id:"arxiv:2611.00001",source_id:"2611.00001",recordId:"2611.00001v2",version:2,
  title:"Quantum contextuality in sequential measurements",abstract:"A nonclassical measurement test.",
@@ -79,4 +80,12 @@ const plan2=feedPlan.plan({authors:["Alice","Bob"],topics:["quantum","biology"],
 assert.equal(plan1.total,4);
 assert.equal(new Set([...plan1.queries,...plan2.queries].map(t=>t.key)).size,4);
 assert.throws(()=>personal.optInMirror({getItem:()=>null},[],{approved:false}),/Explicit migration approval required/);
+assert.equal(authorIdentity.orcid("0000-0002-1825-0097"),"0000-0002-1825-0097");
+assert.equal(authorIdentity.orcid("0000-0002-1825-0098"),null);
+assert.equal(authorIdentity.openAlex("https://openalex.org/A1234"),"A1234");
+const unresolved=authorIdentity.candidate({name:"Alex Smith"},"OpenAlex search");
+assert.equal(unresolved.confirmed,false);
+assert.equal(authorIdentity.sameResearcher(unresolved,unresolved),false);
+assert.throws(()=>citation.normalize({...a,url:"https://example.com/not-the-paper"}),/original source/);
+assert.throws(()=>citation.normalize({...a,url:"https://arxiv.org/abs/2611.00001v1"}),/revision mismatch/);
 console.log("Phases 2-5: strict search, evidence, portability, fair follow plan and opt-in migration tests passed.");
