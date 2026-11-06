@@ -131,6 +131,7 @@ def main():
             audio_entries=[]
             captions=["WEBVTT",""]
             voices_used=set()
+            neural_available=True
             chapters=[]
             elapsed=0.0
             with sync_playwright() as p:
@@ -161,18 +162,23 @@ def main():
                     page.screenshot(path=str(shot))
                     stamp(shot,title,hint,index,target)
                     sound=work/f"{index:02d}.mp3"
-                    try:
-                        # The synchronous Playwright API already runs an event
-                        # loop, so isolate the neural TTS coroutine in its own
-                        # Python process. Calling asyncio.run() here would fail.
-                        subprocess.run([
-                            "python","-c",
-                            "import asyncio,edge_tts,sys; asyncio.run(edge_tts.Communicate(sys.argv[1],voice='en-IN-NeerjaNeural',rate='-7%',pitch='+4Hz').save(sys.argv[2]))",
-                            voice_text(narration),str(sound)
-                        ],check=True,timeout=28,stdout=subprocess.DEVNULL,stderr=subprocess.PIPE)
-                        voice="Neerja neural Indian English"
-                    except Exception as exc:
-                        print(f"WARNING: Neural Indian voice unavailable for scene {index}: {exc}",flush=True)
+                    if neural_available:
+                        try:
+                            # Separate process because Playwright's sync API
+                            # already owns the event loop. One failed network
+                            # attempt disables neural TTS for all later scenes.
+                            subprocess.run([
+                                "python","-c",
+                                "import asyncio,edge_tts,sys; asyncio.run(edge_tts.Communicate(sys.argv[1],voice='en-IN-NeerjaNeural',rate='-7%',pitch='+4Hz').save(sys.argv[2]))",
+                                voice_text(narration),str(sound)
+                            ],check=True,timeout=9,stdout=subprocess.DEVNULL,stderr=subprocess.PIPE)
+                            if not sound.is_file() or sound.stat().st_size < 1000:
+                                raise RuntimeError("Neural narration output was empty")
+                            voice="Neerja neural Indian English"
+                        except Exception as exc:
+                            neural_available=False
+                            print(f"WARNING: Indian neural voice unavailable; using labeled female offline fallback: {str(exc)[:120]}",flush=True)
+                    if not neural_available:
                         sound=work/f"{index:02d}.wav"
                         subprocess.run(["espeak-ng","-v","en+f3","-s","138","-w",str(sound),voice_text(narration)],check=True)
                         voice="eSpeak female fallback"
