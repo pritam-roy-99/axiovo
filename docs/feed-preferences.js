@@ -22,7 +22,8 @@
   const settings=read(storage,"axiovo-research-interest-settings-v1",{});
   const field=read(storage,"axiovo-field-explorer-v1",{});
   const specialized=read(storage,"axiovo-interests-by-field-v1",{});
-  const topics=[...read(storage,TOPICS,[]),...(Array.isArray(settings?.interests)?settings.interests:[])];
+  const manual=read(storage,TOPICS,[]);
+  const topics=[...(Array.isArray(manual)?manual:[]),...(Array.isArray(settings?.interests)?settings.interests:[])];
   // The archive Discover pages store followed paths per archive, not under
   // axiovo-followed-topics. Respect all three without copying the keys.
   const paths=[];
@@ -46,13 +47,13 @@
    }
   }
   return {topics:unique(topics),authors:unique([
-   ...read(storage,AUTHORS,[]),...(Array.isArray(settings?.authors)?settings.authors:[])
+   ...(Array.isArray(read(storage,AUTHORS,[]))?read(storage,AUTHORS,[]):[]),...(Array.isArray(settings?.authors)?settings.authors:[])
   ],60),paths};
  }
  function updateTopic(storage,topic,following){
   const text=String(topic||"").trim().replace(/\s+/g," ").slice(0,120);
   if(text.length<3)return false;
-  const items=unique(read(storage,TOPICS,[])),previous=items.some(x=>x.toLowerCase()===text.toLowerCase());
+  const raw=read(storage,TOPICS,[]),items=unique(Array.isArray(raw)?raw:[]),previous=items.some(x=>x.toLowerCase()===text.toLowerCase());
   if(previous===following)return true;
   const next=following?[...items,text].slice(-80):items.filter(x=>x.toLowerCase()!==text.toLowerCase());
   try{storage.setItem(TOPICS,JSON.stringify(next));return true}catch{return false}
