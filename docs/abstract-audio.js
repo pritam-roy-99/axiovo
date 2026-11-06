@@ -33,7 +33,11 @@ const pause=make("button","Pause"),skip=make("button","Next paper"),stop=make("b
 for(const b of [pause,skip,stop])b.type="button";
 const controls=make("div");controls.append(voiceSelect,speed,pause,skip,stop);
 toolbar.append(title,status,caption,controls);document.body.append(toolbar);
-const available=()=>synth.getVoices().filter(v=>v.localService&&/^en(?:[-_]|$)/i.test(v.lang));
+// Android/Chrome may expose English voices without localService=true.
+const available=()=>{
+ const voices=synth.getVoices().filter(v=>/^en(?:[-_]|$)/i.test(v.lang));
+ return voices.sort((a,b)=>Number(Boolean(b.localService))-Number(Boolean(a.localService)));
+};
 const voiceScore=v=>Number(female.test(v.name))*4+Number(/natural|premium|enhanced/i.test(v.name))*2;
 function refresh(){
  const options=available().sort((a,b)=>voiceScore(b)-voiceScore(a));
@@ -45,13 +49,15 @@ function refresh(){
 function store(){try{localStorage.setItem(key,JSON.stringify(prefs))}catch{}}
 voiceSelect.onchange=()=>{prefs.voice=voiceSelect.value;store()};
 speed.onchange=()=>{prefs.rate=speed.value;store()};
-synth.addEventListener("voiceschanged",refresh);refresh();
+if(typeof synth.addEventListener==="function")synth.addEventListener("voiceschanged",refresh);
+else synth.onvoiceschanged=refresh;
+refresh();
 const replacement=new RegExp("(?<![\\p{L}\\p{N}])("+Object.keys(lexicon).sort((a,b)=>b.length-a.length).join("|")+")(?![\\p{L}\\p{N}])","gu");
 function pronounce(text){
  return text.replace(replacement,term=>lexicon[term]).replace(/°C|[αβγδλμσψπ≈±≤≥×%]/gu,term=>symbols[term]).replace(/\s+/g," ").trim();
 }
 function segments(text){
- const sentences=Intl.Segmenter?[...new Intl.Segmenter("en",{granularity:"sentence"}).segment(text)].map(x=>x.segment):[text];
+ const sentences=typeof Intl.Segmenter==="function"?[...new Intl.Segmenter("en",{granularity:"sentence"}).segment(text)].map(x=>x.segment):[text];
  return sentences.flatMap(value=>value.trim().match(/.{1,205}(?:\s|$)|\S+/gu)||[]).map(x=>x.trim()).filter(Boolean);
 }
 let items=[],paper=0,sentence=0,revision=0,paused=false;
@@ -64,9 +70,10 @@ function say(){
  const {record,parts}=items[paper],phrase=parts[sentence];
  if(!phrase){paper++;sentence=0;say();return}
  const voices=refresh(),voice=voices.find(v=>v.voiceURI===prefs.voice)||voices[0];
- if(!voice){finish("No on-device English voice is available in this browser.");return}
+ // Let the browser use its default speech voice when voices are not enumerated.
+ // This is common on Android before voiceschanged fires.
  const run=revision,utterance=new SpeechSynthesisUtterance(pronounce(phrase));
- utterance.voice=voice;utterance.lang=voice.lang;utterance.rate={slow:.80,steady:.94,brisk:1.17}[prefs.rate]||.94;
+ if(voice)utterance.voice=voice;utterance.lang=voice?.lang||"en-US";utterance.rate={slow:.80,steady:.94,brisk:1.17}[prefs.rate]||.94;
  utterance.onend=()=>{if(run===revision){sentence++;say()}};
  utterance.onerror=()=>{if(run===revision)finish("The on-device voice stopped. Select Listen to try again.")};
  title.textContent=record.title;caption.textContent=phrase;
