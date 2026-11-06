@@ -179,4 +179,18 @@ def choose_same_revision(a, b):
     def quality(p):
         return (bool(p.get("abstract")), len(p.get("abstract") or ""),
                 len(p.get("authors") or []), len(p.get("categories") or []))
-    return a if quality(a) >= quality(b) else b
+    preferred, other = (a, b) if quality(a) >= quality(b) else (b, a)
+    result = dict(preferred)
+    # Dates and journal metadata are complementary claims only within a
+    # confirmed identical revision. Conflicts remain visible, never guessed.
+    warnings = list(result["validation"].get("warnings", []))
+    for field in ("submitted_date", "announced_date", "updated_date", "journal_ref"):
+        existing, incoming = preferred.get(field), other.get(field)
+        if not existing and incoming:
+            result[field] = incoming
+        elif existing and incoming and existing != incoming:
+            warnings.append("source_disagreement:" + field)
+    if preferred.get("title") != other.get("title"):
+        warnings.append("source_disagreement:title")
+    result["validation"] = {**preferred["validation"], "warnings": sorted(set(warnings))}
+    return result
