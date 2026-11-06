@@ -219,6 +219,29 @@ function init(){
  form.requestSubmit();
 });
  $("export-library").onclick=()=>{const papers=library();if(!papers.length){$("library-count").textContent="No papers to export";return}download("axiovo-library.json",JSON.stringify({version:2,exported_at:new Date().toISOString(),papers,metadata,collections:collections(),research_projects:read(PROJECT_KEY,[])},null,2),"application/json")};
+ $("axiovo-public-collection-export").onclick=()=>{
+  const tools=window.AxiovoCollectionExport,citation=window.AxiovoCitationFormats;
+  if(!tools||!citation){libraryStatus("Shareable list exporter unavailable. Reload the page.");return}
+  const selected=collections().find(c=>c.id===activeCollection);
+  const sourcePapers=library().filter(p=>!selected||selected.paper_keys.includes(p.key));
+  const verified=[];
+  for(const p of sourcePapers){
+   try{
+    const input={...p,source:String(p.source||"").toLowerCase(),
+      source_id:p.arxiv_id||p.doi||p.id||p.recordId,
+      version:p.version??(p.arxiv_id?.match(/v(\d+)$/)?.[1]?Number(p.arxiv_id.match(/v(\d+)$/)[1]):null),
+      landing_url:p.url,submitted_date:p.date};
+    citation.normalize(input);verified.push(input);
+   }catch(_error){}
+  }
+  if(!verified.length){libraryStatus("No source-verified preprints available for public-list export.");return}
+  try{
+   const list=tools.portable(selected?.name||"Saved research papers",verified,citation);
+   tools.validate(list);
+   download("axiovo-shareable-paper-list.json",JSON.stringify(list,null,2),"application/json");
+   libraryStatus("Exported "+list.records.length+" source-linked paper identities only. Private notes and settings are excluded.");
+  }catch(error){libraryStatus("Could not export the public list: "+String(error.message||error))}
+ };
  $("export-citations").onclick=()=>{
   const papers=library();if(!papers.length){libraryStatus("No saved papers to export.");return}
   const format=$("axiovo-citation-format")?.value||"bibtex";
