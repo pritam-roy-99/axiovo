@@ -160,7 +160,8 @@ async function request(url,signal,json=true){
 }
 const snapshots=new Map();
 const SNAPSHOT_TTL_MS=5*60*1000;
-async function snapshot(source){
+async function snapshot(source,options={}){
+ if(options?.force===true)snapshots.delete(source);
  const cached=snapshots.get(source);
  if(cached&&Date.now()-cached.at>=SNAPSHOT_TTL_MS)snapshots.delete(source);
  if(!snapshots.has(source)){
