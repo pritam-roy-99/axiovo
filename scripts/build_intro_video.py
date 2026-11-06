@@ -16,8 +16,11 @@ OUT = ROOT / "docs" / "assets"
 NARRATION = ROOT / "scripts" / "tour-narration"
 WIDTH, HEIGHT, FPS, RATE = 960, 540, 12, 24000
 SCENES = [
+    ("Axiovo: From knowledge to discovery", "Your research companion for questions, papers and evidence",
+     "Namaste, and welcome to Axiovo. Axiovo means from knowledge to discovery. Connect a research question to original papers, inspect the source evidence and save the work that matters.",
+     [("Discover", "Find original source records"), ("Verify", "Examine evidence and metadata"), ("Save", "Return to research that matters")]),
     ("Research Desk", "One query across three preprint archives",
-     "Welcome to Axiovo. Search arXiv, bioRxiv, and ChemRxiv from a single research desk.",
+     "Search arXiv, bioRxiv, and ChemRxiv from a single research desk.",
      [("arXiv", "Physics, mathematics and computing"), ("bioRxiv", "Biology and life sciences"), ("ChemRxiv", "Chemistry and molecular sciences")]),
     ("Browse every subject", "Find an archive category or refine it with your own terms",
      "Explore the subject directory of each archive. Search by category code, field name, or a subfield you have added.",
