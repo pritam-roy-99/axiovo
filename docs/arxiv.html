@@ -18,7 +18,7 @@
 <script defer src="./arxiv-daily-archive.js"></script>
 <script defer src="./archive-taxonomy.js"></script>
 <script defer src="./topic-atlas.js"></script>
-<script defer src="./archive-data.js"></script>
+<script defer src="./archive-data.js"></script><script defer src="./paper-sort.js"></script>
 <script defer src="./abstract-audio.js"></script>
 <script defer src="./author-follow.js"></script>
 <script defer src="./topic-report.js"></script>
@@ -102,7 +102,7 @@
        <label>First submitted (UTC) from<input id="archive-from" type="date"></label>
        <label>First submitted (UTC) through<input id="archive-to" type="date"></label>
        <label>Match<select id="archive-match"><option value="metadata">Title and metadata</option><option value="title">Title only</option></select></label>
-       <label>Sort<select id="archive-sort"><option value="relevance">Relevance</option><option value="recent">Newest</option><option value="cited">Most cited where available</option></select></label>
+       <label>Sort<select id="archive-sort"><option value="relevance">Relevance</option><option value="recent">Newest first</option><option value="oldest">Oldest first</option><option value="cited">Most cited (known counts)</option></select></label>
        <label>Affiliation<input id="archive-affiliation" type="search" maxlength="100" placeholder="When supplied by source"></label>
       </div>
       <label class="ex-crosslist"><input id="archive-crosslisted" type="checkbox"> Papers with multiple arXiv categories</label>
@@ -116,6 +116,7 @@
      <p id="archive-sync-status" class="rd-small">Coverage depends on the selected dates and metadata provider.</p>
      <details id="archive-match-details" class="rd-advanced" hidden><summary>How this topic is matched</summary><p class="rd-small" id="archive-match-terms"></p></details>
     </div>
+    <div class="paper-sort-toolbar"><label for="archive-result-sort">Order displayed papers</label><select id="archive-result-sort" aria-label="Order archive papers"><option value="relevance">Most relevant</option><option value="recent">Newest first</option><option value="oldest">Oldest first</option><option value="cited">Most cited (known counts)</option></select><span id="archive-sort-note" class="rd-small" role="status"></span></div>
     <div id="archive-results"></div>
     <div id="archive-result-actions" class="rd-actions"></div>
    </section>
