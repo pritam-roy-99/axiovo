@@ -352,7 +352,13 @@ function save(p){
 function unsave(p){
  const id=p.recordId||p.arxiv_id;
  const items=list(read(keys[p.source],[]));
- return write(keys[p.source],items.filter(item=>p.source==="arxiv"?item!==id:item?.doi?.toLowerCase()!==p.doi));
+ if(!write(keys[p.source],items.filter(item=>p.source==="arxiv"?item!==id:item?.doi?.toLowerCase()!==p.doi)))return false;
+ if(p.source==="arxiv"){
+  const meta=list(read(ARXIV_METADATA,[])).filter(item=>item.recordId!==id);
+  write(ARXIV_METADATA,meta);
+ }
+ root.dispatchEvent(new Event("axiovo-library-change"));
+ return true;
 }
 function savedRecords(source){
  return list(read(source==="arxiv"?ARXIV_METADATA:keys[source],[])).map(p=>normalize(source,p)).filter(Boolean);
