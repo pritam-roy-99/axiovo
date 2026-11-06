@@ -55,7 +55,7 @@ def main():
                         header:box('header.rl-global-header')
                       };
                     }""")
-                    assert result["nav"] == 4, (width,path,"Incorrect global navigation",result)
+                    assert result["nav"] == 5, (width,path,"Incorrect global navigation, expected Explore, Research Desk, My Feed, Library, Research Assistant",result)
                     assert result["settings"] and result["theme"],(width,path,"Appearance actions absent")
                     a,b=result["settings"],result["theme"]
                     assert abs(a["y"]-b["y"])<=2, (width,path,"Settings and theme not in same row",result)
