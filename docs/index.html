@@ -16,12 +16,25 @@
 <script defer src="./research-entry.js"></script>
 <script defer src="./navigation.js"></script>
 <script defer src="./archive-taxonomy.js"></script>
+<script defer src="./arxiv-versions.js"></script>
+<script defer src="./archive-data.js"></script>
+<script defer src="./author-follow.js"></script>
+<script defer src="./feed-core.js"></script>
+<script defer src="./feed-preview.js"></script>
 <script defer src="./pwa.js"></script>
 <style>
 .axiovo-name-meaning{display:grid;gap:4px;margin:14px 0 18px;padding:13px 17px;border-inline-start:3px solid var(--axiovo-accent,#1476a4);border-radius:0 10px 10px 0;background:var(--rl-soft,rgba(49,136,179,.09));color:var(--rl-text,#1b3c52);max-width:680px;line-height:1.6;font-size:clamp(.88rem,1.3vw,1rem)}
 .axiovo-name-meaning strong{font-size:1.06em;font-weight:750;letter-spacing:.015em}
 .axiovo-name-meaning span{display:block}
 @media(max-width:640px){.axiovo-name-meaning{margin:12px 0 17px;padding:11px 13px}}
+</style>
+<style>
+.axiovo-home-feed-preview{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:15px}
+.axiovo-home-feed-preview article{border:1px solid var(--rl-border,#cbdde9);border-radius:12px;padding:16px;background:var(--rl-panel,#fff);min-width:0}
+.axiovo-home-feed-preview a{color:var(--axiovo-accent,#126f9c);font-weight:750;text-decoration:none;line-height:1.45;overflow-wrap:anywhere}
+.axiovo-home-feed-preview p{font-size:12px;line-height:1.6;color:var(--rl-muted,#607a91);margin:8px 0 0}
+.axiovo-home-feed-preview .feed-preview-empty{grid-column:1/-1}
+@media(max-width:680px){.axiovo-home-feed-preview{grid-template-columns:1fr}}
 </style>
 </head>
 <body class="axiovo-home axiovo-research">
@@ -48,6 +61,14 @@
   </div>
   <p id="axiovo-release-status" class="rd-small" role="status" aria-live="polite">Checking the latest synchronized arXiv announcement…</p>
   <p class="rd-small">Axiovo syncs official announced records, not unpublished submissions. Announcement timestamps and first-submission dates are different.</p>
+</section>
+<section class="rd-home-section axiovo-home-feed" aria-labelledby="axiovo-home-feed-heading">
+ <div class="rd-section-heading">
+  <div><p class="rd-kicker">PERSONALIZED LITERATURE</p><h2 id="axiovo-home-feed-heading">Your research, in one feed</h2></div>
+  <a class="rd-text-link" href="./feed.html">Open My Feed →</a>
+ </div>
+ <p class="rd-small">New papers from followed authors and research topics. Every recommendation links to its original source and explains why it appears.</p>
+ <div id="axiovo-home-feed-preview" class="axiovo-home-feed-preview" aria-live="polite">Checking your followed research topics…</div>
 </section>
 <section class="axiovo-video-top rd-home-section rd-tour rd-tour-first" aria-labelledby="axiovo-home-demo-heading">
  <div class="rd-tour-copy">
