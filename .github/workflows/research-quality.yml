@@ -21,6 +21,13 @@ on:
       - 'docs/archive-data.js'
       - 'docs/copilot.js'
       - 'docs/index.html'
+      - 'docs/feed.html'
+      - 'docs/feed.js'
+      - 'docs/feed.css'
+      - 'docs/feed-core.js'
+      - 'docs/feed-preview.js'
+      - 'docs/navigation.js'
+      - 'tests/feed-core.test.js'
       - 'scripts/build_tutorial_video.py'
       - 'scripts/build_intro_video.py'
       - 'tests/test_axiovo_name_origin.py'
@@ -77,6 +84,12 @@ jobs:
           node tests/author-name-aliases.test.js
       - name: Verify homepage name meaning and video intro
         run: python -m unittest discover -s tests -p test_axiovo_name_origin.py -v
+      - name: My Feed engine and browser syntax
+        run: |
+          node --check docs/feed-core.js
+          node --check docs/feed.js
+          node --check docs/feed-preview.js
+          node tests/feed-core.test.js
       - name: Validate browser scripts and source links
         run: |
           python -m scripts.validate_site
