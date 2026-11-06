@@ -250,7 +250,31 @@ function paperCard(p,c){
   const result=data.addComparison(p);
   compare.textContent=result==="added"?"In comparison":result==="full"?"Shortlist full (5 papers)":"Browser storage unavailable";
  });
- actions.append(compare);card.append(actions);window.AxiovoAuthorFollow?.attach(card,p.authors);
+ actions.append(compare);
+ const relationAPI=window.AxiovoPaperRelations;
+ if(relationAPI){
+  const relatedButton=button("Related literature",()=>{
+   let details=card.querySelector(".axiovo-related-literature");
+   if(details){details.remove();relatedButton.setAttribute("aria-expanded","false");return}
+   details=element("section",undefined,"axiovo-related-literature");
+   details.setAttribute("aria-label","Metadata-related papers");
+   details.append(element("p","Suggestions from available source records, not a complete citation graph.","rd-small"));
+   const candidates=data.merge(search?.local||[],search?.batch||[],search?.remote||[]);
+   const matches=relationAPI.related(p,candidates,3);
+   if(!matches.length)details.append(element("p","No strong related-paper matches in the records already loaded. Broaden the search to discover more.","rd-small"));
+   for(const item of matches){
+    const row=element("div",undefined,"rd-small");
+    row.append(link(item.paper.title,item.paper.url));
+    row.append(element("span"," · Shared terms: "+item.reasons.join(", ")));
+    details.append(row);
+   }
+   card.append(details);relatedButton.setAttribute("aria-expanded","true");
+  });
+  relatedButton.setAttribute("aria-expanded","false");
+  relatedButton.setAttribute("aria-label","Show source-backed related papers for "+p.title);
+  actions.append(relatedButton);
+ }
+ card.append(actions);window.AxiovoAuthorFollow?.attach(card,p.authors);
  window.AxiovoTopicReport?.attach(card,p,pathText());return card;
 }
 function filtered(state){
