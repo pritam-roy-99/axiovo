@@ -14,6 +14,25 @@
   if(!doi)doi=null;
   const version=p.version==null?null:Number(p.version);
   if(version!==null&&(!Number.isInteger(version)||version<1))throw Error("Invalid revision");
+  const rawID=id.replace(/^(arxiv|biorxiv|chemrxiv):/i,"");
+  if(source==="arxiv"){
+   if(!/^(?:\\d{4}\\.\\d{4,5}|[a-z-]+(?:\\.[a-z]{2})?\\/\\d{7})(?:v[1-9]\\d*)?$/i.test(rawID))
+    throw Error("Invalid arXiv identifier");
+   const pinned=rawID.match(/v(\\d+)$/);
+   const base=rawID.replace(/v\\d+$/,"");
+   const urlID=url.match(/^https:\\/\\/arxiv\\.org\\/abs\\/(.+)$/i)?.[1];
+   if(!urlID||urlID.replace(/v\\d+$/,"").toLowerCase()!==base.toLowerCase()||
+      (pinned&&urlID.toLowerCase()!==rawID.toLowerCase())||
+      (version!==null&&urlID.endsWith("v"+version)===false))
+    throw Error("arXiv original source or revision mismatch");
+  }else if(source==="biorxiv"){
+   if(!doi||!/^10\\.(?:1101|64898)\\//.test(doi)||
+      !url.toLowerCase().startsWith("https://www.biorxiv.org/content/"+doi))
+    throw Error("Unverified bioRxiv DOI or source link");
+  }else{
+   if(!doi||!url.toLowerCase().startsWith("https://doi.org/"+doi))
+    throw Error("Unverified ChemRxiv DOI source link");
+  }
   const authors=(p.authors||[]).map(x=>clean(typeof x==="string"?x:x.name)).filter(Boolean);
   return {id,source,title:clean(p.title),authors,doi,version,url,
    date:clean(p.submitted_date||p.date||p.published).slice(0,10)||null,
