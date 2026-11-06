@@ -75,8 +75,9 @@
    if(e.name==="AbortError")throw e;
    return {complete:false,missing:requested,papers:[],reason:"Daily archive has not been published or is unreachable"};
   }
-  const missing=requested.filter(day=>manifest.days?.[day]?.complete!==true);
-  const available=requested.filter(day=>manifest.days?.[day]?.complete===true);
+  const verified=day=>manifest.days?.[day]?.complete===true&&Number.isInteger(manifest.days[day].count)&&manifest.days[day].count>0;
+  const missing=requested.filter(day=>!verified(day));
+  const available=requested.filter(verified);
   if(!available.length)return {complete:false,missing,papers:[],totalHarvested:0,
    coveredDays:0,requestedDays:requested.length,
    reason:"No requested submission dates have been completely harvested"};
@@ -88,7 +89,7 @@
      const res=await fetcher(base+day+".json",{signal,cache:"no-store"});
      if(!res.ok)throw Error("Daily file missing: "+day);
      const value=await res.json();
-     if(!value.complete||value.date!==day||value.paper_count!==value.source_total
+     if(!value.complete||value.date!==day||value.paper_count<=0||value.paper_count!==value.source_total
          ||value.paper_count!==manifest.days[day].count||!Array.isArray(value.papers)
          ||value.papers.length!==value.paper_count){
       throw Error("Incomplete or inconsistent daily metadata: "+day);
