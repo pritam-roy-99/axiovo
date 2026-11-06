@@ -293,13 +293,28 @@ async function loadLive(state,more=false){
  try{
   const result=await data.live(source,c,signal,cursor);
   if(signal.aborted)return;
-  const page=data.filter(result.papers,c);
+  // Search a few additional source pages when the first page contains no
+  // matching records. Never imply the provider returned zero papers globally.
+  let page=data.filter(result.papers,c);
+  let next=result.next===cursor?null:result.next;
+  let pagesChecked=1;
+  const seen=new Set([String(cursor??"")]);
+  while(!more&&!page.length&&next!=null&&pagesChecked<3&&!signal.aborted){
+   const current=String(next);
+   if(seen.has(current))break;
+   seen.add(current);
+   const additional=await data.live(source,c,signal,next);
+   if(signal.aborted)return;
+   page=data.merge(page,data.filter(additional.papers,c));
+   next=additional.next===next?null:additional.next;
+   pagesChecked++;
+  }
   state.remote=more?data.merge(state.remote,page):page;
-  state.next=result.next===cursor?null:result.next;
+  state.next=next;
   if(more)state.visible+=12;
   const fallbackCategory=c.category&&source==="biorxiv"&&(c.topicTerms.length||c.q||c.author||c.refinement);
   const categoryNote=fallbackCategory?" bioRxiv papers without a subject tag are checked using topical evidence.":c.category&&source==="chemrxiv"?" Chemistry subject matches use topic terms when Crossref omits subject tags.":"";
-  state.message=state.coverage+result.provider+". Coverage is limited to the records currently indexed or loaded."+categoryNote;
+  state.message=state.coverage+result.provider+" · "+pagesChecked+" source page"+(pagesChecked===1?"":"s")+" checked. Results cover available indexed/loaded records, not the entire archive."+categoryNote;
  }catch{
   if(signal.aborted)return;
   state.failed=true;
