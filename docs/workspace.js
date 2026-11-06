@@ -179,6 +179,35 @@ if(filtered.length>LIBRARY_PAGE_SIZE){
  }
 }
 function init(){
+ const mirrorButton=$("axiovo-idb-mirror");
+ const mirrorStatus=$("axiovo-idb-status");
+ if(mirrorButton&&mirrorStatus){
+  mirrorButton.onclick=async()=>{
+   const migration=window.AxiovoPersonalMigration;
+   const store=window.AxiovoPersonalStore;
+   const backup=window.AxiovoLocalBackup;
+   if(!migration||!store||!backup){
+    mirrorStatus.textContent="Local safety copy unavailable. Existing browser storage is unchanged.";
+    return;
+   }
+   mirrorButton.disabled=true;
+   mirrorStatus.textContent="Copying allowlisted personal data within this device…";
+   try{
+    const result=await migration.optInMirror(localStorage,backup.KEYS,{approved:true,store});
+    mirrorStatus.textContent=result.mode==="indexeddb-mirror"?
+     "Saved "+result.copied+" personal data sections in IndexedDB. Original Library entries are unchanged.":
+     "IndexedDB unavailable. Your original Library is unchanged; export a JSON backup instead.";
+   }catch(error){
+    mirrorStatus.textContent="Safety copy unsuccessful: "+String(error.message||error)+". Original data remains in localStorage.";
+   }finally{mirrorButton.disabled=false}
+  };
+ }
+ window.addEventListener("storage",event=>{
+  if([META_KEY,OLD_KEY,COLLECTION_KEY,FIELD_KEY].includes(event.key)){
+   metadata=readMetadata();updateCollectionFilter();renderLibrary();
+  }
+ });
+
  fillFocus();collectionUI();$("library-search").addEventListener("input",()=>{libraryPage=1;renderLibrary()});$("library-filter").addEventListener("change",()=>{libraryPage=1;renderLibrary()});$("library-source").addEventListener("change",()=>{libraryPage=1;renderLibrary()});
  $("quick-search").addEventListener("submit",e=>{
  e.preventDefault();const q=$("research-query").value.trim();if(!q)return;
