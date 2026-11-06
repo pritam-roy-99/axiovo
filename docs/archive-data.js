@@ -182,7 +182,7 @@ async function latestArxivAnnouncement(signal){
  });
  if(!response.ok)throw Error("arXiv announcement HTTP "+response.status);
  const payload=await response.json();
- if(payload.date_type!=="announcement"||!/^\\d{4}-\\d{2}-\\d{2}$/.test(payload.announcement_date)||
+ if(payload.date_type!=="announcement"||!/^\d{4}-\d{2}-\d{2}$/.test(payload.announcement_date)||
     !Array.isArray(payload.papers))throw Error("Invalid official announcement snapshot");
  // The latest date is a US Eastern announcement date, not the v1 UTC date.
  const papers=payload.papers.filter(p=>p.announcement_date===payload.announcement_date)
