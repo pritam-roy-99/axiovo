@@ -66,27 +66,32 @@ def main():
                         if path:
                             assert result["back"] and result["home"],(width,path,"Back/Home missing")
                     if not path:
-                        # Regression for the dark-on-dark Axiovo meaning panel.
-                        # Verify computed text/background contrast, not only CSS source.
-                        contrast=page.locator(".axiovo-name-meaning").evaluate("""node=>{
-                          const parse=x=>{
+                        # The unified hero has a dark gradient, and the name
+                        # meaning is inline text rather than a separate panel.
+                        # Compare real computed text colors against the darkest
+                        # specified hero background; don't assume a legacy div.
+                        contrast=page.locator(".axiovo-name-line").evaluate("""node=>{
+                          const rgb=x=>{
                             const m=x.match(/[\\d.]+/g);
                             return m?m.slice(0,3).map(Number):[0,0,0];
                           };
-                          const lum=v=>{
-                            const a=parse(v).map(x=>{
-                              const c=x/255;
-                              return c<=.04045?c/12.92:((c+.055)/1.055)**2.4
+                          const luminance=x=>{
+                            const a=rgb(x).map(v=>{
+                              const c=v/255;
+                              return c<=.04045?c/12.92:((c+.055)/1.055)**2.4;
                             });
                             return .2126*a[0]+.7152*a[1]+.0722*a[2];
                           };
-                          const bg=getComputedStyle(node).backgroundColor;
-                          const fg=getComputedStyle(node.querySelector('span')).color;
-                          const h=getComputedStyle(node.querySelector('strong')).color;
-                          const ratio=(a,b)=>(Math.max(lum(a),lum(b))+.05)/(Math.min(lum(a),lum(b))+.05);
-                          return {body:ratio(bg,fg),title:ratio(bg,h)};
+                          const background="#0b2139";
+                          const ratio=c=>(Math.max(luminance(background),luminance(c))+.05)/
+                             (Math.min(luminance(background),luminance(c))+.05);
+                          return {
+                            body:ratio(getComputedStyle(node).color),
+                            strong:ratio(getComputedStyle(node.querySelector("strong")).color),
+                            title:ratio(getComputedStyle(document.querySelector("#welcome-title")).color)
+                          };
                         }""")
-                        assert contrast["body"]>=4.5 and contrast["title"]>=4.5,(width,"Axiovo name text illegible",contrast)
+                        assert min(contrast.values())>=4.5,(width,"Unified Axiovo intro text illegible",contrast)
                     verified.append((width,path or "home"))
                 page.goto(base,wait_until="domcontentloaded")
                 page.locator(".axiovo-archive-card").first.wait_for()
