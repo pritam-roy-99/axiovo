@@ -33,6 +33,7 @@ function paper(p){
  const title=make("h4"),link=make("a",p.title);
  link.href=p.url;link.target="_blank";link.rel="noopener noreferrer";title.append(link);
  card.append(title,make("p",p.authors.slice(0,6).join(", ")+(p.date?" · "+p.date:""),"rd-small"));
+ if(Number.isFinite(p.citations)&&p.citations>=0)card.append(make("p","Cited by "+p.citations.toLocaleString()+" (OpenAlex / available metadata)","rd-small"));
  const save=addButton(data.saved(p)?"Saved to Library":"Save to Library",()=>{
   save.disabled=data.save(p);
   save.textContent=save.disabled?"Saved to Library":"Could not save";
