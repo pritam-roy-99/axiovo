@@ -15,7 +15,7 @@
     .replace(/[\u0300-\u036f]/g,"").match(/[a-z][a-z0-9-]{2,}/g)||[])]
     .filter(t=>!STOP.has(t)).slice(0,70);
  }
- function key(p){return String(p?.source||"")+":"+String(p?.id||p?.doi||"").toLowerCase().replace(/\/v\d+$/,"")}
+ function key(p){return String(p?.source||"")+":"+String(p?.id||p?.doi||"").toLowerCase().replace(/(?:\/v|v)\d+$/,"")}
  function related(target, candidates, limit=3){
   if(!target?.title||!target?.url)return [];
   const titleTerms=new Set(tokens(target.title)), abstractTerms=new Set(tokens(target.abstract));
