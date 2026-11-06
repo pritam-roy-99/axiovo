@@ -16,9 +16,9 @@ OUT = ROOT / "docs" / "assets"
 NARRATION = ROOT / "scripts" / "tour-narration"
 WIDTH, HEIGHT, FPS, RATE = 960, 540, 12, 24000
 SCENES = [
-    ("Axiovo: From knowledge to discovery", "Your research companion for questions, papers and evidence",
-     "Namaste, and welcome to Axiovo. Axiovo means from knowledge to discovery. Connect a research question to original papers, inspect the source evidence and save the work that matters.",
-     [("Discover", "Find original source records"), ("Verify", "Examine evidence and metadata"), ("Save", "Return to research that matters")]),
+    ("Axiovo = Axiom + Novo", "From established knowledge to new discoveries",
+     "Welcome to Axiovo. Its name combines axiom, a foundational starting point for reasoning, with novo, meaning new. Axiovo is about turning established scientific knowledge into new discoveries.",
+     [("Axiom", "The foundations of reasoning"), ("Novo", "New ideas and discoveries"), ("Axiovo", "From knowledge to discovery")]),
     ("Research Desk", "One query across three preprint archives",
      "Search arXiv, bioRxiv, and ChemRxiv from a single research desk.",
      [("arXiv", "Physics, mathematics and computing"), ("bioRxiv", "Biology and life sciences"), ("ChemRxiv", "Chemistry and molecular sciences")]),
