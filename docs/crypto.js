@@ -5,7 +5,7 @@
  if(!data)return;
  let papers=[],shown=[],page=1,loaded=false,stamp="",complete=false;
  const form=$("crypto-search-form");
- const fields=["query","topic","author","sort","from","to"];
+ const fields=["query","field","topic","subtopic","author","sort","from","to"];
  function el(tag,text,cls){
   const e=document.createElement(tag);
   if(text!==undefined)e.textContent=text;
@@ -13,15 +13,123 @@
   return e;
  }
  function link(label,url){const a=el("a",label);a.href=url;return a}
+
+ // Axiovo-curated search hierarchy, not official IACR categories.
+ // Refinements match indexed titles/abstracts using the shared source matcher.
+ const taxonomy={
+  "Quantum and post-quantum security":{
+   "Quantum cryptography":[["Quantum key distribution","quantum key distribution"],["Device-independent QKD","device independent"],["Quantum authentication","quantum authentication"],["Quantum random number generation","quantum random"]],
+   "Post-quantum cryptography":[["Lattice-based cryptography","lattice"],["Code-based cryptography","code based"],["Hash-based signatures","hash based"],["Isogeny-based cryptography","isogeny"]],
+   "Quantum cryptanalysis":[["Quantum attacks","quantum attack"],["Grover's algorithm","Grover"],["Shor's algorithm","Shor"]]
+  },
+  "Foundations and primitives":{
+   "Zero-knowledge proofs":[["SNARKs","SNARK"],["STARKs","STARK"],["Proof systems","proof system"]],
+   "Digital signatures":[["Threshold signatures","threshold signature"],["Aggregate signatures","aggregate signature"],["Ring signatures","ring signature"]],
+   "Encryption":[["Fully homomorphic encryption","homomorphic encryption"],["Attribute-based encryption","attribute based encryption"],["Functional encryption","functional encryption"]],
+   "Hash functions":[["Collision resistance","collision"],["Hash-based commitments","commitment"],["Hash constructions","hash function"]]
+  },
+  "Secure computation and protocols":{
+   "Secure multiparty computation":[["Two-party computation","two party computation"],["Secret sharing","secret sharing"],["Private set intersection","private set intersection"]],
+   "Threshold cryptography":[["Threshold encryption","threshold encryption"],["Distributed key generation","distributed key generation"]],
+   "Privacy and anonymous systems":[["Differential privacy","differential privacy"],["Anonymous credentials","anonymous credential"],["Private information retrieval","private information retrieval"]],
+   "Blockchain and protocols":[["Consensus protocols","consensus"],["Smart contracts","smart contract"],["Zero-knowledge rollups","rollup"]]
+  },
+  "Cryptanalysis and implementation":{
+   "Cryptanalysis":[["Side-channel attacks","side channel"],["Differential cryptanalysis","differential cryptanalysis"],["Fault attacks","fault attack"],["Algebraic attacks","algebraic attack"]],
+   "Security proofs":[["Provable security","provable security"],["Reduction techniques","reduction"],["Random oracle model","random oracle"]],
+   "Applied cryptography":[["Authenticated encryption","authenticated encryption"],["Key exchange","key exchange"],["Transport security","TLS"]]
+  }
+ };
+ const $field=$("crypto-field"),$topic=$("crypto-topic"),$leaf=$("crypto-subtopic");
+ const selectors=[];
+ function setOptions(node,rows,placeholder){
+  node.replaceChildren(new Option(placeholder,""));
+  for(const [label,value] of rows)node.add(new Option(label,value));
+  node.disabled=!rows.length;
+  for(const picker of selectors)picker.sync();
+ }
+ function populateFields(){
+  $field.replaceChildren(new Option("All cryptography research",""));
+  for(const name of Object.keys(taxonomy))$field.add(new Option(name,name));
+ }
+ function updateScope(){
+  const field=$field.value,topic=$topic.selectedOptions[0]?.textContent||"";
+  const leaf=$leaf.selectedOptions[0]?.textContent||"";
+  $("crypto-scope-label").textContent="Scope: "+([field,($topic.value?topic:""),($leaf.value?leaf:"")].filter(Boolean).join(" › ")||"all indexed cryptography research")+".";
+ }
+ function chooseField(value,topic="",leaf=""){
+  $field.value=Object.hasOwn(taxonomy,value)?value:"";
+  setOptions($topic,$field.value?Object.keys(taxonomy[$field.value]).map(name=>[name,name]):[],"All research subfields");
+  if(topic&&[...$topic.options].some(o=>o.value===topic))$topic.value=topic;
+  chooseTopic($topic.value,leaf);updateScope();
+ }
+ function chooseTopic(value,leaf=""){
+  if(value&&[...$topic.options].some(o=>o.value===value))$topic.value=value;
+  const rows=taxonomy[$field.value]?.[$topic.value]||[];
+  setOptions($leaf,rows,"All sub-subtopics");
+  if(leaf&&[...$leaf.options].some(o=>o.value===leaf))$leaf.value=leaf;
+  renderChips("crypto-topic-options",Object.keys(taxonomy[$field.value]||{}),label=>{chooseTopic(label);search()});
+  renderChips("crypto-subtopic-options",rows.map(row=>row[0]),label=>{
+   const found=rows.find(row=>row[0]===label);
+   if(found)$leaf.value=found[1];search();
+  });
+  updateScope();
+ }
+ function renderChips(id,labels,handler){
+  const container=$(id);container.replaceChildren();
+  for(const label of labels){
+   const b=el("button",label,"ex-choice");b.type="button";
+   const active=id==="crypto-topic-options"?label===$topic.value:label===$leaf.selectedOptions[0]?.textContent;
+   b.setAttribute("aria-pressed",String(active));b.onclick=()=>handler(label);
+   container.append(b);
+  }
+  container.hidden=!labels.length;
+ }
+ function findTopics(){
+  const q=$("crypto-topic-find").value.trim().toLowerCase(),target=$("crypto-topic-suggestions");
+  target.replaceChildren();target.hidden=!q;
+  if(!q)return;
+  let matches=0;
+  for(const [field,topics] of Object.entries(taxonomy)){
+   for(const [topic,leaves] of Object.entries(topics)){
+    const candidates=[{label:topic,leaf:""},...leaves.map(row=>({label:row[0],leaf:row[1]}))];
+    for(const candidate of candidates){
+     if(![field,topic,candidate.label].some(s=>s.toLowerCase().includes(q)))continue;
+     const b=el("button",undefined);b.type="button";
+     b.append(el("strong",candidate.label),el("span",field+" › "+topic));
+     b.onclick=()=>{chooseField(field,topic,candidate.leaf);target.hidden=true;$("crypto-topic-find").value="";search()};
+     target.append(b);if(++matches>=15)break;
+    }if(matches>=15)break;
+   }if(matches>=15)break;
+  }
+  if(!matches)target.append(el("p","No matching research paths.","rd-small"));
+ }
+ populateFields();
+ $field.addEventListener("change",()=>{chooseField($field.value);search()});
+ $topic.addEventListener("change",()=>{chooseTopic($topic.value);search()});
+ $leaf.addEventListener("change",()=>{updateScope();search()});
+ $("crypto-topic-find").addEventListener("input",findTopics);
+ $("crypto-show-results").onclick=()=>{
+  search();$("crypto-results-title").scrollIntoView({block:"start",behavior:"smooth"});
+ };
+ $("crypto-clear-path").onclick=()=>{chooseField("");search()};
+ if(window.AxiovoSearchableSelect){
+  for(const [node,placeholder] of [[$field,"Research subject"],[$topic,"Research subfield"],[$leaf,"Sub-subtopic"]]){
+   selectors.push(window.AxiovoSearchableSelect.mount(node,placeholder));
+  }
+ }
  function filters(){
   return {q:$("crypto-query").value.trim(),author:$("crypto-author").value.trim(),
-   topicTerms:$("crypto-topic").value?[ $("crypto-topic").value ]:[],
+   topicTerms:$leaf.value?[$leaf.value]:$topic.value?[$topic.value]:[],
    from:$("crypto-from").value,to:$("crypto-to").value,
    sort:$("crypto-sort").value};
  }
  function fromURL(){
   const qs=new URLSearchParams(location.search);
+  const field=qs.get("field")||"";const topic=qs.get("topic")||"";const leaf=qs.get("subtopic")||"";
+  chooseField(field,topic,leaf);
   for(const key of fields){
+   if(["field","topic","subtopic"].includes(key))continue;
    const value=qs.get(key);
    if(value!==null){
     const input=$("crypto-"+key);
@@ -47,6 +155,7 @@
    target.append(el("p","Loading verified-source snapshot…","rd-small"));return;
   }
   const c=filters();
+  $("crypto-result-sort").value=c.sort;
   if(c.from&&c.to&&c.from>c.to){
    status.textContent="Choose an end date on or after the start date.";return;
   }
@@ -115,14 +224,19 @@
   page=1;updateURL();render();
  }
  form.addEventListener("submit",e=>{e.preventDefault();search()});
- for(const key of ["topic","sort","from","to"])
+ for(const key of ["sort","from","to"])
   $("crypto-"+key).addEventListener("change",search);
+ $("crypto-result-sort").addEventListener("change",()=>{$("crypto-sort").value=$("crypto-result-sort").value;search()});
+ $("crypto-latest").onclick=()=>{$("crypto-from").value="";$("crypto-to").value="";$("crypto-sort").value="recent";search()};
+ $("crypto-week").onclick=()=>{const d=new Date();$("crypto-to").value=d.toISOString().slice(0,10);d.setUTCDate(d.getUTCDate()-7);$("crypto-from").value=d.toISOString().slice(0,10);search()};
+ $("crypto-date-open").onclick=()=>{$("crypto-advanced").open=true;$("crypto-from").focus()};
  $("crypto-reset").onclick=()=>{
-  for(const key of fields)$("crypto-"+key).value=key==="sort"?"relevance":"";
+  chooseField("");
+  for(const key of ["query","author","sort","from","to"])$("crypto-"+key).value=key==="sort"?"relevance":"";
   search();
  };
  $("crypto-follow").onclick=()=>{
-  const term=$("crypto-topic").value;
+  const term=$leaf.value||$topic.value||$field.value;
   if(!term){$("crypto-results-status").textContent="Choose a research topic to follow.";return}
   const api=window.AxiovoFeedPreferences;
   if(!api||!api.updateTopic(localStorage,term,true)){
