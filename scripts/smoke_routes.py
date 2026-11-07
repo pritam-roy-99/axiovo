@@ -68,7 +68,9 @@ def main():
                         assert result["header"]["height"]<=160,(width,path,"Mobile header too tall",result)
                         if path:
                             assert result["back"] and result["home"],(width,path,"Back/Home missing")
-                            assert abs(result["navigation"]["y"]-result["back"]["y"])<=8,(
+                            nav_mid=(result["navigation"]["y"]+result["navigation"]["bottom"])/2
+                            back_mid=(result["back"]["y"]+result["back"]["bottom"])/2
+                            assert abs(nav_mid-back_mid)<=8,(
                                 width,path,"Back and navigation are not in a consistent second row",result)
                             assert result["navigation"]["right"]<=width+2,(
                                 width,path,"Mobile navigation exceeds viewport",result)
