@@ -66,6 +66,19 @@ def main():
     page.get_by_role("option",name="Quantum key distribution",exact=True).click()
     assert page.locator("#crypto-subtopic").input_value()=="quantum key distribution"
     assert "Quantum key distribution" in page.locator("#crypto-scope-label").inner_text()
+    # Save a selected ePrint research path and restore it from local storage.
+    page.locator("#crypto-personal summary").click()
+    page.locator("#crypto-save-path").click()
+    assert "Research path saved" in page.locator("#crypto-personal-status").inner_text()
+    assert page.locator("#crypto-saved-paths .ex-personal-row").count()==1
+    page.reload(wait_until="domcontentloaded")
+    page.locator("#crypto-saved-paths .ex-personal-row").first.wait_for(timeout=10000)
+    assert page.locator("#crypto-saved-paths .ex-personal-row").count()==1
+    page.locator("#crypto-custom-kind").select_option("subtopic")
+    page.locator("#crypto-custom").fill("Quantum authentication protocols")
+    page.locator("#crypto-custom-add").click()
+    assert "Personal topic added" in page.locator("#crypto-personal-status").inner_text()
+    assert page.locator("#crypto-subtopic").input_value()=="Quantum authentication protocols"
     page.locator("#crypto-clear-path").click()
     assert page.locator("#crypto-field").input_value()==""
     assert page.locator("#crypto-topic-input").is_disabled()
