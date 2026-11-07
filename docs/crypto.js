@@ -2,7 +2,7 @@
 (function(){
  "use strict";
  const data=window.AxiovoArchiveData,$=id=>document.getElementById(id);
- if(!data)return;
+ // Topic controls must initialize even when the scholarly metadata service is unavailable.
  let papers=[],shown=[],page=1,loaded=false,stamp="",complete=false;
  const form=$("crypto-search-form");
  const fields=["query","field","topic","subtopic","author","sort","from","to"];
@@ -55,13 +55,15 @@
  function updateScope(){
   const field=$field.value,topic=$topic.selectedOptions[0]?.textContent||"";
   const leaf=$leaf.selectedOptions[0]?.textContent||"";
-  $("crypto-scope-label").textContent="Scope: "+([field,($topic.value?topic:""),($leaf.value?leaf:"")].filter(Boolean).join(" › ")||"all indexed cryptography research")+".";
+  const path=[field,($topic.value?topic:""),($leaf.value?leaf:"")].filter(Boolean).join(" › ");
+  $("crypto-scope-label").textContent="Scope: "+(path||"all indexed cryptography research")+".";
  }
  function chooseField(value,topic="",leaf=""){
   $field.value=Object.hasOwn(taxonomy,value)?value:"";
   setOptions($topic,$field.value?Object.keys(taxonomy[$field.value]).map(name=>[name,name]):[],"All research subfields");
   if(topic&&[...$topic.options].some(o=>o.value===topic))$topic.value=topic;
   chooseTopic($topic.value,leaf);updateScope();
+  for(const picker of selectors)picker.sync();
  }
  function chooseTopic(value,leaf=""){
   if(value&&[...$topic.options].some(o=>o.value===value))$topic.value=value;
@@ -71,7 +73,9 @@
   renderChips("crypto-topic-options",Object.keys(taxonomy[$field.value]||{}),label=>{chooseTopic(label);search()});
   renderChips("crypto-subtopic-options",rows.map(row=>row[0]),label=>{
    const found=rows.find(row=>row[0]===label);
-   if(found)$leaf.value=found[1];search();
+   if(found)$leaf.value=found[1];
+   for(const picker of selectors)picker.sync();
+   updateScope();search();
   });
   updateScope();
  }
@@ -161,7 +165,7 @@
   }
   // The existing archive matcher is reused for exact-ID, dates and authors.
   // Theme selections are a transparent keyword refinement, NOT provider taxonomy.
-  shown=data.filter(papers,c);
+  shown=data?.filter?data.filter(papers,c):[];
   if(c.sort==="title")shown.sort((a,b)=>a.title.localeCompare(b.title)||a.id.localeCompare(b.id));
   const perPage=12;
   const total=shown.length,pages=Math.max(1,Math.ceil(total/perPage));
@@ -246,6 +250,12 @@
  };
  window.addEventListener("storage",e=>{if(e.key==="axiovo-eprint-reading-v1")render()});
  fromURL();
+ if(!data?.snapshot){
+  loaded=true;papers=[];
+  $("crypto-coverage-count").textContent="IACR metadata temporarily unavailable";
+  render();
+  return;
+ }
  data.snapshot("eprint").then(value=>{
   papers=Array.isArray(value.papers)?value.papers:[];
   stamp=value.stamp;complete=value.fullOaiTraversal===true;loaded=true;
