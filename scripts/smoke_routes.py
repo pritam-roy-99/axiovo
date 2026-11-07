@@ -171,7 +171,31 @@ def main():
                     show.click()
                     assert page.evaluate("document.activeElement?.id")=="archive-results-heading",(source,"Results not focused")
                     page.locator(".axiovo-home-link").click()
-                    page.wait_for_url(lambda url: urlsplit(url).path.endswith("/"))
+                    page.wait_for_url(lambda url: urlsplit(url).path.endswith("/index.html"))
+                # Regression: returning from My Feed must show the top of Home,
+                # not a restored anchor at the archive cards below the video.
+                page.goto(base+"index.html#axiovo-archive-title",wait_until="domcontentloaded")
+                page.locator("a[href='./feed.html']").first.click()
+                page.wait_for_url(lambda url: urlsplit(url).path.endswith("/feed.html"))
+                page.locator(".axiovo-back-button").click()
+                page.wait_for_url(lambda url: urlsplit(url).path.endswith("/index.html"))
+                page.locator("#axiovo-home-video").wait_for()
+                assert page.locator("#axiovo-tour-show-video").is_visible()
+                assert not page.locator("#axiovo-home-video").is_hidden()
+                assert page.locator("#axiovo-tour").is_hidden()
+                assert page.evaluate("location.hash")=="" , "Back must not restore archive fragment"
+                page.locator("#axiovo-tour-show-guide").click()
+                assert page.locator("#axiovo-home-video").is_hidden()
+                assert page.locator("#axiovo-tour").is_visible()
+                page.locator("#axiovo-tour-show-video").click()
+                assert page.locator("#axiovo-home-video").is_visible()
+                assert page.locator("#axiovo-tour").is_hidden()
+                page.goto(base+"feed.html",wait_until="domcontentloaded")
+                page.locator(".axiovo-home-link").click()
+                page.wait_for_url(lambda url: urlsplit(url).path.endswith("/index.html"))
+                assert page.locator("#axiovo-home-video").is_visible()
+                assert page.evaluate("location.hash")=="" , "Home must land at the start"
+
                 if width==390:
                     # A user in India should see the latest arXiv release under
                     # its verified US Eastern announcement date, not the UTC
