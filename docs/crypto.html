@@ -12,7 +12,7 @@
 <link rel="stylesheet" href="./research-entry.css">
 <link rel="stylesheet" href="./axiovo-shell.css">
 <link rel="stylesheet" href="./research-desk.css">
-<link rel="stylesheet" href="./crypto.css">
+<link rel="stylesheet" href="./topic-explorer.css">\n<link rel="stylesheet" href="./crypto.css?v=20261107-unified-discover">
 <script defer src="./theme.js"></script>
 <script defer src="./navigation.js"></script>
 <script defer src="./arxiv-versions.js"></script>
@@ -24,11 +24,14 @@
 <script defer src="./crypto.js"></script>
 <script defer src="./pwa.js"></script>
 </head>
-<body class="axiovo-research axiovo-crypto">
+<body class="axiovo-archive-page axiovo-research axiovo-explore axiovo-crypto" data-explore-source="eprint">
 <header></header>
-<main class="rd-page">
-<section class="crypto-hero" aria-labelledby="crypto-title">
- <div class="crypto-heading">
+<main class="rd-page ex-page">
+<nav class="ex-archives crypto-source-links" aria-label="Browse other preprint archives">
+<a href="./arxiv.html"><span class="rd-source-dot arxiv" aria-hidden="true"></span>arXiv</a><a href="./biorxiv.html"><span class="rd-source-dot biorxiv" aria-hidden="true"></span>bioRxiv</a><a href="./chemrxiv.html"><span class="rd-source-dot chemrxiv" aria-hidden="true"></span>ChemRxiv</a><a href="./crypto.html" aria-current="page"><span class="rd-source-dot eprint" aria-hidden="true"></span>Cryptology ePrint</a>
+</nav>
+<section class="ex-hero crypto-hero" aria-labelledby="crypto-title">
+ <div class="ex-hero-copy crypto-heading">
  <p class="rd-kicker">FOURTH ARCHIVE · CRYPTOGRAPHY</p>
  <h1 id="crypto-title">Cryptology ePrint <span>Discover</span></h1>
  <p>Discover papers in cryptography, security, quantum cryptography, and cryptanalysis from the <a href="https://eprint.iacr.org/" rel="noopener" target="_blank">IACR Cryptology ePrint Archive</a>.</p>
@@ -36,9 +39,7 @@
  </div>
  <div class="crypto-hero-actions"><a href="./desk.html" class="rd-button rd-primary">Search all four archives</a><a href="https://eprint.iacr.org/search" class="rd-button rd-secondary" target="_blank" rel="noopener">Official ePrint search ↗</a></div>
 </section>
-<nav class="crypto-source-links" aria-label="Browse other preprint archives">
-<a href="./arxiv.html">arXiv</a><a href="./biorxiv.html">bioRxiv</a><a href="./chemrxiv.html">ChemRxiv</a><a href="./crypto.html" aria-current="page">Cryptology ePrint</a>
-</nav>
+
 <section class="rd-panel crypto-discover" aria-labelledby="crypto-discover-title">
  <div class="crypto-section-head"><div><p class="rd-kicker">FIND PAPERS</p><h2 id="crypto-discover-title">Search cryptography research</h2></div><p id="crypto-coverage-count" class="rd-small" role="status">Checking source metadata…</p></div>
  <form id="crypto-search-form" role="search">
