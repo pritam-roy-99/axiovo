@@ -24,6 +24,13 @@ function app(fetcher,store={}){
  assert.equal(good.api.filter(result.papers,{q:"https://eprint.iacr.org/2026/1234"}).length,1);
  assert.equal(good.api.filter(result.papers,{q:"eprint:2026/1234"}).length,1);
  assert.equal(good.api.filter(result.papers,{q:"2026/1235"}).length,0);
+ const padded={source:"eprint",papers:[{id:"2025/001",title:"Historical verified IACR paper",authors:["Researcher"]},
+ {id:"2025/000000",title:"Invalid zero identifier"}]};
+ const historical=good.api.validate(padded);
+ assert.equal(historical.papers.length,1);
+ assert.equal(historical.papers[0].url,"https://eprint.iacr.org/2025/001");
+ assert.equal(good.api.filter(historical.papers,{q:"eprint:2025/001"}).length,1);
+
 
  assert.equal(good.api.filter(result.papers,{topicTerms:["quantum key distribution"]}).length,1);
  const down=app(async()=>{throw Error("offline")},{"axiovo-eprint-verified-fallback-v1":
