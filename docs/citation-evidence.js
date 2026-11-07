@@ -26,7 +26,8 @@
  }
  function directories(p){
   const id=identity(p);if(!id.title&&!id.doi&&!id.arxiv&&!id.eprint)return [];
-  const q=id.doi||id.arxiv||id.eprint||('"'+id.title+'"');
+  // For ePrint-only records search by the actual title: a bare year/number is ambiguous outside IACR.
+  const q=id.doi||id.arxiv||('"'+id.title+'"');
   const urls=[
    {name:"Google Scholar",url:"https://scholar.google.com/scholar?q="+encodeURIComponent(q),kind:"Search, not verified count"},
    {name:"Semantic Scholar",url:"https://www.semanticscholar.org/search?q="+encodeURIComponent(q),kind:"Search results"},
