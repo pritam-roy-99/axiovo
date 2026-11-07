@@ -416,8 +416,7 @@ async function runSearch({persist=true}={}){
   $("scope-label").textContent="Scope: exact identifier in "+name+".";
  }else $("scope-label").textContent=pathText()?"Scope: "+pathText():"Scope: the whole archive.";
  if(persist){savePrefs();syncURL(criteriaFromForm())}
- const firstYear={arxiv:"1991-08-01",biorxiv:"2013-11-01",chemrxiv:"2017-01-01"};
- const isHistorical=c.from===firstYear[source]&&!!c.to;
+ const isHistorical=c.from===data.historicalStart[source]&&!!c.to;
  const state=search={controller:new AbortController(),criteria:c,local:[],batch:[],remote:[],visible:12,next:null,
   loading:true,failed:false,complete:false,
   coverage:isHistorical?"Historical-year search: provider pages are sampled incrementally; results are not a full historical census. ":"",
@@ -497,9 +496,9 @@ $("date-open").onclick=()=>{$("advanced").open=true;$("from").focus()};
 $("history")?.addEventListener("click",()=>{
  // Earliest available archive dates are lower bounds, not claims of completeness.
  datePreset++;
- const earliest={arxiv:"1991-08-01",biorxiv:"2013-11-01",chemrxiv:"2017-01-01"};
- $("from").value=earliest[source]||"1991-01-01";
- $("to").value=allDates();
+ const years=data.historyRange(source,allDates());
+ $("from").value=years.from;
+ $("to").value=years.to;
  $("sort").value=$("query").value.trim()?"relevance":"oldest";
  $("advanced").open=true;
  runSearch();
