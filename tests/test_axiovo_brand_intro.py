@@ -21,7 +21,7 @@ class BrandIntroTest(unittest.TestCase):
         self.assertLess(section.index('id="welcome-title"'),section.index('id="axiovo-home-video"'))
 
     def test_narration_keeps_brand_intro(self):
-        first=TOUR.split("steps=[",1)[1].split('("Three preprint archives"',1)[0]
+        first=TOUR.split("steps=[",1)[1].split('("Four research archives"',1)[0]
         self.assertIn('Axiovo = Axiom + Novo',first)
         self.assertIn("foundational starting point for reasoning",first)
         self.assertIn('".axiovo-welcome"',first)
