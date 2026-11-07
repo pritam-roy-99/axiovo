@@ -110,12 +110,13 @@ def request(params,retries=3):
             time.sleep(2**attempt*3)
     raise RuntimeError("OAI request failed")
 
-def collect(*,since,max_pages=12,pause=2.0):
+def collect(*,since,until=None,max_pages=12,pause=2.0):
     if not 1<=max_pages<=100:raise ValueError("Unsafe page budget")
     token=None;seen=set();all_rows=[];complete=False
     for page in range(max_pages):
         params={"verb":"ListRecords","resumptionToken":token} if token else {
             "verb":"ListRecords","metadataPrefix":"oai_dc","from":since}
+        if not token and until:params["until"]=until
         records,next_token=parse_page(request(params))
         all_rows.extend(records)
         if not next_token:
