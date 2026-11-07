@@ -143,7 +143,8 @@ function ris(p){
  if(p.source==="arxiv")return window.AxiovoCitation.ris({...p,id:p.recordId,published:p.date});
  const text=value=>String(value||"").replace(/\s+/g," ").trim();
  return ["TY  - UNPB","TI  - "+text(p.title),...p.authors.map(a=>"AU  - "+text(a)),
-  ...(p.date?["PY  - "+p.date.slice(0,4)]:[]),"DB  - "+data.names[p.source],"DO  - "+p.doi,
+  ...(p.date?["PY  - "+p.date.slice(0,4)]:[]),"DB  - "+data.names[p.source],
+  ...(p.doi?["DO  - "+p.doi]:[]),...(p.source==="eprint"?["AN  - IACR ePrint:"+p.recordId]:[]),
   "UR  - "+p.url,"ER  - "].join("\r\n");
 }
 function recordCard(p){
