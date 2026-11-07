@@ -128,6 +128,14 @@
  $("crypto-latest").onclick=()=>{$("crypto-from").value="";$("crypto-to").value="";$("crypto-sort").value="recent";search()};
  $("crypto-week").onclick=()=>{const d=new Date();$("crypto-to").value=d.toISOString().slice(0,10);d.setUTCDate(d.getUTCDate()-7);$("crypto-from").value=d.toISOString().slice(0,10);search()};
  $("crypto-date-open").onclick=()=>{$("crypto-advanced").open=true;$("crypto-from").focus()};
+ $("crypto-history")?.addEventListener("click",()=>{
+  $("crypto-from").value="";$("crypto-to").value="";
+  $("crypto-sort").value="oldest";
+  $("crypto-advanced").open=true;
+  search();
+  $("crypto-index-note").textContent="Historical search uses all source-verified records presently indexed by Axiovo. This is NOT a complete IACR ePrint history; check the original archive for missing papers.";
+ });
+
  $("crypto-reset").onclick=()=>{
   window.AxiovoCryptoTopics?.clear?.();
   for(const key of ["query","author","sort","from","to"])$("crypto-"+key).value=key==="sort"?"relevance":"";
