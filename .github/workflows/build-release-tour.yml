@@ -24,24 +24,37 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: release/reliability-2026-11-07
+      - name: Detect existing published media
+        id: media
+        run: |
+          if test -s docs/assets/axiovo-tour.mp4 && test -s docs/assets/axiovo-tour.vtt && test -s docs/assets/axiovo-tour-build.json; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          fi
       - uses: actions/setup-python@v5
+        if: steps.media.outputs.ready != 'true'
         with:
           python-version: '3.12'
       - name: Install recording dependencies
+        if: steps.media.outputs.ready != 'true'
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y ffmpeg espeak-ng fonts-dejavu-core
           python -m pip install pillow playwright
           python -m playwright install --with-deps chromium
       - name: Record real website and generate audio, captions and MP4
+        if: steps.media.outputs.ready != 'true'
         run: python scripts/build_tutorial_video.py
       - name: Verify nonempty tutorial assets
+        if: steps.media.outputs.ready != 'true'
         run: |
           test -s docs/assets/axiovo-tour.mp4
           test -s docs/assets/axiovo-tour.vtt
           test -s docs/assets/axiovo-tour-build.json
           ffprobe -v error docs/assets/axiovo-tour.mp4
       - name: Commit verified media on release branch
+        if: steps.media.outputs.ready != 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
