@@ -257,7 +257,30 @@ async function discoverAuthors(signal,requestedName=""){
  if(found.length)updatePapers(found);
  else notify("No additional verified arXiv-linked author papers were found in the available metadata.");
 }
-async function refresh(){
+async function loadFastPreview(run){
+ // This is an explicitly incomplete, recent-first preview.
+ // Full official-source snapshots continue loading in parallel.
+ try{
+  const response=await fetch("./data/feed-preview.json",{
+   cache:"default",signal:AbortSignal.timeout(4500)
+  });
+  if(!response.ok)return;
+  const data=await response.json();
+  if(data.schema_version!==1||
+     data.coverage!=="recent-preview-only-full-source-snapshots-load-afterward"||
+     !Array.isArray(data.papers))return;
+  const previews=data.papers.slice(0,750).map(raw=>
+   archive.normalize(raw.source,raw)).filter(Boolean);
+  if(run!==state.refreshId||!previews.length)return;
+  state.papers=archive.merge(state.papers,previews);
+  recalculate();
+  $("feed-status").textContent="Showing "+state.items.length+
+   " matches from a recent-paper preview. Full archive coverage is still loading…";
+ }catch(_error){
+  // Older deployments and offline clients do not require this optional file.
+ }
+}
+async function refresh(manual=false){
  if(state.loading)return;
  if(!personalized(preferences())){
   $("feed-pulse-synced").textContent="Follow an author or topic to get started";
@@ -266,13 +289,17 @@ async function refresh(){
  state.loading=true;$("feed-refresh").disabled=true;
  const run=++state.refreshId;
  const signal=AbortSignal.timeout(22000);
- $("feed-status").textContent="Checking source snapshots; matching papers appear as each archive responds…";
+ $("feed-status").textContent="Loading recent papers first; checking all indexed source records…";
+ // Do not block source loading on the optional small preview.
+ const preview=manual?Promise.resolve():loadFastPreview(run);
  let received=0;const missing=[],timestamps=[];
  try{
   const sources=["arxiv","biorxiv","chemrxiv"];
   await Promise.all(sources.map(async source=>{
    try{
-    const snap=await archive.snapshot(source,{force:true});
+    const snap=await archive.snapshot(source,{
+     force:Boolean(manual),cache:manual?"no-store":"default"
+    });
     if(run!==state.refreshId)return;
     const rows=Array.isArray(snap?.papers)?snap.papers:[];
     received++;
@@ -294,10 +321,13 @@ async function refresh(){
   $("feed-pulse-synced").textContent=timestamps.length?
    "Latest indexed snapshot: "+timestamps.sort().at(-1).slice(0,16).replace("T"," "):
    "Published snapshot date unavailable";
-  try{await discoverAuthors(signal)}catch{ /* Locally indexed metadata remains useful. */ }
+  // OpenAlex author enrichment is optional and may take 22 seconds.
+  // It must not hold the feed spinner or Refresh button hostage.
+  void discoverAuthors(signal).catch(()=>{ /* Source snapshots remain usable. */ });
  }catch{
   notify("The source refresh encountered a network problem. Your existing feed remains available.");
  }finally{
+  await preview;
   if(run===state.refreshId){
    state.loading=false;$("feed-refresh").disabled=false;recalculate();
   }
@@ -357,7 +387,7 @@ $("feed-topic-form").addEventListener("submit",e=>{
  }else notify("Enter a specific research topic of at least three characters.");
 });
 $("feed-more").onclick=()=>{state.limit+=12;recalculate()};
-$("feed-refresh").onclick=refresh;
+$("feed-refresh").onclick=()=>refresh(true);
 $("feed-search-more")?.addEventListener("click",searchMore);
 for(const id of ["feed-source","feed-window","feed-sort"])$(id).addEventListener("change",()=>{
  state.limit=12;recalculate();
