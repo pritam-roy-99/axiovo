@@ -1,6 +1,13 @@
 name: Backfill IACR ePrint OAI metadata safely
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/backfill_eprint.py'
+      - 'scripts/sync_eprint.py'
+      - 'tests/test_eprint_backfill.py'
+      - '.github/workflows/eprint-backfill.yml'
   schedule:
     # Historical OAI metadata update intervals are harvested a bounded year at a time.
     - cron: '40 2 * * *'
