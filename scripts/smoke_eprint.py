@@ -93,6 +93,12 @@ def main():
     page.reload(wait_until="domcontentloaded")
     assert page.locator("#crypto-field").input_value()=="Personal quantum security"
     assert page.locator("#crypto-custom-kind option").count()==3
+    # IACR historical search remains explicitly scoped to available verified records.
+    page.locator("#crypto-history").click()
+    assert page.locator("#crypto-sort").input_value()=="oldest"
+    assert page.locator("#crypto-from").input_value()==""
+    assert page.locator("#crypto-to").input_value()==""
+    assert "not a complete IACR" in page.locator("#crypto-index-note").inner_text().lower()
     page.locator("#crypto-clear-path").click()
     assert page.locator("#crypto-field").input_value()==""
     assert page.locator("#crypto-topic-input").is_disabled()
