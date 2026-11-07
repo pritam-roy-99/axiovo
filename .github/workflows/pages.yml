@@ -52,6 +52,8 @@ jobs:
           node --check docs/assistant-core.js
           node tests/assistant-core.test.js
           node tests/assistant-grounding-50.test.js
+      - name: Verify exact per-paper citations and reject cross-paper counts (required)
+        run: node tests/citation-evidence.test.js
       - name: Test source identity, announcement freshness and precision ranking
         run: |
           node tests/archive-data.test.js
