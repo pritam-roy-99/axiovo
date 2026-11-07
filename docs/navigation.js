@@ -45,14 +45,18 @@
    back.onclick=()=>{
     // document.referrer is not necessarily the previous history entry (BFCache,
     // fragment navigation and reloads). Never infer the history destination from it.
-    let inAppReferrer=false;
+    let previous=null,appBase=null;
     try{
-     const previous=new URL(document.referrer);
-     const appBase=new URL("./",location.href);
-     inAppReferrer=previous.origin===appBase.origin && previous.pathname.startsWith(appBase.pathname);
+     previous=new URL(document.referrer);
+     appBase=new URL("./",location.href);
     }catch{}
-    if(inAppReferrer && history.length>1)history.back();
-    else location.assign(homeURL());
+    const inApp=previous&&appBase&&previous.origin===appBase.origin&&previous.pathname.startsWith(appBase.pathname);
+    if(inApp&&history.length>1){
+     // Returning to Home should show the introduction, never an old fragment.
+     const file=previous.pathname.slice(appBase.pathname.length);
+     if(!file||file==="index.html")location.assign(homeURL());
+     else history.back();
+    }else location.assign(homeURL());
    };
    const actions=document.createElement("div");actions.className="axiovo-nav-return";
    actions.append(back,home);
