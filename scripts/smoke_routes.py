@@ -195,6 +195,19 @@ def main():
                 page.wait_for_url(lambda url: urlsplit(url).path.endswith("/index.html"))
                 assert page.locator("#axiovo-home-video").is_visible()
                 assert page.evaluate("location.hash")=="" , "Home must land at the start"
+                assert page.evaluate("new URLSearchParams(location.search).has('axiovo_return')")
+                page.wait_for_function("window.scrollY<5",timeout=5000)
+                assert page.locator("#axiovo-tour-show-video").get_attribute("aria-pressed")=="true"
+                assert page.locator("#axiovo-home-video").is_visible()
+                # A scroll restoration regression cannot pass merely because
+                # the video still exists somewhere above the viewport.
+                page.evaluate("window.scrollTo(0,document.body.scrollHeight)")
+                page.goto(base+"feed.html",wait_until="domcontentloaded")
+                page.locator(".axiovo-home-link").click()
+                page.wait_for_url(lambda url: urlsplit(url).path.endswith("/index.html"))
+                page.wait_for_function("window.scrollY<5",timeout=5000)
+                assert page.locator("#axiovo-home-video").is_visible()
+
 
                 # Explore in the global header must not bypass the Home
                 # tutorial by navigating directly to the archive-card anchor.
