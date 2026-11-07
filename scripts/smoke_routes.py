@@ -196,6 +196,24 @@ def main():
                 assert page.locator("#axiovo-home-video").is_visible()
                 assert page.evaluate("location.hash")=="" , "Home must land at the start"
 
+                # Explore in the global header must not bypass the Home
+                # tutorial by navigating directly to the archive-card anchor.
+                page.goto(base+"feed.html",wait_until="domcontentloaded")
+                page.locator(".rl-nav").get_by_role("link",name="Explore",exact=False).click()
+                page.wait_for_url(lambda url: urlsplit(url).path.endswith("/index.html"))
+                assert page.evaluate("location.hash")=="" , "Explore from Feed skipped the tutorial"
+                assert page.locator("#axiovo-home-video").is_visible()
+                assert page.locator("#axiovo-tour-show-video").get_attribute("aria-pressed")=="true"
+                # Returning from a BFCache-restored interactive guide must
+                # explicitly restore the tutorial video as the default.
+                page.locator("#axiovo-tour-show-guide").click()
+                page.locator(".rl-nav").get_by_role("link",name="My Feed",exact=False).click()
+                page.wait_for_url(lambda url: urlsplit(url).path.endswith("/feed.html"))
+                page.go_back(wait_until="domcontentloaded")
+                assert page.locator("#axiovo-home-video").is_visible()
+                assert page.locator("#axiovo-tour").is_hidden()
+                assert page.locator("#axiovo-tour-show-video").get_attribute("aria-pressed")=="true"
+
                 if width==390:
                     # A user in India should see the latest arXiv release under
                     # its verified US Eastern announcement date, not the UTC
