@@ -72,9 +72,11 @@ def main():
     assert "Research path saved" in page.locator("#crypto-personal-status").inner_text()
     assert page.locator("#crypto-saved-paths .ex-personal-row").count()==1
     page.reload(wait_until="domcontentloaded")
+    # A closed <details> hides its children. Open it before waiting for a
+    # visible saved row; this validates persistence rather than disclosure state.
+    page.locator("#crypto-personal summary").click()
     page.locator("#crypto-saved-paths .ex-personal-row").first.wait_for(timeout=10000)
     assert page.locator("#crypto-saved-paths .ex-personal-row").count()==1
-    page.locator("#crypto-personal summary").click()
     page.locator("#crypto-custom-kind").select_option("subtopic")
     page.locator("#crypto-custom").fill("Quantum authentication protocols")
     page.locator("#crypto-custom-add").click()
