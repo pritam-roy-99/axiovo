@@ -311,10 +311,36 @@ jobs:
           echo '| Audit internal routes and HTML assets | ${{ steps.audit_internal_routes_and_html_assets.outcome }} |' >> "$GITHUB_STEP_SUMMARY"
       - name: Verify Axiovo meaning in the homepage and video opening
         run: python -m unittest discover -s tests -p test_axiovo_brand_intro.py -v
-      - name: Install current-feature video generation dependencies
+      - name: Reuse already recorded and source-verified Axiovo tutorial
+        id: existing_video
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          folder=Path("docs/assets")
+          mp4=folder/"axiovo-tour.mp4"
+          vtt=folder/"axiovo-tour.vtt"
+          chapter=folder/"axiovo-tour-build.json"
+          try:
+              meta=json.loads(chapter.read_text(encoding="utf-8"))
+              valid=(mp4.is_file() and mp4.stat().st_size>100_000
+                     and vtt.is_file() and vtt.read_text(encoding="utf-8").startswith("WEBVTT")
+                     and len(meta.get("chapters",[]))>=20
+                     and meta.get("source")=="Real Chromium page captures")
+          except (OSError,ValueError,TypeError):
+              valid=False
+          print("Existing verified-source tutorial present:",valid)
+          with open(os.environ["GITHUB_OUTPUT"],"a",encoding="utf-8") as output:
+              output.write(f"reuse={'true' if valid else 'false'}\\n")
+          PY
+      - name: Install MP4 verification tools
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y -qq ffmpeg espeak-ng fonts-dejavu-core
+          sudo apt-get install -y -qq ffmpeg
+      - name: Install tutorial recording dependencies only when missing
+        if: steps.existing_video.outputs.reuse != 'true'
+        run: |
+          sudo apt-get install -y -qq espeak-ng fonts-dejavu-core
           python -m pip install --disable-pip-version-check Pillow edge-tts
       # The older illustrated-video generator depends on narration .opus files
       # which are not all present. It is redundant: the recorded current-site
@@ -326,6 +352,7 @@ jobs:
           python -m pip install --disable-pip-version-check playwright
           python -m playwright install --with-deps chromium
       - name: Record the actual Axiovo step-by-step tutorial
+        if: steps.existing_video.outputs.reuse != 'true'
         run: python scripts/build_tutorial_video.py
       - name: Validate actual MP4 playback streams and caption file (required)
         run: |
