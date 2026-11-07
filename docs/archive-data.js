@@ -30,8 +30,8 @@ const parseDOI=value=>{
 function parseEprint(raw){
  const value=clean(raw).replace(/^https?:\/\/eprint\.iacr\.org\//i,"")
   .replace(/^(?:oai:eprint\.iacr\.org:|eprint:)/i,"");
- const match=value.match(/^((?:19|20)\d{2})\/([1-9]\d{0,5})(?:\.pdf)?$/);
- return match?match[1]+"/"+Number(match[2]):"";
+ const match=value.match(/^((?:19|20)\d{2})\/(\d{1,6})(?:\.pdf)?$/);
+ return match&&Number(match[2])>0?match[1]+"/"+match[2]:"";
 }
 function read(key,fallback){
  try{return JSON.parse(localStorage.getItem(key)||"null")??fallback}catch{return fallback}
