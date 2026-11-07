@@ -168,3 +168,103 @@ body.axiovo-home .axiovo-demo-bottom{margin-top:14px}
   min-height:55px;font-size:.75rem;padding:10px 3px;
  }
 }
+
+/* 2026-11-07 mobile hero correction:
+   .axiovo-welcome-copy inherited flex:1 1 600px from desktop. In the
+   column header that 600px basis becomes HEIGHT, causing the large gap. */
+@media (max-width:900px) {
+ body.axiovo-home .axiovo-welcome-header {
+   display:flex;
+   flex-direction:column;
+   align-items:stretch;
+   justify-content:flex-start;
+   gap:clamp(12px,2.5vw,20px);
+   min-height:0;
+   padding-bottom:clamp(18px,3vw,26px);
+ }
+ body.axiovo-home .axiovo-welcome-header .axiovo-welcome-copy {
+   flex:0 0 auto;
+   width:100%;
+   max-width:none;
+   min-height:0;
+ }
+ body.axiovo-home .axiovo-welcome-header .axiovo-welcome-actions {
+   flex:0 0 auto;
+   width:100%;
+   margin:0;
+   align-self:stretch;
+ }
+}
+@media (max-width:650px) {
+ body.axiovo-home .rd-page > .axiovo-welcome {
+   padding:20px 17px 24px!important;
+ }
+ body.axiovo-home .axiovo-welcome-header {
+   gap:19px;
+   padding-bottom:23px;
+ }
+ body.axiovo-home .axiovo-eyebrow {
+   font-size:10px;
+   letter-spacing:.055em;
+   line-height:1.5;
+   gap:8px;
+ }
+ body.axiovo-home .axiovo-welcome h1 {
+   font-size:clamp(2.15rem,8.5vw,3.2rem);
+   line-height:1.08;
+   letter-spacing:-.047em;
+   margin:14px 0 17px;
+ }
+ body.axiovo-home .axiovo-intro {
+   font-size:clamp(.96rem,3.7vw,1.12rem);
+   line-height:1.6;
+   margin:0;
+ }
+ body.axiovo-home .axiovo-name-line {
+   font-size:.89rem;
+   line-height:1.5;
+   margin:13px 0 0!important;
+ }
+ body.axiovo-home .axiovo-welcome-header .axiovo-welcome-actions {
+   display:grid;
+   grid-template-columns:repeat(2,minmax(0,1fr));
+   gap:10px;
+ }
+ body.axiovo-home .axiovo-welcome-header .axiovo-cta {
+   min-height:48px;
+   min-width:0;
+   padding:10px 8px;
+   width:100%;
+   font-size:clamp(.78rem,3.1vw,.91rem);
+   line-height:1.3;
+   text-align:center;
+ }
+ body.axiovo-home .axiovo-welcome-media {
+   padding-top:19px;
+ }
+ body.axiovo-home .axiovo-demo-heading {
+   gap:8px;
+   padding-bottom:12px;
+ }
+ body.axiovo-home .axiovo-demo-heading h2 {
+   font-size:clamp(1.4rem,5.8vw,1.9rem);
+   margin:10px 0 5px;
+ }
+ body.axiovo-home .axiovo-demo-heading p {
+   font-size:.88rem;
+   line-height:1.5;
+ }
+ body.axiovo-home .axiovo-home-video {
+   border-radius:12px;
+   box-shadow:none;
+ }
+ body.axiovo-home .axiovo-demo-bottom {
+   gap:8px;
+   line-height:1.55;
+ }
+}
+@media(max-width:360px){
+ body.axiovo-home .axiovo-welcome-header .axiovo-welcome-actions {
+   grid-template-columns:1fr;
+ }
+}
