@@ -47,4 +47,32 @@ assert.equal(feed.key(chemistry),"chemrxiv:10.26434/chemrxiv-2026-fixture");
 assert.equal(feed.build([chemistry],{
  topics:["preparation contextuality"],hidden:["chemrxiv:10.26434/chemrxiv-2026-fixture-"]
 },NOW).length,0,"A previously hidden ChemRxiv work stays hidden across revisions");
+
+// Two genuine 2010–2011 arXiv-era subject areas used as name-collision fixtures.
+// A shared "Pritam Roy" name is NOT a confirmed researcher identity.
+const otherPritamPapers=[
+ {id:"1107.2132",source:"arxiv",title:"Magnifying Lens Abstraction for Stochastic Games with Discounted and Long-run Average Objectives",
+  abstract:"We study magnifying lens abstraction, stochastic games and Markov decision processes.",
+  authors:["Krishnendu Chatterjee","Luca de Alfaro","Pritam Roy"],date:"2011-07-11",
+  url:"https://arxiv.org/abs/1107.2132"},
+ {id:"1010.5665",source:"arxiv",title:"Safety-Guarantee Controller Synthesis for Cyber-Physical Systems",
+  abstract:"We study linear temporal logic and synthesis of cyber-physical controllers.",
+  authors:["Pritam Roy","Paulo Tabuada","Rupak Majumdar"],date:"2010-10-27",
+  url:"https://arxiv.org/abs/1010.5665"}
+];
+const ambiguousPrefs={authors:["Pritam Roy"],topics:["quantum information","preparation contextuality"],
+ matchesAuthor:(a,b)=>a.toLowerCase()===b.toLowerCase()};
+assert.equal(feed.build(otherPritamPapers,ambiguousPrefs,NOW).length,0,
+ "A name alone must not inject unrelated publications by a different researcher");
+const uncertain=feed.build(otherPritamPapers,{...ambiguousPrefs,includeUnverifiedNames:true},NOW);
+assert.equal(uncertain.length,2,"Explicit opt-in may show uncertain name-only papers");
+assert(uncertain.every(x=>x.nameOnly&&!x.identityVerified&&
+ x.reasons.some(reason=>reason.includes("identity unverified"))));
+const relatedPritam={...otherPritamPapers[0],id:"2611.02222",title:"Quantum information and contextuality",
+ abstract:"Preparation contextuality in quantum information theory",date:"2026-11-05",
+ url:"https://arxiv.org/abs/2611.02222"};
+const topical=feed.build([relatedPritam],ambiguousPrefs,NOW);
+assert.equal(topical.length,1,"Topical evidence may support a recommendation, not identity verification");
+assert.equal(topical[0].nameOnly,false);
+assert(topical[0].reasons.some(reason=>reason.includes("identity unverified")));
 console.log("PASS: personalized feed ranking, names, topic coverage, dedup, exclusions, sources and freshness");
