@@ -26,7 +26,7 @@ class SourceAndPaletteTests(unittest.TestCase):
      page=(DOCS/"biorxiv.html").read_text()
      self.assertIn('data-explore-source="biorxiv"',page)
      self.assertIn('id="archive-query"',page)
-     self.assertRegex(page,r'src="\\./archive-data\\.js(?:\\?v=[^"]+)?"')
+     self.assertRegex(page,r'src="\./archive-data\.js(?:\?v=[^"]+)?"')
      self.assertIn("https://api.biorxiv.org/details/biorxiv/",(DOCS/"archive-data.js").read_text())
      self.assertIn('<option value="biorxiv">bioRxiv</option>',(DOCS/"workspace.html").read_text())
 
