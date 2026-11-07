@@ -16,9 +16,12 @@ permissions:
   contents: write
   pages: write
   id-token: write
+# Video generation and browser audits are long-running. Source metadata pushes
+# must not cancel a healthy publication halfway through rendering. GitHub
+# retains only the newest queued run in the same concurrency group.
 concurrency:
   group: axiovo-pages
-  cancel-in-progress: true
+  cancel-in-progress: false
 jobs:
   publish:
     runs-on: ubuntu-latest
