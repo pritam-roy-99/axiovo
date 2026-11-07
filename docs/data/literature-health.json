@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "checked_at": "2026-11-07T01:27:59.132636+00:00",
+  "checked_at": "2026-11-07T07:14:20.149827+00:00",
   "warning": "Completeness is proved only for named source windows. No source-wide recall is asserted.",
   "arxiv": {
     "status": "gaps_detected",
@@ -20,19 +20,19 @@
   },
   "biorxiv": {
     "status": "window_verified",
-    "official_window_total": 3490,
-    "paginated_records": 3490,
-    "cached_unique_records": 3644,
+    "official_window_total": 3507,
+    "paginated_records": 3507,
+    "cached_unique_records": 3657,
     "requested_from": "2026-10-24",
     "requested_through": "2026-11-07",
-    "last_success": "2026-11-07T01:22:30.810759+00:00",
+    "last_success": "2026-11-07T07:11:48.861681+00:00",
     "not_a_full_archive": true
   },
   "chemrxiv": {
     "status": "prefix_incomplete",
     "cached_unique_records": 3000,
     "prefix_pages_checked": 8,
-    "last_success": "2026-11-07T01:22:45.970949+00:00",
+    "last_success": "2026-11-07T07:12:00.974757+00:00",
     "scope": "Crossref ChemRxiv DOI-prefix results; not official full ChemRxiv totals",
     "not_a_full_archive": true
   }
