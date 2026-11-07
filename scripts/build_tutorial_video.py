@@ -68,7 +68,7 @@ def cue(t):
 def voice_text(value):
     """Pronunciation hints for technical words in spoken text only."""
     return (value.replace("Axiovo","Ax-ee-oh-voh")
-      .replace("bioRxiv","bio archive").replace("ChemRxiv","chem archive")
+      .replace("bioRxiv","bio archive").replace("ChemRxiv","chem archive").replace("Cryptology ePrint","Cryptology ee print")
       .replace("arXiv","archive").replace("DOI","D O I")
       .replace("Ollama","Oh llama").replace("Qwen","Q wen")
       .replace("Kimi","Kee mee").replace("OpenRouter","Open Router")
@@ -94,7 +94,7 @@ def main():
     # Each scene points to a real page and a meaningful control or feature.
     steps=[
         ("Axiovo = Axiom + Novo", "From established knowledge to new discoveries.", "Welcome to Axiovo. Its name combines axiom, a foundational starting point for reasoning, and novo, meaning new. Axiovo stands for moving from established knowledge toward new scientific discoveries. Let us see how its research tools work.", "", ".axiovo-welcome", None),
-        ("Three preprint archives", "Select arXiv, bioRxiv or ChemRxiv.", "The homepage offers three independent preprint archives. Choose the one that matches your research discipline.", "", ".axiovo-archive-grid", None),
+        ("Four research archives", "Choose arXiv, bioRxiv, ChemRxiv or Cryptology ePrint.", "Axiovo now brings four research archives together. The fourth is the I A C R Cryptology ee print archive, for cryptography, quantum security and cryptanalysis. Choose the source that fits your subject.", "", ".axiovo-archive-grid", None),
         ("Search the arXiv subject list", "Type part of a subject name or category code.", "On arXiv Discover, open Archive subject and type part of a name or code. Typing quant brings up Quantum Physics and other matching categories.", "arxiv.html", "#archive-field-input", ("archive-field-input", "quant")),
         ("Linked research topics", "Refine a subject to a subfield and subtopic.", "You can also type in the research subfield and subtopic dropdowns. Each dropdown offers choices within the path you have selected.", "arxiv.html?category=math-ph&topic=quantum-many-body-theory&subtopic=lieb-robinson-bounds", "#archive-subfield-input", None),
         ("Search by paper title", "Type keywords, a title, DOI or arXiv ID.", "Use the search field to enter the exact title, an author, or an arXiv identifier. Results link to their original paper record.", "arxiv.html?category=math-ph&topic=quantum-many-body-theory&subtopic=lieb-robinson-bounds", "#archive-query", ("archive-query", "Lieb-Robinson bounds")),
@@ -104,8 +104,10 @@ def main():
         ("Save your research path", "Create, follow and restore personal topics.", "You can add personal topics and subtopics, save frequently used research paths, and restore defaults when needed.", "arxiv.html?category=math-ph&topic=quantum-many-body-theory", "#archive-custom-form", ("openclass", ".ex-personal")),
         ("bioRxiv Discover", "Browse independent biology subject areas.", "The bioRxiv Discover page has its own biology taxonomy, searchable topic selectors, and preprint search.", "biorxiv.html?category=Genomics&topic=transcriptomics&subtopic=spatial-transcriptomics", "#archive-topic-input", None),
         ("ChemRxiv Discover", "Browse independent chemistry subject areas.", "ChemRxiv provides searchable chemistry subject and topic dropdowns while keeping the source of each paper visible.", "chemrxiv.html?category=Catalysis&topic=electrocatalysis&subtopic=electrochemical-co2-reduction", "#archive-topic-input", None),
-        ("Cross-archive Research Desk", "Choose one or more sources.", "Open Research Desk to search all three preprint servers in one place. Results remain separated by their original archive.", "desk.html", "#rd-search-form", None),
-        ("Search across sources", "Enter a query once for all selected archives.", "Enter research keywords in Research Desk, then click Search preprints to check arXiv, bioRxiv and ChemRxiv together.", "desk.html", "#rd-query", ("rd-query", "graph neural networks")),
+        ("Cryptology ePrint Discover", "Explore cryptography and quantum security.", "The Cryptology ee print page opens records from the I A C R archive, including quantum cryptography, post-quantum cryptography, signatures and security protocols. Select a topic to narrow the indexed records.", "crypto.html", "#crypto-topic", ("crypto-topic", "quantum cryptography")),
+        ("Exact IACR paper identities", "Check original ePrint year and number.", "Search by title, author or a Cryptology ee print identifier such as 2026 slash 1234. Read each source-linked abstract, save a paper to Library or compare its metadata. Because backfill is ongoing, always use the original I A C R search when the local index lacks a paper.", "crypto.html?topic=quantum+cryptography", ".crypto-searchbar", None),
+        ("Cross-archive Research Desk", "Choose one or more sources.", "Open Research Desk to search all four preprint archives in one place. Results remain separated by their original archive.", "desk.html", "#rd-search-form", None),
+        ("Search across sources", "Enter a query once for all selected archives.", "Enter research keywords in Research Desk, then click Search preprints to check arXiv, bioRxiv, ChemRxiv and Cryptology ee print together.", "desk.html", "#rd-query", ("rd-query", "graph neural networks")),
         ("Research Desk filters", "Apply author, date range and sorting.", "Expand Author, dates and sorting to narrow the cross-archive search before reviewing each source's coverage.", "desk.html", "#rd-advanced", ("open", "rd-advanced")),
         ("Saved searches", "Rerun frequently used research queries.", "Save a useful Research Desk search to repeat it later from the saved search list.", "desk.html", "#rd-watches", None),
         ("Paper comparison", "Build a shortlist and compare abstracts.", "Add papers to the comparison shortlist. Compare available metadata and abstracts side by side, then verify the originals.", "desk.html", "#rd-queue", None),
