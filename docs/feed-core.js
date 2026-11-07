@@ -64,7 +64,7 @@
    seen.add(id);
    const then=date(paper),days=then>0&&then<=now?(now-then)/86400000:null;
    const recency=days===null?0:days<=3?12:days<=7?9:days<=30?5:days<=90?2:0;
-   const reasons=[...authorHit.slice(0,2).map(x=>"Name match only: "+x+" (researcher identity unverified)"),
+   const reasons=[...authorHit.slice(0,2).map(x=>"Author name matches: "+x+" (identity unverified)"),
     ...topicMatches.slice(0,3).map(x=>"Following topic: "+x.topic),
     ...related.map(x=>"Similar to saved: "+x.paper.title.slice(0,65))];
    const score=authorHit.length*35+topicMatches.reduce((n,x)=>n+20+x.score,0)+
