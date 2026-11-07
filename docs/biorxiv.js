@@ -50,7 +50,7 @@
    input.onchange=()=>{const next=read(META,{});next[p.doi]=input.value;write(META,next)};
    article.append(input);
   }
-  article.append(bar);return article;
+  article.append(bar);window.AxiovoCitationEvidence?.add(article,{...p,source:"biorxiv"});return article;
  }
  let feed=[],lastUpdated="";
  function draw(){
