@@ -39,7 +39,7 @@ function anchor(parent,title,url,cls=""){
 function notify(message){$("feed-follow-status").textContent=message}
 function preferences(){
  const data=prefsAPI.derive(localStorage);
- const refs=["arxiv","biorxiv","chemrxiv"].flatMap(source=>archive.savedRecords(source));
+ const refs=["arxiv","biorxiv","chemrxiv","eprint"].flatMap(source=>archive.savedRecords(source));
  const saved=[...refs.map(core.key),...asArray(read("axiovo-reading-list",[])).map(x=>"arxiv:"+String(x).toLowerCase().replace(/v\d+$/,""))];
  return {...data,saved,hidden:read(HIDDEN,[]),includeUnverifiedNames:read(UNVERIFIED_NAMES,false)===true,references:refs.slice(0,20),
   matchesAuthor:(a,b)=>Boolean(follow?.matchesName(a,b))||String(a).toLowerCase()===String(b).toLowerCase()};
@@ -365,7 +365,7 @@ async function refresh(manual=false){
  const preview=manual?Promise.resolve():loadFastPreview(run);
  let received=0;const missing=[],timestamps=[];
  try{
-  const sources=["arxiv","biorxiv","chemrxiv"];
+  const sources=["arxiv","biorxiv","chemrxiv","eprint"];
   await Promise.all(sources.map(async source=>{
    try{
     const snap=await archive.snapshot(source,{
@@ -379,7 +379,7 @@ async function refresh(manual=false){
     sourcePapersChanged();
     state.sourceErrors=[...missing];
     recalculate();
-    $("feed-status").textContent="Loaded "+received+" of 3 archives; "+state.items.length+
+    $("feed-status").textContent="Loaded "+received+" of "+sources.length+" archives; "+state.items.length+
       " personalized matches. Additional source metadata may still be loading.";
    }catch{
     missing.push(source);
@@ -415,7 +415,7 @@ async function searchMore(){
  state.expanded=true;
  const button=$("feed-search-more");button.disabled=true;button.textContent="Searching source metadata…";
  try{
-  const sources=$("feed-source").value==="all"?["arxiv","biorxiv","chemrxiv"]:[$("feed-source").value];
+  const sources=$("feed-source").value==="all"?["arxiv","biorxiv","chemrxiv","eprint"]:[$("feed-source").value];
   // Bound network work so mobile data usage remains predictable.
   const queries=sources.flatMap(source=>[
    ...pref.authors.slice(0,1).map(author=>({source,author})),

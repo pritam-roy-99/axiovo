@@ -35,7 +35,7 @@ class UsabilityTests(unittest.TestCase):
         html=(DOCS/"index.html").read_text()
         self.assertIn('name="viewport" content="width=device-width,initial-scale=1"',html)
         self.assertIn('id="axiovo-archive-title"',html)
-        self.assertEqual(html.count("data-archive="),3)
+        self.assertEqual(html.count("data-archive="),4)
         self.assertIn("Personalize My Feed",(DOCS/"feed-preview.js").read_text())
 
 if __name__=="__main__":

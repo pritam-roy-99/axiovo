@@ -118,6 +118,20 @@ jobs:
         id: chemrxiv
         continue-on-error: true
         run: python scripts/sync_chemrxiv.py
+      - name: Validate IACR ePrint OAI-PMH metadata parser
+        run: python -m unittest discover -s tests -p test_eprint_harvest.py -v
+      - name: Refresh official IACR Cryptology ePrint metadata
+        id: eprint
+        continue-on-error: true
+        env:
+          IACR_MAX_PAGES: '8'
+          IACR_LOOKBACK_DAYS: '21'
+        run: python scripts/sync_eprint.py
+      - name: Report unavailable IACR source metadata
+        if: steps.eprint.outcome == 'failure'
+        run: |
+          echo '::warning::Official IACR OAI metadata was unavailable. Existing verified ePrint records, if any, are retained.'
+          echo '### IACR ePrint metadata unavailable or incomplete' >> "$GITHUB_STEP_SUMMARY"
       - name: Summarize bioRxiv and ChemRxiv source coverage
         if: always()
         run: |
@@ -250,6 +264,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add docs/data/literature-health.json docs/data/feed.json docs/data/biorxiv.json docs/data/chemrxiv.json docs/data/arxiv-days/ docs/data/oai-recent.json docs/data/announcements.json docs/data/records/ docs/data/coverage.json docs/data/needs_review.json docs/data/taxonomy.json docs/data/index/v1/ docs/data/taxonomy/v1.json
+          git add -A docs/data/eprint.json docs/data/eprint-backfill-state.json 2>/dev/null || true
           if ! git diff --cached --quiet; then
             git commit -m "data: refresh arXiv index [skip ci]"
             git fetch origin main
@@ -324,10 +339,12 @@ jobs:
           python scripts/smoke_feed.py
           python scripts/smoke_recommendations.py
           python scripts/smoke_search_links.py
-      - name: Exercise all three dedicated source Discover pages (deployment gate)
+      - name: Exercise existing Discover pages and new Cryptology ePrint source (deployment gate)
         if: steps.chromium_deps.outcome == 'success'
         id: smoke_archives
-        run: python scripts/smoke_archive_pages.py
+        run: |
+          python scripts/smoke_archive_pages.py
+          python scripts/smoke_eprint.py
       - name: Report browser test results
         if: always()
         run: |

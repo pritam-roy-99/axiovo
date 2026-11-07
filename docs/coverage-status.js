@@ -21,6 +21,22 @@ async function show(){
    const shards=document.createElement("td");shards.textContent=String(manifest.shards.filter(s=>s.source===label).length);
    tr.append(name,count,shards);tbody.append(tr);
   }
+  // IACR is an independent OAI snapshot, not yet in v1 normalized shards.
+  // Never add its count to v1's verified shard totals or imply full history.
+  try{
+   const iacrResponse=await fetch("./data/eprint.json",{cache:"no-store",signal:AbortSignal.timeout(12000)});
+   if(iacrResponse.ok){
+    const iacr=await iacrResponse.json();
+    if(iacr.coverage==="incremental-OAI-PMH-snapshot-not-full-history"&&Array.isArray(iacr.papers)){
+     const tr=document.createElement("tr");
+     for(const [n,value] of ["Cryptology ePrint",iacr.papers.length.toLocaleString(),"OAI snapshot (partial)"].entries()){
+      const cell=document.createElement(n===0?"th":"td");
+      if(n===0)cell.scope="row";cell.textContent=value;tr.append(cell);
+     }
+     tbody.append(tr);
+    }
+   }
+  }catch{/* Missing IACR source does not invalidate the older three archives. */}
   const total=Object.values(manifest.by_source).reduce((sum,v)=>sum+Number(v||0),0);
   status.textContent=total.toLocaleString()+" unique verified records represented in the current local shards. These are partial snapshots, NOT complete archive totals.";
   if(total!==manifest.unique_papers)status.textContent+=" Warning: manifest count mismatch.";

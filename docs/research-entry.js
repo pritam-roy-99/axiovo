@@ -6,7 +6,7 @@ function route(){
  if(!url.pathname.endsWith("/")&&!url.pathname.endsWith("/index.html"))return;
  const params=url.searchParams;
  const archive=(params.get("archive")||params.get("view")||"").toLowerCase();
- const native={"arxiv":"arxiv.html","biorxiv":"biorxiv.html","chemrxiv":"chemrxiv.html"};
+ const native={"arxiv":"arxiv.html","biorxiv":"biorxiv.html","chemrxiv":"chemrxiv.html","eprint":"crypto.html","crypto":"crypto.html"};
  if(native[archive]){
   const target=new URL("./"+native[archive],url);
   target.search=url.search;

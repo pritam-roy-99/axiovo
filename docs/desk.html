@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#0b2239">
-<meta name="description" content="Search three preprint archives, compare source-linked records, and save citations in the Axiovo Research Desk.">
+<meta name="description" content="Search four preprint archives, compare source-linked records, and save citations in the Axiovo Research Desk.">
 <title>Research Desk | Axiovo</title>
 <link rel="icon" type="image/svg+xml" href="./icons/axiovo.svg">
 <link rel="manifest" href="./manifest.webmanifest">
@@ -29,13 +29,13 @@
  <div class="rd-desk-heading">
   <p class="rd-kicker">PREPRINT DISCOVERY</p>
   <h1>Research Desk</h1>
-  <p>Run one search across three archives. Check where each record came from, then compare or save the papers you want to read.</p>
+  <p>Run one search across four archives. Check where each record came from, then compare or save the papers you want to read.</p>
   <details class="rd-advanced"><summary>How to use Research Desk</summary><p>Enter a title, keyword, author, DOI or arXiv ID, choose the archives, then select Search preprints. Open an original record to verify it. Add papers to comparison to compare two to five abstracts, save them to Library, or export the shortlist as RIS citations. Search coverage can be partial.</p></details>
  </div>
  <section class="rd-panel rd-filters" aria-labelledby="rd-search-heading">
   <h2 class="rd-sr-only" id="rd-search-heading">Search preprints</h2>
   <form id="rd-search-form" role="search">
-   <label class="rd-label" for="rd-query">Keyword, title, DOI or arXiv ID</label>
+   <label class="rd-label" for="rd-query">Keyword, title, DOI, arXiv or ePrint ID</label>
    <div class="rd-searchbar">
     <input id="rd-query" name="q" type="search" maxlength="220" placeholder="e.g. graph neural networks">
     <button class="rd-button rd-primary" type="submit">Search preprints <span aria-hidden="true">→</span></button>
@@ -44,6 +44,7 @@
     <label><input type="checkbox" value="arxiv" checked><span class="rd-source-dot arxiv" aria-hidden="true"></span> arXiv</label>
     <label><input type="checkbox" value="biorxiv" checked><span class="rd-source-dot biorxiv" aria-hidden="true"></span> bioRxiv</label>
     <label><input type="checkbox" value="chemrxiv" checked><span class="rd-source-dot chemrxiv" aria-hidden="true"></span> ChemRxiv</label>
+    <label><input type="checkbox" value="eprint" checked><span class="rd-source-dot eprint" aria-hidden="true"></span> Cryptology ePrint</label>
    </fieldset>
    <details class="rd-advanced" id="rd-advanced"><summary>Author, dates and sorting</summary>
     <div class="rd-filter-grid">

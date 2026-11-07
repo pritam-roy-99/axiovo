@@ -7,7 +7,7 @@ const core=window.AxiovoFeedCore,archive=window.AxiovoArchiveData,follow=window.
 function read(k,otherwise){try{return JSON.parse(localStorage.getItem(k)||"null")??otherwise}catch{return otherwise}}
 const preferences=window.AxiovoFeedPreferences?.derive(localStorage);
 function paragraph(text){const p=document.createElement("p");p.textContent=text;host.append(p)}
-if(!preferences?.directTopics.length&&!preferences?.authors.length&&!preferences?.paths.some(path=>path.source==="arxiv")){
+if(!preferences?.directTopics.length&&!preferences?.authors.length&&!preferences?.paths.some(path=>["arxiv","eprint"].includes(path.source))){
  host.replaceChildren();const box=document.createElement("article");box.className="feed-preview-empty";
  const link=document.createElement("a");link.href="./feed.html";link.textContent="Personalize My Feed →";box.append(link);
  const p=document.createElement("p");p.textContent="Follow an author or research topic to start receiving personalized updates.";box.append(p);host.append(box);return;

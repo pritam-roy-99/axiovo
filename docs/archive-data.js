@@ -1,12 +1,12 @@
 /* Shared preprint retrieval, source identity and library storage. */
 (function(root){
 "use strict";
-const names={arxiv:"arXiv",biorxiv:"bioRxiv",chemrxiv:"ChemRxiv"};
-const paths={arxiv:"feed.json",biorxiv:"biorxiv.json",chemrxiv:"chemrxiv.json"};
-const keys={arxiv:"axiovo-reading-list",biorxiv:"axiovo-biorxiv-reading-v1",chemrxiv:"axiovo-chemrxiv-reading-v1"};
+const names={arxiv:"arXiv",biorxiv:"bioRxiv",chemrxiv:"ChemRxiv",eprint:"Cryptology ePrint"};
+const paths={arxiv:"feed.json",biorxiv:"biorxiv.json",chemrxiv:"chemrxiv.json",eprint:"eprint.json"};
+const keys={arxiv:"axiovo-reading-list",biorxiv:"axiovo-biorxiv-reading-v1",chemrxiv:"axiovo-chemrxiv-reading-v1",eprint:"axiovo-eprint-reading-v1"};
 const ARXIV_METADATA="axiovo-archive-library-v1";
 const COMPARISON="axiovo-desk-comparison-v1";
-const official={arxiv:"https://arxiv.org/search/",biorxiv:"https://www.biorxiv.org/",chemrxiv:"https://chemrxiv.org/"};
+const official={arxiv:"https://arxiv.org/search/",biorxiv:"https://www.biorxiv.org/",chemrxiv:"https://chemrxiv.org/",eprint:"https://eprint.iacr.org/"};
 const clean=value=>String(value??"").trim();
 const simple=value=>clean(value).normalize("NFKD").replace(/\p{M}/gu,"").toLowerCase().replace(/[^\p{L}\p{N}]+/gu," ").trim();
 const plain=value=>clean(value).replace(/<\/?[a-z][^>]*>/gi," ").replace(/&(?:lt|gt|amp|quot|apos|nbsp);/g,m=>({"&lt;":"<","&gt;":">","&amp;":"&","&quot;":'"',"&apos;":"'","&nbsp;":" "}[m])).replace(/\s+/g," ");
@@ -26,6 +26,13 @@ const parseDOI=value=>{
  const doi=clean(value).replace(/^(?:doi:\s*|https?:\/\/(?:dx\.)?doi\.org\/)/i,"");
  return /^10\.\d{4,9}\/[-a-z0-9._;()/:+]+$/i.test(doi)?doi.toLowerCase():"";
 };
+// IACR ePrint IDs are year/number, never arXiv IDs or DOI revisions.
+function parseEprint(raw){
+ const value=clean(raw).replace(/^https?:\/\/eprint\.iacr\.org\//i,"")
+  .replace(/^(?:oai:eprint\.iacr\.org:|eprint:)/i,"");
+ const match=value.match(/^((?:19|20)\d{2})\/([1-9]\d{0,5})(?:\.pdf)?$/);
+ return match?match[1]+"/"+Number(match[2]):"";
+}
 function read(key,fallback){
  try{return JSON.parse(localStorage.getItem(key)||"null")??fallback}catch{return fallback}
 }
@@ -54,6 +61,14 @@ function normalize(source,p){
   provenance:clean(p.provenance||p.metadata_source),announcementDate:day(p.announcementDate||p.announcement_date),doi:parseDOI(p.doi||p.DOI)
  };
  if(record.category&&!record.categories.includes(record.category))record.categories.unshift(record.category);
+ if(source==="eprint"){
+  const id=parseEprint(p.recordId||p.id||p.link||p.url);
+  if(!id)return null;
+  const url="https://eprint.iacr.org/"+id;
+  return {...record,id,recordId:id,version:null,url,pdf:url+".pdf",
+   metadataUpdated:day(p.metadata_updated||p.updated),
+   provenance:record.provenance||"IACR ePrint OAI-PMH"};
+ }
  if(source==="arxiv"){
   const id=parseArxiv(p.recordId||p.id||p.arxiv_id||p.link);
   if(!id)return null;
@@ -119,6 +134,11 @@ function categoryMatch(p,category){
  const exact=category.codes||[category.code];
  return p.categories.some(code=>exact.some(value=>simple(code)===simple(value)));
 }
+function eprintIdentifier(value){
+ const raw=clean(value);
+ if(!/^(?:eprint:\s*|https?:\/\/eprint\.iacr\.org\/|(?:19|20)\d{2}\/)/i.test(raw))return "";
+ return parseEprint(raw);
+}
 function identifier(value){
  const doi=parseDOI(value);
  const arxiv=parseArxiv(value)||(doi.startsWith("10.48550/arxiv.")?parseArxiv(doi.slice("10.48550/arxiv.".length)):null);
@@ -134,12 +154,14 @@ function matchesAuthor(authors,query){
 }
 function matchScore(p,c){
  if(c.from&&(!p.date||p.date<c.from)||c.to&&(!p.date||p.date>c.to))return null;
+ const cryptoId=eprintIdentifier(c.q);
+ if(cryptoId&&(p.source!=="eprint"||p.id!==cryptoId))return null;
  const {arxiv:id,doi}=identifier(c.q);
  if(id&&(p.source!=="arxiv"||p.id.toLowerCase()!==id.base.toLowerCase()||(id.explicit&&p.recordId.toLowerCase()!==id.requested.toLowerCase())))return null;
  if(doi&&p.doi!==doi)return null;
  if(c.crosslisted&&(p.source!=="arxiv"||p.categories.length<2))return null;
  const text=[p.title,p.abstract,p.authors.join(" "),p.categories.join(" "),p.id,p.doi].join(" ");
- if(!id&&!doi&&!matchesText(c.match==="title"?p.title:text,c.q))return null;
+ if(!id&&!doi&&!cryptoId&&!matchesText(c.match==="title"?p.title:text,c.q))return null;
  if(!matchesAuthor(p.authors,c.author)||!matchesText(p.affiliations.join(" "),c.affiliation))return null;
  const terms=c.topicTerms||[],hit=topicHit(p,terms);
  if(terms.length&&!hit)return null;
@@ -373,6 +395,7 @@ async function chemLive(c,signal,cursor){
 }
 function live(source,criteria,signal,cursor){
  if(source==="arxiv")return arxivLive(criteria,signal,cursor);
+ if(source==="eprint")return snapshot("eprint").then(data=>({papers:filter(data.papers,criteria),total:null,provider:"IACR OAI-PMH indexed snapshot (partial coverage)",next:null}));
  if(source==="biorxiv"){
   const browse=!criteria.q&&!criteria.author&&!criteria.refinement&&!criteria.topicTerms?.length;
   const orderedSearch=!criteria.category&&(criteria.sort==="oldest"||criteria.sort==="cited");
@@ -381,6 +404,10 @@ function live(source,criteria,signal,cursor){
  return chemLive(criteria,signal,cursor);
 }
 function sourceLink(source,criteria={}){
+ if(source==="eprint"){
+  const id=eprintIdentifier(criteria.q);
+  return id?"https://eprint.iacr.org/"+id:"https://eprint.iacr.org/search";
+ }
  if(source==="arxiv"){
   const id=identifier(criteria.q).arxiv;
   if(id)return root.AxiovoArxiv.abs(id.requested);
@@ -396,6 +423,7 @@ function sourceLink(source,criteria={}){
  return official[source];
 }
 function storedId(source,item){
+ if(source==="eprint")return parseEprint(typeof item==="string"?item:item?.recordId||item?.id||item?.url);
  if(source==="arxiv")return parseArxiv(item)?.requested;
  const doi=parseDOI(item?.doi);
  return source==="biorxiv"&&item?.version?doi+"v"+Number(item.version):doi;
@@ -449,5 +477,5 @@ function removeComparison(p){
  return true;
 }
 root.AxiovoArchiveData={names,clean,simple,read,write,normalize,workKey,recordKey,merge,filter,topicHit,categoryMatch,identifier,snapshot,latestArxivAnnouncement,datedArxiv,live,sourceLink,
- saved,save,unsave,savedRecords,parseDOI,comparison,addComparison,removeComparison};
+ saved,save,unsave,savedRecords,parseDOI,parseEprint,eprintIdentifier,comparison,addComparison,removeComparison};
 })(window);

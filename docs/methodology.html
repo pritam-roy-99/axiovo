@@ -13,6 +13,12 @@ main code{overflow-wrap:anywhere}
 </style><link rel="manifest" href="./manifest.webmanifest"><meta name="theme-color" content="#0b2239"><link rel="icon" type="image/svg+xml" href="./icons/axiovo.svg"><script defer src="./pwa.js"></script><link rel="stylesheet" href="./axiovo-shell.css?v=2"></head><body><header></header>
 <main><h1>Axiovo data coverage and methodology</h1>
 <p>Axiovo is an independent, experimental open-source research workspace, not an official arXiv or SciRate service. This page documents what the site actually does and what it cannot guarantee.</p>
+<section id="axiovo-iacr-methodology" aria-labelledby="axiovo-iacr-title">
+<h2 id="axiovo-iacr-title">Cryptology ePrint: official records and limitations</h2>
+<p>Axiovo indexes metadata from the <a href="https://eprint.iacr.org/" target="_blank" rel="noopener">IACR Cryptology ePrint Archive</a> using its OAI-PMH metadata service. The ePrint paper identifier is <code>year/number</code>, for example <code>2026/1234</code>; it is not an arXiv identifier and cannot be converted to one. All record links point to the original archive.</p>
+<p>Only the metadata available in the harvested windows is searchable locally. Historical years are backfilled progressively and the count of returned records is <strong>not</strong> the full archive count. OAI-PMH datestamps record metadata updates, not independently verified first-submission dates. We do not invent exact revision histories or publication citations when they are not supplied.</p>
+<p>Selected topical labels such as quantum cryptography or post-quantum cryptography are transparent Axiovo search refinements, not claims about an official IACR category taxonomy. No paper PDFs are redistributed. For comprehensive historic results, <a href="https://eprint.iacr.org/search" target="_blank" rel="noopener">search the official archive directly</a>. Saved papers remain private in the browser and are backed up only when you explicitly export them.</p>
+</section>
 <section id="axiovo-source-health" aria-labelledby="axiovo-source-health-heading">
 <h2 id="axiovo-source-health-heading">Live archive update health</h2>
 <p id="axiovo-source-health-summary" role="status" aria-live="polite">Checking source timestamps…</p>

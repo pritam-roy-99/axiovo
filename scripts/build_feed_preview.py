@@ -16,7 +16,7 @@ DATA = ROOT / "docs" / "data"
 INPUTS = (
     ("arxiv", "feed.json"), ("arxiv", "oai-recent.json"),
     ("arxiv", "announcements.json"), ("biorxiv", "biorxiv.json"),
-    ("chemrxiv", "chemrxiv.json"),
+    ("chemrxiv", "chemrxiv.json"), ("eprint", "eprint.json"),
 )
 MAX_PER_SOURCE = 220
 
@@ -34,7 +34,7 @@ def identity(source, row):
 
 def build(data=DATA):
     data = Path(data)
-    buckets = {key: {} for key in ("arxiv", "biorxiv", "chemrxiv")}
+    buckets = {key: {} for key in ("arxiv", "biorxiv", "chemrxiv", "eprint")}
     examined = {}
     for source, name in INPUTS:
         path = data / name

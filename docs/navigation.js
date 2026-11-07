@@ -8,10 +8,10 @@
   logo.append(mark,document.createTextNode(" Axiovo"));
   const nav=document.createElement("nav");nav.className="rl-nav";nav.setAttribute("aria-label","Main navigation");
   const file=location.pathname.split("/").pop()||"index.html";
-  const archivePage=["arxiv.html","biorxiv.html","chemrxiv.html"].includes(file);
+  const archivePage=["arxiv.html","biorxiv.html","chemrxiv.html","crypto.html"].includes(file);
   const links=[
    ["./#axiovo-archive-title","Explore","Browse research subjects and preprint archives"],
-   ["./desk.html","Research Desk","Search arXiv, bioRxiv and ChemRxiv together"],
+   ["./desk.html","Research Desk","Search arXiv, bioRxiv, ChemRxiv and Cryptology ePrint together"],
    ["./feed.html","My Feed","New papers from your followed authors and research subtopics"],
    ["./workspace.html","Library","View saved papers, notes and research collections"],
    ["./copilot.html","Research Assistant","Inspect papers and compare source-linked evidence"]
