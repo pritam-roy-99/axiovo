@@ -1,6 +1,6 @@
 /* Axiovo offline shell. Scholarly metadata, video and PDFs stay network-only. */
 "use strict";
-const CACHE = "axiovo-shell-v69";
+const CACHE = "axiovo-shell-v70";
 const SHELL = [
   "./", "./index.html", "./desk.html", "./feed.html", "./workspace.html", "./arxiv.html", "./biorxiv.html", "./chemrxiv.html", "./crypto.html",
   "./theme.css", "./axiovo-shell.css", "./home-landing.css?v=20261107-readable-cta-v2", "./home-tour.js?v=20261107-four-sources-2", "./theme.js", "./research-entry.css", "./research-entry.js",
@@ -41,7 +41,9 @@ self.addEventListener("fetch", event => {
   event.respondWith((async () => {
     const cache = await caches.open(CACHE);
     try {
-      const response = await fetch(req);
+      // Navigation always revalidates HTML on the network, including after a new deployment.
+      // Only fall back to the offline shell when the network genuinely fails.
+      const response = await fetch(req, req.mode === "navigate" ? {cache:"no-store"} : undefined);
       if (response.ok && response.type === "basic") {
         event.waitUntil(cache.put(req.mode === "navigate" ? url.origin + url.pathname : req, response.clone()));
       }
