@@ -100,7 +100,7 @@ def main():
     assert page.locator("#crypto-sort").input_value()=="oldest"
     assert page.locator("#crypto-from").input_value()==""
     assert page.locator("#crypto-to").input_value()==""
-    assert "not a complete IACR" in page.locator("#crypto-index-note").inner_text().lower()
+    assert "not a complete iacr" in page.locator("#crypto-index-note").inner_text().lower()
     page.locator("#crypto-clear-path").click()
     assert page.locator("#crypto-field").input_value()==""
     assert page.locator("#crypto-topic-input").is_disabled()
