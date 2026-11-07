@@ -6,40 +6,40 @@
     "arxiv": {
       "input_records": 6122,
       "invalid_or_unavailable": 0,
-      "last_sync": "2026-11-07T14:09:52.450778+00:00",
+      "last_sync": "2026-11-07T18:01:58.495039+00:00",
       "coverage": "available source snapshots, not a complete historical archive"
     },
     "biorxiv": {
-      "input_records": 3698,
+      "input_records": 3701,
       "invalid_or_unavailable": 0,
-      "last_sync": "2026-11-07T14:05:08.016617+00:00",
+      "last_sync": "2026-11-07T17:56:42.822565+00:00",
       "coverage": "available source snapshots, not a complete historical archive"
     },
     "chemrxiv": {
       "input_records": 3000,
       "invalid_or_unavailable": 0,
-      "last_sync": "2026-11-07T14:05:20.018990+00:00",
+      "last_sync": "2026-11-07T17:56:57.253504+00:00",
       "coverage": "available source snapshots, not a complete historical archive"
     }
   },
   "shards": {
     "arxiv/2026-11.json": 3643,
     "biorxiv/2026-10.json": 2009,
-    "biorxiv/2026-11.json": 1689,
-    "chemrxiv/2020-08.json": 187,
-    "chemrxiv/2020-09.json": 404,
-    "chemrxiv/2020-10.json": 391,
-    "chemrxiv/2020-11.json": 397,
-    "chemrxiv/2020-12.json": 413,
-    "chemrxiv/2021-01.json": 365,
+    "biorxiv/2026-11.json": 1692,
+    "chemrxiv/2021-01.json": 181,
     "chemrxiv/2021-02.json": 393,
-    "chemrxiv/2021-03.json": 147,
+    "chemrxiv/2021-03.json": 490,
+    "chemrxiv/2021-04.json": 415,
+    "chemrxiv/2021-05.json": 429,
+    "chemrxiv/2021-06.json": 224,
+    "chemrxiv/2021-11.json": 270,
+    "chemrxiv/2021-12.json": 295,
     "chemrxiv/2022-08.json": 1,
     "chemrxiv/2023-01.json": 1,
     "chemrxiv/2026-09.json": 1,
     "chemrxiv/2026-11.json": 300
   },
-  "record_count": 10341,
+  "record_count": 10344,
   "latest_arxiv_announcement": {
     "date": "2026-11-06",
     "count": 2622,
