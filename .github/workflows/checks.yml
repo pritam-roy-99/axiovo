@@ -47,4 +47,5 @@ jobs:
           python scripts/smoke_archive_pages.py
           python scripts/smoke_search_links.py
           python scripts/smoke_feed.py
+          python scripts/smoke_feed_worker.py
           python scripts/smoke_recommendations.py

@@ -5,6 +5,16 @@
  if(root)root.AxiovoFeedCore=api;
 })(typeof window!=="undefined"?window:null,function(){
  "use strict";
+ // Cache token sets by normalized paper object. This never changes matching:
+ // validate the input strings before reuse to tolerate mutations or revisions.
+ const paperTokens=new WeakMap();
+ function preparedTokens(paper){
+  const prior=paperTokens.get(paper);
+  if(prior&&prior.titleText===paper.title&&prior.abstractText===paper.abstract)return prior.tokens;
+  const tokens={title:new Set(terms(paper.title)),abstract:new Set(terms(paper.abstract))};
+  paperTokens.set(paper,{titleText:paper.title,abstractText:paper.abstract,tokens});
+  return tokens;
+ }
  const STOP=new Set("the and for with from into onto this that those these study studies using based via new paper papers research method methods models model analysis results approach their which what where how why".split(" "));
  function terms(value){return [...new Set(String(value||"").toLowerCase().normalize("NFKD").replace(/[\u0300-\u036f]/g,"").match(/[a-z][a-z0-9-]{2,}/g)||[])].filter(x=>!STOP.has(x)).slice(0,45)}
  function key(p){
@@ -47,7 +57,7 @@
    const hiddenEarlier=paper.source==="chemrxiv"&&hidden.has(id+"-");
    if(seen.has(id)||hidden.has(id)||hiddenEarlier)continue;
    // Tokenize each paper once per ranking pass, even with dozens of follows.
-   const prepared={title:new Set(terms(paper.title)),abstract:new Set(terms(paper.abstract))};
+   const prepared=preparedTokens(paper);
    const authorHit=(paper.authors||[]).filter(x=>authors.some(y=>prefs.matchesAuthor?prefs.matchesAuthor(y,x):String(y).toLowerCase()===String(x).toLowerCase()));
    const matches=[...interests.map(topic=>({topic,...overlaps(topic,paper.title,paper.abstract,prepared,queryCache)})),
     ...(prefs.paths||[]).flatMap(path=>pathMatches(path,paper,prepared,queryCache))];
