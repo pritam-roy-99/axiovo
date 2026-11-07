@@ -84,9 +84,12 @@ def check_release_assets():
         if not p.is_file():
             ISSUES.append(f"Service-worker asset missing: {raw}")
     home = (DOCS / "index.html").read_text(encoding="utf-8")
+    if 'id="axiovo-tour"' not in home or 'home-tour.js' not in home:
+        ISSUES.append("Homepage interactive onboarding is absent")
+    # Never publish an HTML media reference unless its source file exists.
     for asset in ("assets/axiovo-tour.mp4", "assets/axiovo-tour.vtt"):
-        if asset not in home or not (DOCS / asset).is_file():
-            ISSUES.append(f"Homepage tutorial asset unavailable: {asset}")
+        if asset in home and not (DOCS / asset).is_file():
+            ISSUES.append(f"Homepage references missing tutorial asset: {asset}")
 
 def check_coverage():
     m = DOCS / "data/arxiv-days/manifest.json"
