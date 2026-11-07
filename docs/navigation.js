@@ -1,16 +1,17 @@
 /* One navigation language across Axiovo; local profile remains under Settings. */
 (function(){
+ const HOME="./index.html?axiovo_return=1";
  function mount(){
   const header=document.querySelector("header");if(!header)return;
   const toggle=header.querySelector(".theme-toggle");
-  const logo=document.createElement("a");logo.className="rl-logo";logo.href="./index.html";logo.setAttribute("aria-label","Axiovo home");
+  const logo=document.createElement("a");logo.className="rl-logo";logo.href=HOME;logo.setAttribute("aria-label","Axiovo home");
   const mark=document.createElement("span");mark.className="rl-logo-mark";mark.textContent="A";
   logo.append(mark,document.createTextNode(" Axiovo"));
   const nav=document.createElement("nav");nav.className="rl-nav";nav.setAttribute("aria-label","Main navigation");
   const file=location.pathname.split("/").pop()||"index.html";
   const archivePage=["arxiv.html","biorxiv.html","chemrxiv.html","crypto.html"].includes(file);
   const links=[
-   [file==="index.html"?"#axiovo-archive-title":"./index.html","Explore","Browse research subjects and preprint archives"],
+   [file==="index.html"?"#axiovo-archive-title":HOME,"Explore","Browse research subjects and preprint archives"],
    ["./desk.html","Research Desk","Search arXiv, bioRxiv, ChemRxiv and Cryptology ePrint together"],
    ["./feed.html","My Feed","New papers from your followed authors and research subtopics"],
    ["./workspace.html","Library","View saved papers, notes and research collections"],
@@ -35,7 +36,7 @@
   // Explicit, reliable home/back controls. Back returns to the immediately
   // previous same-origin page; a direct visit falls back to the homepage.
   if(file!=="index.html"){
-   const home=document.createElement("a");home.href="./index.html";home.className="axiovo-home-link";
+   const home=document.createElement("a");home.href=HOME;home.className="axiovo-home-link";
    home.textContent="⌂ Home";home.setAttribute("aria-label","Back to Axiovo homepage");
    const back=document.createElement("button");back.type="button";back.className="axiovo-back-button";
    back.textContent="← Back";back.setAttribute("aria-label","Go to previous page, or Axiovo homepage");
@@ -53,9 +54,9 @@
      const prior=new URL(document.referrer);
      const appBase=new URL("./",location.href);
      const priorFile=prior.pathname.slice(appBase.pathname.length);
-     if(!priorFile||priorFile==="index.html")location.assign(new URL("./index.html",location.href).href);
+     if(!priorFile||priorFile==="index.html")location.assign(new URL(HOME,location.href).href);
      else history.back();
-    }else location.assign(new URL("./index.html",location.href).href);
+    }else location.assign(new URL(HOME,location.href).href);
    };
    const actions=document.createElement("div");actions.className="axiovo-nav-return";
    actions.append(back,home);
