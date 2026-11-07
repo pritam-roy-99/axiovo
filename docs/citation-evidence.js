@@ -49,6 +49,14 @@
     if(count!==null)out.push({name:"Crossref",count,identity:"DOI verified"});
    }
   }
+  if(id.doi&&responses?.openalex){
+   const w=responses.openalex;
+   const candidates=[w.doi,...(Array.isArray(w.locations)?w.locations.map(x=>x?.doi):[])];
+   if(candidates.some(x=>doi(x).toLowerCase()===id.doi.toLowerCase())){
+    const count=validCount(w.cited_by_count);
+    if(count!==null)out.push({name:"OpenAlex",count,identity:"DOI/location verified"});
+   }
+  }
   if(responses?.semantic){
    const d=responses.semantic,ident=d.externalIds||{};
    const matched=(id.doi&&doi(ident.DOI).toLowerCase()===id.doi.toLowerCase())||
@@ -75,6 +83,7 @@
    return res.json();
   };
   if(id.doi)tasks.crossref=get("https://api.crossref.org/works/"+encodeURIComponent(id.doi));
+  if(id.doi)tasks.openalex=get("https://api.openalex.org/works/"+encodeURIComponent("https://doi.org/"+id.doi));
   if(id.doi||id.arxiv)tasks.semantic=get("https://api.semanticscholar.org/graph/v1/paper/"+
    encodeURIComponent(id.doi?"DOI:"+id.doi:"ARXIV:"+id.arxiv)+"?fields=externalIds,citationCount");
   if(id.arxiv)tasks.inspire=get("https://inspirehep.net/api/literature?"+
