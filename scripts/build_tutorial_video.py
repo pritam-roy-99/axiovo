@@ -18,7 +18,7 @@ import subprocess
 import tempfile
 import wave
 
-from tutorial_voice import VOICE, VOICE_VERSION
+from tutorial_voice import VOICE, VOICE_VERSION, VOICE_ENGINE
 
 from PIL import Image, ImageDraw, ImageFont
 from playwright.sync_api import sync_playwright
@@ -157,7 +157,7 @@ def main():
                     shot=work/f"{index:02d}.png"
                     page.screenshot(path=str(shot))
                     stamp(shot,title,hint,index,target)
-                    sound=work/f"{index:02d}.mp3"
+                    sound=work/f"{index:02d}.wav"
                     # Use a single professional female neural voice across all
                     # chapters. A transient TTS failure retries; it must never
                     # downgrade the whole tutorial to robotic eSpeak.
@@ -194,7 +194,7 @@ def main():
             (OUT/"axiovo-tour.vtt").write_text("\n".join(captions)+"\n",encoding="utf-8")
             (OUT/"axiovo-tour-build.json").write_text(json.dumps({
                 "scenes":len(steps),"duration_seconds":round(elapsed,1),"voices":sorted(voices_used),
-                "voice_version":VOICE_VERSION,"voice_engine":"edge-tts-neural","voice_locale":"en-US",
+                "voice_version":VOICE_VERSION,"voice_engine":VOICE_ENGINE,"voice_locale":"en-US",
                 "chapters":chapters,
                 "source":"Real Chromium page captures","pronunciation":"Spoken-word technical corrections"
             },indent=2),encoding="utf-8")
