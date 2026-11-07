@@ -12,7 +12,7 @@
 <link rel="stylesheet" href="./research-entry.css">
 <link rel="stylesheet" href="./axiovo-shell.css?v=20261107-unified2">
 <link rel="stylesheet" href="./research-desk.css">
-<link rel="stylesheet" href="./home-landing.css?v=20261107-mobile-cta-fix">
+<link rel="stylesheet" href="./home-landing.css?v=20261107-readable-cta-v2">
 <script defer src="./theme.js"></script>
 <script defer src="./research-entry.js"></script>
 <script defer src="./navigation.js"></script>
@@ -67,8 +67,14 @@
    <p class="axiovo-name-line"><strong>Axiovo</strong> = <em>Axiom</em> + <em>Novo</em>: from established knowledge to new discoveries.</p>
   </div>
   <div class="axiovo-welcome-actions" aria-label="Start exploring Axiovo">
-   <a class="axiovo-cta axiovo-cta-primary" href="./desk.html">Search papers <span aria-hidden="true">↗</span></a>
-   <a class="axiovo-cta axiovo-cta-outline" href="#axiovo-archive-title">Explore archives <span aria-hidden="true">↓</span></a>
+   <a class="axiovo-cta axiovo-cta-primary" href="./desk.html" aria-label="Search papers across four archives">
+    <svg class="axiovo-cta-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.15" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10.8" cy="10.8" r="7.3"/><path d="m16.1 16.1 5 5"/></svg>
+    <span class="axiovo-cta-copy"><strong>Search papers</strong><small>Find work across four sources</small></span>
+   </a>
+   <a class="axiovo-cta axiovo-cta-outline" href="#axiovo-archive-title" aria-label="Explore research archives by subject">
+    <svg class="axiovo-cta-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+    <span class="axiovo-cta-copy"><strong>Explore archives</strong><small>Browse sources and subjects</small></span>
+   </a>
   </div>
  </div>
  <div class="axiovo-welcome-media" id="axiovo-start-here">
@@ -76,7 +82,7 @@
    <div><span class="axiovo-demo-tag">START HERE</span><h2 id="axiovo-tour-heading">See how Axiovo works</h2><p>One guided introduction to discovering, reading and organizing research.</p></div>
    <span class="axiovo-demo-subtitle">Narrated video · Real Axiovo interface</span>
   </div>
-  <video id="axiovo-home-video" class="axiovo-home-video" controls playsinline preload="metadata" poster="./assets/axiovo-tour-poster.svg" aria-label="Narrated Axiovo website walkthrough">
+  <video id="axiovo-home-video" class="axiovo-home-video" controls playsinline preload="metadata" poster="./assets/axiovo-tour-poster.svg?v=four-sources-2" aria-label="Narrated Axiovo website walkthrough">
    <source src="./assets/axiovo-tour.mp4" type="video/mp4">
    <track kind="captions" src="./assets/axiovo-tour.vtt" srclang="en" label="English captions" default>
    Your browser does not support the video. Use the interactive guide.
@@ -112,7 +118,7 @@
   </details>
  </div>
 </section>
-<script defer src="./home-tour.js?v=20261107-four-sources"></script>
+<script defer src="./home-tour.js?v=20261107-four-sources-2"></script>
 
 
 <section class="rd-home-section" aria-labelledby="axiovo-archive-title">
