@@ -273,3 +273,10 @@ body.axiovo-home .axiovo-demo-bottom{margin-top:14px}
 /* The same 2×2 directory is visible on narrow mobile, no horizontal overflow. */
 @media(max-width:700px){body.axiovo-home .axiovo-archive-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
 @media(max-width:330px){body.axiovo-home .axiovo-archive-grid{grid-template-columns:1fr!important}}
+
+/* Four archive names in the interactive introduction, legible at every size. */
+body.axiovo-home .axiovo-demo-illustration{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media(max-width:650px){
+ body.axiovo-home .axiovo-demo-illustration{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+ body.axiovo-home .axiovo-demo-illustration span{min-height:48px;font-size:.76rem}
+}
