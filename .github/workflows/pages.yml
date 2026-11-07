@@ -47,28 +47,34 @@ jobs:
         id: validate_website_scripts
         run: python -m scripts.validate_site
       - name: Research Assistant relevance and cited-answer regression gate
+        id: assistant_relevance
         run: |
           node --check docs/copilot.js
           node --check docs/assistant-core.js
           node tests/assistant-core.test.js
           node tests/assistant-grounding-50.test.js
       - name: Test Research Assistant exact identifiers and public fallback (required)
+        id: assistant_exact
         run: node tests/copilot-retrieval.test.js
       - name: Verify exact per-paper citations and reject cross-paper counts (required)
+        id: citations_exact
         run: node tests/citation-evidence.test.js
       - name: Test source identity, announcement freshness and precision ranking
+        id: source_identity
         run: |
           node tests/archive-data.test.js
           node tests/search-recall.test.js
           node tests/search-accuracy.test.js
           node tests/topic-report.test.js
       - name: Check source-backed five-paper comparison extraction
+        id: comparison_extraction
         run: node tests/evidence-extract.test.js
       - name: Test research relevance ranking
         id: test_research_relevance_ranking
         continue-on-error: true
         run: node tests/relevance.test.js
       - name: Evaluate fifty source-grounded bibliography queries (required)
+        id: bibliography_fifty
         run: node tests/assistant-grounding-50.test.js
       - name: Unified research assistant regression tests
         id: unified_research_assistant_regression_tests
@@ -109,6 +115,7 @@ jobs:
           node tests/cached-arxiv-search.test.js
           node tests/arxiv-daily-archive.test.js
       - name: Verify three-source metadata harvester regression tests (required)
+        id: source_harvest
         run: python -m unittest discover -s tests -p test_source_harvest.py -v
       - name: Refresh free bioRxiv metadata
         if: github.event_name != 'push'
@@ -129,8 +136,10 @@ jobs:
         continue-on-error: true
         run: python scripts/sync_chemrxiv.py
       - name: Validate independent ePrint source and offline recovery (required)
+        id: eprint_independent
         run: node tests/eprint-independent.test.js
       - name: Validate IACR ePrint OAI-PMH metadata parser
+        id: eprint_parser
         run: python -m unittest discover -s tests -p test_eprint_harvest.py -v
       - name: Refresh official IACR Cryptology ePrint metadata
         if: github.event_name != 'push'
@@ -213,10 +222,12 @@ jobs:
           echo 'The previous feed is preserved. Check the refresh step logs and retry.' >> "$GITHUB_STEP_SUMMARY"
           echo '::warning::Could not refresh arXiv data. Existing records are preserved.'
       - name: Audit source-count completeness and publish repair queue
+        id: coverage_audit
         run: |
           python -m unittest discover -s tests -p test_literature_coverage.py -v
           python -m scripts.audit_literature_coverage
       - name: Build honest four-source freshness summary
+        id: freshness_build
         run: |
           python scripts/build_source_freshness.py
           python - <<'PY'
@@ -228,6 +239,7 @@ jobs:
           assert Path("docs/data/source-freshness.json").stat().st_size < 8000
           PY
       - name: Generate smaller My Feed first-paint preview
+        id: feed_preview
         run: |
           python scripts/build_feed_preview.py
           python - <<'PY'
@@ -239,18 +251,22 @@ jobs:
           assert Path("docs/data/feed-preview.json").stat().st_size<4_000_000
           PY
       - name: Search ranking and related-paper regression gates
+        id: ranking_gate
         run: |
           node tests/research-ranking-benchmark.test.js
           node tests/paper-relations.test.js
       - name: Test normalized source schema and coverage accounting
         run: python -m unittest discover -s tests -p test_normalized_index.py -v
       - name: Build verified monthly source metadata shards
+        id: normalized_build
         run: python -m scripts.build_normalized_index
       - name: Test versioned taxonomy integrity
         run: python -m unittest discover -s tests -p test_taxonomy_json.py -v
       - name: Build curated versioned topic taxonomy
+        id: taxonomy_build
         run: python -m scripts.build_taxonomy_json
       - name: Build source-verified monthly shards and versioned taxonomy
+        id: source_shards
         run: |
           python -m unittest discover -s tests -p test_verified_records.py -v
           python scripts/build_verified_records.py
@@ -269,6 +285,7 @@ jobs:
           print("Phase 1 coverage, review queue and taxonomy counts validated")
           PY
       - name: Verify every static navigation link and destination
+        id: nav_integrity
         run: python -m unittest discover -s tests -p test_navigation_integrity.py -v
       - name: Audit internal routes and HTML assets
         id: audit_internal_routes_and_html_assets
@@ -296,6 +313,36 @@ jobs:
             git rebase -X theirs origin/main
             git push origin HEAD:main
           fi
+      - name: Explain any failed required deployment gate
+        if: always()
+        run: |
+          echo '## Required deployment gates' >> "$GITHUB_STEP_SUMMARY"
+          echo '| Gate | Result |' >> "$GITHUB_STEP_SUMMARY"
+          echo '|---|---|' >> "$GITHUB_STEP_SUMMARY"
+          echo '| test metadata processing | ${{ steps.test_metadata_processing.outcome }} |' >> "$GITHUB_STEP_SUMMARY"
+          echo '| security and privacy baseline gate | ${{ steps.security_and_privacy_baseline_gate.outcome }} |' >> "$GITHUB_STEP_SUMMARY"
+          echo '| validate website scripts | ${{ steps.validate_website_scripts.outcome }} |' >> "$GITHUB_STEP_SUMMARY"
+          echo '| assistant relevance | ${{ steps.assistant_relevance.outcome }} |' >> "$GITHUB_STEP_SUMMARY"
+          echo '| assistant exact | ${{ steps.assistant_exact.outcome }} |' >> "$GITHUB_STEP_SUMMARY"
+          echo '| citations exact | ${{ steps.citations_exact.outcome }} |' >> "$GITHUB_STEP_SUMMARY"
+          echo '| source identity | ${{ steps.source_identity.outcome }} |' >> "$GITHUB_STEP_SUMMARY"
+          echo '| comparison extraction | ${{ steps.comparison_extraction.outcome }} |' >> "$GITHUB_STEP_SUMMARY"
+          echo '| bibliography fifty | ${{ steps.bibliography_fifty.outcome }} |' >> "$GITHUB_STEP_SUMMARY"
+          echo '| source harvest | ${{ steps.source_harvest.outcome }} |' >> "$GITHUB_STEP_SUMMARY"
+          echo '| eprint independent | ${{ steps.eprint_independent.outcome }} |' >> "$GITHUB_STEP_SUMMARY"
+          echo '| eprint parser | ${{ steps.eprint_parser.outcome }} |' >> "$GITHUB_STEP_SUMMARY"
+          echo '| coverage audit | ${{ steps.coverage_audit.outcome }} |' >> "$GITHUB_STEP_SUMMARY"
+          echo '| freshness build | ${{ steps.freshness_build.outcome }} |' >> "$GITHUB_STEP_SUMMARY"
+          echo '| feed preview | ${{ steps.feed_preview.outcome }} |' >> "$GITHUB_STEP_SUMMARY"
+          echo '| ranking gate | ${{ steps.ranking_gate.outcome }} |' >> "$GITHUB_STEP_SUMMARY"
+          echo '| normalized build | ${{ steps.normalized_build.outcome }} |' >> "$GITHUB_STEP_SUMMARY"
+          echo '| taxonomy build | ${{ steps.taxonomy_build.outcome }} |' >> "$GITHUB_STEP_SUMMARY"
+          echo '| source shards | ${{ steps.source_shards.outcome }} |' >> "$GITHUB_STEP_SUMMARY"
+          echo '| nav integrity | ${{ steps.nav_integrity.outcome }} |' >> "$GITHUB_STEP_SUMMARY"
+          echo '| brand intro | ${{ steps.brand_intro.outcome }} |' >> "$GITHUB_STEP_SUMMARY"
+          echo '| video validate | ${{ steps.video_validate.outcome }} |' >> "$GITHUB_STEP_SUMMARY"
+          echo '| built assets | ${{ steps.built_assets.outcome }} |' >> "$GITHUB_STEP_SUMMARY"
+          echo 'Any required failure above blocks publication. A monitoring-only check after deployment does not undo a published site.' >> "$GITHUB_STEP_SUMMARY"
       - name: Summarize nonblocking pre-deployment checks
         if: always()
         run: |
@@ -316,6 +363,7 @@ jobs:
           echo '| Test rate-limited arXiv fallback and date archive | ${{ steps.test_rate_limited_arxiv_fallback_and_date_archive.outcome }} |' >> "$GITHUB_STEP_SUMMARY"
           echo '| Audit internal routes and HTML assets | ${{ steps.audit_internal_routes_and_html_assets.outcome }} |' >> "$GITHUB_STEP_SUMMARY"
       - name: Verify Axiovo meaning in the homepage and video opening
+        id: brand_intro
         run: python -m unittest discover -s tests -p test_axiovo_brand_intro.py -v
       - name: Install MP4 verification tools
         run: |
@@ -368,6 +416,7 @@ jobs:
         if: steps.existing_video.outputs.reuse != 'true'
         run: python scripts/build_tutorial_video.py
       - name: Validate actual MP4 playback streams and caption file (required)
+        id: video_validate
         run: |
           python - <<'PY'
           import json, subprocess
@@ -409,6 +458,7 @@ jobs:
         run: |
           echo 'Browser checks: full ${{ steps.smoke_full.outcome }}, archives ${{ steps.smoke_archives.outcome }}' >> "$GITHUB_STEP_SUMMARY"
       - name: Verify published website links and new tour bundle
+        id: built_assets
         run: python scripts/audit_internal_links.py --built
       - name: Build Atom topic subscriptions
         id: atom_feeds
@@ -429,8 +479,16 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v4
       - name: Audit deployed Axiovo pages, live links, navigation and video
+        id: postdeploy_audit
+        continue-on-error: true
         run: |
           python scripts/audit_live_site.py
         env:
           AXIOVO_BASE_URL: https://pritam-roy-99.github.io/axiovo/
+      - name: Explain post-deployment monitoring failure without undoing publication
+        if: steps.postdeploy_audit.outcome == 'failure'
+        run: |
+          echo '::warning::GitHub Pages was deployed, but external live-site monitoring failed. Inspect postdeploy_audit logs; the deployed artifact remains intact.'
+          echo '### Live-site monitoring warning' >> "$GITHUB_STEP_SUMMARY"
+          echo 'The deployed website may be accessible even though the external verification request failed. This is not evidence that source data or code publication failed.' >> "$GITHUB_STEP_SUMMARY"
 
