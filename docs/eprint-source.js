@@ -38,7 +38,7 @@ function validate(payload){
   source:"IACR OAI-PMH",partial:true,cache:false};
 }
 async function fetchSource(url){
- const abort=new AbortController(),timer=setTimeout(()=>abort.abort(),17000);
+ const abort=new AbortController(),timer=setTimeout(()=>abort.abort(),10000);
  try{
   const res=await fetch(url,{cache:"no-store",signal:abort.signal,headers:{Accept:"application/json"}});
   if(!res.ok)throw Error("HTTP "+res.status);
@@ -60,8 +60,10 @@ function remember(value){
   localStorage.setItem(KEY,JSON.stringify({stamp:value.stamp,papers:subset}));
  }catch{}
 }
-let inflight=null;
+let inflight=null,lastValue=null,lastAt=0;
+const MEMORY_TTL_MS=5*60*1000;
 async function load(options={}){
+ if(!options.force&&lastValue&&Date.now()-lastAt<MEMORY_TTL_MS)return lastValue;
  if(inflight&&!options.force)return inflight;
  const action=(async()=>{
   const problems=[];
@@ -77,7 +79,11 @@ async function load(options={}){
   throw Error("Official-source snapshot unavailable across configured hosts: "+problems.join("; ").slice(0,460));
  })();
  inflight=action;
- try{return await action}finally{if(inflight===action)inflight=null}
+ try{
+  const value=await action;
+  lastValue=value;lastAt=Date.now();
+  return value;
+ }finally{if(inflight===action)inflight=null}
 }
 function filter(papers,c){
  const terms=(Array.isArray(c?.topicTerms)?c.topicTerms:[]).filter(Boolean).map(norm);
