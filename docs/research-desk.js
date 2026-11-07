@@ -180,7 +180,7 @@ function makeLane(source,criteria){
  title.append(node("span",undefined,"rd-source-dot "+source),document.createTextNode(data.names[source]));
  const summary=node("p","Checking source…","rd-small");
  group.append(title,summary);
- const native=new URL("./"+source+".html",location.href);
+ const native=new URL(source==="eprint"?"./crypto.html":"./"+source+".html",location.href);
  for(const key of ["q","from","to","author"])if(criteria[key])native.searchParams.set(key,criteria[key]);
  head.append(group,link("Open archive page →",native.href,"rd-text-link"));
  const list=node("div"),footer=node("div",undefined,"rd-actions");
