@@ -17,7 +17,7 @@
   "axiovo-research-interest-settings-v1","axiovo-interests-by-field-v1",
   "axiovo-pdf-notes-v1","axiovo-comparisons-v1",
   "axiovo-local-profile","axiovo-theme","axiovo-palette-v1",
-  "axiovo-custom-taxonomy-v1","axiovo-biorxiv-reading-v1","axiovo-biorxiv-notes-v1","axiovo-chemrxiv-reading-v1",
+  "axiovo-custom-taxonomy-v1","axiovo-biorxiv-reading-v1","axiovo-biorxiv-notes-v1","axiovo-chemrxiv-reading-v1","axiovo-eprint-reading-v1",
   "axiovo-browser-state-arxiv","axiovo-browser-state-biorxiv","axiovo-browser-state-chemrxiv",
   "axiovo-custom-fields-arxiv","axiovo-custom-fields-biorxiv","axiovo-custom-fields-chemrxiv",
   "axiovo-onboarding-dismissed-v1","axiovo-alert-seen-v1",
