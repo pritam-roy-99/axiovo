@@ -15,12 +15,13 @@
 <script defer src="./theme.js"></script>
 <script defer src="./navigation.js"></script>
 <script defer src="./arxiv-versions.js"></script>
-<script defer src="./archive-data.js"></script>
+<script defer src="./eprint-source.js?v=20261107-history-v4"></script>
+<script defer src="./archive-data.js?v=20261107-history-v2"></script>
 <script defer src="./paper-sort.js"></script>
 <script defer src="./assistant-core.js"></script>
 <script defer src="./author-follow.js"></script>
 <script defer src="./hosted-ai-config.js"></script>
-<script defer src="./copilot.js"></script>
+<script defer src="./copilot.js?v=20261107-research-reliability-v1"></script>
 <script defer src="./pwa.js"></script>
 </head>
 <body class="axiovo-research axiovo-assistant">
@@ -29,7 +30,7 @@
  <div class="rd-desk-heading">
   <p class="rd-kicker">WORK WITH THE SOURCE</p>
   <h1>Research Assistant</h1>
-  <p>Find related arXiv papers or inspect what a paper’s abstract actually says. Open the original before drawing conclusions.</p>
+  <p>Find source-linked research papers, including arXiv historical records, and inspect what an abstract actually establishes. Open the original before drawing conclusions.</p>
  </div>
  <section class="rd-panel assistant-compose" aria-labelledby="assistant-task-title">
   <h2 class="rd-sr-only" id="assistant-task-title">Choose a task</h2>
@@ -45,14 +46,14 @@
    <button class="rd-button rd-secondary" id="search-openalex" type="button">Search more arXiv records</button>
    <span id="busy" class="rd-small" role="status"></span>
   </div>
-  <p class="rd-small assistant-privacy">Default: evidence-based abstract analysis, not a generative AI model. It highlights source-reported findings and uncertainty. For model-generated explanations, select Ollama or WebGPU under Optional text and local model. Search more queries public research metadata services.</p>
+  <p class="rd-small assistant-privacy">Default: source-linked literature retrieval and abstract evidence, not a generative AI model. Results may be incomplete and should be checked against the original papers. For model-generated explanations, select Ollama or WebGPU under Optional text and local model. Search more queries public research metadata services.</p>
   <details class="rd-advanced assistant-advanced">
    <summary>Optional text and local model</summary>
    <label for="draft">Paste an abstract or claim to inspect</label>
    <textarea id="draft" rows="3" maxlength="7500" placeholder="Pasted text stays in this tab or goes to your selected local model."></textarea>
    <button class="rd-button rd-secondary" id="clear-draft" type="button">Clear pasted text</button>
    <label for="retrieval-scope">Search scope for public questions</label>
-   <select id="retrieval-scope"><option value="local">Indexed arXiv records</option><option value="all">Also search public arXiv metadata</option></select>
+   <select id="retrieval-scope"><option value="all" selected>Public arXiv metadata + indexed fallback</option><option value="local">Indexed records first, public lookup if no match</option></select>
    <label for="engine">Answer mode</label>
    <select id="engine"><option value="evidence">Source evidence</option><option value="ollama">Local Ollama model</option><option value="browser">On-device WebGPU model</option><option value="hosted">Hosted AI (when configured)</option></select>
    <div id="ollama-settings" hidden>
@@ -93,7 +94,7 @@
   <section class="rd-panel" aria-labelledby="assistant-source-title">
    <div class="assistant-panel-head"><h2 id="assistant-source-title">Sources</h2><span id="source-count" class="rd-count">0</span></div>
    <div class="paper-sort-toolbar"><label for="source-sort">Order source papers</label><select id="source-sort"><option value="relevance">Evidence citation order</option><option value="recent">Newest first</option><option value="oldest">Oldest first</option><option value="cited">Most cited (known counts)</option></select><span id="source-sort-note" class="rd-small" role="status"></span></div>
-   <p id="retrieval-status" class="rd-small" role="status">Loading the arXiv index…</p>
+   <p id="retrieval-status" class="rd-small" role="status">Loading the research index…</p>
    <p class="rd-small">Showing the strongest matching papers first. Abstracts and author actions are collapsed to keep mobile browsing readable.</p>
    <div id="evidence-list"></div>
    <details class="rd-advanced"><summary>Source actions</summary><div class="rd-actions"><button class="rd-button rd-secondary" id="copy-sources" type="button">Copy references</button><button class="rd-button rd-secondary" id="clear-sources" type="button">Clear sources</button><a class="rd-text-link" href="./lab.html#reader">Open PDF reader →</a></div></details>
