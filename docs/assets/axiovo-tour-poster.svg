@@ -1,21 +1,29 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720" role="img" aria-label="Axiovo feature walkthrough poster">
-<defs><linearGradient id="bg" x2="1" y2="1"><stop stop-color="#091829"/><stop offset="1" stop-color="#154361"/></linearGradient></defs>
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720" role="img" aria-label="Axiovo four archive tutorial poster: arXiv, bioRxiv, ChemRxiv and Cryptology ePrint">
+<defs>
+<linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#0b2138"/><stop offset="1" stop-color="#176081"/></linearGradient>
+<linearGradient id="tile" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#193d56"/><stop offset="1" stop-color="#1d4c61"/></linearGradient>
+</defs>
 <rect width="1280" height="720" fill="url(#bg)"/>
-<rect x="60" y="44" width="1160" height="630" rx="28" fill="#10283d" stroke="#36748d" stroke-width="2"/>
-<text x="105" y="124" fill="#6ee3e3" font-family="Arial,sans-serif" font-size="31" font-weight="700">A  AXIOVO</text>
-<text x="105" y="210" fill="#ffffff" font-family="Arial,sans-serif" font-size="48" font-weight="700">Discover research in three archives</text>
-<text x="105" y="255" fill="#b6cfe1" font-family="Arial,sans-serif" font-size="23">Illustrated feature tour • source-linked papers • personal research library</text>
-<g font-family="Arial,sans-serif" font-size="30" font-weight="700">
-<rect x="105" y="305" width="323" height="205" rx="18" fill="#193d53" stroke="#4b819c"/>
-<rect x="479" y="305" width="323" height="205" rx="18" fill="#193d53" stroke="#4b819c"/>
-<rect x="853" y="305" width="323" height="205" rx="18" fill="#193d53" stroke="#4b819c"/>
-<text x="137" y="375" fill="#ffffff">arXiv</text><text x="511" y="375" fill="#ffffff">bioRxiv</text><text x="885" y="375" fill="#ffffff">ChemRxiv</text>
+<rect x="56" y="42" width="1168" height="636" rx="27" fill="#102a42" stroke="#4b92aa" stroke-width="2"/>
+<circle cx="105" cy="110" r="13" fill="#80e5dc"/>
+<text x="133" y="122" font-family="Arial, sans-serif" font-size="31" fill="#d8f6ff" font-weight="800">AXIOVO</text>
+<text x="104" y="208" font-family="Arial, sans-serif" font-size="49" fill="#fff" font-weight="800">Explore research in four archives</text>
+<text x="104" y="251" font-family="Arial, sans-serif" font-size="23" fill="#cde8f4">Real website walkthrough · source-linked papers · private research library</text>
+<g font-family="Arial, sans-serif">
+<rect x="104" y="306" width="250" height="186" rx="18" fill="url(#tile)" stroke="#6aa9bf"/>
+<rect x="378" y="306" width="250" height="186" rx="18" fill="url(#tile)" stroke="#6aa9bf"/>
+<rect x="652" y="306" width="250" height="186" rx="18" fill="url(#tile)" stroke="#6aa9bf"/>
+<rect x="926" y="306" width="250" height="186" rx="18" fill="url(#tile)" stroke="#6aa9bf"/>
+<g fill="#fff" font-size="27" font-weight="700">
+<text x="125" y="368">arXiv</text><text x="399" y="368">bioRxiv</text><text x="673" y="368">ChemRxiv</text><text x="947" y="368" font-size="24">Cryptology</text><text x="947" y="403" font-size="24">ePrint</text>
 </g>
-<g font-family="Arial,sans-serif" font-size="18" fill="#bad2e1">
-<text x="137" y="422">Physics · Mathematics</text><text x="137" y="451">Computing · Statistics</text>
-<text x="511" y="422">Life Sciences</text><text x="511" y="451">Genomics · Neuroscience</text>
-<text x="885" y="422">Chemistry · Materials</text><text x="885" y="451">Catalysis · Molecular Science</text>
+<g fill="#d7edf8" font-size="18">
+<text x="125" y="421">Physics · Mathematics</text><text x="125" y="451">Computing</text>
+<text x="399" y="421">Life sciences</text><text x="399" y="451">Genomics</text>
+<text x="673" y="421">Chemistry · Materials</text><text x="673" y="451">Molecular science</text>
+<text x="947" y="441">Cryptography</text><text x="947" y="471">Quantum security</text>
 </g>
-<circle cx="640" cy="576" r="38" fill="#60d9e2"/><path d="M630 556v40l32-20z" fill="#0d2538"/>
-<text x="105" y="625" fill="#b6cfe1" font-family="Arial,sans-serif" font-size="18">54-second narrated overview of current features</text>
+</g>
+<circle cx="640" cy="582" r="39" fill="#7be8e2"/><path d="M629 562v42l35-21z" fill="#09273c"/>
+<text x="104" y="644" fill="#cce9f6" font-family="Arial,sans-serif" font-size="19">Watch the current Axiovo feature walkthrough</text>
 </svg>

@@ -92,6 +92,29 @@ def main():
                           };
                         }""")
                         assert min(contrast.values())>=4.5,(width,"Unified Axiovo intro text illegible",contrast)
+                        # The icon-first CTA labels must remain readable in light and dark themes.
+                        cta_contrast=page.evaluate("""() => {
+                          const lum=v=>{
+                            const nums=v.match(/[\\d.]+/g).slice(0,3).map(Number).map(x=>{
+                              const c=x/255;
+                              return c<=.04045?c/12.92:((c+.055)/1.055)**2.4;
+                            });
+                            return .2126*nums[0]+.7152*nums[1]+.0722*nums[2];
+                          };
+                          return [...document.querySelectorAll(".axiovo-welcome-actions .axiovo-cta")].map(a=>{
+                            const computed=getComputedStyle(a);
+                            const title=a.querySelector("strong"),helper=a.querySelector("small");
+                            const contrast=node=>{
+                              const foreground=lum(getComputedStyle(node).color),background=lum(computed.backgroundColor);
+                              return (Math.max(foreground,background)+.05)/(Math.min(foreground,background)+.05);
+                            };
+                            return {label:title.textContent,ratio:contrast(title),help:contrast(helper),
+                              icons:a.querySelectorAll("svg").length,visible:a.getBoundingClientRect().width>0};
+                          });
+                        }""")
+                        assert len(cta_contrast)==2,(width,"Homepage start actions missing",cta_contrast)
+                        assert all(x["ratio"]>=4.5 and x["help"]>=4.5 and x["icons"]==1 and x["visible"]
+                                   for x in cta_contrast),(width,"CTA contrast or icon regression",cta_contrast)
                         if width<=390:
                             geometry=page.evaluate("""() => {
                               const rect=s=>{const r=document.querySelector(s).getBoundingClientRect();
@@ -215,7 +238,13 @@ def main():
                         lambda route: route.fulfill(status=200,content_type="application/json",
                             body='{"papers":[]}'))
                     page.reload(wait_until="domcontentloaded")
-                    page.wait_for_function("document.getElementById('retrieval-status').textContent.includes('indexed arXiv records ready')")
+                    # The Research Assistant can refresh its status after
+                    # IACR/OAI enrichment. Assert the actual verified fixture
+                    # has entered the picker, not a transient status string.
+                    page.wait_for_function("""() =>
+                        [...document.querySelectorAll('#paper-picker option')]
+                          .some(option => option.value === '2611.11003')
+                    """,timeout=20000)
                     page.locator("#question").fill("Why should we study macroscopic quantumness?")
                     page.locator("#ask").click()
                     page.wait_for_function("document.querySelector('#ask').disabled===false && document.querySelector('#conversation .message.assistant')",timeout=15000)

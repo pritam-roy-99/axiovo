@@ -65,9 +65,13 @@ def main():
             assert all("Magnifying Lens" not in title for title in titles), "Unverified same-name author leaked into default feed"
             assert not page.locator("#feed-show-unverified-names").is_checked()
             page.locator("#feed-show-unverified-names").check()
-            assert any("Magnifying Lens" in title for title in page.locator(".feed-card h3").all_inner_texts())
+            page.wait_for_function("""() =>
+              [...document.querySelectorAll(".feed-card h3")].some(x=>x.textContent.includes("Magnifying Lens"))
+            """,timeout=12000)
             page.locator("#feed-show-unverified-names").uncheck()
-            assert not any("Magnifying Lens" in title for title in page.locator(".feed-card h3").all_inner_texts())
+            page.wait_for_function("""() =>
+              ![...document.querySelectorAll(".feed-card h3")].some(x=>x.textContent.includes("Magnifying Lens"))
+            """,timeout=12000)
             assert "preparation contextuality" in page.locator("#feed-followed-paths").inner_text().lower()
             assert page.locator("#feed-followed-authors").inner_text().find("Majumdar")>=0
             first=page.locator(".feed-card").first
@@ -82,15 +86,22 @@ def main():
             page.locator("#feed-topic-input").fill("quantum contextuality")
             page.locator("#feed-topic-form button").click()
             assert "quantum contextuality" in page.locator("#feed-followed-topics").inner_text()
+            # Worker-backed feed operations commit asynchronously. Verify
+            # their final rendered states rather than inspecting the old DOM
+            # immediately after a user input is dispatched.
+            def expect_count(expected):
+                page.wait_for_function("""expected =>
+                    document.querySelectorAll(".feed-card").length === expected
+                """,arg=expected,timeout=12000)
             page.locator("#feed-source").select_option("biorxiv")
-            assert page.locator(".feed-card").count()==0
+            expect_count(0)
             page.locator("#feed-source").select_option("all")
             page.locator("[data-view='following']").click()
-            assert page.locator(".feed-card").count()==2
+            expect_count(2)
             page.locator(".feed-card").first.locator(".feed-dismiss").click()
-            assert page.locator(".feed-card").count()==1
+            expect_count(1)
             page.locator("#feed-undo-button").click()
-            assert page.locator(".feed-card").count()==2
+            expect_count(2)
             card=page.locator(".feed-card").first
             title=card.locator("h3").inner_text()
             card.get_by_role("button",name="Add to comparison").click()

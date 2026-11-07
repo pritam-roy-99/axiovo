@@ -24,7 +24,7 @@ class IntroVideoTests(unittest.TestCase):
         self.assertIn("playsinline",parser.videos[0])
         self.assertNotIn("autoplay",parser.videos[0])
         self.assertNotIn("hidden",parser.videos[0])
-        self.assertEqual(parser.videos[0].get("poster"),"./assets/axiovo-tour-poster.svg")
+        self.assertTrue(parser.videos[0].get("poster","").startswith("./assets/axiovo-tour-poster.svg"))
         self.assertTrue(any(x.get("src","").split("?")[0]=="./assets/axiovo-tour.mp4" for x in parser.sources))
         self.assertTrue(any(x.get("kind")=="captions" and x.get("srclang")=="en" for x in parser.tracks))
         self.assertIn("Full step-by-step guide",html)

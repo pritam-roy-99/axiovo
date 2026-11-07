@@ -166,7 +166,17 @@ for(const p of filtered.slice(0,50)){
 if(filtered.length>50)text(root,"p","Showing the first 50 matching saved papers. Narrow the search to find more.","rl-subtext")
 }
 function init(){
- fillFocus();collectionUI();$("library-search").addEventListener("input",renderLibrary);$("library-filter").addEventListener("change",renderLibrary);$("library-source").addEventListener("change",renderLibrary);
+ fillFocus();collectionUI();
+ // Avoid rebuilding every saved-paper card for every keystroke on mobile.
+ // Search is still exhaustive, including older papers and private notes.
+ let searchTimer;
+ $("library-search").addEventListener("input",()=>{
+  clearTimeout(searchTimer);
+  searchTimer=setTimeout(renderLibrary,140);
+ });
+ const applyFilters=()=>{clearTimeout(searchTimer);renderLibrary()};
+ $("library-filter").addEventListener("change",applyFilters);
+ $("library-source").addEventListener("change",applyFilters);
  $("quick-search").addEventListener("submit",e=>{
  e.preventDefault();const q=$("research-query").value.trim();if(!q)return;
  const input=document.getElementById("scholar-query"),form=document.getElementById("scholar-search-form"),source=document.getElementById("rl-source-scholarly");

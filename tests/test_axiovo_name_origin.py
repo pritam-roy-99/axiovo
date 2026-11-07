@@ -21,8 +21,8 @@ class NameOriginTests(unittest.TestCase):
 
     def test_video_and_transcript_in_the_same_section(self):
         section=HOME.split('<section class="axiovo-welcome"',1)[1].split("</section>",1)[0]
-        self.assertIn('src="./assets/axiovo-tour.mp4"',section)
-        self.assertIn('src="./assets/axiovo-tour.vtt"',section)
+        self.assertIn('src="./assets/axiovo-tour.mp4',section)
+        self.assertIn('src="./assets/axiovo-tour.vtt',section)
         self.assertIn("Full step-by-step guide",section)
         self.assertIn("Axiom</em> + <em>Novo",section)
 
