@@ -19,6 +19,9 @@ assert.equal(e.resultsFor(bio,{crossref:{message:{DOI:"10.1101/2026.01.01.000001
 assert.deepEqual(e.resultsFor(bio,{crossref:{message:{DOI:"10.1101/wrong","is-referenced-by-count":999}}}),[]);
 assert.deepEqual(e.resultsFor(bio,{crossref:{message:{DOI:"10.1101/2026.01.01.000001","is-referenced-by-count":null}}}),[]);
 assert.deepEqual(e.resultsFor(bio,{crossref:{message:{DOI:"10.1101/2026.01.01.000001","is-referenced-by-count":-1}}}),[]);
+assert.deepEqual(e.resultsFor(bio,{openalex:{doi:"https://doi.org/10.1101/2026.01.01.000001",cited_by_count:24}}).map(x=>x.count),[24]);
+assert.deepEqual(e.resultsFor(bio,{openalex:{doi:"https://doi.org/10.1234/wrong",cited_by_count:2000,locations:[{doi:"https://doi.org/10.1101/2026.01.01.000001"}]}}).map(x=>x.count),[2000]);
+assert.deepEqual(e.resultsFor(bio,{openalex:{doi:"https://doi.org/10.1234/wrong",cited_by_count:2000}}),[]);
 assert.deepEqual(e.resultsFor(arxiv,{semantic:{citationCount:900,externalIds:{ArXiv:"2601.12345"}}}).map(x=>x.count),[900]);
 assert.deepEqual(e.resultsFor(arxiv,{semantic:{citationCount:900,externalIds:{ArXiv:"2601.12346"}}}),[]);
 assert.deepEqual(e.resultsFor(arxiv,{inspire:{hits:{hits:[{metadata:{arxiv_eprints:[{value:"2601.12345"}],citation_count:15}}]}}}).map(x=>x.count),[15]);
