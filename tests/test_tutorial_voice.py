@@ -11,8 +11,8 @@ from tutorial_voice import VOICE, VOICE_VERSION, voice_text
 
 class TutorialVoiceTests(unittest.TestCase):
     def test_neural_female_voice(self):
-        self.assertEqual(VOICE, "en-US-JennyNeural")
-        self.assertEqual(VOICE_VERSION, "axiovo-female-neural-v2")
+        self.assertEqual(VOICE, "af_bella")
+        self.assertEqual(VOICE_VERSION, "axiovo-kokoro-bella-v3")
 
     def test_technical_names_speak_consistently(self):
         spoken = voice_text("Axiovo explores arXiv, bioRxiv, ChemRxiv, Cryptology ePrint, DOI, IACR, WebGPU.")
@@ -36,13 +36,14 @@ class TutorialVoiceTests(unittest.TestCase):
 
     def test_deployment_rebuilds_old_narration(self):
         workflow = (ROOT / ".github/workflows/pages.yml").read_text("utf8")
-        self.assertIn('meta.get("voice_version")=="axiovo-female-neural-v2"', workflow)
-        self.assertIn('meta.get("voices")==["en-US-JennyNeural"]', workflow)
-        self.assertIn('voice_metadata.get("voice_engine")=="edge-tts-neural"', workflow)
+        self.assertIn('meta.get("voice_version")=="axiovo-kokoro-bella-v3"', workflow)
+        self.assertIn('meta.get("voices")==["af_bella"]', workflow)
+        self.assertIn("python scripts/revoice_tutorial.py", workflow)
+        self.assertIn('voice_metadata.get("voice_engine")=="kokoro-onnx"', workflow)
         self.assertIn("actions/cache@v4", workflow)
         page = (ROOT / "docs" / "index.html").read_text("utf8")
-        self.assertIn("axiovo-tour.mp4?v=axiovo-female-neural-v2", page)
-        self.assertIn("axiovo-tour.vtt?v=axiovo-female-neural-v2", page)
+        self.assertIn("axiovo-tour.mp4?v=axiovo-kokoro-bella-v3", page)
+        self.assertIn("axiovo-tour.vtt?v=axiovo-kokoro-bella-v3", page)
 
 
 if __name__ == "__main__":
