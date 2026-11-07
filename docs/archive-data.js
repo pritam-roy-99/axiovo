@@ -214,7 +214,8 @@ async function snapshot(source,options={}){
     options.cache==="default"?"default":undefined);
    const rows=data?.papers??data?.records??data;
    if(!Array.isArray(rows))throw Error("Invalid "+source+" snapshot");
-   return {stamp:clean(data.generated_at||data.checked_at),papers:rows.map(p=>normalize(source,p)).filter(Boolean)};
+   return {stamp:clean(data.generated_at||data.checked_at),papers:rows.map(p=>normalize(source,p)).filter(Boolean),
+    fullOaiTraversal:source==="eprint"&&data.historical_oai_traversal_complete===true};
   };
   // Announcements are the source of newly released records, not proof of v1 dates.
   // Keep announcementDate distinct from the first-submission date, and never
@@ -226,7 +227,8 @@ async function snapshot(source,options={}){
    // Keep distinct revisions available for exact-ID searches. Browsing
    // results combine versions after applying the user's filters.
    return {stamp:available.map(result=>result.stamp).sort().at(-1),
-    papers:mergeRecords(recordKey,available.map(result=>result.papers))};
+    papers:mergeRecords(recordKey,available.map(result=>result.papers)),
+    fullOaiTraversal:source==="eprint"&&available.some(result=>result.fullOaiTraversal)};
   }).catch(error=>{if(snapshots.get(source)?.promise===loaded)snapshots.delete(source);throw error});
   snapshots.set(source,{at:Date.now(),promise:loaded});
  }
@@ -395,7 +397,8 @@ async function chemLive(c,signal,cursor){
 }
 function live(source,criteria,signal,cursor){
  if(source==="arxiv")return arxivLive(criteria,signal,cursor);
- if(source==="eprint")return snapshot("eprint").then(data=>({papers:filter(data.papers,criteria),total:null,provider:"IACR OAI-PMH indexed snapshot (partial coverage)",next:null}));
+ if(source==="eprint")return snapshot("eprint").then(data=>({papers:filter(data.papers,criteria),total:null,
+  provider:data.fullOaiTraversal?"IACR OAI-PMH full available history traversal (not an archive-wide census)":"IACR OAI-PMH indexed snapshot (partial coverage)",next:null}));
  if(source==="biorxiv"){
   const browse=!criteria.q&&!criteria.author&&!criteria.refinement&&!criteria.topicTerms?.length;
   const orderedSearch=!criteria.category&&(criteria.sort==="oldest"||criteria.sort==="cited");
