@@ -1,0 +1,40 @@
+name: Backfill IACR ePrint OAI metadata safely
+on:
+  workflow_dispatch:
+  schedule:
+    # Historical OAI metadata update intervals are harvested a bounded year at a time.
+    - cron: '40 2 * * *'
+permissions:
+  contents: write
+concurrency:
+  group: axiovo-eprint-history
+  cancel-in-progress: false
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate OAI metadata parser
+        run: python -m unittest discover -s tests -p 'test_eprint_harvest.py' -v
+      - name: Backfill one completed OAI metadata-update year
+        env:
+          IACR_BACKFILL_WINDOWS: '1'
+          IACR_BACKFILL_PAGES: '80'
+        run: python -m scripts.backfill_eprint
+      - name: Commit only source-validated IACR metadata and checkpoint
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A docs/data/eprint.json docs/data/eprint-backfill-state.json
+          if ! git diff --cached --quiet; then
+            git commit -m "data: advance validated IACR ePrint OAI history [skip ci]"
+            git fetch origin main
+            git rebase -X theirs origin/main
+            git push origin HEAD:main
+          fi
