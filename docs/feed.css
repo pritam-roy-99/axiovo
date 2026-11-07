@@ -168,3 +168,9 @@
  .axiovo-feed-page .feed-post-identity{min-width:0}
  .axiovo-feed-page .feed-post-header .feed-source{max-width:80px;white-space:normal;text-align:center}
 }
+
+/* Author homonyms must be visible as uncertainty, never researcher identity. */
+.axiovo-feed-page .feed-author-warning{font-size:12px;line-height:1.55;color:var(--rl-muted,#607a91);margin:10px 0}
+.axiovo-feed-page .feed-uncertain-option{display:flex;flex-wrap:wrap;align-items:flex-start;gap:7px;font-size:12px;line-height:1.5;padding:11px 12px;margin:8px 0 15px;border:1px solid var(--rl-border,#cbdde9);border-radius:10px;color:var(--rl-text,#17324a);cursor:pointer}
+.axiovo-feed-page .feed-uncertain-option input{flex:none;width:17px;height:17px;margin:1px 0 0;accent-color:var(--axiovo-accent,#126f9c)}
+.axiovo-feed-page .feed-uncertain-option small{flex-basis:100%;margin-left:24px;color:var(--rl-muted,#607a91);font-size:11px}
