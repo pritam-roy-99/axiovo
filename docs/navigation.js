@@ -13,7 +13,7 @@
   const file=location.pathname.split("/").pop()||"index.html";
   const archivePage=["arxiv.html","biorxiv.html","chemrxiv.html","crypto.html"].includes(file);
   const links=[
-   [file==="index.html"?"#axiovo-archive-title":HOME,"Explore","Browse research subjects and preprint archives"],
+   ["./#axiovo-archive-title","Explore","Browse research subjects and preprint archives"],
    ["./desk.html","Research Desk","Search arXiv, bioRxiv, ChemRxiv and Cryptology ePrint together"],
    ["./feed.html","My Feed","New papers from your followed authors and research subtopics"],
    ["./workspace.html","Library","View saved papers, notes and research collections"],
