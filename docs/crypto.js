@@ -99,6 +99,7 @@
    const original=link("Original record ↗",p.url);original.target="_blank";original.rel="noopener";
    original.className="rd-button rd-secondary";
    actions.append(save,compare,assistant,original);article.append(actions);
+   window.AxiovoCitationEvidence?.add(article,p);
    target.append(article);
   }
   if(pages>1){
