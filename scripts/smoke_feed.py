@@ -34,6 +34,8 @@ def main():
              {"id":"2611.00013","title":"Educational robotics beyond ROS",
               "abstract":"An unrelated educational robotics study.", "authors":["Robotics Person"],
               "published":"2026-11-05"}]}
+            # The published fast preview must not contaminate synthetic source fixtures.
+            page.route("**/data/feed-preview.json",lambda r:r.fulfill(status=404,body=""))
             page.route("**/data/feed.json",lambda r:r.fulfill(status=200,content_type="application/json",body=json.dumps(fixture)))
             for path in ("oai-recent.json","announcements.json","biorxiv.json","chemrxiv.json"):
                 page.route("**/data/"+path,lambda r:r.fulfill(status=200,content_type="application/json",body='{"papers":[]}'))
