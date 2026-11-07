@@ -5,7 +5,7 @@ const SHELL = [
   "./", "./index.html", "./desk.html", "./feed.html", "./workspace.html", "./arxiv.html", "./biorxiv.html", "./chemrxiv.html", "./crypto.html",
   "./theme.css", "./axiovo-shell.css", "./home-landing.css?v=20261107-readable-cta-v2", "./home-tour.js?v=20261107-four-sources-2", "./theme.js", "./research-entry.css", "./research-entry.js",
   "./source-pulse.js", "./assets/axiovo-tour-poster.svg?v=four-sources-2", "./citation-evidence.js?v=20261107-verified2-verified2", "./citation-evidence.css?v=20261107-verified2-verified2", "./navigation.js", "./pwa.js", "./paper-sort.js", "./feed.js", "./feed-rank-worker.js", "./feed-core.js", "./feed-preferences.js", "./feed-preview.js", "./feed.css", "./topic-explorer.css", "./topic-explorer.js", "./topic-atlas.js",
-  "./crypto.css?v=20261107-custom-paths-v2", "./crypto-topics.js?v=20261107-custom-paths-v2", "./crypto.js?v=20261107-custom-paths-v2", "./archive-taxonomy.js", "./archive-data.js", "./arxiv-daily-archive.js", "./arxiv-versions.js", "./searchable-select.js",
+  "./crypto.css?v=20261107-custom-paths-v2", "./crypto-topics.js?v=20261107-custom-paths-v2", "./eprint-source.js?v=20261107-independent-v1", "./crypto.js?v=20261107-independent-v1", "./archive-taxonomy.js", "./archive-data.js", "./arxiv-daily-archive.js", "./arxiv-versions.js", "./searchable-select.js",
   "./data/topics/arxiv.tsv", "./data/topics/biorxiv.tsv", "./data/topics/chemrxiv.tsv",
   "./abstract-audio.js", "./author-follow.js", "./following-authors.js", "./research-workspace.css", "./research-desk.js", "./research-desk.css", "./zotero-ris.js",
   "./workspace.js", "./workspace.css", "./paper-actions.css", "./paper-card-polish.css?v=20261106-save2", "./research-workflow.css",
