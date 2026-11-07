@@ -82,6 +82,7 @@ def parse_page(raw):
     errors=root.findall("o:error",NAMESPACE)
     if errors:
         error=errors[0]
+        if error.get("code")=="noRecordsMatch":return [],""
         raise ValueError("OAI-PMH error "+str(error.get("code"))+": "+str(error.text)[:160])
     records=[parse_record(x) for x in root.findall(".//o:ListRecords/o:record",NAMESPACE)]
     token=root.find(".//o:ListRecords/o:resumptionToken",NAMESPACE)
