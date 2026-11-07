@@ -46,19 +46,19 @@ def main():
             page.set_default_timeout(25000)
             errors=[]
             page.on("pageerror",lambda e:errors.append(str(e)))
-            page.add_init_script("""({workerEnabled}) => {
+            page.add_init_script("""(() => {
               localStorage.setItem("axiovo-followed-topics",JSON.stringify(["preparation contextuality"]));
               localStorage.setItem("axiovo-author-follows",JSON.stringify(["Pritam Roy"]));
               window.__workerConstructed=0;
               const NativeWorker=window.Worker;
-              if(workerEnabled){
+              if(WORKER_FLAG){
                 window.Worker=class extends NativeWorker {
                   constructor(...args){super(...args);window.__workerConstructed++}
                 };
               }else{
                 window.Worker=undefined;
               }
-            }""",{"workerEnabled":worker_enabled})
+            })()""".replace("WORKER_FLAG","true" if worker_enabled else "false"))
             page.route("**/data/feed-preview.json",lambda req:req.fulfill(status=404,body=""))
             page.route("**/data/feed.json",lambda req:req.fulfill(
                 status=200,content_type="application/json",body=fixture))
