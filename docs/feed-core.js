@@ -13,22 +13,25 @@
   return source+":"+id;
  }
  function date(p){const raw=p.announcementDate||p.announcement_date||p.published||p.date||"";const ms=Date.parse(raw);return Number.isFinite(ms)?ms:0}
- function overlaps(query,title,abstract){
-  const words=terms(query), t=new Set(terms(title)),a=new Set(terms(abstract));
+ function overlaps(query,title,abstract,prepared,queryCache){
+  let words=queryCache?.get(query);
+  if(!words){words=terms(query);if(queryCache)queryCache.set(query,words)}
+  const t=prepared?.title||new Set(terms(title));
+  const a=prepared?.abstract||new Set(terms(abstract));
   const main=words.filter(x=>t.has(x)),support=words.filter(x=>a.has(x));
   // Long expressions must share several distinct concepts, not one generic word.
   const needed=words.length<=2?words.length:Math.max(2,Math.ceil(words.length*.5));
   const found=new Set([...main,...support]);
   return {matched:words.length>0&&found.size>=needed,score:Math.round((main.length*7+support.length*2)*Math.min(1,found.size/Math.max(1,words.length))),words:[...found]};
  }
- function pathMatches(path,paper){
+ function pathMatches(path,paper,prepared,queryCache){
   if(path.source!==(paper.source||"arxiv"))return [];
   const category=path.category.toLowerCase();
   const tags=(paper.categories||[]).map(tag=>String(tag).toLowerCase());
   const inCategory=tags.some(tag=>tag===category||tag.startsWith(category+"."));
   if(!path.terms.length)return inCategory?[{topic:path.label,score:0,matched:true}]:[];
   if(tags.length&&!inCategory)return [];
-  return path.terms.map(topic=>({topic,...overlaps(topic,paper.title,paper.abstract)}));
+  return path.terms.map(topic=>({topic,...overlaps(topic,paper.title,paper.abstract,prepared,queryCache)}));
  }
  function build(papers,prefs={},now=Date.now()){
   const authors=(prefs.authors||[]).filter(Boolean);
@@ -36,7 +39,7 @@
   const saved=new Set((prefs.saved||[]).map(x=>String(x).toLowerCase()));
   const references=(prefs.references||[]).filter(x=>x?.title).slice(0,20);
   const hidden=new Set((prefs.hidden||[]).map(x=>String(x).toLowerCase()));
-  const seen=new Set(),out=[];
+  const seen=new Set(),out=[],queryCache=new Map();
   for(const paper of papers||[]){
    if(!paper?.title||!paper?.url||!/^https:\/\//.test(paper.url))continue;
    const id=key(paper);
@@ -44,11 +47,13 @@
    const hiddenEarlier=paper.source==="chemrxiv"&&hidden.has(id+"-");
    if(seen.has(id)||hidden.has(id)||hiddenEarlier)continue;
    seen.add(id);
+   // Tokenize each paper once per ranking pass, even with dozens of follows.
+   const prepared={title:new Set(terms(paper.title)),abstract:new Set(terms(paper.abstract))};
    const authorHit=(paper.authors||[]).filter(x=>authors.some(y=>prefs.matchesAuthor?prefs.matchesAuthor(y,x):String(y).toLowerCase()===String(x).toLowerCase()));
-   const matches=[...interests.map(topic=>({topic,...overlaps(topic,paper.title,paper.abstract)})),
-    ...(prefs.paths||[]).flatMap(path=>pathMatches(path,paper))];
+   const matches=[...interests.map(topic=>({topic,...overlaps(topic,paper.title,paper.abstract,prepared,queryCache)})),
+    ...(prefs.paths||[]).flatMap(path=>pathMatches(path,paper,prepared,queryCache))];
    const topicMatches=[...new Map(matches.filter(x=>x.matched).map(x=>[x.topic.toLowerCase(),x])).values()];
-   const related=references.filter(x=>key(x)!==id).map(x=>({paper:x,...overlaps(x.title,paper.title,paper.abstract||"")})).filter(x=>x.matched).sort((a,b)=>b.score-a.score).slice(0,1);
+   const related=references.filter(x=>key(x)!==id).map(x=>({paper:x,...overlaps(x.title,paper.title,paper.abstract||"",prepared,queryCache)})).filter(x=>x.matched).sort((a,b)=>b.score-a.score).slice(0,1);
    if(!authorHit.length&&!topicMatches.length&&!related.length)continue;
    const then=date(paper),days=then>0&&then<=now?(now-then)/86400000:null;
    const recency=days===null?0:days<=3?12:days<=7?9:days<=30?5:days<=90?2:0;
