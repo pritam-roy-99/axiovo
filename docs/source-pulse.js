@@ -19,7 +19,7 @@
     const time=Date.parse(item.checked_at),age=Date.now()-time;
     const valid=Number.isFinite(time)&&age>=0;
     card.dataset.state=valid&&age<=24*3600*1000?"recent":valid?"older":"unknown";
-    status.textContent=valid?"Checked "+new Date(time).toLocaleString():"Check time unavailable";
+    status.textContent=valid?(age>24*3600*1000?"Older snapshot · ":"Checked ")+new Date(time).toLocaleString():"Check time unavailable";
    }
    const note=document.createElement("small");
    note.textContent=item?.coverage==="available-OAI-history-traversed"?
