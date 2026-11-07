@@ -311,11 +311,15 @@ jobs:
           echo '| Audit internal routes and HTML assets | ${{ steps.audit_internal_routes_and_html_assets.outcome }} |' >> "$GITHUB_STEP_SUMMARY"
       - name: Verify Axiovo meaning in the homepage and video opening
         run: python -m unittest discover -s tests -p test_axiovo_brand_intro.py -v
+      - name: Install MP4 verification tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
       - name: Reuse already recorded and source-verified Axiovo tutorial
         id: existing_video
         run: |
           python - <<'PY'
-          import json, os
+          import json, os, subprocess
           from pathlib import Path
           folder=Path("docs/assets")
           mp4=folder/"axiovo-tour.mp4"
@@ -327,16 +331,19 @@ jobs:
                      and vtt.is_file() and vtt.read_text(encoding="utf-8").startswith("WEBVTT")
                      and len(meta.get("chapters",[]))>=20
                      and meta.get("source")=="Real Chromium page captures")
-          except (OSError,ValueError,TypeError):
+              if valid:
+                  tracks=json.loads(subprocess.check_output([
+                      "ffprobe","-v","error","-show_streams","-show_format",
+                      "-of","json",str(mp4)],text=True))
+                  valid=(float(tracks.get("format",{}).get("duration",0))>90
+                         and any(t.get("codec_name")=="h264" for t in tracks.get("streams",[]))
+                         and any(t.get("codec_name")=="aac" for t in tracks.get("streams",[])))
+          except (OSError,ValueError,TypeError,subprocess.CalledProcessError):
               valid=False
           print("Existing verified-source tutorial present:",valid)
           with open(os.environ["GITHUB_OUTPUT"],"a",encoding="utf-8") as output:
               output.write(f"reuse={'true' if valid else 'false'}\n")
           PY
-      - name: Install MP4 verification tools
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq ffmpeg
       - name: Install tutorial recording dependencies only when missing
         if: steps.existing_video.outputs.reuse != 'true'
         run: |
