@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-06T21:08:28.122951+00:00",
+  "generated_at": "2026-11-07T00:24:18.022443+00:00",
   "source": "official arXiv OAI-PMH and verified submission-date Atom batches, with category fallback",
   "index_scope": "all-category recent OAI harvest (partial if incomplete) and independently verified full submission-day shards; older history remains partial",
   "refresh_methods": [
@@ -82533,6 +82533,214 @@
       "metadata_source": "arXiv OAI-PMH"
     },
     {
+      "id": "2611.01109",
+      "version": 1,
+      "title": "Light Fidelity in Academic Libraries: A Radiant Journey to Light the Future",
+      "abstract": "Academic contexts have changed due to the fast expansion of communication technology, affecting information access, sharing, and dissemination. Light Fidelity (LiFi) is a new technology that may transform academic library connections in this changing environment. This article examines how LiFi can accelerate data transmission, secure data, and provide a more dynamic and collaborative learning environment to spur creativity. Academic libraries may accelerate information interchange using visible light communication with LiFi technology. LiFi is the solution for the increasing need of digital access it adress the situation by enabling faster research activities and enhancing collaboration among students, faculty, and researchers. Present paper discusses the importance and application of LiFi in libraries.",
+      "authors": [
+        "Jagan B L",
+        "Sudhi S Vijayan",
+        "Renjith V R",
+        "Arunkumar V R"
+      ],
+      "categories": [
+        "cs.DL"
+      ],
+      "primary_category": "cs.DL",
+      "published": "2026-11-04T00:00:00Z",
+      "published_date_precision": "day",
+      "updated": "2026-11-05T00:00:00Z",
+      "link": "https://arxiv.org/abs/2611.01109",
+      "topics": [],
+      "doi": "",
+      "metadata_source": "arXiv OAI-PMH"
+    },
+    {
+      "id": "2611.00964",
+      "version": 1,
+      "title": "Stability threshold for 3D Boussinesq equations with rotation near the Couette flow and vertical stratified temperature",
+      "abstract": "The most important features that distinguish fluid flow in the atmosphere and ocean are the effects of rotation and stratification, which are described by the Boussinesq equations with rotation. This paper examines the stability threshold at high Reynolds number $\\mathbf{Re}$ for the 3D Boussinesq equations with rotation near Couette flow and a vertical stratified temperature. For the zero modes, the combined effects of rotation and stratification sustain velocity-temperature oscillations with frequencies bounded away from zero. In the stable rotational regime, rotation suppresses the linear growth associated with the lift-up effect, while stratification sustains oscillations in the double zero modes. Although the zero modes dynamics are not fully dispersive, we exploit the structure of the oscillatory phases and cancellations in the equations to obtain a modified energy estimate for the entire zero modes system. Combining this estimate with enhanced dissipation and inviscid damping of the nonzero modes, we establish a bound for the stability threshold, with order $\\mathbf{Re}^{-2/3}(1+\\log\\mathbf{Re})^{-1-a_0}$ for any fixed $a_0\\in(0,1/2)$.",
+      "authors": [
+        "Wenting Huang",
+        "Zekai Luo",
+        "Ying Sun",
+        "Jiahong Wu",
+        "Xiaojing Xu"
+      ],
+      "categories": [
+        "math.AP"
+      ],
+      "primary_category": "math.AP",
+      "published": "2026-11-04T00:00:00Z",
+      "published_date_precision": "day",
+      "updated": "2026-11-05T00:00:00Z",
+      "link": "https://arxiv.org/abs/2611.00964",
+      "topics": [
+        "open-systems"
+      ],
+      "doi": "",
+      "metadata_source": "arXiv OAI-PMH"
+    },
+    {
+      "id": "2611.00935",
+      "version": 1,
+      "title": "Labadain-MedQA: A Tetun Medical QA Dataset for Fine-Tuning and Evaluating Large Language Models",
+      "abstract": "Advances in large language models (LLMs) have created opportunities for cross-lingual transfer of medical knowledge from high-resource to low-resource languages to support access to healthcare information. However, medical question-answering (QA) datasets for fine-tuning and evaluating LLMs remain scarce for Tetun. To address this gap, we translated MedAlpaca's Medical Flashcards and WikiDoc Patient Information collections into Tetun using Gemini 2.5 Flash, producing 39,077 medical QA pairs. Translation quality was assessed on 50 randomly sampled QA pairs (100 documents) using automatic metrics against human reference translations and evaluations by two native Tetun-speaking healthcare professionals, focusing on medical accuracy and Tetun fluency. Human translations achieved higher mean ratings than LLM-generated translations for both criteria (4.43/5 vs. 4.02/5), with statistically significant differences (Wilcoxon signed-rank test, p < 0.001). To assess downstream utility, we fine-tuned Gemma and Llama variants on the translated MedAlpaca dataset using parameter-efficient fine-tuning (PEFT) and evaluated them on 325 Tetun-translated United States Medical Licensing Examination multiple-choice questions. Gemma 4 12B fine-tuned using QLoRA achieved relative improvements in mean accuracy of 10.79% with 4-bit NormalFloat (NF4) inference and 10.42% after merging the LoRA adapters into the BF16 base model, compared with the corresponding base models. These results highlight the viability of automatic dataset translation for Tetun medical QA and the effectiveness of PEFT in enhancing model performance. The datasets, models, and evaluation resources are accessible at https://github.com/labadain/labadain-medqa to support reproducible research on Tetun medical QA and facilitate machine translation, cross lingual, and multilingual research.",
+      "authors": [
+        "Gabriel de Jesus",
+        "Sérgio Nunes"
+      ],
+      "categories": [
+        "cs.CL",
+        "cs.AI"
+      ],
+      "primary_category": "cs.CL",
+      "published": "2026-11-04T00:00:00Z",
+      "published_date_precision": "day",
+      "updated": "2026-11-05T00:00:00Z",
+      "link": "https://arxiv.org/abs/2611.00935",
+      "topics": [],
+      "doi": "",
+      "metadata_source": "arXiv OAI-PMH"
+    },
+    {
+      "id": "2611.00892",
+      "version": 1,
+      "title": "Learning to Group and Order: Cross-Instance Self-Supervised RL for Vision-Centric MLLMs",
+      "abstract": "Reinforcement learning (RL) post-training has become an important paradigm for improving multimodal large language models (MLLMs), especially with automatically verifiable rewards. Self-supervised visual pretext tasks provide such rewards without human annotations. However, existing methods mainly exploit within-instance structure, offering limited supervision for cross-instance discrimination and fine-grained comparison. We introduce Group-and-Order Self-Supervised Reinforcement Learning (GO-SSL), a cross-instance jigsaw framework for vision-centric MLLM post-training. Given two visual instances, GO-SSL mixes their local elements and trains the model to group them by instance of origin while recovering the order within each group, coupling instance-level comparison with spatial, temporal, or geometric structure recovery. This paired formulation turns the same unlabeled data into richer verifiable supervision through diverse pairings, shuffles, and a random-to-hard curriculum. We instantiate GO-SSL mainly on cross-image jigsaw tasks and further extend it to 3D depth and video temporal ordering. Across diverse benchmarks, GO-SSL consistently improves over the base MLLM and prior self-supervised post-training baselines, with clear gains in fine-grained perception and spatial understanding. Further evaluations across model scales and families support its generality. These results suggest that cross-instance comparison provides a useful self-supervised RL signal for improving transferable visual understanding in MLLMs. Code is available at https://github.com/SEU-VIPGroup/GO-SSL.",
+      "authors": [
+        "Songming Yang",
+        "Hong-Tao Yu",
+        "Xiu-Shen Wei"
+      ],
+      "categories": [
+        "cs.CV"
+      ],
+      "primary_category": "cs.CV",
+      "published": "2026-11-04T00:00:00Z",
+      "published_date_precision": "day",
+      "updated": "2026-11-05T00:00:00Z",
+      "link": "https://arxiv.org/abs/2611.00892",
+      "topics": [],
+      "doi": "",
+      "metadata_source": "arXiv OAI-PMH"
+    },
+    {
+      "id": "2611.00864",
+      "version": 1,
+      "title": "From MHV Gravity Amplitudes and Hodges map to Pentad Varieties",
+      "abstract": "We study some geometric aspects behind the Hodges matrix appearing in the context of scattering amplitudes for the $\\mathcal N=8$ supergravity. Through a vector bundle construction, we show that the Hodges matrix gives rise to a canonical rational map from the two-step flag variety to symmetric matrices, called the $\\textit{Hodges map}$. This construction allows to define the amplitude geometrically: its vanishing locus is a divisor - the $\\textit{MHV gravity divisor}$. Inspired by the Hodges map, we introduce the notion of Hadamard ratio of two varieties. In the case relevant to gravity, this is the ratio of two Grassmannians, which we call the $\\textit{pentad variety}$, connecting it to the pentad constraint from algebraic statistics. Moreover, we show that the pentad variety is closely related to the combinatorial algebraic geometry of Martin's affine slope variety, and the phirotopes of Below, Krummeck, and Richter-Gebert.",
+      "authors": [
+        "Joris Koefler",
+        "Emanuele Ventura",
+        "Hongmiao Yu"
+      ],
+      "categories": [
+        "math.AG",
+        "hep-th",
+        "math.CO"
+      ],
+      "primary_category": "math.AG",
+      "published": "2026-11-04T00:00:00Z",
+      "published_date_precision": "day",
+      "updated": "2026-11-05T00:00:00Z",
+      "link": "https://arxiv.org/abs/2611.00864",
+      "topics": [
+        "mathematics"
+      ],
+      "doi": "",
+      "metadata_source": "arXiv OAI-PMH"
+    },
+    {
+      "id": "2611.00846",
+      "version": 1,
+      "title": "Instability of streaky high-supersonic boundary layers over cooled walls",
+      "abstract": "We investigate the instability of streaks induced by free-stream vortical disturbances in cooled-wall high-supersonic boundary layers. Distinct types of instability modes are identified: modified Mack second modes, a newly discovered varicose secondary-instability mode and sinuous or varicose secondary-instability modes akin to those in incompressible boundary layers. Unique characteristics of the new secondary-instability mode are that its eigenfunctions concentrate in valley regions and feature intense temperature fluctuations near the wall. The streaks in high-supersonic boundary layers destabilise the three-dimensional secondary-instability modes, but suppress the growth of the modified Mack second modes, both radiating and non-radiating. The suppression of radiating modes amounts to a reduction of the two-dimensional noise they emit. Numerical results indicate that, unlike streaks in adiabatic-wall boundary layers, whose instability concentrates in low-speed peak regions away from the wall, the secondary instability of streaks in cooled-wall high-supersonic boundary layers occurs both in low-speed peak regions and in high-speed valley regions.",
+      "authors": [
+        "Dongdong Xu",
+        "Pierre Ricco",
+        "Elena Marensi",
+        "Xuesong Wu"
+      ],
+      "categories": [
+        "physics.flu-dyn"
+      ],
+      "primary_category": "physics.flu-dyn",
+      "published": "2026-11-04T00:00:00Z",
+      "published_date_precision": "day",
+      "updated": "2026-11-05T00:00:00Z",
+      "link": "https://arxiv.org/abs/2611.00846",
+      "topics": [],
+      "doi": "",
+      "metadata_source": "arXiv OAI-PMH"
+    },
+    {
+      "id": "2611.00818",
+      "version": 1,
+      "title": "Well begun is half done: the computation of Eulerian paths",
+      "abstract": "We characterize the uniform computational strength of finding (one-way or two-way, directed or undirected) Eulerian paths in countable graphs. In the one-way case, for both directed and undirected graphs, this problem is Weihrauch-equivalent to $\\mathsf{lim}\\times\\mathsf{C}_{\\mathbb{N}}'$, where $\\mathsf{C}_{\\mathbb{N}}'$ is the jump of closed choice on the natural numbers. This refines the proof-theoretic strength of the existence of a one-way Eulerian path given by the reverse mathematics framework. The $\\mathsf{C}_{\\mathbb{N}}'$ component comes entirely from the difficulty of choosing a starting vertex: with a valid start prescribed, the problem is equivalent to $\\mathsf{lim}$, which also characterizes the degree of the two-way directed/undirected Eulerian path problem. We also study the complexity of orienting the edges of a graph while preserving the existence of a one-way/two-way Eulerian path. In the one-way case, this problem is not computable, and we prove that $\\mathsf{lim}_2<_{\\mathrm{W}}\\mathsf{OrientEP}<_{\\mathrm{W}}\\mathsf{C}_{2}'\\sqcap\\mathsf{Sort}_2$ and $\\mathsf{OrientEP}\\not\\le_{\\mathrm{W}}\\mathsf{C}_{\\mathbb{N}}$. On the other hand, valid orientations are uniformly computable for two-way paths and for one-way paths with a prescribed valid starting vertex.",
+      "authors": [
+        "Manlio Valenti"
+      ],
+      "categories": [
+        "math.LO",
+        "math.CO"
+      ],
+      "primary_category": "math.LO",
+      "published": "2026-11-04T00:00:00Z",
+      "published_date_precision": "day",
+      "updated": "2026-11-05T00:00:00Z",
+      "link": "https://arxiv.org/abs/2611.00818",
+      "topics": [],
+      "doi": "",
+      "metadata_source": "arXiv OAI-PMH"
+    },
+    {
+      "id": "2611.00815",
+      "version": 1,
+      "title": "VCoT-SQL: Enhancing Text-to-SQL Generation through Dual Chain-of-Thought Validation Training",
+      "abstract": "Open-source LLMs provide a flexible alternative to closed-source models for Text-to-SQL but still struggle with complex queries. Finetuning with chain-of-thought (CoT) data improves reasoning, yet standard datasets lack CoT annotations, requiring synthetic generation. Existing synthesis methods only verify the final answer, allowing flawed reasoning steps to corrupt the training data. We propose VCoT-SQL, a framework that improves Text-to-SQL generation through intermediate-step validated CoT supervision and a dedicated SQL validator, which enables small open-source models to outperform frontier closed-source models. VCoT-SQL trains two complementary models on curated reasoning traces: an SQL generator using clause-level CoT templates where reasoning steps are verified via execution and schema alignment checks, and an SQL validator using diagnostic CoT templates to detect syntactic, semantic, and type level errors. We further design a hierarchical schema filtering pipeline that integrates and refines complementary retrieval strategies to distill relevant database elements. VCoT-SQL achieves 66.82% execution accuracy on challenging dataset BIRD dev and 86.8% on Spider test, improving the base 7B model by 7% on BIRD. Notably, our CoT synthesis relies on 7B models yet outperforms methods that use 72B-scale or even proprietary closed source teachers for data generation, demonstrating that rigorous step-level validation can be more effective than scaling up teacher model size. Our dataset and code are available at https://github.com/INTREBID/VCoT-SQL.",
+      "authors": [
+        "Rui Zhang",
+        "Yujia Su",
+        "Ruixuan Li",
+        "Yuhua Li",
+        "Yixin Su"
+      ],
+      "categories": [
+        "cs.AI"
+      ],
+      "primary_category": "cs.AI",
+      "published": "2026-11-04T00:00:00Z",
+      "published_date_precision": "day",
+      "updated": "2026-11-05T00:00:00Z",
+      "link": "https://arxiv.org/abs/2611.00815",
+      "topics": [],
+      "doi": "10.18653/2026.emnlp-main.2686",
+      "metadata_source": "arXiv OAI-PMH"
+    },
+    {
+      "id": "2611.00603",
+      "version": 1,
+      "title": "Implications of the PXP ground-state sign structure for neural-network variational Monte Carlo",
+      "abstract": "Positive-definite neural-network quantum states cannot directly represent the ground state of the PXP Hamiltonian, since the ground-state wavefunction carries a nontrivial relative-sign structure. Building on the chiral symmetry of the PXP Hamiltonian, we show that this sign structure is fixed exactly by the parity of the total up-spin number: a diagonal unitary transformation that assigns a sign to each spin configuration according to this parity maps the PXP Hamiltonian to its negative, rendering the transformed Hamiltonian stoquastic on the Rydberg-blockaded Hilbert space. Since the configuration graph of allowed configurations is connected, the Perron-Frobenius theorem guarantees a unique, strictly positive ground state of the transformed Hamiltonian, yielding an exact sign rule for the ground state of the original Hamiltonian in terms of the parity of the up-spin number. Variational Monte Carlo performed directly on the transformed Hamiltonian with a positive-definite ansatz therefore requires no architecture-specific modification to represent the true ground state. We evaluate the performance of this formulation using five representative neural-network quantum state architectures, SineKAN, reflection-symmetrized SineKAN, RBM, MLP, and LSTM, for different chain lengths.",
+      "authors": [
+        "Jun Sur Richard Park",
+        "Kwangmin Yu"
+      ],
+      "categories": [
+        "quant-ph"
+      ],
+      "primary_category": "quant-ph",
+      "published": "2026-11-04T00:00:00Z",
+      "published_date_precision": "day",
+      "updated": "2026-11-05T00:00:00Z",
+      "link": "https://arxiv.org/abs/2611.00603",
+      "topics": [],
+      "doi": "",
+      "metadata_source": "arXiv OAI-PMH"
+    },
+    {
       "id": "2611.08052",
       "version": 1,
       "title": "The Moving Frontier: How the National Justice Project Is Using Digital Technology to Expand Access to Justice",
@@ -84409,216 +84617,6 @@
       "link": "https://arxiv.org/abs/2611.04216",
       "topics": [],
       "doi": ""
-    },
-    {
-      "id": "2611.04108",
-      "version": 2,
-      "title": "Separating Common and Unique Directions for Model Merging",
-      "abstract": "Model merging combines multiple fine-tuned models without additional training, and arithmetic methods have emerged as a simple yet effective way to merge models without data. However, existing arithmetic methods treat task vectors in parameter space and apply a single element-wise rule to directions that can differ in mergeability. In a shared directional basis, we find a consistent two-regime structure: a low-dispersion common bulk shared across tasks and a high-dispersion task-dominated tail that carries disproportionate energy. These findings motivate Common--Unique Subspace Decomposition (CUSD), a data-free pre-merging method that separates task vectors into common and unique directional components, merges the common components with a downstream arithmetic operator, and retains unique residuals separately. Experiments across $11$ base models, four model families, and four arithmetic-based merging operators show that CUSD improves 42 of 44 model--operator combinations and achieves up to 22.5% improvement over the corresponding baselines. Our code is publicly available at https://github.com/stwang666/CUSD",
-      "authors": [
-        "Shiting Wang",
-        "Yingjie Zou",
-        "Ke Li"
-      ],
-      "categories": [
-        "cs.LG",
-        "cs.AI"
-      ],
-      "primary_category": "cs.LG",
-      "published": "2026-11-03T00:32:11Z",
-      "updated": "2026-11-04T10:47:34Z",
-      "link": "https://arxiv.org/abs/2611.04108",
-      "topics": [],
-      "doi": ""
-    },
-    {
-      "id": "2611.05759",
-      "version": 1,
-      "title": "PAYWORTHY: Can LLMs Predict Which Freelance Jobs an AI Agent Will Complete?",
-      "abstract": "Before an AI agent takes on a paid job, someone has to judge whether it is likely to succeed. We test whether frontier language models can make this call before any attempt. We propose PAYWORTHY which contains 1{,}494 real freelance job postings, sampled from 18.8M postings made between 2020 and 2026 on a freelancing platform. An agent attempts each job from the posting alone in a single run, and an LLM judge acting as the client decides whether to accept the work. We ask 18 models to forecast how likely the agent is to succeed and measure how well each model's forecasts rank the accepted jobs above the rejected ones (AUC, where 0.5 is a random ranking). The answer depends on how the agent is described. Told what the agent cannot do, every model ranks the jobs well (AUC 0.66--0.86). Told instead that it is a generic agent with a browser and code execution, the same models rank the same jobs about as well as a random ordering (0.45--0.56). These results hold under judges from four other model families (Claude, GLM, Kimi and Qwen), and the informed forecasts also rank the verdicts of two human raters. Code is available at https://github.com/upwork/Payworthy",
-      "authors": [
-        "Mohammad Reza Rezaei",
-        "Dingxian Wang",
-        "Brett Levert",
-        "Celeste Fejzo",
-        "Andrew Rabinovich",
-        "Zhao Chen"
-      ],
-      "categories": [
-        "cs.AI",
-        "cs.CL"
-      ],
-      "primary_category": "cs.AI",
-      "published": "2026-11-03T00:00:00Z",
-      "published_date_precision": "day",
-      "updated": "2026-11-05T00:00:00Z",
-      "link": "https://arxiv.org/abs/2611.05759",
-      "topics": [],
-      "doi": "",
-      "metadata_source": "arXiv OAI-PMH"
-    },
-    {
-      "id": "2611.05758",
-      "version": 1,
-      "title": "Mechanical Engineering Skills: An Open Library of Agent Skills for Design, Analysis and Manufacturing",
-      "abstract": "Mechanical engineers use specialized tools for CAD, simulation, manufacturing and research, each with a distinct interface and learning curve. We present Mechanical Engineering Skills, an open library of 33 agent skills that makes these capabilities accessible through a single text or voice conversation. Each skill combines operating instructions, executable tools and verification procedures. A language model interprets the request, selects and coordinates skills, while deterministic tools perform computations and return checked results. Default workflows require no tool-specific interface training, local model execution or model fine-tuning; skills load on demand and install with one command. Nineteen skills adapt published or preprint research from our laboratory, including text-to-CAD, linkage synthesis, CFD setup, stress-field and lattice surrogates, equation discovery, additive-manufacturing planning and in-process monitoring. Fourteen additional skills support core engineering and education. We describe the skill format, design principles and a method for translating research into practical workflows. Five case studies with explicit evidence scopes and independent reruns demonstrate exact analytical agreement for lattice homogenization, rocket apogee predictions within 4% of stored OpenRocket references, an equation fit nine times more accurate than a cubic polynomial at an unseen temperature, and an end-to-end rehearsal of porosity monitoring. Controlled agent comparisons remain future work. The open library is available at https://github.com/BaratiLab/mechanical-engineering-skills.",
-      "authors": [
-        "Achuth Chandrasekhar",
-        "Jesse Barkley",
-        "Peter Pak",
-        "Rumi Loghmani",
-        "Aakash Oza",
-        "Amir Barati Farimani"
-      ],
-      "categories": [
-        "cs.MA"
-      ],
-      "primary_category": "cs.MA",
-      "published": "2026-11-03T00:00:00Z",
-      "published_date_precision": "day",
-      "updated": "2026-11-05T00:00:00Z",
-      "link": "https://arxiv.org/abs/2611.05758",
-      "topics": [],
-      "doi": "",
-      "metadata_source": "arXiv OAI-PMH"
-    },
-    {
-      "id": "2611.05757",
-      "version": 1,
-      "title": "The most entangled states of four and seven qubits",
-      "abstract": "Pure states of four and seven qubits cannot be maximally entangled across every balanced bipartition; we determine how entangled they can be on average. For four qubits we prove the conjecture of Higuchi and Sudbery: the mean von Neumann entropy of the three $2|2$ cuts is at most $1+\\tfrac12\\log_2 3$ bits, with equality exactly on the local-unitary orbits of their state $M_4$ and its complex conjugate. For seven qubits the mean purity of the 35 balanced $3|4$ cuts is at least $121/917$ and their mean entropy is at most $2.965356029\\ldots$ bits, each with a unique optimiser up to local unitaries and qubit permutations. The two optimisers are distinct members of one icosahedral family, so minimum purity and maximum entropy select different states. The proofs bound moments of the marginal spectra by positive identities on several copies of the state, some of them spin flipped, and bound the entropy by a polynomial in those moments. The four-qubit maximum has an analytic proof; the seven-qubit proofs, and some of the four-qubit refinements below, are computer-assisted, with exact arithmetic and rigorous error bounds. We also prove the Gour--Wallach conjecture for Rényi entropies of all orders, with the maximiser changing from $M_4$ to cluster states at $q_*\\approx1.588$, and obtain sharp Tsallis bounds, mixed-state bounds and quantitative stability.",
-      "authors": [
-        "Antony Lewis"
-      ],
-      "categories": [
-        "quant-ph"
-      ],
-      "primary_category": "quant-ph",
-      "published": "2026-11-03T00:00:00Z",
-      "published_date_precision": "day",
-      "updated": "2026-11-05T00:00:00Z",
-      "link": "https://arxiv.org/abs/2611.05757",
-      "topics": [
-        "entanglement-steering"
-      ],
-      "doi": "",
-      "metadata_source": "arXiv OAI-PMH"
-    },
-    {
-      "id": "2611.05756",
-      "version": 1,
-      "title": "Flow-Optimal Separators for Minor-Free and Induced-Minor-Free Graphs in Linear Time via Follow the Regularized Leader",
-      "abstract": "We give a new algorithm for finding balanced separators in minor-free and induced-minor-free graphs. A key technical idea is a new connection to online learning: we formulate a continuous, non-convex optimization problem and solve it using the Follow the Regularized Leader (FTRL) framework. Our implementation of each FTRL step yields a purely combinatorial algorithm that assigns and adjusts vertex weights over multiple rounds. For graphs with $n$ vertices and $m$ edges, we obtain the following results. (1) For $H$-induced-minor-free graphs, we find a balanced separator of size $O(\\log(|V(H)|)\\sqrt{|V(H)|+|E(H)|}\\sqrt{m})$ in expected linear time for fixed $H$. As a corollary, we find balanced separators of size $O(\\sqrt{m})$ in string graphs in expected linear time, without requiring string representations. (2) For $K_h$-minor-free graphs, we find a balanced separator of size $O(h\\log h\\sqrt{n})$ in expected linear time for fixed $h$. Our algorithm unifies two long lines of work on separators in minor-free graphs, dating back to Alon, Seymour, and Thomas (1990): one optimizing separator size and the other optimizing running time. It also gives a natural interpretation of the vertex weighting scheme in a recent linear-time algorithm by Bonnet, Korhonen, Le, Li, and Masarik (2026). The separator bounds for both graph classes are flow-optimal: techniques based on flow-cut duality, including ours, cannot yield balanced separators of asymptotically smaller size.",
-      "authors": [
-        "Hung Le",
-        "Jack Spalding-Jamieson"
-      ],
-      "categories": [
-        "cs.DS"
-      ],
-      "primary_category": "cs.DS",
-      "published": "2026-11-03T00:00:00Z",
-      "published_date_precision": "day",
-      "updated": "2026-11-05T00:00:00Z",
-      "link": "https://arxiv.org/abs/2611.05756",
-      "topics": [],
-      "doi": "",
-      "metadata_source": "arXiv OAI-PMH"
-    },
-    {
-      "id": "2611.05755",
-      "version": 1,
-      "title": "Decompose the Distillation: Interpretable Single-Pass Guidance for Diffusion Models",
-      "abstract": "Classifier-Free Guidance is a widely used inference-time guidance rule for conditional image generation with diffusion models, which exposes a guidance scale that adjusts conditioning strength after training. This flexibility requires conditional and unconditional model evaluations at every sampling step, so an N-step trajectory takes 2N forward passes. Single-pass alternatives reduce such cost, yet most collapse CFG's two components into one opaque guided prediction, losing the separable base flow and guidance direction that support per-step control and diagnostics, even when the scale remains adjustable. This work introduces CtrlFlow, a single-pass guidance method that preserves CFG's separable base-flow and guidance-direction interface. To preserve both components at one-pass cost, CtrlFlow attaches two lightweight LoRA adapters to a frozen backbone, each adding 2.5% parameters, and predicts the base flow and guidance direction from one pass of the shared frozen backbone. Because the guidance scale multiplies the guidance direction only after the forward pass, one evaluation yields the guided velocity at any scale, so a single trained checkpoint remains adjustable at inference without retraining. Preserving two outputs introduces a training mismatch: inference amplifies guidance-direction errors by the chosen scale, while naive component-wise losses weight both outputs equally. To align training with this composed inference-time error, CtrlFlow uses a unified multi-scale distillation loss. Residual guidance errors can still persist at extreme scales, where even small guidance-direction errors are amplified by the guidance scale. To reduce this inference-time error, CtrlFlow applies scale-adaptive modulation to damp velocity-field errors and time-grid warping to concentrate solver evaluations where the trajectory changes most rapidly.",
-      "authors": [
-        "Wuyang Zhang",
-        "Xiaolin Xu"
-      ],
-      "categories": [
-        "cs.CV",
-        "cs.GR"
-      ],
-      "primary_category": "cs.CV",
-      "published": "2026-11-03T00:00:00Z",
-      "published_date_precision": "day",
-      "updated": "2026-11-05T00:00:00Z",
-      "link": "https://arxiv.org/abs/2611.05755",
-      "topics": [],
-      "doi": "",
-      "metadata_source": "arXiv OAI-PMH"
-    },
-    {
-      "id": "2611.05754",
-      "version": 1,
-      "title": "GRASP: Gradient-Guided Sampling for Contact-Rich Physics-Based Motion Retargeting",
-      "abstract": "We study physics-based retargeting of human demonstrations for robot learning: finding robot controls that reproduce reference motions under contact dynamics. We propose GRASP (Gradient Recovery from Archived Samples for Proposals), which combines sampling-based exploration with gradient-guided refinement without requiring a differentiable simulator. GRASP-TO extends tempered sequential Monte Carlo by fitting local quadratic cost models to archived rollouts and using their gradients to guide Markov chain Monte Carlo rejuvenation. Metropolis-Hastings correction preserves the target distribution for each fixed proposal kernel, and a population analysis connects the recovered gradients to Gaussian smoothing. GRASP-MPC scales this optimizer to long demonstrations through warm-started receding-horizon planning. Experiments on dexterous hands and humanoids show accurate retargeting with a shared tracking objective and no task-specific contact rewards, including 92.8% success on 1352 bimanual OakInk2 demonstrations. The refined references improve PPO tracking in pen spinning and humanoid-object interaction. We also demonstrate dexterous manipulation and whole-body humanoid motion on real hardware.",
-      "authors": [
-        "Yang Liu",
-        "Tong Wang",
-        "Yiming Bao",
-        "Heng Yang"
-      ],
-      "categories": [
-        "cs.RO"
-      ],
-      "primary_category": "cs.RO",
-      "published": "2026-11-03T00:00:00Z",
-      "published_date_precision": "day",
-      "updated": "2026-11-05T00:00:00Z",
-      "link": "https://arxiv.org/abs/2611.05754",
-      "topics": [],
-      "doi": "",
-      "metadata_source": "arXiv OAI-PMH"
-    },
-    {
-      "id": "2611.05753",
-      "version": 1,
-      "title": "Toward a Compositional Knowledge Architecture for a Shared Organizational Cortex",
-      "abstract": "Organizations accumulate evidence in conversations, documents, decisions and relationships, but they act on interpretations: judgements assembled from several observations, resting on assumptions, and revised as circumstances change. Existing retrieval, knowledge graphs and agent memory keep the records and lose the interpretation. We propose a four-layer architecture, Signals, Domains, Claims and Dimensions, in which interpretations persist with their justifications and standing, a truth-maintenance network revises that standing as evidence changes, and validated, versioned Dimensions position interpretations on named axes. We call the result a shared organizational cortex. In a registered retrieval experiment, the Dimension term gains 0.028 nDCG@10 (p = 0.002). In system-level comparisons, the full retrieval configuration improves nDCG@10 by 0.081 over Signals-only and 0.053 over graph-augmented Signals-only retrieval (both reported p < 0.001). The architecture gives organizations a persistent, revisable basis for shared judgement.",
-      "authors": [
-        "Andrew Miracle",
-        "Phyl Georgiou",
-        "Christine Okoth",
-        "Ese Monday"
-      ],
-      "categories": [
-        "cs.AI",
-        "cs.IR"
-      ],
-      "primary_category": "cs.AI",
-      "published": "2026-11-03T00:00:00Z",
-      "published_date_precision": "day",
-      "updated": "2026-11-05T00:00:00Z",
-      "link": "https://arxiv.org/abs/2611.05753",
-      "topics": [],
-      "doi": "",
-      "metadata_source": "arXiv OAI-PMH"
-    },
-    {
-      "id": "2611.05752",
-      "version": 1,
-      "title": "Shock-driven Jetting at HMX Crystal Surface Asperities",
-      "abstract": "Shock-induced jetting and recompression are plausible mechanisms for hot spot formation in energetic materials, but remain poorly understood. To this end, we apply all-atom nonreactive molecular dynamics (MD) simulations of a shock-loaded sinusoidal surface asperity in the crystalline explosive HMX (octahydro-1,3,5,7-tetranitro-1,3,5,7-tetrazocine) to quantify the roles of shock strength, asperity geometry, system size, and crystallographic orientation in determining the jetting response. Our simulations span a shock pressure interval of $\\approx$4-47 GPa, which captures responses in both detonation initiation and steady-state detonation regimes. We find that shock strength and asperity curvature exert strong influence on jet velocity, temperature, and morphology, while feature size and crystallographic orientation play more modest roles. Jet morphology correlates strongly with the HMX ambient-pressure phase diagram and the narrow temperature range associated with its liquid phase. Coherent jets form when focusing and dissipation are sufficient to drive local temperatures above the melting point, while formation of molecular plumes is seemingly connected to jet temperatures exceeding the liquid-vapor transition temperature. Formation of plumes is unlike the jetting responses seen in metals, which typically exhibit liquid phases that are stable over wider temperature intervals. This work proposes a simple hypothesis for the connection between jet morphology and ambient-pressure phase diagrams that can be readily tested in other explosives and metals. It also provides a foundation for ongoing nonreactive and reactive MD simulations of jet impact and recompression to quantify the role played by jets in forming hot spots in HMX-based explosives.",
-      "authors": [
-        "Ethan Holbrook",
-        "Matthew P. Kroonblawd",
-        "H. Keo Springer",
-        "Alejandro Strachan"
-      ],
-      "categories": [
-        "cond-mat.mtrl-sci",
-        "cond-mat.mes-hall"
-      ],
-      "primary_category": "cond-mat.mtrl-sci",
-      "published": "2026-11-03T00:00:00Z",
-      "published_date_precision": "day",
-      "updated": "2026-11-05T00:00:00Z",
-      "link": "https://arxiv.org/abs/2611.05752",
-      "topics": [
-        "open-systems"
-      ],
-      "doi": "",
-      "metadata_source": "arXiv OAI-PMH"
     }
   ]
 }
