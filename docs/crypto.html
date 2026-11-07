@@ -12,7 +12,8 @@
 <link rel="stylesheet" href="./research-entry.css">
 <link rel="stylesheet" href="./axiovo-shell.css">
 <link rel="stylesheet" href="./research-desk.css">
-<link rel="stylesheet" href="./topic-explorer.css">\n<link rel="stylesheet" href="./crypto.css?v=20261107-unified-discover">
+<link rel="stylesheet" href="./topic-explorer.css">
+<link rel="stylesheet" href="./crypto.css?v=20261107-unified-discover">
 <script defer src="./theme.js"></script>
 <script defer src="./navigation.js"></script>
 <script defer src="./arxiv-versions.js"></script>
@@ -21,61 +22,111 @@
 <script defer src="./author-follow.js"></script>
 <script defer src="./feed-preferences.js"></script>
 <script defer src="./abstract-audio.js"></script>
+<script defer src="./searchable-select.js"></script>
 <script defer src="./crypto.js"></script>
 <script defer src="./pwa.js"></script>
 </head>
 <body class="axiovo-archive-page axiovo-research axiovo-explore axiovo-crypto" data-explore-source="eprint">
 <header></header>
 <main class="rd-page ex-page">
-<nav class="ex-archives crypto-source-links" aria-label="Browse other preprint archives">
-<a href="./arxiv.html"><span class="rd-source-dot arxiv" aria-hidden="true"></span>arXiv</a><a href="./biorxiv.html"><span class="rd-source-dot biorxiv" aria-hidden="true"></span>bioRxiv</a><a href="./chemrxiv.html"><span class="rd-source-dot chemrxiv" aria-hidden="true"></span>ChemRxiv</a><a href="./crypto.html" aria-current="page"><span class="rd-source-dot eprint" aria-hidden="true"></span>Cryptology ePrint</a>
+<section class="ex-hero" aria-labelledby="crypto-title">
+<nav class="ex-archives" aria-label="Preprint archives">
+<a href="./arxiv.html"><span class="rd-source-dot arxiv" aria-hidden="true"></span>arXiv</a>
+<a href="./biorxiv.html"><span class="rd-source-dot biorxiv" aria-hidden="true"></span>bioRxiv</a>
+<a href="./chemrxiv.html"><span class="rd-source-dot chemrxiv" aria-hidden="true"></span>ChemRxiv</a>
+<a href="./crypto.html" aria-current="page"><span class="rd-source-dot eprint" aria-hidden="true"></span>Cryptology ePrint</a>
 </nav>
-<section class="ex-hero crypto-hero" aria-labelledby="crypto-title">
- <div class="ex-hero-copy crypto-heading">
- <p class="rd-kicker">FOURTH ARCHIVE · CRYPTOGRAPHY</p>
- <h1 id="crypto-title">Cryptology ePrint <span>Discover</span></h1>
- <p>Discover papers in cryptography, security, quantum cryptography, and cryptanalysis from the <a href="https://eprint.iacr.org/" rel="noopener" target="_blank">IACR Cryptology ePrint Archive</a>.</p>
- <p class="crypto-coverage"><strong>Source integrity:</strong> Axiovo searches metadata harvested from IACR OAI-PMH. The local index may be incomplete, especially for historical dates. Official records always remain available directly from IACR.</p>
- </div>
- <div class="crypto-hero-actions"><a href="./desk.html" class="rd-button rd-primary">Search all four archives</a><a href="https://eprint.iacr.org/search" class="rd-button rd-secondary" target="_blank" rel="noopener">Official ePrint search ↗</a></div>
+<div class="ex-hero-copy">
+<div><p class="rd-kicker">TOPIC EXPLORER</p><h1 id="crypto-title">Explore Cryptology ePrint</h1>
+<p>Choose a cryptography research path, then search source-linked IACR ePrint papers.</p></div>
+<p class="ex-count" id="crypto-coverage-count" role="status">Checking indexed IACR metadata…</p>
+</div>
 </section>
-
-<section class="rd-panel crypto-discover" aria-labelledby="crypto-discover-title">
- <div class="crypto-section-head"><div><p class="rd-kicker">FIND PAPERS</p><h2 id="crypto-discover-title">Search cryptography research</h2></div><p id="crypto-coverage-count" class="rd-small" role="status">Checking source metadata…</p></div>
- <form id="crypto-search-form" role="search">
-  <label for="crypto-query">Paper title, keywords, author, or IACR ID (e.g., 2026/1234)</label>
-  <div class="crypto-searchbar"><input id="crypto-query" type="search" maxlength="240" placeholder="e.g. quantum key distribution"><button type="submit" class="rd-button rd-primary">Search papers</button></div>
-  <div class="crypto-filter-grid">
-   <label>Research topic<select id="crypto-topic">
-    <option value="">All cryptography research</option>
-    <option value="post-quantum cryptography">Post-quantum cryptography</option>
-    <option value="quantum cryptography">Quantum cryptography and QKD</option>
-    <option value="zero-knowledge proof">Zero-knowledge proofs</option>
-    <option value="multiparty computation">Secure multiparty computation</option>
-    <option value="lattice-based cryptography">Lattice-based cryptography</option>
-    <option value="fully homomorphic encryption">Homomorphic encryption</option>
-    <option value="digital signature">Digital signatures</option>
-    <option value="cryptanalysis">Cryptanalysis</option>
-    <option value="threshold cryptography">Threshold cryptography</option>
-    <option value="blockchain">Blockchain and protocols</option>
-   </select></label>
-   <label>Author<input id="crypto-author" type="search" maxlength="130" placeholder="Author name"></label>
-   <label>Sort<select id="crypto-sort"><option value="relevance">Relevance</option><option value="recent">Newest indexed</option><option value="oldest">Oldest indexed</option><option value="title">Title A–Z</option></select></label>
-   <label>From<input id="crypto-from" type="date"></label>
-   <label>To<input id="crypto-to" type="date"></label>
-  </div>
-  <div class="crypto-quick-actions"><button type="button" id="crypto-reset" class="rd-button rd-secondary">Clear filters</button><button type="button" id="crypto-follow" class="rd-button rd-secondary">Follow selected topic</button><a class="rd-text-link" href="./feed.html">Open My Feed ↗</a></div>
- </form>
+<details class="rd-panel ex-help"><summary>How to search and save papers</summary>
+<p>Select a research subject, subfield, and optionally a more specific topic. These are Axiovo search suggestions, not IACR-assigned categories. Search the verified IACR metadata currently indexed by Axiovo, then read the abstract, open the original paper, save to Library, or add to comparison. A missing result does not mean a paper is absent from IACR.</p>
+</details>
+<noscript><p>Enable JavaScript to use the topic explorer or <a href="https://eprint.iacr.org/search">search IACR directly</a>.</p></noscript>
+<div class="ex-layout">
+<aside class="ex-sidebar" aria-label="Explore cryptography topics">
+<section class="rd-panel ex-guide">
+<p class="rd-kicker">BROWSE THE TOPIC MAP</p>
+<h2>Choose a research path</h2>
+<div class="ex-finder">
+<label for="crypto-topic-find">Find any subject, topic or subtopic</label>
+<input type="search" id="crypto-topic-find" maxlength="100" placeholder="Name, method or cryptographic topic" autocomplete="off">
+<div id="crypto-topic-suggestions" class="ex-suggestions" hidden></div>
+</div>
+<p class="rd-small ex-picker-hint">Open a dropdown and type to filter its choices.</p>
+<div class="ex-steps">
+<label for="crypto-field"><span class="ex-step-number" aria-hidden="true">1</span> Research subject</label>
+<select id="crypto-field"><option value="">All cryptography research</option></select>
+<label for="crypto-topic"><span class="ex-step-number" aria-hidden="true">2</span> Research subfield</label>
+<select id="crypto-topic" disabled><option value="">Choose a subject first</option></select>
+<div class="ex-choices" id="crypto-topic-options" hidden></div>
+<label for="crypto-subtopic"><span class="ex-step-number" aria-hidden="true">3</span> Sub-subtopic</label>
+<select id="crypto-subtopic" disabled><option value="">Choose a subfield first</option></select>
+<div class="ex-choices" id="crypto-subtopic-options" hidden></div>
+</div>
+<div class="ex-guide-actions">
+<button type="button" class="rd-button rd-primary ex-show-papers" id="crypto-show-results">Show matching papers <span aria-hidden="true">↓</span></button>
+<button type="button" class="rd-button rd-secondary" id="crypto-clear-path">Clear path</button>
+</div>
+<div class="crypto-topic-actions">
+<button type="button" id="crypto-follow" class="rd-button rd-secondary">Follow selected topic</button>
+<a href="./feed.html" class="rd-text-link">Open My Feed ↗</a>
+</div>
+<p class="rd-small crypto-taxonomy-note">Research paths are Axiovo-curated keyword guides, not an official IACR subject taxonomy.</p>
 </section>
-<section class="crypto-results-section" aria-labelledby="crypto-results-title">
- <div class="crypto-section-head"><div><p class="rd-kicker">SOURCE-LINKED PAPERS</p><h2 id="crypto-results-title">Research results</h2></div><p class="rd-small" role="status" id="crypto-results-status">Loading official-source metadata…</p></div>
- <div id="crypto-results" class="crypto-results" aria-live="polite"></div>
- <div id="crypto-pagination" class="crypto-pagination"></div>
+</aside>
+<div class="ex-main">
+<section class="rd-panel ex-search crypto-discover" aria-labelledby="crypto-discover-title">
+<h2 id="crypto-discover-title">Search Cryptology ePrint papers</h2>
+<p class="rd-small" id="crypto-scope-label">Scope: all indexed cryptography research.</p>
+<form id="crypto-search-form" role="search">
+<label class="rd-label" for="crypto-query">Keywords, title, author, or IACR identifier</label>
+<div class="rd-searchbar crypto-searchbar"><input id="crypto-query" type="search" maxlength="240" placeholder="Search within the selected path"><button type="submit" class="rd-button rd-primary">Search papers</button></div>
+<div class="ex-date-presets" role="group" aria-label="Date shortcuts">
+<button type="button" id="crypto-latest" class="rd-button rd-secondary">Latest indexed papers</button>
+<button type="button" id="crypto-week" class="rd-button rd-secondary">Past 7 days</button>
+<button type="button" id="crypto-date-open" class="rd-button rd-secondary">Choose dates</button>
+</div>
+<details class="rd-advanced" id="crypto-advanced">
+<summary>Author, dates and other filters</summary>
+<div class="rd-filter-grid">
+<label>Author<input id="crypto-author" type="search" maxlength="130" placeholder="Author name"></label>
+<label>From (source date)<input id="crypto-from" type="date"></label>
+<label>To (source date)<input id="crypto-to" type="date"></label>
+<label>Sort<select id="crypto-sort"><option value="relevance">Relevance</option><option value="recent">Newest indexed</option><option value="oldest">Oldest indexed</option><option value="title">Title A–Z</option></select></label>
+</div>
+<button type="button" id="crypto-reset" class="rd-button rd-secondary">Clear all filters</button>
+</details>
+</form>
+</section>
+<section class="ex-results crypto-results-section" aria-labelledby="crypto-results-title">
+<div class="rd-section-heading">
+<div><p class="rd-kicker">SOURCE-LINKED RECORDS</p><h2 id="crypto-results-title" tabindex="-1">Papers</h2></div>
+<a class="rd-text-link" href="./desk.html#rd-queue-heading">Open comparison shortlist →</a>
+</div>
+<div class="rd-panel ex-result-summary">
+<p id="crypto-results-status" role="status" aria-live="polite">Loading official-source metadata…</p>
+<p class="rd-small" id="crypto-index-note">Coverage reflects verified IACR records indexed by Axiovo, not the full archive.</p>
+<details class="rd-advanced"><summary>How this topic is matched</summary><p class="rd-small">Selected research topics are keyword refinements over indexed IACR metadata. They are not official IACR subject categories. Dates come from the source record, not inferred publication or revision histories.</p></details>
+</div>
+<div class="paper-sort-toolbar">
+<label for="crypto-result-sort">Order displayed papers</label>
+<select id="crypto-result-sort" aria-label="Order ePrint papers">
+<option value="relevance">Most relevant</option><option value="recent">Newest indexed</option><option value="oldest">Oldest indexed</option><option value="title">Title A–Z</option>
+</select>
+</div>
+<div id="crypto-results" class="crypto-results" aria-live="polite"></div>
+<div id="crypto-pagination" class="crypto-pagination"></div>
 </section>
 <section class="rd-panel crypto-integrity" aria-labelledby="crypto-integrity-title">
- <h2 id="crypto-integrity-title">How to interpret coverage</h2>
- <p>Every listed paper uses an IACR ePrint identifier and links to its official record. This archive may have papers not yet indexed in Axiovo. OAI-PMH metadata-update dates are not treated as original publication dates, and the archive's revision history is not invented.</p>
- <p><a href="https://eprint.iacr.org/search" target="_blank" rel="noopener">Search the entire original archive ↗</a> · <a href="./methodology.html">Read Axiovo's methodology</a></p>
+<h2 id="crypto-integrity-title">Source coverage and verification</h2>
+<p>Every listed paper has an official IACR ePrint identifier linking back to its source record. Historical coverage may be incomplete. OAI-PMH metadata update dates must not be interpreted as original publication dates or fabricated revision histories.</p>
+<p><a href="https://eprint.iacr.org/search" target="_blank" rel="noopener noreferrer">Search the complete IACR archive ↗</a> · <a href="./methodology.html">Read Axiovo's methodology</a> · <a href="./desk.html">Search all four archives</a></p>
 </section>
+</div>
+</div>
 </main>
 </body></html>
