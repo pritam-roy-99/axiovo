@@ -105,7 +105,7 @@ const selectedCollection=collections().find(x=>x.id===activeCollection);const fi
 const listen=$("listen-library");listen.hidden=!window.AxiovoAbstractAudio||!filtered.some(p=>p.abstract);listen.onclick=()=>window.AxiovoAbstractAudio?.play(filtered.slice(0,50));
 if(!filtered.length){text(root,"div",papers.length?"No saved papers match these filters.":"No saved papers yet. Discover a paper and save it to your Library.","rl-empty");return}
 for(const p of filtered.slice(0,50)){
- const art=paperCard(p);
+ const art=paperCard(p);window.AxiovoCitationEvidence?.add(art,p);
  const details=text(art,"details","","library-paper-notes");
  const labels={"to-read":"To read",reading:"Reading",done:"Reviewed",cited:"Cited"};
  const summary=text(details,"summary","Notes and organization · "+(labels[metadata[p.key]?.status]||"To read"));
