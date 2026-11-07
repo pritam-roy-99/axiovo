@@ -27,7 +27,8 @@ class UsabilityTests(unittest.TestCase):
     def test_shared_navigation_and_legacy_library(self):
         nav=(DOCS/"navigation.js").read_text()
         self.assertIn('history.back()',nav)
-        self.assertIn('home.href="./"',nav)
+        self.assertIn('home.href=HOME',nav)
+        self.assertIn('const HOME="./index.html?axiovo_return=1"',nav)
         self.assertIn('url.hash==="#workspace"',(DOCS/"research-entry.js").read_text())
         self.assertIn("axiovo-reading-list",(DOCS/"workspace.js").read_text())
 
