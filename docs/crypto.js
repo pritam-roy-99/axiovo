@@ -69,7 +69,7 @@
   for(const p of visible){
    const article=el("article",undefined,"crypto-paper");
    const head=el("div",undefined,"crypto-paper-heading");
-   const id=el("small","IACR ePrint "+p.recordId+" · "+(p.date||"Posting date not provided"),"crypto-paper-id");
+   const id=el("small","IACR ePrint "+p.recordId+" · "+(p.date||"Source date not provided"),"crypto-paper-id");
    const h3=el("h3");
    const a=link(p.title,p.url);a.target="_blank";a.rel="noopener noreferrer";
    h3.append(a);head.append(id,h3);article.append(head);
