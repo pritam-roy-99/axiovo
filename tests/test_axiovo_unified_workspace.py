@@ -18,7 +18,7 @@ class Nodes(HTMLParser):
 class UnifiedWorkspaceTests(unittest.TestCase):
     def test_archives_and_workspace_are_separate_destinations(self):
         home=(DOCS/"index.html").read_text()
-        for source in ("arxiv","biorxiv","chemrxiv"):
+        for source in ("arxiv","biorxiv","chemrxiv","crypto"):
             self.assertIn(f'href="./{source}.html"',home)
         self.assertIn('href="./workspace.html"',home)
         redirect=(DOCS/"discover.html").read_text()
@@ -43,7 +43,7 @@ class UnifiedWorkspaceTests(unittest.TestCase):
 
     def test_tour_explains_name_and_steps(self):
         script=(ROOT/"scripts"/"build_tutorial_video.py").read_text()
-        for phrase in ("Axiovo = Axiom + Novo","Three preprint archives",
+        for phrase in ("Axiovo = Axiom + Novo","Four research archives",
                        "Cross-archive Research Desk","workspace.html","copilot.html"):
             self.assertIn(phrase,script)
 
