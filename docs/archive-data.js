@@ -214,6 +214,13 @@ async function request(url,signal,json=true,cacheMode){
 const snapshots=new Map();
 const SNAPSHOT_TTL_MS=5*60*1000;
 async function snapshot(source,options={}){
+ // The IACR reader verifies source IDs and provides an independent
+ // published-host/offline fallback. Other archives retain their own loaders.
+ if(source==="eprint"&&root.AxiovoEprintSource?.load){
+  const value=await root.AxiovoEprintSource.load(options);
+  return {stamp:value.stamp,papers:value.papers,fullOaiTraversal:value.fullOaiTraversal,
+   partial:value.partial,offlineSubset:value.cache===true};
+ }
  if(options?.force===true)snapshots.delete(source);
  const cached=snapshots.get(source);
  if(cached&&Date.now()-cached.at>=SNAPSHOT_TTL_MS)snapshots.delete(source);
