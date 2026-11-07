@@ -20,6 +20,9 @@ function app(fetcher,store={}){
  assert.equal(calls,2);
  assert.equal(result.papers.length,1);
  assert.equal(result.papers[0].url,"https://eprint.iacr.org/2026/1234");
+ assert.equal(result.papers[0].citations,null,"Unknown IACR citations must stay unknown");
+ assert.equal(result.papers[0].affiliations.length,0,"Absent affiliations are not invented");
+
  assert.equal(good.api.filter(result.papers,{q:"2026/1234"}).length,1);
  assert.equal(good.api.filter(result.papers,{q:"https://eprint.iacr.org/2026/1234"}).length,1);
  assert.equal(good.api.filter(result.papers,{q:"eprint:2026/1234"}).length,1);
