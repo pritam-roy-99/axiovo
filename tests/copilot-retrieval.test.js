@@ -52,6 +52,8 @@ function context({rows=[],snapshot=[],publicHits=[],onLive=null}={}){
   "Unavailable IACR records must link to IACR, not arXiv");
  assert(js.includes('candidates.length===0'),"Unmatched local queries must trigger public metadata fallback");
  assert(js.includes('index=[];indexVersion="unavailable"'),"A missing local feed must not prevent public search");
+ assert(js.includes('const fallback=retrieved(q,"")'),"External metadata outages must preserve useful local search evidence");
+ assert(js.includes("sourceWarning"),"Public metadata failures must not be silently cleared by status updates");
  const html=fs.readFileSync("docs/copilot.html","utf8");
  assert(html.includes('value="all" selected'),"Public retrieval must be selected by default");
  console.log("Research Assistant: exact arXiv identity, revision safety, IACR source links, and public fallback passed.");
