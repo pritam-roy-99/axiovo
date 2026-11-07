@@ -315,6 +315,23 @@ def main():
                     page.route("**/data/oai-recent.json",
                         lambda route: route.fulfill(status=200,content_type="application/json",
                             body='{"papers":[]}'))
+                    page.route("**/data/eprint.json",
+                        lambda route: route.fulfill(status=200,content_type="application/json",
+                            body=json.dumps({"source":"eprint","papers":[
+                                {"id":"2026/1234","title":"Public key signature protocols"}]})))
+                    attempted=[]
+                    providers={
+                        "api.openalex.org": {"results":[]},
+                        "api.datacite.org": {"data":[],"meta":{"total":0},"links":{}},
+                    }
+                    def empty_public_lookup(route):
+                        host=urlsplit(route.request.url).hostname
+                        attempted.append(host)
+                        route.fulfill(status=200,content_type="application/json",
+                            headers={"Access-Control-Allow-Origin":"*"},
+                            body=json.dumps(providers[host]))
+                    for host in providers:
+                        page.route(f"https://{host}/**",empty_public_lookup)
                     page.reload(wait_until="domcontentloaded")
                     # The Research Assistant can refresh its status after
                     # IACR/OAI enrichment. Assert the actual verified fixture
@@ -323,6 +340,8 @@ def main():
                         [...document.querySelectorAll('#paper-picker option')]
                           .some(option => option.value === '2611.11003')
                     """,timeout=20000)
+                    page.locator(".assistant-advanced").first.evaluate("el=>el.open=true")
+                    page.locator("#retrieval-scope").select_option("local")
                     page.locator("#question").fill("Why should we study macroscopic quantumness?")
                     page.locator("#ask").click()
                     page.wait_for_function("document.querySelector('#ask').disabled===false && document.querySelector('#conversation .message.assistant')",timeout=15000)
@@ -332,16 +351,11 @@ def main():
                     assert "Macroscopic energy gaps" not in page.locator("#evidence-list").inner_text()
                     assert page.locator("#evidence-list .assistant-source-details").count()==1
                     assert page.locator("#evidence-list .assistant-source-details").first.get_attribute("open") is None
-                    attempted=[]
-                    def external_lookup(route):
-                        attempted.append(route.request.url)
-                        route.abort()
-                    for provider in ("https://api.openalex.org/**","https://api.datacite.org/**"):
-                        page.route(provider,external_lookup)
+                    assert not attempted,("Public providers queried despite a relevant indexed match",attempted)
                     page.locator("#question").fill("Microbial resistance in tropical river sediments")
                     page.locator("#ask").click()
                     page.wait_for_function("document.querySelector('#retrieval-status').textContent.includes('0 relevant sources')")
-                    assert not attempted,("Indexed-only search sent a query to a public provider",attempted)
+                    assert set(attempted)==set(providers),("No public fallback after an indexed miss",attempted)
                     for requested in ("2611.11003v9","2611.11999"):
                         page.goto(base+"copilot.html?id="+requested,wait_until="domcontentloaded")
                         assert page.locator("#question").input_value()==requested
@@ -350,9 +364,9 @@ def main():
                         original.wait_for()
                         assert original.get_attribute("href")=="https://arxiv.org/abs/"+requested
                         assert page.locator("#evidence-list .source").count()==0
-                    assert not attempted,("Unverified arXiv ID looked up in indexed-only mode",attempted)
-                    for provider in ("https://api.openalex.org/**","https://api.datacite.org/**"):
-                        page.unroute(provider,external_lookup)
+                    for host in providers:
+                        page.unroute(f"https://{host}/**",empty_public_lookup)
+                    page.unroute("**/data/eprint.json")
                 if width==390:
                     # Followed-author identity regression: abbreviated A. S. Majumdar
                     # must reveal work indexed as Archan S Majumdar, while an
