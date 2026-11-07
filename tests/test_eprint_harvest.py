@@ -15,6 +15,7 @@ class EprintTests(unittest.TestCase):
     def test_canonical_ids_do_not_invent_revisions(self):
         self.assertEqual(source.canonical("https://eprint.iacr.org/2026/2774"),"2026/2774")
         self.assertEqual(source.canonical("oai:eprint.iacr.org:2026/2774"),"2026/2774")
+        self.assertEqual(source.canonical("oai:eprint.iacr.org:2005/001"),"2005/001")
         for bad in ("2026/0","2026/2774v2","javascript:evil","2026/2774/other"):
             self.assertIsNone(source.canonical(bad))
     def test_original_metadata_and_dates(self):
