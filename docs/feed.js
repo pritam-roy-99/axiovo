@@ -75,7 +75,7 @@ function displayPreferences(prefs){
  for(const path of prefs.paths){
   const params=new URLSearchParams(Object.entries({category:path.category,topic:path.topic,subtopic:path.subtopic,refine:path.refine})
    .filter(([,value])=>value));
-  anchor(paths,path.label,"./"+path.source+".html?"+params,"feed-chip");
+  anchor(paths,path.label,"./"+(path.source==="eprint"?"crypto":path.source)+".html?"+params,"feed-chip");
  }
 }
 const personalized=prefs=>prefs.authors.length||prefs.directTopics.length||prefs.paths.length||prefs.references.length;
