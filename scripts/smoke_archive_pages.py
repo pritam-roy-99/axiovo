@@ -141,6 +141,16 @@ def main():
       checks+=1
      check_searchable_path(page,base,source,touch=width==390)
      checks+=1
+     # Historical-range action must load a source-era window, never a recent-only default.
+     page.goto(base+source+".html",wait_until="domcontentloaded")
+     page.locator("#archive-history").click()
+     expected={"arxiv":"1991-08-01","biorxiv":"2013-11-01","chemrxiv":"2017-01-01"}[source]
+     assert page.locator("#archive-from").input_value()==expected,(source,"Historical start")
+     assert page.locator("#archive-to").input_value(),(source,"Missing historical end")
+     assert page.locator("#archive-sort").input_value()=="oldest"
+     assert page.locator("#archive-advanced").evaluate("el=>el.open")
+     assert page.evaluate("document.documentElement.scrollWidth<=innerWidth+7"),(source,width,"History overflow")
+     checks+=1
     context.close()
    browser.close()
  finally:
