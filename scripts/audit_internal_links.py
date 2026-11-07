@@ -76,9 +76,9 @@ def audit():
                 if destination is not None and anchor not in destination.ids:
                     errors.append(f"{html.name}:{line}: missing anchor #{anchor} in {rel}")
     home = (DOCS / "index.html").read_text(encoding="utf-8")
-    archives = re.findall(r'data-archive="(arxiv|biorxiv|chemrxiv)"\s+href="([^"]+)"', home)
-    if archives != [("arxiv", "./arxiv.html"), ("biorxiv", "./biorxiv.html"), ("chemrxiv", "./chemrxiv.html")]:
-        errors.append("Homepage must contain exactly three correctly linked archive choices")
+    archives = re.findall(r'data-archive="(arxiv|biorxiv|chemrxiv|eprint)"\s+href="([^"]+)"', home)
+    if archives != [("arxiv", "./arxiv.html"), ("biorxiv", "./biorxiv.html"), ("chemrxiv", "./chemrxiv.html"), ("eprint", "./crypto.html")]:
+        errors.append("Homepage must contain exactly four correctly linked archive choices")
     if "<video" not in home or not (home.find('class="axiovo-welcome"') < home.find("<video") < home.find('class="axiovo-archive-grid')):
         errors.append("Homepage must show the tutorial inside its first unified welcome section, before the archive directory")
     # Standalone archives must use the same designed application shell as Home.
