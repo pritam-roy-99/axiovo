@@ -1,94 +1,42 @@
-/* Cryptology ePrint uses the same Discover visual system as the other archives.
-   Only archive-specific layout and paper presentation are defined here. */
-.axiovo-crypto .rd-page{width:min(1320px,100%);padding-inline:clamp(14px,2.5vw,36px)}
-.axiovo-crypto .crypto-source-links{margin-bottom:12px}
-.axiovo-crypto .crypto-hero{
-  display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:end;
-  gap:16px;margin:0 0 20px;padding:0;border:0;border-radius:0;
-  background:transparent;color:var(--rd-ink);box-shadow:none;
-}
-.axiovo-crypto .crypto-heading{display:block;max-width:none;min-width:0}
-.axiovo-crypto .crypto-heading h1{
-  font-size:clamp(2rem,5vw,3.45rem);line-height:1.08;
-  letter-spacing:-.055em;margin:5px 0 9px;color:var(--rd-ink)
-}
-.axiovo-crypto .crypto-heading h1 span{color:var(--rd-link)}
-.axiovo-crypto .crypto-heading p{line-height:1.5;color:var(--rd-muted);margin:5px 0}
-.axiovo-crypto .crypto-heading a{color:var(--rd-link)}
-.axiovo-crypto .crypto-heading .crypto-coverage{
-  font-size:.81rem;color:var(--rd-muted);line-height:1.5;
-  margin:10px 0 0;max-width:80ch
-}
-.axiovo-crypto .crypto-hero-actions{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end;max-width:390px}
-.axiovo-crypto .crypto-hero-actions .rd-button{min-height:42px;text-align:center;white-space:normal}
-.axiovo-crypto .crypto-discover{padding:clamp(15px,2vw,23px)}
-.axiovo-crypto .crypto-section-head{
- display:flex;justify-content:space-between;align-items:baseline;
- gap:9px 16px;flex-wrap:wrap;margin-bottom:13px
-}
-.axiovo-crypto .crypto-section-head h2{font-size:clamp(1.18rem,2.2vw,1.45rem);margin:4px 0}
-.axiovo-crypto .crypto-section-head .rd-small{max-width:100%;overflow-wrap:anywhere}
-.axiovo-crypto .crypto-discover form{display:grid;gap:12px}
-.axiovo-crypto .crypto-discover form>label{font-size:.84rem;font-weight:720;color:var(--rd-ink)}
-.axiovo-crypto .crypto-searchbar{display:flex;gap:9px;min-width:0}
-.axiovo-crypto .crypto-searchbar input{flex:1;min-width:0}
-.axiovo-crypto .crypto-searchbar input,
-.axiovo-crypto .crypto-filter-grid input,
-.axiovo-crypto .crypto-filter-grid select{
- box-sizing:border-box;min-width:0;min-height:44px;width:100%;max-width:100%;
- border:1px solid var(--rd-border);border-radius:8px;
- background:var(--rd-surface);color:var(--rd-ink);
- padding:9px 11px;font:inherit;font-size:.9rem;
-}
-.axiovo-crypto .crypto-filter-grid{
- display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px
-}
-.axiovo-crypto .crypto-filter-grid label{
- display:grid;gap:6px;min-width:0;font-size:.81rem;font-weight:700;color:var(--rd-ink)
-}
-.axiovo-crypto .crypto-quick-actions{display:flex;align-items:center;flex-wrap:wrap;gap:8px}
-.axiovo-crypto .crypto-results-section{margin:20px 0}
+/* IACR ePrint: same Axiovo Discover composition and responsive behavior. */
+.axiovo-crypto .rd-page{width:min(100%,1240px)}
+.axiovo-crypto .ex-hero{margin-bottom:18px}
+.axiovo-crypto .ex-hero-copy{align-items:end}
+.axiovo-crypto .ex-hero-copy h1{font-size:clamp(2rem,5vw,3.45rem)}
+.axiovo-crypto .ex-layout{grid-template-columns:minmax(235px,.34fr) minmax(0,1fr)}
+.axiovo-crypto .ex-guide,.axiovo-crypto .ex-search{min-width:0}
+.axiovo-crypto .crypto-topic-actions{border-top:1px solid var(--rd-border);margin-top:14px;padding-top:12px;display:grid;justify-items:start;gap:11px}
+.axiovo-crypto .crypto-taxonomy-note{margin-top:10px}
+.axiovo-crypto .crypto-discover form{display:grid;gap:10px;margin-top:10px}
+.axiovo-crypto .crypto-discover .rd-advanced{margin-top:3px}
+.axiovo-crypto .crypto-discover .rd-filter-grid{margin:12px 0}
+.axiovo-crypto .crypto-results-section{margin-top:19px}
 .axiovo-crypto .crypto-results{display:grid;grid-template-columns:minmax(0,1fr);gap:9px;margin-top:9px}
-.axiovo-crypto .crypto-paper{
- display:grid;align-content:start;gap:9px;min-width:0;padding:13px 15px;
- border:1px solid var(--rd-border);border-radius:10px;
- background:var(--rd-surface);color:var(--rd-ink)
+.axiovo-crypto .crypto-results .crypto-paper{min-width:0;display:grid;gap:6px;border:1px solid var(--rd-border);border-radius:11px;background:var(--rd-surface);padding:12px 13px;color:var(--rd-ink)}
+.axiovo-crypto .crypto-paper h3{font-size:1.04rem;line-height:1.36;margin:4px 0;overflow-wrap:anywhere}
+.axiovo-crypto .crypto-paper h3 a{color:var(--rd-link);text-decoration:none}
+.axiovo-crypto .crypto-paper h3 a:hover{text-decoration:underline}
+.axiovo-crypto .crypto-paper-id,.axiovo-crypto .crypto-paper-authors{color:var(--rd-muted);font-size:.8rem;line-height:1.55}
+.axiovo-crypto .crypto-paper details{font-size:.85rem}
+.axiovo-crypto .crypto-paper details summary{cursor:pointer;color:var(--rd-link);font-weight:700}
+.axiovo-crypto .crypto-paper details p{line-height:1.6;margin-top:6px;max-height:240px;overflow-y:auto}
+.axiovo-crypto .crypto-paper-actions{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}
+.axiovo-crypto .crypto-paper-actions .rd-button{min-height:39px;font-size:.76rem;padding:7px 9px;white-space:normal}
+.axiovo-crypto .crypto-pagination{display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:12px;margin:16px 0}
+.axiovo-crypto .crypto-integrity{margin-top:22px;padding:14px}
+.axiovo-crypto .crypto-integrity p{font-size:.83rem;line-height:1.6;margin-top:8px}
+.axiovo-crypto .crypto-results-section .ex-result-summary{margin:10px 0}
+.axiovo-crypto .crypto-results-section .paper-sort-toolbar{margin:10px 0}
+.axiovo-crypto .ex-choices{margin-top:4px}
+.axiovo-crypto .ex-finder input{min-width:0}
+@media(max-width:740px){
+ .axiovo-crypto .ex-layout{grid-template-columns:minmax(0,1fr)}
+ .axiovo-crypto .ex-hero{margin-bottom:14px}
+ .axiovo-crypto .ex-hero-copy h1{font-size:clamp(1.8rem,6.7vw,2.5rem)}
+ .axiovo-crypto .rd-searchbar{min-width:0}
 }
-.axiovo-crypto .crypto-paper h3{font-size:1.06rem;line-height:1.38;margin:4px 0 0;overflow-wrap:anywhere}
-.axiovo-crypto .crypto-paper h3 a{color:var(--rd-ink);text-decoration:none}
-.axiovo-crypto .crypto-paper h3 a:hover{text-decoration:underline;color:var(--rd-link)}
-.axiovo-crypto .crypto-paper-id{font-size:.76rem;color:var(--rd-muted)}
-.axiovo-crypto .crypto-paper-authors{font-size:.83rem;line-height:1.5;color:var(--rd-muted)}
-.axiovo-crypto .crypto-paper details{font-size:.85rem;line-height:1.6;border-top:1px solid var(--rd-border);padding-top:8px}
-.axiovo-crypto .crypto-paper summary{cursor:pointer;color:var(--rd-link);font-weight:700}
-.axiovo-crypto .crypto-paper details p{padding-top:8px;max-height:250px;overflow:auto}
-.axiovo-crypto .crypto-paper-actions{display:flex;gap:7px;flex-wrap:wrap}
-.axiovo-crypto .crypto-paper-actions .rd-button{min-height:40px;font-size:.79rem}
-.axiovo-crypto .crypto-pagination{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:12px;padding:18px 0}
-.axiovo-crypto .crypto-integrity{margin-bottom:22px;padding:17px}
-.axiovo-crypto .crypto-integrity p{line-height:1.6;margin-top:9px}
-.axiovo-crypto :is(input,select,button,a,summary):focus-visible{outline:3px solid var(--rd-link);outline-offset:2px}
-@media(max-width:960px){
- .axiovo-crypto .crypto-hero{grid-template-columns:minmax(0,1fr)}
- .axiovo-crypto .crypto-hero-actions{justify-content:flex-start;max-width:none}
- .axiovo-crypto .crypto-filter-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
-}
-@media(max-width:700px){
- .axiovo-crypto .crypto-filter-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
- .axiovo-crypto .crypto-hero{gap:11px;margin-bottom:14px}
- .axiovo-crypto .crypto-heading h1{font-size:clamp(1.85rem,7vw,2.45rem)}
- .axiovo-crypto .crypto-heading p{font-size:.89rem}
-}
-@media(max-width:480px){
- .axiovo-crypto .crypto-hero-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:100%}
- .axiovo-crypto .crypto-hero-actions .rd-button{font-size:.78rem;padding:8px}
- .axiovo-crypto .crypto-searchbar{flex-direction:column}
- .axiovo-crypto .crypto-searchbar button{min-height:44px}
- .axiovo-crypto .crypto-filter-grid label:first-child{grid-column:1/-1}
- .axiovo-crypto .crypto-filter-grid label:nth-child(2),
- .axiovo-crypto .crypto-filter-grid label:nth-child(3){grid-column:span 1}
- .axiovo-crypto .crypto-filter-grid label:nth-child(4),
- .axiovo-crypto .crypto-filter-grid label:nth-child(5){grid-column:span 1}
+@media(max-width:440px){
  .axiovo-crypto .crypto-paper-actions .rd-button{flex:1 1 auto}
- .axiovo-crypto .crypto-section-head{align-items:flex-start}
+ .axiovo-crypto .crypto-results-section .rd-section-heading{align-items:flex-start;gap:9px}
+ .axiovo-crypto .crypto-pagination button{min-height:42px}
 }
