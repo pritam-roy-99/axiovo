@@ -3,6 +3,17 @@
 "use strict";
 const names={arxiv:"arXiv",biorxiv:"bioRxiv",chemrxiv:"ChemRxiv",eprint:"Cryptology ePrint"};
 const paths={arxiv:"feed.json",biorxiv:"biorxiv.json",chemrxiv:"chemrxiv.json",eprint:"eprint.json"};
+/* Earliest supported archive eras, not verified completeness boundaries. */
+const historicalStart=Object.freeze({arxiv:"1991-08-01",biorxiv:"2013-11-01",chemrxiv:"2017-01-01",eprint:"1996-01-01"});
+function historyRange(source,end=new Date().toISOString().slice(0,10)){
+ return {from:historicalStart[source]||"1991-01-01",to:end};
+}
+function sourceDateWindow(source,c){
+ const lower=historicalStart[source];
+ if(!lower||!c?.from||c.from>=lower)return c;
+ return {...c,from:lower};
+}
+
 const keys={arxiv:"axiovo-reading-list",biorxiv:"axiovo-biorxiv-reading-v1",chemrxiv:"axiovo-chemrxiv-reading-v1",eprint:"axiovo-eprint-reading-v1"};
 const ARXIV_METADATA="axiovo-archive-library-v1";
 const COMPARISON="axiovo-desk-comparison-v1";
@@ -404,11 +415,12 @@ function live(source,criteria,signal,cursor){
  if(source==="eprint")return snapshot("eprint").then(data=>({papers:filter(data.papers,criteria),total:null,
   provider:data.fullOaiTraversal?"IACR OAI-PMH full available history traversal (not an archive-wide census)":"IACR OAI-PMH indexed snapshot (partial coverage)",next:null}));
  if(source==="biorxiv"){
+  criteria=sourceDateWindow(source,criteria);
   const browse=!criteria.q&&!criteria.author&&!criteria.refinement&&!criteria.topicTerms?.length;
   const orderedSearch=!criteria.category&&(criteria.sort==="oldest"||criteria.sort==="cited");
   return parseDOI(criteria.q)||(browse&&!orderedSearch)?bioNative(criteria,signal,cursor):bioIndex(criteria,signal,cursor);
  }
- return chemLive(criteria,signal,cursor);
+ return chemLive(sourceDateWindow(source,criteria),signal,cursor);
 }
 function sourceLink(source,criteria={}){
  if(source==="eprint"){
@@ -483,6 +495,6 @@ function removeComparison(p){
  root.dispatchEvent(new Event("axiovo:comparison-change"));
  return true;
 }
-root.AxiovoArchiveData={names,clean,simple,read,write,normalize,workKey,recordKey,merge,filter,topicHit,categoryMatch,identifier,snapshot,latestArxivAnnouncement,datedArxiv,live,sourceLink,
+root.AxiovoArchiveData={names,historicalStart,historyRange,sourceDateWindow,clean,simple,read,write,normalize,workKey,recordKey,merge,filter,topicHit,categoryMatch,identifier,snapshot,latestArxivAnnouncement,datedArxiv,live,sourceLink,
  saved,save,unsave,savedRecords,parseDOI,parseEprint,eprintIdentifier,comparison,addComparison,removeComparison};
 })(window);
