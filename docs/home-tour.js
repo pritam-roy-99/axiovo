@@ -34,7 +34,7 @@
       "Watch the narrated tutorial, or switch to the interactive guide.";
     }else{
      video.pause();
-     status.textContent="Interactive guide selected. The tutorial video remains available above.";
+     status.textContent="Interactive guide selected. Switch back to the narrated video whenever you prefer.";
     }
     if(retry)retry.hidden=!unavailable;
    }
