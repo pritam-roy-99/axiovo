@@ -288,7 +288,7 @@ if(resultSort){
 $("rd-range").addEventListener("change",showDates);
 $("rd-history")?.addEventListener("click",()=>{
  $("rd-range").value="custom";
- $("rd-from").value="1991-08-01";
+ $("rd-from").value=data.historyRange("arxiv").from;
  $("rd-to").value=new Date().toISOString().slice(0,10);
  $("rd-sort").value=$("rd-query").value.trim()?"relevance":"oldest";
  $("rd-advanced").open=true;showDates();runSearch();
