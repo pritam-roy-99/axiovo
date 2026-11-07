@@ -14,20 +14,61 @@
   const root=document.getElementById("axiovo-tour");if(!root)return;
   const video=document.getElementById("axiovo-home-video");
   if(video){
-   const useVideo=()=>{root.hidden=true;video.hidden=false;};
-   const useGuide=()=>{
-    video.hidden=true;
-    root.hidden=false;
-    const subtitle=document.querySelector(".axiovo-demo-subtitle");
-    if(subtitle)subtitle.textContent="Interactive walkthrough · Six steps";
-    const description=document.querySelector(".axiovo-demo-heading p");
-    if(description)description.textContent="The recorded tutorial could not load. Explore Axiovo using the interactive guide.";
-   };
-   video.addEventListener("loadedmetadata",useVideo);
-   video.addEventListener("error",useGuide);
-   video.querySelectorAll("source").forEach(source=>source.addEventListener("error",useGuide));
-   if(video.readyState>=1)useVideo();
-   else if(video.networkState===HTMLMediaElement.NETWORK_NO_SOURCE)useGuide();
+   const watch=document.getElementById("axiovo-tour-show-video");
+   const guide=document.getElementById("axiovo-tour-show-guide");
+   const retry=document.getElementById("axiovo-tour-retry-video");
+   const status=document.getElementById("axiovo-tour-media-status");
+   let mode="video";
+   let unavailable=false;
+   function display(next){
+    mode=next;
+    const isVideo=mode==="video";
+    video.hidden=!isVideo;
+    root.hidden=isVideo;
+    watch?.setAttribute("aria-pressed",String(isVideo));
+    guide?.setAttribute("aria-pressed",String(!isVideo));
+    if(isVideo){
+     if(video.paused&&video.readyState===0&&!unavailable)video.load();
+     status.textContent=unavailable?
+      "Video currently unavailable. Retry the recording or use the interactive guide.":
+      "Watch the narrated tutorial, or switch to the interactive guide.";
+    }else{
+     video.pause();
+     status.textContent="Interactive guide selected. The tutorial video remains available above.";
+    }
+    if(retry)retry.hidden=!unavailable;
+   }
+   function videoReady(){
+    unavailable=false;
+    if(retry)retry.hidden=true;
+    if(mode==="video")display("video");
+   }
+   function videoError(){
+    unavailable=true;
+    if(mode==="video"){
+     // Never silently replace the video with unrelated homepage cards.
+     // The explicit tutorial controls remain visible even when the MP4 fails.
+     display("video");
+    }else if(retry)retry.hidden=false;
+   }
+   video.addEventListener("loadedmetadata",videoReady);
+   video.addEventListener("canplay",videoReady);
+   video.addEventListener("error",videoError);
+   video.querySelectorAll("source").forEach(source=>source.addEventListener("error",videoError));
+   watch?.addEventListener("click",()=>display("video"));
+   guide?.addEventListener("click",()=>display("guide"));
+   retry?.addEventListener("click",()=>{
+    unavailable=false;
+    if(retry)retry.hidden=true;
+    video.load();
+    display("video");
+   });
+   window.addEventListener("pageshow",()=>{
+    // Reconcile a restored BFCache page with its visible tutorial mode.
+    if(mode==="video"&&video.readyState===0&&!unavailable)video.load();
+    display(mode);
+   });
+   display("video");
   }
   const overline=document.getElementById("axiovo-tour-overline"),title=document.getElementById("axiovo-tour-title"),description=document.getElementById("axiovo-tour-description"),illustration=document.getElementById("axiovo-tour-illustration"),counter=document.getElementById("axiovo-tour-counter"),progress=document.getElementById("axiovo-tour-progress"),action=document.getElementById("axiovo-tour-action"),prev=document.getElementById("axiovo-tour-prev"),next=document.getElementById("axiovo-tour-next");
   let current=0;const dots=[];
