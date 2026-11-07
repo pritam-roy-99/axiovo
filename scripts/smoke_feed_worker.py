@@ -70,7 +70,7 @@ def main():
               document.querySelector("#feed-match-count")?.textContent?.includes("matching") &&
               document.querySelector("#feed-refresh")?.disabled === false
             """,timeout=25000)
-            page.wait_for_timeout(250)
+            page.locator(".feed-card").first.wait_for(state="visible",timeout=25000)
             counts=page.evaluate("""() => ({
               total:document.querySelector("#feed-match-count").textContent,
               first:[...document.querySelectorAll(".feed-card h3")].map(x=>x.textContent),
