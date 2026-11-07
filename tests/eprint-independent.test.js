@@ -20,6 +20,11 @@ function app(fetcher,store={}){
  assert.equal(calls,2);
  assert.equal(result.papers.length,1);
  assert.equal(result.papers[0].url,"https://eprint.iacr.org/2026/1234");
+ assert.equal(good.api.filter(result.papers,{q:"2026/1234"}).length,1);
+ assert.equal(good.api.filter(result.papers,{q:"https://eprint.iacr.org/2026/1234"}).length,1);
+ assert.equal(good.api.filter(result.papers,{q:"eprint:2026/1234"}).length,1);
+ assert.equal(good.api.filter(result.papers,{q:"2026/1235"}).length,0);
+
  assert.equal(good.api.filter(result.papers,{topicTerms:["quantum key distribution"]}).length,1);
  const down=app(async()=>{throw Error("offline")},{"axiovo-eprint-verified-fallback-v1":
   JSON.stringify({stamp:"2026-11-06",papers:fixture.papers})});
