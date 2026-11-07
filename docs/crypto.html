@@ -13,7 +13,7 @@
 <link rel="stylesheet" href="./axiovo-shell.css">
 <link rel="stylesheet" href="./research-desk.css">
 <link rel="stylesheet" href="./topic-explorer.css">
-<link rel="stylesheet" href="./crypto.css?v=20261107-archive-v4">
+<link rel="stylesheet" href="./crypto.css?v=20261107-paths-v1">
 <script defer src="./theme.js"></script>
 <script defer src="./navigation.js"></script>
 <script defer src="./arxiv-versions.js"></script>
@@ -23,7 +23,8 @@
 <script defer src="./feed-preferences.js"></script>
 <script defer src="./abstract-audio.js"></script>
 <script defer src="./searchable-select.js"></script>
-<script defer src="./crypto.js?v=20261107-archive-v4"></script>
+<script defer src="./crypto-topics.js?v=20261107-paths-v1"></script>
+<script defer src="./crypto.js?v=20261107-paths-v1"></script>
 <script defer src="./pwa.js?v=20261107-archive-v4"></script>
 </head>
 <body class="axiovo-archive-page axiovo-research axiovo-explore axiovo-crypto" data-explore-source="eprint">
@@ -75,6 +76,20 @@
 <button type="button" id="crypto-follow" class="rd-button rd-secondary">Follow selected topic</button>
 <a href="./feed.html" class="rd-text-link">Open My Feed ↗</a>
 </div>
+<details class="ex-personal" id="crypto-personal">
+<summary>My topics and saved paths</summary>
+<p class="rd-small">Add your own topics and sub-subtopics, or keep this path on this device.</p>
+<button type="button" class="rd-button rd-secondary" id="crypto-save-path" disabled>Save current path</button>
+<div id="crypto-saved-paths" class="ex-personal-list" aria-live="polite"></div>
+<form id="crypto-custom-form">
+<label for="crypto-custom-kind">Add a
+<select id="crypto-custom-kind"><option value="topic">Research topic</option><option value="subtopic">Sub-subtopic under selected topic</option></select></label>
+<label for="crypto-custom">Name
+<input id="crypto-custom" type="text" maxlength="90" placeholder="e.g. a method or research question" required></label>
+<button type="submit" class="rd-button rd-secondary" id="crypto-custom-add" disabled>Add to this subject</button>
+</form>
+<p class="rd-small" id="crypto-personal-status" role="status" aria-live="polite"></p>
+</details>
 <p class="rd-small crypto-taxonomy-note">Research paths are Axiovo-curated keyword guides, not an official IACR subject taxonomy.</p>
 </section>
 </aside>
