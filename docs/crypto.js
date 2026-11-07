@@ -59,7 +59,7 @@
   page=Math.max(1,Math.min(page,pages));
   const visible=shown.slice((page-1)*perPage,page*perPage);
   status.textContent=total+" of "+papers.length+" indexed IACR records match. "+
-   "Coverage is partial; not all historical papers are indexed.";
+   (complete?"Completed all available OAI metadata-date windows. Some source records may not be exposed.":"Coverage is partial; not all historical papers are indexed.");
   if(!total){
    target.append(el("p","No match in Axiovo's available IACR metadata. This does not mean the original archive has no such paper.","rd-small"));
    const official=link("Search IACR ePrint directly ↗","https://eprint.iacr.org/search");
@@ -133,9 +133,9 @@
  fromURL();
  data.snapshot("eprint").then(value=>{
   papers=Array.isArray(value.papers)?value.papers:[];
-  stamp=value.stamp;loaded=true;
+  stamp=value.stamp;complete=value.fullOaiTraversal===true;loaded=true;
   $("crypto-coverage-count").textContent=papers.length+" verified-source records indexed"+
-   (stamp?" · updated "+stamp.slice(0,10):"")+" · history incomplete";
+   (stamp?" · updated "+stamp.slice(0,10):"")+(complete?" · full available OAI history traversed":" · history incomplete");
   render();
  }).catch(()=>{
   loaded=true;papers=[];
