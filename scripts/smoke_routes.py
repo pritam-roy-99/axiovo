@@ -238,7 +238,13 @@ def main():
                         lambda route: route.fulfill(status=200,content_type="application/json",
                             body='{"papers":[]}'))
                     page.reload(wait_until="domcontentloaded")
-                    page.wait_for_function("document.getElementById('retrieval-status').textContent.includes('indexed arXiv records ready')")
+                    # The Research Assistant can refresh its status after
+                    # IACR/OAI enrichment. Assert the actual verified fixture
+                    # has entered the picker, not a transient status string.
+                    page.wait_for_function("""() =>
+                        [...document.querySelectorAll('#paper-picker option')]
+                          .some(option => option.value === '2611.11003')
+                    """,timeout=20000)
                     page.locator("#question").fill("Why should we study macroscopic quantumness?")
                     page.locator("#ask").click()
                     page.wait_for_function("document.querySelector('#ask').disabled===false && document.querySelector('#conversation .message.assistant')",timeout=15000)
