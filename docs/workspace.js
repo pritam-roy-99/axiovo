@@ -66,7 +66,7 @@ function library(){
   const indexed=parsed.explicit?indexedById.get(id):indexedByBase.get(parsed.base);
   list.set("arxiv:"+id,normalizeArxiv(cached.get(id)||indexed||{id},id));
  }
- for(const source of ["biorxiv","chemrxiv"])for(const p of archive?.savedRecords(source)||[]){
+ for(const source of ["biorxiv","chemrxiv","eprint"])for(const p of archive?.savedRecords(source)||[]){
   const key=archive.recordKey(p);list.set(key,{...p,key});
  }
  const ext=read(FIELD_KEY,[]);if(Array.isArray(ext))for(const paper of ext){const p=normalizeOpenAlex(paper);if(p){const match=paper.locations?.map(x=>arxivID(x.landing_page_url||x.pdf_url)).find(Boolean);if(match&&list.has("arxiv:"+match))continue;list.set(p.key,p)}}
