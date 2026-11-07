@@ -4,7 +4,8 @@
 const SOURCES=[
  {id:"arxiv",name:"arXiv",url:"./data/announcements.json"},
  {id:"biorxiv",name:"bioRxiv",url:"./data/biorxiv.json"},
- {id:"chemrxiv",name:"ChemRxiv",url:"./data/chemrxiv.json"}
+ {id:"chemrxiv",name:"ChemRxiv",url:"./data/chemrxiv.json"},
+ {id:"eprint",name:"Cryptology ePrint",url:"./data/eprint.json"}
 ];
 async function load(url){
  const response=await fetch(url,{cache:"no-store",signal:AbortSignal.timeout(12000)});
@@ -26,6 +27,8 @@ function label(source,data){
    "Announcement batch reported complete":"Announcement batch partial or unverified";
  else if(source==="biorxiv")coverage=data.complete_window===true?
    "Recent date window paginated in full; archive partial":"Recent date window partial; archive partial";
+ else if(source==="eprint")coverage=data.complete_requested_window===true?
+   "Requested OAI update window paginated; historical archive still partial":"IACR incremental metadata; history not yet fully indexed";
  else coverage=data.prefix_exhausted===true?
    "ChemRxiv DOI-prefix query exhausted; full archive unverified":"Partial DOI discovery; full archive unverified";
  return {status:freshness,count:count.toLocaleString(),coverage,last:clock?clock.text:"Unavailable"};
@@ -49,7 +52,7 @@ async function show(){
   cell(tr,health.status);cell(tr,health.coverage);body.append(tr);
  }
  const good=result.filter(x=>x.health.status==="Checked recently").length;
- summary.textContent=good+" of 3 metadata snapshots checked within the past 24 hours. Recent checks do not prove full archive coverage.";
+ summary.textContent=good+" of "+SOURCES.length+" metadata snapshots checked within the past 24 hours. Recent checks do not prove full archive coverage.";
  const details=document.getElementById("axiovo-arxiv-day-health");
  if(details){
   try{
@@ -60,7 +63,7 @@ async function show(){
    details.textContent="Independent source audit: arXiv "+Number(arxiv.verified_days||0)+
     " count-checked UTC dates, "+Number(arxiv.queue_total||0)+" unchecked or invalid recent dates queued for re-harvest."+
     " bioRxiv: "+(bio.status||"unverified")+". ChemRxiv: "+(chem.status||"unverified")+
-    ". None of these counts establishes complete historical archive coverage.";
+    ". IACR ePrint: incremental OAI records, historical coverage not certified. None of these counts establishes complete historical archive coverage.";
   }catch(error){
    // Older deployments may not yet include the independent audit.
    const manifest=await load("./data/arxiv-days/manifest.json");
