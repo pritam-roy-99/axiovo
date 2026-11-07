@@ -40,3 +40,14 @@
  .axiovo-crypto .crypto-results-section .rd-section-heading{align-items:flex-start;gap:9px}
  .axiovo-crypto .crypto-pagination button{min-height:42px}
 }
+
+/* Matching the other three archive explorers: private topic paths. */
+.axiovo-crypto .ex-personal{border-top:1px solid var(--rd-border);margin-top:14px;padding-top:11px}
+.axiovo-crypto .ex-personal>summary{cursor:pointer;color:var(--rd-link);font-weight:740;font-size:.86rem}
+.axiovo-crypto .ex-personal>p{margin:10px 0}
+.axiovo-crypto .ex-personal form{margin-top:14px}
+.axiovo-crypto .ex-personal-list{margin-top:9px}
+.axiovo-crypto .ex-personal-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:7px;align-items:start}
+.axiovo-crypto .ex-personal-row button{overflow-wrap:anywhere;white-space:normal}
+.axiovo-crypto #crypto-custom-add{width:100%}
+.axiovo-crypto #crypto-coverage-count{max-width:min(100%,42ch);overflow-wrap:anywhere}
