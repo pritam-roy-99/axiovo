@@ -129,8 +129,17 @@ def run(max_windows=15,max_pages=70,max_splits=60,*,first=None,today=None):
     while state["pending"] and completed<max_windows:
         item=state["pending"][0]
         print("Harvest IACR OAI update window",item["from"],"to",item["until"],flush=True)
-        rows,full=source.collect(since=item["from"],until=item["until"],
-                                 max_pages=max_pages)
+        try:
+            rows,full=source.collect(since=item["from"],until=item["until"],
+                                     max_pages=max_pages)
+        except (TimeoutError, OSError, ValueError) as error:
+            if not completed:
+                raise
+            # Preserve already completed windows; resume the failed interval
+            # next run rather than discarding this entire successful batch.
+            print("IACR source unavailable; preserving",completed,
+                  "verified windows. Failed interval retained:",error,flush=True)
+            break
         if not full:
             parts=split_window(item)
             if not parts:
