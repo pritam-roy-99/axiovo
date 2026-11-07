@@ -3,7 +3,7 @@
 
 The video captures a real Chromium session with the current Axiovo interface.
 No stock slides, invented screenshots, third-party video services, or AI claims.
-Run after installing playwright/Chromium, Pillow, ffmpeg and espeak-ng.
+Run after installing playwright/Chromium, Pillow, ffmpeg and edge-tts.
 """
 from __future__ import annotations
 
@@ -18,7 +18,7 @@ import subprocess
 import tempfile
 import wave
 
-from scripts.tutorial_voice import VOICE, VOICE_VERSION, voice_text
+from tutorial_voice import VOICE, VOICE_VERSION
 
 from PIL import Image, ImageDraw, ImageFont
 from playwright.sync_api import sync_playwright
