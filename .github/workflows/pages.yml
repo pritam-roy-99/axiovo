@@ -120,6 +120,9 @@ jobs:
           echo 'No live bioRxiv results were available. Cached records are preserved, if any.' >> "$GITHUB_STEP_SUMMARY"
           echo '::warning::bioRxiv synchronization unsuccessful; review diagnostics in logs.'
       - name: Refresh verified ChemRxiv DOI metadata
+        # Code pushes publish the last verified snapshot; scheduled/manual
+        # refreshes contact the scholarly source independently.
+        if: github.event_name != 'push'
         id: chemrxiv
         continue-on-error: true
         run: python scripts/sync_chemrxiv.py
@@ -128,6 +131,7 @@ jobs:
       - name: Validate IACR ePrint OAI-PMH metadata parser
         run: python -m unittest discover -s tests -p test_eprint_harvest.py -v
       - name: Refresh official IACR Cryptology ePrint metadata
+        if: github.event_name != 'push'
         id: eprint
         continue-on-error: true
         env:
