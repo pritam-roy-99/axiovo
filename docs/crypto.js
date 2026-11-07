@@ -89,9 +89,16 @@
     const outcome=data.addComparison(p);
     compare.textContent=outcome==="full"?"Comparison full (5 papers)":outcome==="unavailable"?"Storage unavailable":"Added to comparison";
    };
+   const assistant=link("Research Assistant","./copilot.html?id="+encodeURIComponent("eprint:"+p.id));
+   assistant.className="rd-button rd-secondary";
+   if(p.abstract&&window.AxiovoAbstractAudio){
+    const listen=el("button","Listen to abstract","rd-button rd-secondary");
+    listen.type="button";listen.onclick=()=>window.AxiovoAbstractAudio.play([p]);
+    actions.append(listen);
+   }
    const original=link("Original record ↗",p.url);original.target="_blank";original.rel="noopener";
    original.className="rd-button rd-secondary";
-   actions.append(save,compare,original);article.append(actions);
+   actions.append(save,compare,assistant,original);article.append(actions);
    target.append(article);
   }
   if(pages>1){
