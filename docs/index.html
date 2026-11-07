@@ -12,10 +12,10 @@
 <link rel="stylesheet" href="./research-entry.css">
 <link rel="stylesheet" href="./axiovo-shell.css?v=20261107-unified2">
 <link rel="stylesheet" href="./research-desk.css">
-<link rel="stylesheet" href="./home-landing.css?v=20261107-readable-cta-v2">
+<link rel="stylesheet" href="./home-landing.css?v=20261107-home-return-v1">
 <script defer src="./theme.js"></script>
 <script defer src="./research-entry.js"></script>
-<script defer src="./navigation.js"></script>
+<script defer src="./navigation.js?v=20261107-home-return-v1"></script>
 <script defer src="./archive-taxonomy.js"></script>
 <script defer src="./arxiv-versions.js"></script>
 <script defer src="./archive-data.js"></script>
@@ -83,11 +83,17 @@
    <div><span class="axiovo-demo-tag">START HERE</span><h2 id="axiovo-tour-heading">See how Axiovo works</h2><p>One guided introduction to discovering, reading and organizing research.</p></div>
    <span class="axiovo-demo-subtitle">Narrated video · Real Axiovo interface</span>
   </div>
-  <video id="axiovo-home-video" class="axiovo-home-video" controls playsinline preload="none" poster="./assets/axiovo-tour-poster.svg?v=four-sources-2" aria-label="Narrated Axiovo website walkthrough">
+  <video id="axiovo-home-video" class="axiovo-home-video" controls playsinline preload="metadata" poster="./assets/axiovo-tour-poster.svg?v=four-sources-2" aria-label="Narrated Axiovo website walkthrough">
    <source src="./assets/axiovo-tour.mp4?v=four-sources-20261107" type="video/mp4">
    <track kind="captions" src="./assets/axiovo-tour.vtt?v=four-sources-20261107" srclang="en" label="English captions" default>
    Your browser does not support the video. Use the interactive guide.
   </video>
+  <div class="axiovo-tour-mode-switch" role="group" aria-label="Choose how to learn Axiovo">
+   <button type="button" class="rd-button rd-primary" id="axiovo-tour-show-video" aria-pressed="true">Watch tutorial video</button>
+   <button type="button" class="rd-button rd-secondary" id="axiovo-tour-show-guide" aria-pressed="false">Interactive step-by-step guide</button>
+   <button type="button" class="rd-button rd-secondary" id="axiovo-tour-retry-video" hidden>Retry video</button>
+  </div>
+  <p class="axiovo-tour-media-status rd-small" id="axiovo-tour-media-status" role="status" aria-live="polite"></p>
   <div class="axiovo-demo-frame" id="axiovo-tour" hidden aria-label="Interactive Axiovo product walkthrough">
    <div class="axiovo-demo-top"><span class="axiovo-demo-brand"><span aria-hidden="true">A</span> AXIOVO</span><span class="axiovo-demo-stage" id="axiovo-tour-counter">1 / 6</span></div>
    <div class="axiovo-demo-screen">
@@ -119,7 +125,7 @@
   </details>
  </div>
 </section>
-<script defer src="./home-tour.js?v=20261107-four-sources-2"></script>
+<script defer src="./home-tour.js?v=20261107-home-return-v1"></script>
 
 
 <section class="rd-home-section" aria-labelledby="axiovo-archive-title">
