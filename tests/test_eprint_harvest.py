@@ -15,6 +15,7 @@ class EprintTests(unittest.TestCase):
     def test_canonical_ids_do_not_invent_revisions(self):
         self.assertEqual(source.canonical("https://eprint.iacr.org/2026/2774"),"2026/2774")
         self.assertEqual(source.canonical("oai:eprint.iacr.org:2026/2774"),"2026/2774")
+        self.assertEqual(source.canonical("oai:eprint.iacr.org:2005/001"),"2005/001")
         for bad in ("2026/0","2026/2774v2","javascript:evil","2026/2774/other"):
             self.assertIsNone(source.canonical(bad))
     def test_original_metadata_and_dates(self):
@@ -46,6 +47,18 @@ class EprintTests(unittest.TestCase):
             self.assertEqual(output.read_bytes(),before)
             self.assertEqual(json.loads(before)["coverage"],"incremental-OAI-PMH-snapshot-not-full-history")
             self.assertTrue(json.loads(before)["no_claim_of_full_historical_coverage"])
+    def test_historical_completion_survives_incremental_refresh(self):
+        with tempfile.TemporaryDirectory() as folder:
+            out=Path(folder)/"eprint.json"
+            paper=source.parse_page(page())[0][0]
+            first=source.write_snapshot([paper],out=out,full_traversal=True)
+            self.assertTrue(first["historical_oai_traversal_complete"])
+            self.assertTrue(first["historical_oai_traversal_finished_at"])
+            recent=source.write_snapshot([paper],out=out,complete=True)
+            self.assertTrue(recent["historical_oai_traversal_complete"])
+            self.assertEqual(recent["historical_oai_traversal_finished_at"],
+                             first["historical_oai_traversal_finished_at"])
+            self.assertTrue(recent["no_claim_of_full_historical_coverage"])
     def test_deleted_record_is_respected(self):
         row=source.parse_page(page())[0][0]
         with tempfile.TemporaryDirectory() as folder:
