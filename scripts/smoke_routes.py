@@ -92,6 +92,26 @@ def main():
                           };
                         }""")
                         assert min(contrast.values())>=4.5,(width,"Unified Axiovo intro text illegible",contrast)
+                        if width<=390:
+                            geometry=page.evaluate("""() => {
+                              const rect=s=>{const r=document.querySelector(s).getBoundingClientRect();
+                                return {top:r.top,bottom:r.bottom,height:r.height,width:r.width}};
+                              return {
+                                copy:rect(".axiovo-welcome-copy"),
+                                actions:rect(".axiovo-welcome-actions"),
+                                tutorial:rect(".axiovo-welcome-media"),
+                                header:rect(".axiovo-welcome-header"),
+                                primary:rect(".axiovo-cta-primary"),
+                                secondary:rect(".axiovo-cta-outline"),
+                              };
+                            }""")
+                            gap=geometry["actions"]["top"]-geometry["copy"]["bottom"]
+                            assert 0<=gap<=45,(width,"Unexpected blank space before mobile homepage buttons",gap,geometry)
+                            assert geometry["copy"]["height"]<430,(width,"Mobile copy retains desktop minimum height",geometry)
+                            assert geometry["header"]["height"]<620,(width,"Welcome pushes tutorial below first screen",geometry)
+                            assert geometry["tutorial"]["top"]>=geometry["actions"]["bottom"],(width,"Tutorial overlaps buttons",geometry)
+                            assert abs(geometry["primary"]["top"]-geometry["secondary"]["top"])<=3,(width,"Mobile CTAs not aligned",geometry)
+
                     verified.append((width,path or "home"))
                 page.goto(base,wait_until="domcontentloaded")
                 page.locator(".axiovo-archive-card").first.wait_for()
