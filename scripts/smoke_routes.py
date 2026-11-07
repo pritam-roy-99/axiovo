@@ -209,6 +209,20 @@ def main():
                 assert page.locator("#axiovo-home-video").is_visible()
 
 
+                # A transient MP4 error must never silently swap the video
+                # for the six-card guide, on either viewport.
+                page.goto(base+"index.html?axiovo_return=1",wait_until="domcontentloaded")
+                page.locator("#axiovo-home-video").wait_for()
+                page.locator("#axiovo-home-video source").evaluate("el=>el.dispatchEvent(new Event('error'))")
+                assert page.locator("#axiovo-home-video").is_visible(),(width,"Video hidden after media error")
+                assert page.locator("#axiovo-tour").is_hidden(),(width,"Guide unexpectedly replaced video")
+                assert page.locator("#axiovo-tour-show-video").get_attribute("aria-pressed")=="true"
+                page.locator("#axiovo-tour-show-guide").click()
+                assert page.locator("#axiovo-tour").is_visible()
+                page.locator("#axiovo-tour-show-video").click()
+                assert page.locator("#axiovo-home-video").is_visible()
+                assert page.locator("#axiovo-tour").is_hidden()
+
                 # Explore in the global header must not bypass the Home
                 # tutorial by navigating directly to the archive-card anchor.
                 page.goto(base+"feed.html",wait_until="domcontentloaded")
