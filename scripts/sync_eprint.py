@@ -127,7 +127,7 @@ def collect(*,since,until=None,max_pages=12,pause=2.0):
         if pause:time.sleep(pause)
     return all_rows,complete
 
-def write_snapshot(rows,out=OUT,since=None,complete=False,*,permit_empty=False):
+def write_snapshot(rows,out=OUT,since=None,complete=False,*,permit_empty=False,full_traversal=None):
     out=Path(out)
     previous=None
     if out.exists():
@@ -147,6 +147,10 @@ def write_snapshot(rows,out=OUT,since=None,complete=False,*,permit_empty=False):
     if not combined and not permit_empty:
         raise ValueError("No valid ePrint records; old snapshot preserved")
     papers=sorted(combined.values(),key=lambda p:(p.get("date") or "",p["id"]),reverse=True)
+    verified_history=(previous or {}).get("historical_oai_traversal_complete",False) if full_traversal is None else bool(full_traversal)
+    completed_at=(previous or {}).get("historical_oai_traversal_finished_at")
+    if full_traversal is True:
+        completed_at=datetime.now(timezone.utc).isoformat(timespec="seconds")
     payload={
         "source":"eprint","provider":"IACR Cryptology ePrint Archive OAI-PMH",
         "generated_at":datetime.now(timezone.utc).isoformat(timespec="seconds"),
@@ -154,6 +158,8 @@ def write_snapshot(rows,out=OUT,since=None,complete=False,*,permit_empty=False):
         "complete_requested_window":bool(complete),
         "requested_from":since,
         "known_records":len(papers),
+        "historical_oai_traversal_complete":verified_history,
+        "historical_oai_traversal_finished_at":completed_at,
         "no_claim_of_full_historical_coverage":True,
         "papers":papers}
     out.parent.mkdir(parents=True,exist_ok=True)
