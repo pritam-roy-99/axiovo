@@ -45,7 +45,12 @@ function init(){
  function report(text){const target=$("crypto-personal-status");if(target)target.textContent=text}
  function ensureCustom(){
   for(const row of custom){
-   if(!row||!Object.hasOwn(taxonomy,row.field))continue;
+   if(!row||!row.name)continue;
+   if(row.kind==="subject"){
+    if(!Object.hasOwn(taxonomy,row.name))taxonomy[row.name]={};
+    continue;
+   }
+   if(!Object.hasOwn(taxonomy,row.field))continue;
    if(row.kind==="topic"){
     if(!Object.hasOwn(taxonomy[row.field],row.name))taxonomy[row.field][row.name]=[];
    }else if(row.kind==="subtopic"&&Object.hasOwn(taxonomy[row.field],row.topic)){
@@ -64,6 +69,9 @@ function init(){
   sync();
  }
  const path=()=>({field:field.value,topic:topic.value,subtopic:leaf.value});
+ const pathKey=storageKey+"-current";
+ function rememberPath(){try{localStorage.setItem(pathKey,JSON.stringify(path()))}catch{}}
+ function restorePath(){try{return JSON.parse(localStorage.getItem(pathKey)||"null")||{}}catch{return {}}}
  function redrawChips(id,items,chosen,select){
   const target=$(id);if(!target)return;
   target.replaceChildren();
@@ -98,26 +106,63 @@ function init(){
   const pieces=[field.value,topic.value,leaf.value?selected:""].filter(Boolean);
   const scope=$("crypto-scope-label");
   if(scope)scope.textContent="Scope: "+(pieces.join(" › ")||"all indexed cryptography research")+".";
+  rememberPath();
   renderSaved();
   document.dispatchEvent(new CustomEvent("axiovo:crypto-path-change",{detail:path()}));
  }
  function renderSaved(){
-  const target=$("crypto-saved-paths");if(!target)return;
-  target.replaceChildren();
-  for(const item of saved){
-   if(!item?.field)continue;
-   const row=document.createElement("div");row.className="ex-personal-row";
-   const jump=document.createElement("button");jump.type="button";jump.className="rd-button rd-secondary";
-   jump.textContent=[item.field,item.topic,item.label||item.subtopic].filter(Boolean).join(" › ");
-   jump.onclick=()=>{applyField(item.field,item.topic,item.subtopic);notify()};
-   const remove=document.createElement("button");remove.type="button";remove.className="rd-button rd-secondary";remove.textContent="Remove";
-   remove.setAttribute("aria-label","Remove saved research path");
-   remove.onclick=()=>{saved=saved.filter(p=>JSON.stringify(p)!==JSON.stringify(item));persist();renderSaved()};
-   row.append(jump,remove);target.append(row);
+  const target=$("crypto-saved-paths");
+  if(target){
+   target.replaceChildren();
+   for(const item of saved){
+    if(!item?.field)continue;
+    const row=document.createElement("div");row.className="ex-personal-row";
+    const jump=document.createElement("button");jump.type="button";jump.className="rd-button rd-secondary";
+    jump.textContent=[item.field,item.topic,item.label||item.subtopic].filter(Boolean).join(" › ");
+    jump.onclick=()=>{applyField(item.field,item.topic,item.subtopic);notify()};
+    const remove=document.createElement("button");remove.type="button";remove.className="rd-button rd-secondary";remove.textContent="Remove";
+    remove.setAttribute("aria-label","Remove saved research path");
+    remove.onclick=()=>{saved=saved.filter(p=>p!==item);persist();renderSaved()};
+    row.append(jump,remove);target.append(row);
+   }
   }
   const save=$("crypto-save-path");if(save)save.disabled=!field.value;
-  const customSubmit=$("crypto-custom-add");if(customSubmit)customSubmit.disabled=!field.value;
+  const kind=$("crypto-custom-kind")?.value||"subject";
+  const required=kind==="subject"||kind==="topic"&&!!field.value||kind==="subtopic"&&!!field.value&&!!topic.value;
+  const button=$("crypto-custom-add");
+  if(button){
+   button.disabled=!required;
+   button.textContent=kind==="subject"?"Add research subject":kind==="topic"?"Add research subfield":"Add sub-subtopic";
+  }
+  const hint=$("crypto-custom-hint");
+  if(hint)hint.textContent=kind==="subject"
+    ?"Create a personal research subject. It is not an official IACR category."
+    :kind==="topic"
+    ?field.value?"Add a subfield under "+field.value+".":"Select a research subject above before adding a subfield."
+    :topic.value?"Add a sub-subtopic under "+topic.value+".":"Select a research subject and subfield above first.";
+  const list=$("crypto-custom-list");
+  if(list){
+   list.replaceChildren();
+   for(const entry of custom){
+    const row=document.createElement("div");row.className="ex-personal-row";
+    const label=document.createElement("span");
+    label.textContent=[entry.field,entry.topic,entry.name].filter(Boolean).filter((x,i,arr)=>arr.indexOf(x)===i).join(" › ");
+    const remove=document.createElement("button");remove.type="button";remove.className="rd-button rd-secondary";remove.textContent="Remove";
+    remove.setAttribute("aria-label","Remove "+entry.name);
+    remove.onclick=()=>{
+     const current=path();custom=custom.filter(item=>item!==entry);persist();
+     // Rebuild from the original curated taxonomy, deleting only user-added entries.
+     if(entry.kind==="subject")delete taxonomy[entry.name];
+     else if(entry.kind==="topic")delete taxonomy[entry.field]?.[entry.name];
+     else if(taxonomy[entry.field]?.[entry.topic])
+      taxonomy[entry.field][entry.topic]=taxonomy[entry.field][entry.topic].filter(x=>x[1]!==entry.name);
+     applyField(current.field,current.topic,current.subtopic);notify();report("Personal research path removed.");
+    };
+    row.append(label,remove);list.append(row);
+   }
+  }
  }
+ $("crypto-custom-kind")?.addEventListener("change",renderSaved);
  field.addEventListener("change",()=>{applyField(field.value);notify()});
  topic.addEventListener("change",()=>{applyTopic(topic.value);notify()});
  leaf.addEventListener("change",()=>{notify(); const rows=taxonomy[field.value]?.[topic.value]||[];
@@ -155,17 +200,28 @@ function init(){
  $("crypto-custom-form")?.addEventListener("submit",event=>{
   event.preventDefault();
   const name=clean($("crypto-custom").value),kind=$("crypto-custom-kind").value;
-  if(!field.value||!name||(kind==="subtopic"&&!topic.value)){report("Select the parent research path first.");return}
-  const entry={field:field.value,topic:topic.value,kind,name};
-  if(kind==="topic"&&Object.hasOwn(taxonomy[field.value],name)){report("Topic already exists.");return}
-  if(kind==="subtopic"&&taxonomy[field.value][topic.value]?.some(row=>row[1]===name)){report("Subtopic already exists.");return}
+  if(!name){report("Enter a name for the new research path.");return}
+  if(kind==="topic"&&!field.value){report("Select a research subject first.");return}
+  if(kind==="subtopic"&&(!field.value||!topic.value)){report("Select a subject and subfield first.");return}
+  if(kind==="subject"&&Object.keys(taxonomy).some(x=>norm(x)===norm(name))){report("Research subject already exists.");return}
+  if(kind==="topic"&&Object.keys(taxonomy[field.value]).some(x=>norm(x)===norm(name))){report("Research subfield already exists.");return}
+  if(kind==="subtopic"&&taxonomy[field.value][topic.value]?.some(row=>norm(row[0])===norm(name))){report("Sub-subtopic already exists.");return}
+  const entry={field:kind==="subject"?name:field.value,topic:kind==="subtopic"?topic.value:"",kind,name};
   custom.push(entry);custom=custom.slice(-60);
-  ensureCustom();const current=path();applyField(current.field,kind==="topic"?name:current.topic,kind==="subtopic"?name:"");
-  $("crypto-custom").value="";persist();notify();report("Personal topic added. Matches use text from indexed IACR records.");
+  ensureCustom();
+  const current=path();
+  fill(field,Object.keys(taxonomy).map(label=>[label,label]),"All cryptography research");
+  if(kind==="subject")applyField(name);
+  else if(kind==="topic")applyField(current.field,name);
+  else applyField(current.field,current.topic,name);
+  $("crypto-custom").value="";
+  persist();notify();
+  report((kind==="subject"?"Research subject":kind==="topic"?"Research subfield":"Sub-subtopic")+" added. This is a personal keyword search path, not an official IACR classification.");
  });
  fill(field,Object.keys(taxonomy).map(name=>[name,name]),"All cryptography research");
  const params=new URLSearchParams(location.search);
- applyField(params.get("field")||"",params.get("topic")||"",params.get("subtopic")||"");
+ const previous=restorePath();
+ applyField(params.get("field")||previous.field||"",params.get("topic")||previous.topic||"",params.get("subtopic")||previous.subtopic||"");
  if(window.AxiovoSearchableSelect?.mount){
   for(const [node,label] of [[field,"Research subject"],[topic,"Research subfield"],[leaf,"Sub-subtopic"]]){
    try{pickers.push(window.AxiovoSearchableSelect.mount(node,label))}catch(error){console.error("ePrint searchable chooser",error)}
