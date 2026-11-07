@@ -1,0 +1,53 @@
+/* Cryptology Discover retains Axiovo's global design language. */
+.axiovo-crypto .rd-page{width:min(1320px,100%);padding-inline:clamp(14px,2.5vw,36px)}
+.crypto-hero{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:22px;
+ background:linear-gradient(130deg,#092339,#154965);color:#f3faff;padding:clamp(23px,3.5vw,46px);
+ border-radius:20px;margin:10px 0 15px}
+.crypto-heading{flex:1 1 400px;max-width:73ch}
+.crypto-heading h1{font-size:clamp(2.2rem,4vw,3.5rem);line-height:1.09;letter-spacing:-.045em;margin:10px 0 16px}
+.crypto-heading h1 span{color:#a5f0dc}
+.crypto-heading p{line-height:1.65}
+.crypto-heading a{color:#aff5e6}
+.crypto-heading .crypto-coverage{font-size:.88rem;color:#d4e9f2;margin-top:14px}
+.crypto-hero-actions{display:grid;gap:10px;min-width:210px}
+.crypto-source-links{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin-bottom:22px}
+.crypto-source-links a{min-height:46px;display:grid;place-items:center;text-align:center;padding:9px;
+ border:1px solid var(--rd-border);border-radius:10px;color:var(--rd-ink);background:var(--rd-surface);
+ text-decoration:none;font-size:.91rem;font-weight:750}
+.crypto-source-links a[aria-current="page"]{background:#e3f4ed;border-color:#74ac93;color:#154e3a}
+.crypto-discover{padding:clamp(17px,2.6vw,27px)}
+.crypto-section-head{display:flex;justify-content:space-between;align-items:end;gap:12px;flex-wrap:wrap;margin-bottom:15px}
+.crypto-section-head h2{font-size:clamp(1.35rem,2.5vw,2rem)}
+.crypto-discover form{display:grid;gap:12px}
+.crypto-discover form>label{font-size:.87rem;font-weight:750;color:var(--rd-ink)}
+.crypto-searchbar{display:flex;gap:10px;min-width:0}
+.crypto-searchbar input{flex:1;min-width:0}
+.crypto-searchbar input,.crypto-filter-grid input,.crypto-filter-grid select{min-height:46px;border:1px solid var(--rd-border);border-radius:10px;
+ background:var(--rd-surface);color:var(--rd-ink);padding:10px;font:inherit;width:100%;max-width:100%}
+.crypto-filter-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
+.crypto-filter-grid label{min-width:0;display:grid;gap:7px;font-size:.84rem;font-weight:700;color:var(--rd-ink)}
+.crypto-quick-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.crypto-results-section{margin:27px 0}
+.crypto-results{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+.crypto-paper{border:1px solid var(--rd-border);background:var(--rd-surface);color:var(--rd-ink);border-radius:15px;
+ padding:clamp(15px,2vw,22px);min-width:0;display:grid;align-content:start;gap:11px}
+.crypto-paper h3{font-size:1.12rem;line-height:1.42;margin:6px 0 0;overflow-wrap:anywhere}
+.crypto-paper h3 a{color:var(--rd-ink);text-decoration:none}
+.crypto-paper h3 a:hover{text-decoration:underline;color:var(--rd-link)}
+.crypto-paper-id{color:var(--rd-muted);font-size:.75rem}
+.crypto-paper-authors{font-size:.83rem;line-height:1.55;color:var(--rd-muted)}
+.crypto-paper details{font-size:.84rem;line-height:1.6;border-top:1px solid var(--rd-border);padding-top:10px}
+.crypto-paper summary{cursor:pointer;color:var(--rd-link);font-weight:700}
+.crypto-paper details p{padding-top:9px;max-height:250px;overflow:auto}
+.crypto-paper-actions{display:flex;gap:8px;flex-wrap:wrap}
+.crypto-paper-actions .rd-button{min-height:42px;font-size:.78rem}
+.crypto-pagination{display:flex;align-items:center;justify-content:center;gap:15px;padding:22px 0}
+.crypto-integrity{margin-bottom:24px;padding:20px}
+.crypto-integrity p{line-height:1.65;margin-top:10px}
+@media(max-width:950px){.crypto-filter-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:700px){.crypto-results{grid-template-columns:1fr}.crypto-filter-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:480px){.crypto-hero{padding:21px 17px;border-radius:15px}.crypto-hero-actions{width:100%}
+ .crypto-source-links{grid-template-columns:repeat(2,minmax(0,1fr))}.crypto-searchbar{flex-direction:column}
+ .crypto-searchbar button{min-height:46px}.crypto-filter-grid{grid-template-columns:1fr 1fr}
+ .crypto-filter-grid label:first-child{grid-column:1/-1}
+ .crypto-paper-actions .rd-button{flex:1 1 auto}}
