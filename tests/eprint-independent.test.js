@@ -10,7 +10,7 @@ function app(fetcher,store={}){
  class AbortController{constructor(){this.signal={}}abort(){}}
  const window={localStorage};
  vm.runInNewContext(code,{window,localStorage,fetch:fetcher,AbortController,setTimeout:()=>0,clearTimeout:()=>{},URL});
- return {api:window.AxiovoEprintSource,store};
+ return {api:window.AxiovoEprintSource,store,window,localStorage};
 }
 (async()=>{
  let calls=0;
@@ -33,6 +33,19 @@ function app(fetcher,store={}){
 
 
  assert.equal(good.api.filter(result.papers,{topicTerms:["quantum key distribution"]}).length,1);
+ // Shared Research Desk and My Feed use this same verified ePrint reader.
+ good.window.AxiovoArxiv={parse:()=>null};
+ vm.runInNewContext(fs.readFileSync("docs/archive-data.js","utf8"),{
+  window:good.window,localStorage:good.localStorage,URL,URLSearchParams,
+  AbortSignal,Event,fetch:async()=>{throw Error("Shared source fallback was bypassed");}
+ });
+ const shared=await good.window.AxiovoArchiveData.snapshot("eprint");
+ assert.equal(shared.papers.length,1);
+ assert.equal(shared.papers[0].url,"https://eprint.iacr.org/2026/1234");
+ const viaDesk=await good.window.AxiovoArchiveData.live("eprint",{q:"2026/1234"});
+ assert.equal(viaDesk.papers.length,1);
+ assert.match(viaDesk.provider,/IACR OAI-PMH/);
+
  const down=app(async()=>{throw Error("offline")},{"axiovo-eprint-verified-fallback-v1":
   JSON.stringify({stamp:"2026-11-06",papers:fixture.papers})});
  const cached=await down.api.load();
