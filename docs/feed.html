@@ -47,7 +47,7 @@
   <section class="feed-side-card" id="feed-follow-tools" aria-labelledby="feed-followed-heading">
    <h2 id="feed-followed-heading">Tune your feed</h2>
    <p>Follow a researcher or a precise topic. Your changes also appear across Axiovo.</p>
-   <form id="feed-author-form" class="feed-follow-form"><label for="feed-author-input">Follow a researcher</label><div><input id="feed-author-input" type="search" placeholder="Enter an author’s name" maxlength="120" required><button type="submit">Follow</button></div></form>
+   <p class="feed-author-warning">Names alone cannot verify a researcher. By default, My Feed requires matching research topics too.</p><label class="feed-uncertain-option"><input type="checkbox" id="feed-show-unverified-names"> Include possible author-name matches without topic evidence <small>(may include different researchers with the same name)</small></label><form id="feed-author-form" class="feed-follow-form"><label for="feed-author-input">Follow a researcher</label><div><input id="feed-author-input" type="search" placeholder="Enter an author’s name" maxlength="120" required><button type="submit">Follow</button></div></form>
    <form id="feed-topic-form" class="feed-follow-form"><label for="feed-topic-input">Follow a research subtopic</label><div><input id="feed-topic-input" type="search" placeholder="Enter a topic you want to follow" maxlength="120" required><button type="submit">Follow</button></div></form>
    <p id="feed-follow-status" role="status" class="feed-follow-status"></p>
    <p class="feed-side-label">Followed authors</p><div id="feed-followed-authors" class="feed-chips"></div>
