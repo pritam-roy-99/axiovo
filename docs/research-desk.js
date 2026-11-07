@@ -252,8 +252,8 @@ async function runSearch(search=readForm()){
  const {signal}=controller;
  $("rd-results").replaceChildren();$("rd-source-jumps").replaceChildren();lanes.clear();
  let sources=search.sources;
- const arxiv=window.AxiovoArxiv.parse(search.q),doi=data.parseDOI(search.q);
- const target=arxiv||doi.startsWith("10.48550/arxiv.")?"arxiv":doi.startsWith("10.26434/")?"chemrxiv":/^10\.(?:1101|64898)\//.test(doi)?"biorxiv":"";
+ const arxiv=window.AxiovoArxiv.parse(search.q),doi=data.parseDOI(search.q),eprint=data.eprintIdentifier(search.q);
+ const target=eprint?"eprint":arxiv||doi.startsWith("10.48550/arxiv.")?"arxiv":doi.startsWith("10.26434/")?"chemrxiv":/^10\.(?:1101|64898)\//.test(doi)?"biorxiv":"";
  if(target){
   if(!sources.includes(target)){
    message.textContent="Select "+data.names[target]+" to look up this identifier.";
