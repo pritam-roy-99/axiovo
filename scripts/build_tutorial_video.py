@@ -104,7 +104,7 @@ def main():
         ("Save your research path", "Create, follow and restore personal topics.", "You can add personal topics and subtopics, save frequently used research paths, and restore defaults when needed.", "arxiv.html?category=math-ph&topic=quantum-many-body-theory", "#archive-custom-form", ("openclass", ".ex-personal")),
         ("bioRxiv Discover", "Browse independent biology subject areas.", "The bioRxiv Discover page has its own biology taxonomy, searchable topic selectors, and preprint search.", "biorxiv.html?category=Genomics&topic=transcriptomics&subtopic=spatial-transcriptomics", "#archive-topic-input", None),
         ("ChemRxiv Discover", "Browse independent chemistry subject areas.", "ChemRxiv provides searchable chemistry subject and topic dropdowns while keeping the source of each paper visible.", "chemrxiv.html?category=Catalysis&topic=electrocatalysis&subtopic=electrochemical-co2-reduction", "#archive-topic-input", None),
-        ("Cryptology ePrint Discover", "Explore cryptography and quantum security.", "The Cryptology ee print page opens records from the I A C R archive, including quantum cryptography, post-quantum cryptography, signatures and security protocols. Select a topic to narrow the indexed records.", "crypto.html", "#crypto-topic", ("select", "crypto-topic", "quantum cryptography")),
+        ("Cryptology ePrint Discover", "Explore cryptography and quantum security.", "The Cryptology ee print page opens records from the I A C R archive, including quantum cryptography, post-quantum cryptography, signatures and security protocols. Type a research topic and select the matching suggestion to narrow indexed records.", "crypto.html", "#crypto-topic-find", ("crypto-search", "quantum cryptography")),
         ("Exact IACR paper identities", "Check original ePrint year and number.", "Search by title, author or a Cryptology ee print identifier such as 2026 slash 1234. Read each source-linked abstract, save a paper to Library or compare its metadata. Because backfill is ongoing, always use the original I A C R search when the local index lacks a paper.", "crypto.html?topic=quantum+cryptography", ".crypto-searchbar", None),
         ("Cross-archive Research Desk", "Choose one or more sources.", "Open Research Desk to search all four preprint archives in one place. Results remain separated by their original archive.", "desk.html", "#rd-search-form", None),
         ("Search across sources", "Enter a query once for all selected archives.", "Enter research keywords in Research Desk, then click Search preprints to check arXiv, bioRxiv, ChemRxiv and Cryptology ee print together.", "desk.html", "#rd-query", ("rd-query", "graph neural networks")),
@@ -148,6 +148,11 @@ def main():
                             page.locator("#"+action[1]).evaluate("el=>el.open=true")
                         elif action[0]=="select":
                             page.locator("#"+action[1]).select_option(action[2])
+                        elif action[0]=="crypto-search":
+                            # Use the visible search-and-suggestion interaction, not
+                            # a native select hidden by the searchable-select UI.
+                            page.locator("#crypto-topic-find").fill(action[1])
+                            page.locator("#crypto-topic-suggestions button").first.click(timeout=8000)
                         elif action[0]=="openclass":
                             page.locator(action[1]).first.evaluate("el=>el.open=true")
                         elif action[0]=="hosted":

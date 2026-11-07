@@ -40,6 +40,9 @@ class IntroVideoTests(unittest.TestCase):
         self.assertIn("sync_playwright()",source)
         self.assertIn("page.screenshot(",source)
         self.assertIn("axiovo-tour-build.json",source)
+        self.assertIn('("crypto-search", "quantum cryptography")',source)
+        self.assertIn('#crypto-topic-suggestions button',source)
+        self.assertNotIn('("select", "crypto-topic", "quantum cryptography")',source)
 
 if __name__=="__main__":
     unittest.main()
