@@ -203,6 +203,17 @@ jobs:
         run: |
           python -m unittest discover -s tests -p test_literature_coverage.py -v
           python -m scripts.audit_literature_coverage
+      - name: Build honest four-source freshness summary
+        run: |
+          python scripts/build_source_freshness.py
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          summary=json.loads(Path("docs/data/source-freshness.json").read_text("utf8"))
+          assert summary["schema_version"]==1
+          assert set(summary["sources"])=={"arxiv","biorxiv","chemrxiv","eprint"}
+          assert Path("docs/data/source-freshness.json").stat().st_size < 8000
+          PY
       - name: Generate smaller My Feed first-paint preview
         run: |
           python scripts/build_feed_preview.py
@@ -263,6 +274,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/data/source-freshness.json
           git add docs/data/literature-health.json docs/data/feed.json docs/data/biorxiv.json docs/data/chemrxiv.json docs/data/arxiv-days/ docs/data/oai-recent.json docs/data/announcements.json docs/data/records/ docs/data/coverage.json docs/data/needs_review.json docs/data/taxonomy.json docs/data/index/v1/ docs/data/taxonomy/v1.json
           git add -A docs/data/eprint.json docs/data/eprint-backfill-state.json 2>/dev/null || true
           if ! git diff --cached --quiet; then
