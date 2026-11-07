@@ -20,60 +20,89 @@
    const status=document.getElementById("axiovo-tour-media-status");
    let mode="video";
    let unavailable=false;
+   let failures=0;
+   let retryTimer=null;
+   const MAX_RETRIES=2;
+   const clearRetry=()=>{if(retryTimer!==null){clearTimeout(retryTimer);retryTimer=null}};
+   const setStatus=message=>{if(status)status.textContent=message};
    function display(next){
     mode=next;
-    const isVideo=mode==="video";
+    const isVideo=next==="video";
     video.hidden=!isVideo;
     root.hidden=isVideo;
     watch?.setAttribute("aria-pressed",String(isVideo));
     guide?.setAttribute("aria-pressed",String(!isVideo));
+    if(watch)watch.classList.toggle("rd-primary",isVideo);
+    if(guide)guide.classList.toggle("rd-primary",!isVideo);
+    if(retry)retry.hidden=!unavailable;
     if(isVideo){
-     if(video.paused&&video.readyState===0&&!unavailable)video.load();
-     status.textContent=unavailable?
-      "Video currently unavailable. Retry the recording or use the interactive guide.":
-      "Watch the narrated tutorial, or switch to the interactive guide.";
+     setStatus(unavailable?
+      "The recorded video is currently unavailable. Retry video, or choose the interactive guide.":
+      "Recorded walkthrough. Select Play to watch, or choose the interactive guide.");
     }else{
      video.pause();
-     status.textContent="Interactive guide selected. Switch back to the narrated video whenever you prefer.";
+     setStatus("Interactive guide selected. The recorded video remains available in the Watch tutorial tab.");
     }
-    if(retry)retry.hidden=!unavailable;
    }
-   function videoReady(){
+   function retryLoad(){
+    if(!video.isConnected||mode!=="video")return;
+    clearRetry();
     unavailable=false;
     if(retry)retry.hidden=true;
+    setStatus("Reconnecting to the recorded tutorial…");
+    // A new media request, not a page reload; saved research preferences remain untouched.
+    video.load();
+   }
+   function videoReady(){
+    clearRetry();
+    failures=0;
+    unavailable=false;
     if(mode==="video")display("video");
+    else if(retry)retry.hidden=true;
    }
    function videoError(){
+    // Source-level errors may fire while another candidate or the media
+    // element is still loading. Do not react after playable data arrives.
+    if(video.readyState>=HTMLMediaElement.HAVE_METADATA)return;
+    if(retryTimer!==null)return;
+    if(failures<MAX_RETRIES&&navigator.onLine!==false){
+     failures++;
+     setStatus("The tutorial is reconnecting ("+failures+"/"+MAX_RETRIES+").");
+     retryTimer=setTimeout(()=>{retryTimer=null;retryLoad()},1000*failures);
+     return;
+    }
     unavailable=true;
-    if(mode==="video"){
-     // Never silently replace the video with unrelated homepage cards.
-     // The explicit tutorial controls remain visible even when the MP4 fails.
-     display("video");
-    }else if(retry)retry.hidden=false;
+    if(retry)retry.hidden=false;
+    if(mode==="video")display("video");
+    // Never switch the user to the interactive guide automatically.
    }
    video.addEventListener("loadedmetadata",videoReady);
    video.addEventListener("canplay",videoReady);
    video.addEventListener("error",videoError);
    video.querySelectorAll("source").forEach(source=>source.addEventListener("error",videoError));
-   watch?.addEventListener("click",()=>display("video"));
-   guide?.addEventListener("click",()=>display("guide"));
-   retry?.addEventListener("click",()=>{
-    unavailable=false;
-    if(retry)retry.hidden=true;
-    video.load();
+   watch?.addEventListener("click",()=>{
     display("video");
+    if(unavailable){failures=0;retryLoad()}
    });
+   guide?.addEventListener("click",()=>{clearRetry();display("guide")});
+   retry?.addEventListener("click",()=>{failures=0;display("video");retryLoad()});
+   window.addEventListener("online",()=>{
+    if(unavailable&&mode==="video"){failures=0;retryLoad()}
+   });
+   window.addEventListener("pagehide",clearRetry);
    window.addEventListener("pageshow",event=>{
-    // Returning from My Feed or any other page must show the actual
-    // homepage tutorial, never leave a restored interactive-guide state
-    // or a blank media surface in place of it.
-    if(event.persisted || new URLSearchParams(location.search).has("axiovo_return")){
-     unavailable=false;
-     if(video.readyState===0)video.load();
+    if(event.persisted||new URLSearchParams(location.search).has("axiovo_return")){
+     // BFCache restores media as well as scroll position. Reset the
+     // tutorial presentation without forcing autoplay or switching guides.
+     clearRetry();
+     failures=0;unavailable=false;
      display("video");
+     if(video.readyState===0)retryLoad();
     }else display(mode);
    });
    display("video");
+   // preload=metadata is enough; don't request the MP4 repeatedly before
+   // the media element reports an actual failure.
   }
   const overline=document.getElementById("axiovo-tour-overline"),title=document.getElementById("axiovo-tour-title"),description=document.getElementById("axiovo-tour-description"),illustration=document.getElementById("axiovo-tour-illustration"),counter=document.getElementById("axiovo-tour-counter"),progress=document.getElementById("axiovo-tour-progress"),action=document.getElementById("axiovo-tour-action"),prev=document.getElementById("axiovo-tour-prev"),next=document.getElementById("axiovo-tour-next");
   let current=0;const dots=[];
