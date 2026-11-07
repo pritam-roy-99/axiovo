@@ -18,6 +18,8 @@ import subprocess
 import tempfile
 import wave
 
+from scripts.tutorial_voice import VOICE, VOICE_VERSION, voice_text
+
 from PIL import Image, ImageDraw, ImageFont
 from playwright.sync_api import sync_playwright
 
@@ -64,20 +66,6 @@ def cue(t):
     ms=round(t*1000)
     return f"{ms//3600000:02}:{ms//60000%60:02}:{ms//1000%60:02}.{ms%1000:03}"
 
-
-def voice_text(value):
-    """Pronunciation hints for technical words in spoken text only."""
-    return (value.replace("Axiovo","Ax-ee-oh-voh")
-      .replace("bioRxiv","bio archive").replace("ChemRxiv","chem archive").replace("Cryptology ePrint","Cryptology ee print")
-      .replace("arXiv","archive").replace("DOI","D O I")
-      .replace("Ollama","Oh llama").replace("Qwen","Q wen")
-      .replace("Kimi","Kee mee").replace("OpenRouter","Open Router")
-      .replace("WebGPU","Web G P U"))
-
-async def neural_speech(text,path):
-    import edge_tts
-    speaker=edge_tts.Communicate(voice_text(text),voice="en-IN-NeerjaNeural",rate="-7%",pitch="+4Hz")
-    await speaker.save(str(path))
 
 def media_duration(path):
     return float(subprocess.check_output([
@@ -133,7 +121,6 @@ def main():
             audio_entries=[]
             captions=["WEBVTT",""]
             voices_used=set()
-            neural_available=True
             chapters=[]
             elapsed=0.0
             with sync_playwright() as p:
@@ -171,26 +158,14 @@ def main():
                     page.screenshot(path=str(shot))
                     stamp(shot,title,hint,index,target)
                     sound=work/f"{index:02d}.mp3"
-                    if neural_available:
-                        try:
-                            # Separate process because Playwright's sync API
-                            # already owns the event loop. One failed network
-                            # attempt disables neural TTS for all later scenes.
-                            subprocess.run([
-                                "python","-c",
-                                "import asyncio,edge_tts,sys; asyncio.run(edge_tts.Communicate(sys.argv[1],voice='en-IN-NeerjaNeural',rate='-7%',pitch='+4Hz').save(sys.argv[2]))",
-                                voice_text(narration),str(sound)
-                            ],check=True,timeout=9,stdout=subprocess.DEVNULL,stderr=subprocess.PIPE)
-                            if not sound.is_file() or sound.stat().st_size < 1000:
-                                raise RuntimeError("Neural narration output was empty")
-                            voice="Neerja neural Indian English"
-                        except Exception as exc:
-                            neural_available=False
-                            print(f"WARNING: Indian neural voice unavailable; using labeled female offline fallback: {str(exc)[:120]}",flush=True)
-                    if not neural_available:
-                        sound=work/f"{index:02d}.wav"
-                        subprocess.run(["espeak-ng","-v","en+f3","-s","138","-w",str(sound),voice_text(narration)],check=True)
-                        voice="eSpeak female fallback"
+                    # Use a single professional female neural voice across all
+                    # chapters. A transient TTS failure retries; it must never
+                    # downgrade the whole tutorial to robotic eSpeak.
+                    subprocess.run([
+                        "python", "-m", "scripts.tutorial_voice",
+                        narration, str(sound), "--voice", VOICE
+                    ], check=True, timeout=180)
+                    voice=VOICE
                     voices_used.add(voice)
                     # Convert every clip to one PCM format before ffmpeg concatenation.
                     pcm=work/f"{index:02d}-pcm.wav"
@@ -219,6 +194,7 @@ def main():
             (OUT/"axiovo-tour.vtt").write_text("\n".join(captions)+"\n",encoding="utf-8")
             (OUT/"axiovo-tour-build.json").write_text(json.dumps({
                 "scenes":len(steps),"duration_seconds":round(elapsed,1),"voices":sorted(voices_used),
+                "voice_version":VOICE_VERSION,"voice_engine":"edge-tts-neural","voice_locale":"en-US",
                 "chapters":chapters,
                 "source":"Real Chromium page captures","pronunciation":"Spoken-word technical corrections"
             },indent=2),encoding="utf-8")
