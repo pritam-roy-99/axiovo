@@ -3,7 +3,7 @@
  "use strict";
  const data=window.AxiovoArchiveData,$=id=>document.getElementById(id);
  // Topic controls must initialize even when the scholarly metadata service is unavailable.
- let papers=[],shown=[],page=1,loaded=false,stamp="",complete=false;
+ let papers=[],shown=[],page=1,loaded=false,stamp="",complete=false,offlineSubset=false,sourceName="";
  const form=$("crypto-search-form");
  const fields=["query","field","topic","subtopic","author","sort","from","to"];
  function el(tag,text,cls){
@@ -59,14 +59,14 @@
   }
   // The existing archive matcher is reused for exact-ID, dates and authors.
   // Theme selections are a transparent keyword refinement, NOT provider taxonomy.
-  shown=data?.filter?data.filter(papers,c):[];
+  shown=window.AxiovoEprintSource?.filter?window.AxiovoEprintSource.filter(papers,c):data?.filter?data.filter(papers,c):[];
   if(c.sort==="title")shown.sort((a,b)=>a.title.localeCompare(b.title)||a.id.localeCompare(b.id));
   const perPage=12;
   const total=shown.length,pages=Math.max(1,Math.ceil(total/perPage));
   page=Math.max(1,Math.min(page,pages));
   const visible=shown.slice((page-1)*perPage,page*perPage);
-  status.textContent=total+" of "+papers.length+" indexed IACR records match. "+
-   (complete?"Completed all available OAI metadata-date windows. Some source records may not be exposed.":"Coverage is partial; not all historical papers are indexed.");
+  status.textContent=total+" of "+papers.length+" "+(offlineSubset?"locally saved source-verified records":"indexed IACR records")+" match. "+
+   (offlineSubset?"Offline subset: coverage is limited and may be outdated.":complete?"Completed available OAI metadata-date windows. Some source records may not be exposed.":"Coverage is partial; not all historical papers are indexed.");
   if(!total){
    target.append(el("p","No match in Axiovo's available IACR metadata. This does not mean the original archive has no such paper.","rd-small"));
    const official=link("Search IACR ePrint directly ↗","https://eprint.iacr.org/search");
@@ -83,17 +83,17 @@
    article.append(el("p",p.authors.join(", ")||"Authors not provided by source","crypto-paper-authors"));
    if(p.abstract){const abs=el("details");abs.append(el("summary","Read original abstract"),el("p",p.abstract));article.append(abs)}
    const actions=el("div",undefined,"crypto-paper-actions");
-   const save=el("button",data.saved(p)?"★ Saved":"☆ Save","rd-button rd-secondary");
-   save.type="button";save.setAttribute("aria-pressed",String(data.saved(p)));
+   const save=el("button",data?.saved?.(p)?"★ Saved":"☆ Save","rd-button rd-secondary");
+   save.type="button";save.setAttribute("aria-pressed",String(!!data?.saved?.(p)));
    save.onclick=()=>{
-    const yes=data.saved(p);const ok=yes?data.unsave(p):data.save(p);
+    const yes=data?.saved?.(p);const ok=yes?data?.unsave?.(p):data?.save?.(p);
     if(!ok){$("crypto-results-status").textContent="Could not update Library storage.";return}
     save.textContent=yes?"☆ Save":"★ Saved";
     save.setAttribute("aria-pressed",String(!yes));
    };
    const compare=el("button","Add to comparison","rd-button rd-secondary");
    compare.type="button";compare.onclick=()=>{
-    const outcome=data.addComparison(p);
+    const outcome=data?.addComparison?.(p)||"unavailable";
     compare.textContent=outcome==="full"?"Comparison full (5 papers)":outcome==="unavailable"?"Storage unavailable":"Added to comparison";
    };
    const assistant=link("Research Assistant","./copilot.html?id="+encodeURIComponent("eprint:"+p.id));
@@ -144,21 +144,37 @@
  };
  window.addEventListener("storage",e=>{if(e.key==="axiovo-eprint-reading-v1")render()});
  fromURL();
- if(!data?.snapshot){
-  loaded=true;papers=[];
-  $("crypto-coverage-count").textContent="IACR metadata temporarily unavailable";
-  render();
-  return;
- }
- data.snapshot("eprint").then(value=>{
+ function applySnapshot(value){
   papers=Array.isArray(value.papers)?value.papers:[];
-  stamp=value.stamp;complete=value.fullOaiTraversal===true;loaded=true;
-  $("crypto-coverage-count").textContent=papers.length+" verified-source records indexed"+
-   (stamp?" · updated "+stamp.slice(0,10):"")+(complete?" · full available OAI history traversed":" · history incomplete");
+  stamp=value.stamp||"";
+  complete=value.fullOaiTraversal===true;
+  offlineSubset=value.cache===true;
+  sourceName=value.source||"IACR OAI-PMH";
+  loaded=true;
+  $("crypto-coverage-count").textContent=papers.length.toLocaleString()+
+   (offlineSubset?" saved source-verified records (offline subset)":" verified-source records indexed")+
+   (stamp?" · snapshot "+stamp.slice(0,10):"")+
+   (complete?" · available history traversed":" · history incomplete");
+  $("crypto-index-note").textContent=offlineSubset?
+   "Offline fallback contains only a small source-verified subset. Reconnect for the complete published index.":
+   "Records from "+sourceName+". Axiovo's index is not the complete IACR historical archive.";
   render();
- }).catch(()=>{
-  loaded=true;papers=[];
-  $("crypto-coverage-count").textContent="IACR metadata unavailable · official archive remains accessible";
-  render();
- });
+ }
+ async function loadEprint(force=false){
+  const button=$("crypto-retry");
+  if(button)button.disabled=true;
+  loaded=false;render();
+  try{
+   if(!window.AxiovoEprintSource?.load)throw Error("Independent ePrint loader unavailable");
+   applySnapshot(await window.AxiovoEprintSource.load({force}));
+  }catch(error){
+   loaded=true;papers=[];offlineSubset=false;render();
+   $("crypto-coverage-count").textContent="Indexed data unavailable · retry or search IACR directly";
+   $("crypto-index-note").textContent="The indexed snapshot could not be retrieved. No papers or citation data were fabricated.";
+   $("crypto-results-status").textContent="Unable to load source-verified records. "+String(error.message||error).slice(0,180);
+  }finally{if(button)button.disabled=false}
+ }
+ $("crypto-retry")?.addEventListener("click",()=>loadEprint(true));
+ loadEprint();
+
 })();
