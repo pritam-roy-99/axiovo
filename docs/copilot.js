@@ -93,27 +93,35 @@ function evidenceText(query){
   "Source evidence could not be summarized. Check the original records.";
 }
 async function findPaper(id,allowPublicLookup=false){
- const iacr=Archive?.eprintIdentifier(id);
- if(iacr){
-  const known=index.find(p=>p.id==="eprint:"+iacr);
-  if(known)return Archive.normalize("eprint",{id:iacr,...known});
+ const cryptoId=Archive?.eprintIdentifier?.(id);
+ if(cryptoId){
+  const existing=index.find(p=>p.source==="eprint"&&
+    (p.recordId===cryptoId||p.id==="eprint:"+cryptoId));
+  if(existing)return Archive.normalize("eprint",{...existing,id:cryptoId,recordId:cryptoId});
+  if(!Archive?.snapshot)return null;
   try{
    const batch=await Archive.snapshot("eprint");
-   return batch.papers.find(p=>p.id===iacr)||null;
+   return batch.papers.find(p=>p.id===cryptoId)||null;
   }catch{return null}
  }
- const parsed=window.AxiovoArxiv?.parse(id);
+ const parsed=window.AxiovoArxiv?.parse?.(id);
  if(!parsed)return null;
  for(const record of index){
   if(window.AxiovoArxiv.base(record.id)!==parsed.base)continue;
-  const cached=Archive?.normalize("arxiv",record);
-  if(cached&&(!parsed.explicit||cached.recordId===parsed.requested))return cached;
+  const cached=Archive?.normalize?.("arxiv",record);
+  if(cached&&(!parsed.explicit||cached.recordId.toLowerCase()===parsed.requested.toLowerCase()))
+   return cached;
  }
- if(allowPublicLookup&&!parsed.explicit&&Archive){
-  try{return (await Archive.live("arxiv",{q:parsed.base})).papers[0]||null}catch{}
- }
- return null;
+ if(!allowPublicLookup||!Archive?.live)return null;
+ try{
+  const result=await Archive.live("arxiv",{q:parsed.base});
+  // Never treat the first bibliographic hit as a verified exact-ID result.
+  // An explicit revision cannot be authenticated by an unversioned DOI record.
+  if(parsed.explicit)return null;
+  return result.papers.find(p=>p.source==="arxiv"&&p.id===parsed.base)||null;
+ }catch{return null}
 }
+
 function paperSummary(p,draft){
  const abstract=p?.abstract||draft;
  if(!abstract)return "The abstract for this identifier is unavailable in the current index.";
@@ -328,18 +336,22 @@ async function submit(){
  record("user",question||"Inspect the supplied abstract");
  try{
   await indexReady;
-  const paper=id?await findPaper(id,$("retrieval-scope").value==="all"):null;
+  const paper=id?await findPaper(id,true):null;
   const found=mode==="claims"?[]:retrieved(paper?.title||query,draft);
   // Match sources to the whole question, not to a single broad word.
   let candidates=found;
-  if(mode!=="claims"&&!id&&question.length>=3&&!draft&&$("retrieval-scope").value==="all"){
+  // Public lookup is the normal path for questions outside the limited local
+  // snapshot. Keep indexed evidence usable when a provider is down.
+  if(mode!=="claims"&&!id&&question.length>=3&&!draft&&
+     ($("retrieval-scope").value==="all"||candidates.length===0)){
    try{candidates=[...candidates,...await widerArxiv(question)]}
-   catch{rstatus("Public metadata lookup failed; showing only relevant indexed papers.")}
+   catch{rstatus("Public metadata could not be retrieved. Showing only matching indexed source records.");}
   }
   if(mode!=="claims"&&Core){
    candidates=Core.rank(paper?.title||query,candidates,12).map(x=>({...x.paper,score:x.score}));
   }
-  if(paper)candidates.unshift({...paper,provider:paper.provenance||"arXiv indexed metadata"});
+  if(paper)candidates.unshift({...paper,provider:paper.provenance||
+    (paper.source==="eprint"?"IACR Cryptology ePrint":"arXiv indexed metadata")});
   addSources(candidates,false);
   rstatus(sources.length+" relevant source"+(sources.length===1?"":"s")+
    " from available metadata; historical coverage is not guaranteed.");
@@ -356,8 +368,10 @@ async function submit(){
  finally{setBusy(false)}
 }
 function showOriginalLink(id){
- const original=append("a"," Check arXiv for "+id+" ↗",$("retrieval-status"));
- original.href=arxivUrl(id);original.target="_blank";original.rel="noopener noreferrer";
+ const crypto=Archive?.eprintIdentifier?.(id);
+ const original=append("a",crypto?" Open original IACR ePrint "+crypto+" ↗":" Open original arXiv "+id+" ↗",$("retrieval-status"));
+ original.href=crypto?"https://eprint.iacr.org/"+crypto:arxivUrl(id);
+ original.target="_blank";original.rel="noopener noreferrer";
 }
 function setBusy(active){
  busy=active;
@@ -412,7 +426,7 @@ function pickerOptions(query=""){
  }
  const oldA=root.value||selectedPaperId,oldB=other.value;fill(root,oldA);fill(other,oldB);
  if(!root.value&&choices.some(p=>p.id===selectedPaperId))root.value=selectedPaperId;
- $("paper-status").textContent=index.length+" indexed arXiv metadata records available. Select a paper to investigate.";
+ $("paper-status").textContent=index.length+" indexed source records available. Select a paper to investigate.";
 }
 function chosenPaper(selectId="paper-picker"){
  const selected=$(selectId).value;return index.find(p=>p.id===selected)||null
@@ -548,5 +562,10 @@ const indexReady=fetch("data/feed.json",{cache:"no-cache",signal:AbortSignal.tim
   if(normalized.every(id=>index.some(p=>p.id===id)))comparePapers();
   else $("paper-status").textContent="At least one requested paper is outside the local index. Open both originals before interpreting an AI comparison.";
  }
-}).catch(()=>rstatus("Local index unavailable. Public metadata search is available from Search more arXiv records."));
+}).catch(error=>{
+ index=[];indexVersion="unavailable";
+ rstatus("Local index is unavailable ("+String(error.message||error).slice(0,90)+"). Public source search and exact paper lookup remain available.");
+ // Retrieval must not depend on a successful download of the recent cache.
+ void loadIacrSources();
+});
 engineChange();
