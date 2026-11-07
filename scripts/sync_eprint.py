@@ -26,7 +26,7 @@ ROOT=Path(__file__).resolve().parents[1]
 OUT=ROOT/"docs/data/eprint.json"
 NAMESPACE={"o":"http://www.openarchives.org/OAI/2.0/",
            "d":"http://purl.org/dc/elements/1.1/"}
-ID=re.compile(r"(?:^|/|:)((?:19|20)\d{2})/([1-9]\d{0,5})(?:$|[?#])")
+ID=re.compile(r"(?:^|/|:)((?:19|20)\d{2})/(\d{1,6})(?:$|[?#])")
 USER_AGENT="AxiovoPublicMetadataHarvester/1.0 (github.com/pritam-roy-99/axiovo; contact via repository issues)"
 RETRYABLE={429,500,502,503,504}
 
@@ -39,8 +39,8 @@ def canonical(raw):
         value=value.removeprefix("oai:eprint.iacr.org:")
     elif value.startswith("eprint:"):
         value=value.removeprefix("eprint:")
-    match=re.fullmatch(r"((?:19|20)\d{2})/([1-9]\d{0,5})",value)
-    return f"{match[1]}/{int(match[2])}" if match else None
+    match=re.fullmatch(r"((?:19|20)\d{2})/(\d{1,6})",value)
+    return f"{match[1]}/{match[2]}" if match and int(match[2])>0 else None
 
 def date_only(value):
     value=str(value or "").strip()
