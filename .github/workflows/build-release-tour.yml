@@ -11,6 +11,9 @@ on:
     paths:
       - .github/workflows/build-release-tour.yml
   workflow_dispatch:
+concurrency:
+  group: axiovo-release-tour
+  cancel-in-progress: true
 jobs:
   build-video:
     runs-on: ubuntu-latest
@@ -45,5 +48,7 @@ jobs:
           git add docs/assets/axiovo-tour.mp4 docs/assets/axiovo-tour.vtt docs/assets/axiovo-tour-build.json
           if ! git diff --cached --quiet; then
             git commit -m "build: publish narrated tutorial recorded from Axiovo pages"
+            git fetch origin release/reliability-2026-11-07
+            git rebase FETCH_HEAD
             git push origin HEAD:release/reliability-2026-11-07
           fi
