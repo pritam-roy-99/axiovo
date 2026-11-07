@@ -69,6 +69,11 @@
    (offlineSubset?"Offline subset: coverage is limited and may be outdated.":complete?"Completed available OAI metadata-date windows. Some source records may not be exposed.":"Coverage is partial; not all historical papers are indexed.");
   if(!total){
    target.append(el("p","No match in Axiovo's available IACR metadata. This does not mean the original archive has no such paper.","rd-small"));
+   const exact=data?.parseEprint?.(c.q)||"";
+   if(exact){
+    const original=link("Open original IACR ePrint "+exact+" ↗","https://eprint.iacr.org/"+exact);
+    original.target="_blank";original.rel="noopener noreferrer";target.append(original);
+   }
    const official=link("Search IACR ePrint directly ↗","https://eprint.iacr.org/search");
    official.target="_blank";official.rel="noopener";target.append(official);
    return;
