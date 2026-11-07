@@ -529,3 +529,169 @@ body.axiovo-home .rd-home-section {margin-top:24px}
  .axiovo-research :is(.rd-button,.ex-archives a,.library-tabs a) {transition:none}
  .axiovo-research :is(.rd-button,.ex-archives a,.library-tabs a):hover:not(:disabled) {transform:none}
 }
+
+
+/* Mobile design refresh: coherent two-row shell, thumb-size controls and
+   readable research content. CSS-only, preserving all existing handlers. */
+@media (max-width:760px) {
+  html,body {max-width:100%;overflow-x:clip}
+  html body header.rl-global-header {
+    display:grid!important;
+    grid-template-columns:minmax(0,auto) minmax(0,1fr)!important;
+    grid-template-rows:auto auto!important;
+    column-gap:10px!important;row-gap:9px!important;
+    align-items:center!important;
+    min-height:0!important;
+    padding:10px 12px 9px!important;
+    padding-top:max(10px,env(safe-area-inset-top))!important;
+  }
+  html body header.rl-global-header > .rl-logo {
+    grid-column:1!important;grid-row:1!important;
+    min-width:0!important;max-width:100%!important;
+    font-size:17px!important;gap:7px!important;
+    justify-self:start!important;
+  }
+  html body header.rl-global-header .rl-logo .rl-logo-mark {
+    height:32px!important;width:32px!important;min-width:32px!important;
+    border-radius:9px!important;font-size:20px!important;
+  }
+  html body header.rl-global-header > .axiovo-header-appearance {
+    grid-column:2!important;grid-row:1!important;
+    justify-self:end!important;min-width:0!important;
+    display:flex!important;justify-content:flex-end!important;
+    margin:0!important;gap:6px!important;
+  }
+  html body header.rl-global-header .axiovo-header-appearance > :is(.rl-settings-link,.theme-toggle) {
+    min-height:40px!important;height:40px!important;
+    padding:0 10px!important;border-radius:10px!important;
+    font-size:12px!important;
+  }
+  html body header.rl-global-header > .axiovo-nav-return {
+    grid-column:1!important;grid-row:2!important;
+    display:flex!important;flex-wrap:nowrap!important;
+    width:auto!important;min-width:0!important;
+    gap:5px!important;justify-self:start!important;align-self:stretch!important;
+  }
+  html body header.rl-global-header .axiovo-nav-return > :is(.axiovo-back-button,.axiovo-home-link) {
+    width:auto!important;min-width:0!important;
+    height:42px!important;min-height:42px!important;
+    padding:0 8px!important;border-radius:10px!important;
+    font-size:12px!important;
+    white-space:nowrap!important;
+  }
+  html body header.rl-global-header > .rl-nav {
+    grid-column:2!important;grid-row:2!important;
+    align-self:stretch!important;
+    display:flex!important;align-items:center!important;
+    width:100%!important;min-width:0!important;max-width:100%!important;
+    flex-wrap:nowrap!important;justify-content:flex-start!important;
+    overflow-x:auto!important;overflow-y:hidden!important;
+    gap:5px!important;
+    margin:0!important;padding:0 1px 2px!important;
+    scroll-padding-inline:4px;scroll-snap-type:x proximity;
+    scrollbar-width:none!important;
+    -webkit-overflow-scrolling:touch;
+  }
+  html body header.rl-global-header > .rl-nav::-webkit-scrollbar {display:none}
+  html body header.rl-global-header .rl-nav a {
+    display:inline-flex!important;align-items:center!important;
+    flex:0 0 auto!important;
+    min-height:42px!important;
+    padding:9px 11px!important;
+    font-size:12px!important;white-space:nowrap!important;
+    border-radius:10px!important;
+    scroll-snap-align:start;
+  }
+  html body.axiovo-home header.rl-global-header > .axiovo-nav-return {display:none!important}
+  html body.axiovo-home header.rl-global-header > .rl-nav {
+    grid-column:1/-1!important;grid-row:2!important;
+  }
+
+  /* Stable spacing, and no accidental horizontal document scrolling. */
+  .axiovo-research .rd-page {padding:14px 12px 42px!important}
+  .axiovo-research :is(.rd-panel,.ex-guide,.ex-search,.ex-result-summary) {
+    box-sizing:border-box;max-width:100%;min-width:0;
+    border-radius:14px;
+  }
+  .axiovo-research :is(.rd-searchbar,.rd-filter-grid,.ex-layout,.ex-main,.ex-sidebar) {min-width:0}
+  .axiovo-research :is(input[type="search"],input[type="text"],input[type="date"],select,textarea) {
+    box-sizing:border-box;max-width:100%;min-width:0;
+    font-size:16px!important;
+    min-height:44px;
+  }
+  .axiovo-research :is(.rd-button,.ex-choices button,.ex-guide-actions button) {
+    min-height:44px;white-space:normal;overflow-wrap:anywhere;
+  }
+  .axiovo-research :is(.rd-section-heading,.ex-hero-copy) {
+    align-items:flex-start;gap:9px;
+  }
+  .axiovo-research :is(.rd-section-heading h2,.ex-hero h1) {
+    overflow-wrap:anywhere;
+  }
+
+  /* Archive switcher: compact pill row with horizontal scrolling rather
+     than four squeezed labels or cards wrapping unpredictably. */
+  .axiovo-explore .ex-archives,.axiovo-crypto .ex-archives {
+    display:flex!important;flex-wrap:nowrap!important;
+    gap:7px;overflow-x:auto;overflow-y:hidden;
+    max-width:100%;min-width:0;margin-bottom:12px;
+    padding:2px 0 7px;scroll-snap-type:x proximity;
+    scrollbar-width:thin;-webkit-overflow-scrolling:touch;
+  }
+  .axiovo-explore .ex-archives a,.axiovo-crypto .ex-archives a {
+    flex:0 0 auto!important;scroll-snap-align:start;
+    min-height:42px;padding:8px 12px;font-size:12px;
+    border-radius:12px;white-space:nowrap;
+  }
+  .axiovo-explore .ex-hero,.axiovo-crypto .ex-hero {margin-bottom:13px}
+  .axiovo-explore .ex-hero-copy h1,.axiovo-crypto .ex-hero-copy h1 {
+    font-size:clamp(1.75rem,7vw,2.5rem);letter-spacing:-.045em;line-height:1.08;
+  }
+  .axiovo-explore .ex-count,.axiovo-crypto #crypto-coverage-count {
+    display:block;max-width:100%;font-size:11px;line-height:1.4;
+  }
+  .axiovo-explore .ex-layout,.axiovo-crypto .ex-layout {
+    grid-template-columns:minmax(0,1fr)!important;gap:12px!important;
+  }
+  .axiovo-explore .ex-guide,.axiovo-crypto .ex-guide {padding:14px!important}
+  .axiovo-explore .ex-search,.axiovo-crypto .ex-search {padding:15px!important}
+  .axiovo-explore .ex-picker-option,.axiovo-crypto .ex-picker-option {
+    min-height:46px;padding:10px 12px;
+  }
+  .axiovo-explore .ex-choices,.axiovo-crypto .ex-choices {
+    display:flex;flex-wrap:wrap;gap:5px;
+  }
+  .axiovo-explore .ex-choices[hidden],.axiovo-crypto .ex-choices[hidden]{display:none!important}
+
+  /* Paper cards keep source, title, metadata and action hierarchy readable. */
+  .axiovo-research :is(.rd-paper-card,.ex-paper,.crypto-paper) {
+    width:100%;max-width:100%;min-width:0;
+    padding:13px!important;border-radius:13px;
+    overflow-wrap:anywhere;
+  }
+  .axiovo-research :is(.rd-paper-card,.ex-paper,.crypto-paper) :is(h3,h4,a) {
+    overflow-wrap:anywhere;
+  }
+  .axiovo-research :is(.rd-paper-actions,.crypto-paper-actions,.ex-paper-actions) {
+    display:flex;flex-wrap:wrap;gap:6px;
+  }
+  .axiovo-research :is(.rd-paper-actions,.crypto-paper-actions,.ex-paper-actions) :is(a,button) {
+    min-height:43px;flex:1 1 132px;
+    display:inline-flex;align-items:center;justify-content:center;
+    text-align:center;white-space:normal;
+  }
+  .paper-sort-toolbar{padding:11px;border-radius:12px}
+  .paper-sort-toolbar select{width:100%;min-height:44px;font-size:16px!important}
+  body :is(.axiovo-credit,.rl-page-footer){padding-bottom:max(16px,env(safe-area-inset-bottom))!important}
+}
+@media(max-width:390px) {
+  html body header.rl-global-header {column-gap:7px!important;padding-inline:9px!important}
+  html body header.rl-global-header > .rl-logo {font-size:15px!important;gap:5px!important}
+  html body header.rl-global-header .axiovo-header-appearance > :is(.rl-settings-link,.theme-toggle) {
+    padding-inline:8px!important;font-size:11px!important;
+  }
+  html body header.rl-global-header .axiovo-nav-return > :is(.axiovo-back-button,.axiovo-home-link) {
+    padding-inline:6px!important;font-size:11px!important;
+  }
+  .axiovo-research .rd-page {padding-inline:10px!important}
+}
