@@ -5,7 +5,7 @@
 (function(root){
 "use strict";
 const KEY="axiovo-eprint-verified-fallback-v1";
-const ID=/^((?:19|20)\d{2})\/([1-9]\d{0,5})$/;
+const ID=/^((?:19|20)\d{2})\/(\d{1,6})$/;
 const ENDPOINTS=[
  "./data/eprint.json",
  "https://raw.githubusercontent.com/pritam-roy-99/axiovo/main/docs/data/eprint.json",
@@ -14,7 +14,7 @@ const ENDPOINTS=[
 const clean=x=>String(x??"").trim();
 const norm=x=>clean(x).normalize("NFKD").replace(/\p{M}/gu,"").toLowerCase();
 const date=x=>/^\d{4}-\d{2}-\d{2}/.test(clean(x))?clean(x).slice(0,10):"";
-const safeId=x=>{const m=clean(x).replace(/^eprint:\s*/i,"").replace(/^https?:\/\/eprint\.iacr\.org\//i,"").replace(/\.pdf$/i,"").match(ID);return m?m[0]:""};
+const safeId=x=>{const m=clean(x).replace(/^eprint:\s*/i,"").replace(/^https?:\/\/eprint\.iacr\.org\//i,"").replace(/\.pdf$/i,"").match(ID);return m&&Number(m[2])>0?m[0]:""};
 function normalize(p){
  if(!p||typeof p!=="object")return null;
  const id=safeId(p.recordId||p.id||p.url||p.link);
