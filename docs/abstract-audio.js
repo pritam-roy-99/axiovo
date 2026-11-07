@@ -5,7 +5,7 @@ const synth=window.speechSynthesis;
 if(!synth||!window.SpeechSynthesisUtterance)return;
 const key="axiovo-abstract-audio-v1";
 const lexicon={
- "arXiv":"archive","bioRxiv":"bio archive","ChemRxiv":"chem archive","Axiovo":"ax-ee-OH-voh",
+ "arXiv":"archive","bioRxiv":"bio archive","ChemRxiv":"chem archive","Cryptology ePrint":"cryptology ee print","Axiovo":"ax-ee-OH-voh",
  "CRISPR":"crisper","Cas9":"cass nine","qubit":"cue bit","qubits":"cue bits","POVM":"P O V M",
  "CHSH":"C H S H","DNA":"D N A","RNA":"R N A","mRNA":"messenger R N A","PCR":"P C R",
  "DFT":"D F T","NMR":"N M R","GPU":"G P U","LLM":"L L M","CO₂":"carbon dioxide","CO2":"carbon dioxide",
