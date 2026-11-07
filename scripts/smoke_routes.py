@@ -50,6 +50,7 @@ def main():
                         logo:box('.rl-logo'),
                         back:box('.axiovo-back-button'),
                         home:box('.axiovo-home-link'),
+                        navigation:box('.rl-nav'),
                         overflow:document.documentElement.scrollWidth - window.innerWidth,
                         nav:document.querySelectorAll('.rl-nav a').length,
                         header:box('header.rl-global-header')
@@ -63,8 +64,14 @@ def main():
                     assert result["overflow"]<=7,(width,path,"Page has horizontal overflow",result)
                     if width<=760:
                         assert abs(result["logo"]["y"]-a["y"])<=7,(width,path,"Mobile header shifted",result)
+                        assert result["navigation"],(width,path,"Mobile navigation missing")
+                        assert result["header"]["height"]<=160,(width,path,"Mobile header too tall",result)
                         if path:
                             assert result["back"] and result["home"],(width,path,"Back/Home missing")
+                            assert abs(result["navigation"]["y"]-result["back"]["y"])<=8,(
+                                width,path,"Back and navigation are not in a consistent second row",result)
+                            assert result["navigation"]["right"]<=width+2,(
+                                width,path,"Mobile navigation exceeds viewport",result)
                     if not path:
                         # The unified hero has a dark gradient, and the name
                         # meaning is inline text rather than a separate panel.
