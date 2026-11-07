@@ -1,0 +1,98 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:20.100
+Welcome to Axiovo. Its name combines axiom, a foundational starting point for reasoning, and novo, meaning new. Axiovo stands for moving from established knowledge toward new scientific discoveries. Let us see how its research tools work.
+
+00:00:20.300 --> 00:00:37.089
+Axiovo now brings four research archives together. The fourth is the I A C R Cryptology ee print archive, for cryptography, quantum security and cryptanalysis. Choose the source that fits your subject.
+
+00:00:37.289 --> 00:00:49.657
+On arXiv Discover, open Archive subject and type part of a name or code. Typing quant brings up Quantum Physics and other matching categories.
+
+00:00:49.857 --> 00:01:00.274
+You can also type in the research subfield and subtopic dropdowns. Each dropdown offers choices within the path you have selected.
+
+00:01:00.474 --> 00:01:11.109
+Use the search field to enter the exact title, an author, or an arXiv identifier. Results link to their original paper record.
+
+00:01:11.309 --> 00:01:24.386
+Expand the advanced search settings. Specify a date or date range. Axiovo distinguishes verified complete date batches from partial source snapshots.
+
+00:01:24.586 --> 00:01:33.189
+For arXiv, the cross-list option can narrow results to records appearing in more than one subject category.
+
+00:01:33.389 --> 00:01:42.401
+Use author and affiliation fields to make a more precise query and read the source evidence before using a result.
+
+00:01:42.601 --> 00:01:52.209
+You can add personal topics and subtopics, save frequently used research paths, and restore defaults when needed.
+
+00:01:52.409 --> 00:02:01.809
+The bioRxiv Discover page has its own biology taxonomy, searchable topic selectors, and preprint search.
+
+00:02:02.009 --> 00:02:11.497
+ChemRxiv provides searchable chemistry subject and topic dropdowns while keeping the source of each paper visible.
+
+00:02:11.697 --> 00:02:31.182
+The Cryptology ee print page opens records from the I A C R archive, including quantum cryptography, post-quantum cryptography, signatures and security protocols. Type a research topic and select the matching suggestion to narrow indexed records.
+
+00:02:31.382 --> 00:02:56.250
+Search by title, author or a Cryptology ee print identifier such as 2026 slash 1234. Read each source-linked abstract, save a paper to Library or compare its metadata. Because backfill is ongoing, always use the original I A C R search when the local index lacks a paper.
+
+00:02:56.450 --> 00:03:06.147
+Open Research Desk to search all four preprint archives in one place. Results remain separated by their original archive.
+
+00:03:06.347 --> 00:03:18.134
+Enter research keywords in Research Desk, then click Search preprints to check arXiv, bioRxiv, ChemRxiv and Cryptology ee print together.
+
+00:03:18.334 --> 00:03:26.669
+Expand Author, dates and sorting to narrow the cross-archive search before reviewing each source's coverage.
+
+00:03:26.869 --> 00:03:33.419
+Save a useful Research Desk search to repeat it later from the saved search list.
+
+00:03:33.619 --> 00:03:44.200
+Add papers to the comparison shortlist. Compare available metadata and abstracts side by side, then verify the originals.
+
+00:03:44.400 --> 00:03:52.363
+The Library gathers papers you saved from the different archives, with source and collection filters.
+
+00:03:52.563 --> 00:04:02.297
+Use the Library controls to create collections, filter saved papers, and organize your reading notes on this device.
+
+00:04:02.497 --> 00:04:10.390
+Select Following authors to review researchers you've saved, and inspect their available paper records.
+
+00:04:10.590 --> 00:04:19.633
+Library also contains project tools to organize research questions, keywords and associated references.
+
+00:04:19.833 --> 00:04:29.346
+Explore research recommendations based on your saved projects and interests. Always check the original source paper.
+
+00:04:29.546 --> 00:04:38.129
+Open Research Assistant and ask a focused question to retrieve source-linked evidence from indexed literature.
+
+00:04:38.329 --> 00:04:50.693
+Choose Inspect a paper and provide an arXiv ID or original link. The assistant distinguishes abstract claims from what still needs proof verification.
+
+00:04:50.893 --> 00:05:02.203
+Under Optional text and local model, choose evidence-only analysis, an on-device model, Ollama, or your own hosted API provider.
+
+00:05:02.403 --> 00:05:17.662
+For privacy, Axiovo does not ask for provider API keys in your browser. Hosted models require an administrator configured server. Until then, use source evidence or local models.
+
+00:05:17.862 --> 00:05:27.671
+Use the Sources panel to open original records, verify citations, and export a research session or evidence report.
+
+00:05:27.871 --> 00:05:36.608
+Open Research Tools to read local PDFs, use available annotations and explore research utilities.
+
+00:05:36.808 --> 00:05:44.845
+The paper workspace preserves version-exact arXiv links and supports personal research notes.
+
+00:05:45.045 --> 00:05:54.034
+Use Settings for preferences. Switch Night and Day appearance with the same accessible controls on every page.
+
+00:05:54.234 --> 00:06:06.473
+You've now seen the main Axiovo workflows. Search broadly, save carefully, and always open the original research record to verify technical claims.
+
