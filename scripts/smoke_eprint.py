@@ -74,6 +74,7 @@ def main():
     page.reload(wait_until="domcontentloaded")
     page.locator("#crypto-saved-paths .ex-personal-row").first.wait_for(timeout=10000)
     assert page.locator("#crypto-saved-paths .ex-personal-row").count()==1
+    page.locator("#crypto-personal summary").click()
     page.locator("#crypto-custom-kind").select_option("subtopic")
     page.locator("#crypto-custom").fill("Quantum authentication protocols")
     page.locator("#crypto-custom-add").click()
