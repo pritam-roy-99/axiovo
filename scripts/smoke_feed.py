@@ -33,7 +33,11 @@ def main():
               "authors":["Another Researcher"],"published":"2026-11-05"},
              {"id":"2611.00013","title":"Educational robotics beyond ROS",
               "abstract":"An unrelated educational robotics study.", "authors":["Robotics Person"],
-              "published":"2026-11-05"}]}
+              "published":"2026-11-05"},
+             {"id":"1107.2132","title":"Magnifying Lens Abstraction for Stochastic Games",
+              "abstract":"Stochastic games and discounted-sum objectives.",
+              "authors":["Krishnendu Chatterjee","Luca de Alfaro","Pritam Roy"],
+              "published":"2011-07-11"}]}
             # The published fast preview must not contaminate synthetic source fixtures.
             page.route("**/data/feed-preview.json",lambda r:r.fulfill(status=404,body=""))
             page.route("**/data/feed.json",lambda r:r.fulfill(status=200,content_type="application/json",body=json.dumps(fixture)))
@@ -48,7 +52,7 @@ def main():
             assert "No authors followed yet" in page.locator("#feed-followed-authors").inner_text()
             assert "No topics followed yet" in page.locator("#feed-followed-topics").inner_text()
             page.evaluate("""() => {
-               localStorage.setItem("axiovo-author-follows",JSON.stringify(["A.S. Majumdar"]));
+               localStorage.setItem("axiovo-author-follows",JSON.stringify(["A.S. Majumdar","Pritam Roy"]));
                localStorage.setItem("axiovo-topic-explorer-arxiv-v1",
                  JSON.stringify({followed:[{category:"quant-ph",topic:"preparation contextuality",
                     label:"Preparation contextuality"}]}));
@@ -58,6 +62,12 @@ def main():
             titles=page.locator(".feed-card h3").all_inner_texts()
             assert len(titles)==2,(titles,"source-only topic and author matching")
             assert all("robotics" not in title.lower() for title in titles)
+            assert all("Magnifying Lens" not in title for title in titles), "Unverified same-name author leaked into default feed"
+            assert not page.locator("#feed-show-unverified-names").is_checked()
+            page.locator("#feed-show-unverified-names").check()
+            assert any("Magnifying Lens" in title for title in page.locator(".feed-card h3").all_inner_texts())
+            page.locator("#feed-show-unverified-names").uncheck()
+            assert not any("Magnifying Lens" in title for title in page.locator(".feed-card h3").all_inner_texts())
             assert "preparation contextuality" in page.locator("#feed-followed-paths").inner_text().lower()
             assert page.locator("#feed-followed-authors").inner_text().find("Majumdar")>=0
             first=page.locator(".feed-card").first
