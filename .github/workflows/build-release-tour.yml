@@ -1,0 +1,45 @@
+name: Build Axiovo narrated tutorial
+on:
+  push:
+    branches:
+      - release/reliability-2026-11-07
+    paths:
+      - .github/workflows/build-release-tour.yml
+      - scripts/build_tutorial_video.py
+  workflow_dispatch:
+jobs:
+  build-video:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install recording dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg espeak-ng fonts-dejavu-core
+          python -m pip install pillow playwright
+          python -m playwright install --with-deps chromium
+      - name: Record real website and generate audio, captions and MP4
+        run: python scripts/build_tutorial_video.py
+      - name: Verify nonempty tutorial assets
+        run: |
+          test -s docs/assets/axiovo-tour.mp4
+          test -s docs/assets/axiovo-tour.vtt
+          test -s docs/assets/axiovo-tour-build.json
+          ffprobe -v error docs/assets/axiovo-tour.mp4
+      - name: Commit verified media on release branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/assets/axiovo-tour.mp4 docs/assets/axiovo-tour.vtt docs/assets/axiovo-tour-build.json
+          if ! git diff --cached --quiet; then
+            git commit -m "build: publish narrated tutorial recorded from Axiovo pages"
+            git push origin HEAD:release/reliability-2026-11-07
+          fi
