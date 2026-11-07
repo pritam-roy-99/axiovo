@@ -14,7 +14,7 @@ class UsabilityTests(unittest.TestCase):
 
     def test_profile_is_optional_settings_not_primary_nav(self):
         nav=(DOCS/"navigation.js").read_text()
-        self.assertIn('["./#axiovo-archive-title","Explore",',nav)
+        self.assertIn('[file==="index.html"?"#axiovo-archive-title":HOME,"Explore",',nav)
         self.assertIn('["./workspace.html","Library",',nav)
         self.assertIn('["./copilot.html","Research Assistant",',nav)
         self.assertNotIn('["./community.html","Community"]',nav)
