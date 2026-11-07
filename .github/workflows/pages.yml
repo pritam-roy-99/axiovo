@@ -331,7 +331,7 @@ jobs:
               valid=False
           print("Existing verified-source tutorial present:",valid)
           with open(os.environ["GITHUB_OUTPUT"],"a",encoding="utf-8") as output:
-              output.write(f"reuse={'true' if valid else 'false'}\\n")
+              output.write(f"reuse={'true' if valid else 'false'}\n")
           PY
       - name: Install MP4 verification tools
         run: |
