@@ -369,107 +369,44 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq ffmpeg
-      - name: Restore the current female-narrated tutorial recording
-        uses: actions/cache@v4
-        with:
-          path: |
-            docs/assets/axiovo-tour.mp4
-            docs/assets/axiovo-tour.vtt
-            docs/assets/axiovo-tour-build.json
-          key: axiovo-kokoro-bella-v3-${{ hashFiles('scripts/build_tutorial_video.py', 'scripts/revoice_tutorial.py', 'scripts/tutorial_voice.py') }}
-      - name: Reuse already recorded and source-verified Axiovo tutorial
-        id: existing_video
+      - name: Validate published tutorial video, captions and narration (required)
+        id: video_validate
         run: |
           python - <<'PY'
-          import json, os, subprocess
+          from hashlib import file_digest
+          import json, subprocess
           from pathlib import Path
-          folder=Path("docs/assets")
-          mp4=folder/"axiovo-tour.mp4"
-          vtt=folder/"axiovo-tour.vtt"
-          chapter=folder/"axiovo-tour-build.json"
-          try:
-              meta=json.loads(chapter.read_text(encoding="utf-8"))
-              valid=(mp4.is_file() and mp4.stat().st_size>100_000
-                     and vtt.is_file() and vtt.read_text(encoding="utf-8").startswith("WEBVTT")
-                     and len(meta.get("chapters",[]))>=20
-                     and meta.get("source")=="Real Chromium page captures"
-                     and meta.get("voice_version")=="axiovo-kokoro-bella-v3"
-                     and meta.get("voice_engine")=="kokoro-onnx"
-                     and meta.get("voices")==["af_bella"])
-              if valid:
-                  tracks=json.loads(subprocess.check_output([
-                      "ffprobe","-v","error","-show_streams","-show_format",
-                      "-of","json",str(mp4)],text=True))
-                  valid=(float(tracks.get("format",{}).get("duration",0))>90
-                         and any(t.get("codec_name")=="h264" for t in tracks.get("streams",[]))
-                         and any(t.get("codec_name")=="aac" for t in tracks.get("streams",[])))
-          except (OSError,ValueError,TypeError,subprocess.CalledProcessError):
-              valid=False
-          print("Existing verified-source tutorial present:",valid)
-          with open(os.environ["GITHUB_OUTPUT"],"a",encoding="utf-8") as output:
-              output.write(f"reuse={'true' if valid else 'false'}\n")
+          from scripts.tutorial_voice import VOICE, VOICE_ENGINE, VOICE_LOCALE, VOICE_VERSION
+
+          directory = Path("docs/assets")
+          video = directory / "axiovo-tour.mp4"
+          captions = (directory / "axiovo-tour.vtt").read_text(encoding="utf-8")
+          meta = json.loads((directory / "axiovo-tour-build.json").read_text(encoding="utf-8"))
+          assert video.is_file() and video.stat().st_size > 100_000, "Tutorial video missing or empty"
+          assert captions.startswith("WEBVTT"), "Captions missing"
+          assert 20 <= len(meta["chapters"]) == captions.count(" --> "), "Captions and chapter index disagree"
+          assert meta.get("source") == "Real Chromium page captures", "Unexpected tutorial source"
+          assert meta.get("voice_version") == VOICE_VERSION, "Old tutorial audio was reused"
+          assert meta.get("voice_engine") == VOICE_ENGINE, "Unexpected narration engine"
+          assert meta.get("voice_locale") == VOICE_LOCALE and meta.get("voices") == [VOICE], "Unexpected tutorial voice"
+          with video.open("rb") as media:
+              assert file_digest(media, "sha256").hexdigest() == meta.get("media_sha256"), "Video does not match the verified narration"
+          probe = json.loads(subprocess.check_output([
+              "ffprobe", "-v", "error", "-show_streams", "-show_format", "-of", "json", str(video)
+          ], text=True))
+          tracks = probe["streams"]
+          assert any(t["codec_type"] == "video" and t["codec_name"] == "h264" for t in tracks), "No H.264 video track"
+          assert any(t["codec_type"] == "audio" and t["codec_name"] == "aac" for t in tracks), "No AAC audio track"
+          duration = float(probe["format"]["duration"])
+          assert duration > 90 and abs(duration - meta["duration_seconds"]) < 0.1, "Tutorial duration does not match"
+          subprocess.run(["ffmpeg", "-v", "error", "-i", str(video), "-t", "4", "-f", "null", "-"], check=True)
+          print("Verified the committed Indian-English narration, captions, chapter index and playback streams")
           PY
-      - name: Cache local female neural speech model
-        if: steps.existing_video.outputs.reuse != 'true'
-        uses: actions/cache@v4
-        with:
-          path: .cache/axiovo-voice
-          key: axiovo-kokoro-model-v1
-      - name: Install local neural speech generator
-        if: steps.existing_video.outputs.reuse != 'true'
-        run: |
-          sudo apt-get install -y -qq fonts-dejavu-core
-          python -m pip install --disable-pip-version-check Pillow kokoro-onnx soundfile
-          bash scripts/download_tutorial_voice.sh
-      - name: Replace robotic tutorial audio with expressive female narration
-        id: revoice_video
-        if: steps.existing_video.outputs.reuse != 'true'
-        run: |
-          if [[ -s docs/assets/axiovo-tour.mp4 && -s docs/assets/axiovo-tour.vtt && -s docs/assets/axiovo-tour-build.json ]]; then
-            python scripts/revoice_tutorial.py
-            echo "done=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "done=false" >> "$GITHUB_OUTPUT"
-          fi
-      # The older illustrated-video generator depends on narration .opus files
-      # which are not all present. It is redundant: the recorded current-site
-      # tutorial below generates the final MP4, captions and chapter index.
-      # Do not run it as a mandatory deployment gate.
       - name: Install Chromium for independent interaction checks
         id: chromium_deps
         run: |
           python -m pip install --disable-pip-version-check playwright
           python -m playwright install --with-deps chromium
-      - name: Record the actual Axiovo step-by-step tutorial
-        if: steps.existing_video.outputs.reuse != 'true' && steps.revoice_video.outputs.done != 'true'
-        run: python scripts/build_tutorial_video.py
-      - name: Validate actual MP4 playback streams and caption file (required)
-        id: video_validate
-        run: |
-          python - <<'PY'
-          import json, subprocess
-          from pathlib import Path
-          directory=Path("docs/assets")
-          video=directory/"axiovo-tour.mp4"
-          caption=directory/"axiovo-tour.vtt"
-          chapter=directory/"axiovo-tour-build.json"
-          assert video.is_file() and video.stat().st_size > 100000, "Tutorial video missing/empty"
-          assert caption.is_file() and caption.read_text().startswith("WEBVTT"), "Captions missing"
-          assert chapter.is_file() and len(json.loads(chapter.read_text()).get("chapters",[])) >= 20, "Video chapter index missing"
-          voice_metadata=json.loads(chapter.read_text(encoding="utf-8"))
-          assert voice_metadata.get("voice_version")=="axiovo-kokoro-bella-v3", "Old tutorial audio was reused"
-          assert voice_metadata.get("voice_engine")=="kokoro-onnx", "Narration is not neural female speech"
-          assert voice_metadata.get("voices")==["af_bella"], "Unexpected or mixed tutorial voices"
-          probe=json.loads(subprocess.check_output([
-              "ffprobe","-v","error","-show_streams","-show_format",
-              "-of","json",str(video)],text=True))
-          tracks=probe["streams"]
-          assert any(t.get("codec_type")=="video" and t.get("codec_name")=="h264" for t in tracks), "No H264 video track"
-          assert any(t.get("codec_type")=="audio" and t.get("codec_name")=="aac" for t in tracks), "No AAC audio track"
-          assert float(probe["format"]["duration"]) > 90, "Tutorial video truncated"
-          subprocess.run(["ffmpeg","-v","error","-i",str(video),"-t","4","-f","null","-"],check=True)
-          print("Verified HTML5-compatible H264/AAC video, decodable frames, captions and chapters")
-          PY
 
       - name: Exercise all current routes and mobile interactions (deployment gate)
         if: steps.chromium_deps.outcome == 'success'

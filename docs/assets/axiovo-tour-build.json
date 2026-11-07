@@ -1,8 +1,8 @@
 {
   "scenes": 32,
-  "duration_seconds": 366.7,
+  "duration_seconds": 364.5,
   "voices": [
-    "eSpeak female fallback"
+    "en-IN-NeerjaNeural"
   ],
   "chapters": [
     {
@@ -10,226 +10,232 @@
       "title": "Axiovo = Axiom + Novo",
       "instruction": "From established knowledge to new discoveries.",
       "start_seconds": 0.0,
-      "duration_seconds": 20.3
+      "duration_seconds": 18.98
     },
     {
       "step": 2,
       "title": "Four research archives",
       "instruction": "Choose arXiv, bioRxiv, ChemRxiv or Cryptology ePrint.",
-      "start_seconds": 20.3,
-      "duration_seconds": 16.99
+      "start_seconds": 18.98,
+      "duration_seconds": 19.484
     },
     {
       "step": 3,
       "title": "Search the arXiv subject list",
       "instruction": "Type part of a subject name or category code.",
-      "start_seconds": 37.29,
-      "duration_seconds": 12.57
+      "start_seconds": 38.464,
+      "duration_seconds": 11.996
     },
     {
       "step": 4,
       "title": "Linked research topics",
       "instruction": "Refine a subject to a subfield and subtopic.",
-      "start_seconds": 49.86,
-      "duration_seconds": 10.62
+      "start_seconds": 50.46,
+      "duration_seconds": 10.46
     },
     {
       "step": 5,
       "title": "Search by paper title",
       "instruction": "Type keywords, a title, DOI or arXiv ID.",
-      "start_seconds": 60.47,
-      "duration_seconds": 10.84
+      "start_seconds": 60.92,
+      "duration_seconds": 11.516
     },
     {
       "step": 6,
       "title": "Date-aware search",
       "instruction": "Use first-submission dates and verify completeness.",
-      "start_seconds": 71.31,
-      "duration_seconds": 13.28
+      "start_seconds": 72.436,
+      "duration_seconds": 13.892
     },
     {
       "step": 7,
       "title": "Cross-listed categories",
       "instruction": "Filter arXiv primary and cross-listed records.",
-      "start_seconds": 84.59,
-      "duration_seconds": 8.8
+      "start_seconds": 86.328,
+      "duration_seconds": 8.54
     },
     {
       "step": 8,
       "title": "Find an author",
       "instruction": "Apply author and affiliation filters.",
-      "start_seconds": 93.39,
-      "duration_seconds": 9.21
+      "start_seconds": 94.868,
+      "duration_seconds": 8.756
     },
     {
       "step": 9,
       "title": "Save your research path",
       "instruction": "Create, follow and restore personal topics.",
-      "start_seconds": 102.6,
-      "duration_seconds": 9.81
+      "start_seconds": 103.624,
+      "duration_seconds": 9.116
     },
     {
       "step": 10,
       "title": "bioRxiv Discover",
       "instruction": "Browse independent biology subject areas.",
-      "start_seconds": 112.41,
-      "duration_seconds": 9.6
+      "start_seconds": 112.74,
+      "duration_seconds": 9.596
     },
     {
       "step": 11,
       "title": "ChemRxiv Discover",
       "instruction": "Browse independent chemistry subject areas.",
-      "start_seconds": 122.01,
-      "duration_seconds": 9.69
+      "start_seconds": 122.336,
+      "duration_seconds": 9.092
     },
     {
       "step": 12,
       "title": "Cryptology ePrint Discover",
       "instruction": "Explore cryptography and quantum security.",
-      "start_seconds": 131.7,
-      "duration_seconds": 19.68
+      "start_seconds": 131.428,
+      "duration_seconds": 19.46
     },
     {
       "step": 13,
       "title": "Exact IACR paper identities",
       "instruction": "Check original ePrint year and number.",
-      "start_seconds": 151.38,
-      "duration_seconds": 25.07
+      "start_seconds": 150.888,
+      "duration_seconds": 24.38
     },
     {
       "step": 14,
       "title": "Cross-archive Research Desk",
       "instruction": "Choose one or more sources.",
-      "start_seconds": 176.45,
-      "duration_seconds": 9.9
+      "start_seconds": 175.268,
+      "duration_seconds": 10.604
     },
     {
       "step": 15,
       "title": "Search across sources",
       "instruction": "Enter a query once for all selected archives.",
-      "start_seconds": 186.35,
-      "duration_seconds": 11.99
+      "start_seconds": 185.872,
+      "duration_seconds": 11.828
     },
     {
       "step": 16,
       "title": "Research Desk filters",
       "instruction": "Apply author, date range and sorting.",
-      "start_seconds": 198.33,
-      "duration_seconds": 8.54
+      "start_seconds": 197.7,
+      "duration_seconds": 8.18
     },
     {
       "step": 17,
       "title": "Saved searches",
       "instruction": "Rerun frequently used research queries.",
-      "start_seconds": 206.87,
-      "duration_seconds": 6.75
+      "start_seconds": 205.88,
+      "duration_seconds": 6.956
     },
     {
       "step": 18,
       "title": "Paper comparison",
       "instruction": "Build a shortlist and compare abstracts.",
-      "start_seconds": 213.62,
-      "duration_seconds": 10.78
+      "start_seconds": 212.836,
+      "duration_seconds": 11.228
     },
     {
       "step": 19,
       "title": "Your Library",
       "instruction": "Keep saved papers across all archives.",
-      "start_seconds": 224.4,
-      "duration_seconds": 8.16
+      "start_seconds": 224.064,
+      "duration_seconds": 7.652
     },
     {
       "step": 20,
       "title": "Organize collections",
       "instruction": "Create collections and add private notes.",
-      "start_seconds": 232.56,
-      "duration_seconds": 9.93
+      "start_seconds": 231.716,
+      "duration_seconds": 9.116
     },
     {
       "step": 21,
       "title": "Follow researchers",
       "instruction": "Track authors you choose.",
-      "start_seconds": 242.5,
-      "duration_seconds": 8.09
+      "start_seconds": 240.832,
+      "duration_seconds": 7.916
     },
     {
       "step": 22,
       "title": "Research projects",
       "instruction": "Group papers around research questions.",
-      "start_seconds": 250.59,
-      "duration_seconds": 9.24
+      "start_seconds": 248.748,
+      "duration_seconds": 8.828
     },
     {
       "step": 23,
       "title": "Research recommendations",
       "instruction": "Check relevant recommendations and evidence.",
-      "start_seconds": 259.83,
-      "duration_seconds": 9.71
+      "start_seconds": 257.576,
+      "duration_seconds": 9.908
     },
     {
       "step": 24,
       "title": "Research Assistant",
       "instruction": "Ask a specific literature question.",
-      "start_seconds": 269.55,
-      "duration_seconds": 8.78
+      "start_seconds": 267.484,
+      "duration_seconds": 8.324
     },
     {
       "step": 25,
       "title": "Inspect paper claims",
       "instruction": "Choose Inspect a paper to examine its abstract.",
-      "start_seconds": 278.33,
-      "duration_seconds": 12.56
+      "start_seconds": 275.808,
+      "duration_seconds": 12.404
     },
     {
       "step": 26,
       "title": "Choose AI options",
       "instruction": "Use source evidence, local models or provider APIs.",
-      "start_seconds": 290.89,
-      "duration_seconds": 11.51
+      "start_seconds": 288.212,
+      "duration_seconds": 11.42
     },
     {
       "step": 27,
       "title": "Optional hosted AI",
       "instruction": "Hosted AI is disabled until a secure server is configured.",
-      "start_seconds": 302.4,
-      "duration_seconds": 15.46
+      "start_seconds": 299.632,
+      "duration_seconds": 16.652
     },
     {
       "step": 28,
       "title": "Evidence and export",
       "instruction": "Inspect original citations and export the report.",
-      "start_seconds": 317.86,
-      "duration_seconds": 10.01
+      "start_seconds": 316.284,
+      "duration_seconds": 9.788
     },
     {
       "step": 29,
       "title": "PDF Research Tools",
       "instruction": "Read a PDF and use the research utilities.",
-      "start_seconds": 327.87,
-      "duration_seconds": 8.94
+      "start_seconds": 326.072,
+      "duration_seconds": 8.612
     },
     {
       "step": 30,
       "title": "Paper workspace",
       "instruction": "Inspect arXiv versions and private notes.",
-      "start_seconds": 336.81,
-      "duration_seconds": 8.24
+      "start_seconds": 334.684,
+      "duration_seconds": 7.724
     },
     {
       "step": 31,
       "title": "Settings and themes",
       "instruction": "Choose appearance and research preferences.",
-      "start_seconds": 345.05,
-      "duration_seconds": 9.19
+      "start_seconds": 342.408,
+      "duration_seconds": 9.38
     },
     {
       "step": 32,
       "title": "Explore Axiovo",
       "instruction": "Return home, browse, search and organize.",
-      "start_seconds": 354.23,
-      "duration_seconds": 12.44
+      "start_seconds": 351.788,
+      "duration_seconds": 12.692
     }
   ],
   "source": "Real Chromium page captures",
-  "pronunciation": "Spoken-word technical corrections"
+  "pronunciation": "Spoken-word technical corrections",
+  "voice_version": "axiovo-neerja-v1",
+  "voice_engine": "edge-tts",
+  "voice_locale": "en-IN",
+  "voice_style": "warm, conversational female narration",
+  "media_sha256": "a79b9258fc85b382bca8437e3f36a52654e3e38996da60a3627ccc4358052f39",
+  "narration_source": "Existing source-verified tutorial and captions"
 }

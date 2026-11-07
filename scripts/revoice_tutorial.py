@@ -7,6 +7,7 @@ Updates the MP4, captions, and chapter timings together, atomically.
 """
 from __future__ import annotations
 
+from hashlib import file_digest
 import json
 import os
 from pathlib import Path
@@ -14,7 +15,7 @@ import re
 import subprocess
 import tempfile
 
-from tutorial_voice import VOICE, VOICE_ENGINE, VOICE_VERSION, render
+from tutorial_voice import VOICE, VOICE_ENGINE, VOICE_LOCALE, VOICE_VERSION, render
 
 ROOT = Path(__file__).resolve().parents[1]
 ASSETS = ROOT / "docs" / "assets"
@@ -43,7 +44,10 @@ def narration_from_captions(contents: str) -> list[str]:
         lines = [line.strip() for line in block.splitlines() if line.strip()]
         if not lines or "-->" not in lines[0]:
             continue
-        result.append(" ".join(lines[1:]))
+        text = " ".join(lines[1:])
+        result.append(text.replace("I A C R", "IACR").replace(
+            "Cryptology ee print", "Cryptology ePrint"
+        ))
     return result
 
 def main() -> None:
@@ -60,7 +64,7 @@ def main() -> None:
         return
 
     total = duration(VIDEO)
-    with tempfile.TemporaryDirectory(prefix="axiovo-voice-") as directory:
+    with tempfile.TemporaryDirectory(prefix=".axiovo-voice-", dir=ASSETS) as directory:
         work = Path(directory)
         video_list = []
         audio_list = []
@@ -86,7 +90,7 @@ def main() -> None:
             render(text, wav)
             # Give a little space for breathing between natural sentences.
             speech_seconds = duration(wav)
-            pause = 0.65
+            pause = 0.5
             scene_length = speech_seconds + pause
             padded = work / f"padded-{i:02}.wav"
             run("ffmpeg", "-y", "-loglevel", "error", "-i", str(wav),
@@ -121,16 +125,21 @@ def main() -> None:
             "-map", "0:v:0", "-map", "1:a:0",
             "-c:v", "libx264", "-preset", "veryfast", "-crf", "24",
             "-pix_fmt", "yuv420p", "-r", "12",
-            "-c:a", "aac", "-b:a", "160k", "-shortest",
+            "-af", "loudnorm=I=-17:LRA=9:TP=-1.5", "-ar", "24000",
+            "-c:a", "aac", "-b:a", "96k", "-shortest",
             "-movflags", "+faststart", str(final))
 
+        with final.open("rb") as media:
+            media_sha256 = file_digest(media, "sha256").hexdigest()
         new_meta = {
             **old,
             "duration_seconds": round(duration(final), 2),
             "voices": [VOICE],
             "voice_version": VOICE_VERSION,
             "voice_engine": VOICE_ENGINE,
-            "voice_style": "warm, expressive, natural female narration",
+            "voice_locale": VOICE_LOCALE,
+            "voice_style": "warm, conversational female narration",
+            "media_sha256": media_sha256,
             "chapters": new_chapters,
             "source": "Real Chromium page captures",
             "narration_source": "Existing source-verified tutorial and captions",

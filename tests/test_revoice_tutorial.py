@@ -7,14 +7,14 @@ import unittest
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 import revoice_tutorial as remix
-from tutorial_voice import VOICE, VOICE_VERSION, VOICE_ENGINE
+from tutorial_voice import VOICE, VOICE_VERSION, VOICE_ENGINE, VOICE_LOCALE
 
 
 class RevoiceTutorialTests(unittest.TestCase):
     def test_video_uses_one_neural_female_voice(self):
-        self.assertEqual(VOICE, "af_bella")
-        self.assertEqual(VOICE_ENGINE, "kokoro-onnx")
-        self.assertEqual(VOICE_VERSION, "axiovo-kokoro-bella-v3")
+        self.assertEqual(VOICE, "en-IN-NeerjaNeural")
+        self.assertEqual(VOICE_ENGINE, "edge-tts")
+        self.assertEqual(VOICE_LOCALE, "en-IN")
 
     def test_original_recording_has_matching_caption_chapters(self):
         contents = remix.CAPTIONS.read_text(encoding="utf-8")
@@ -24,6 +24,7 @@ class RevoiceTutorialTests(unittest.TestCase):
         self.assertEqual(len(captions), len(chapters))
         self.assertGreaterEqual(len(chapters), 20)
         self.assertTrue(all(captions))
+        self.assertIn("IACR Cryptology ePrint Archive", captions[1])
 
     def test_timestamps_keep_precise_webvtt_format(self):
         self.assertEqual(remix.timestamp(0), "00:00:00.000")

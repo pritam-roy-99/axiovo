@@ -5,6 +5,7 @@ These tests inspect source and do NOT replace browser end-to-end tests.
 import unittest
 from pathlib import Path
 from html.parser import HTMLParser
+from urllib.parse import urlsplit
 
 DOCS=Path(__file__).resolve().parents[1]/"docs"
 
@@ -17,7 +18,7 @@ class Page(HTMLParser):
     def handle_starttag(self,tag,attrs):
         d=dict(attrs)
         if d.get("id"):self.ids.append(d["id"])
-        if tag=="script" and d.get("src"):self.scripts.append(d["src"])
+        if tag=="script" and d.get("src"):self.scripts.append(urlsplit(d["src"]).path)
         if tag=="a" and d.get("href"):self.links.append(d["href"])
 
 class RouteAuditTests(unittest.TestCase):

@@ -1,6 +1,6 @@
 # Axiovo official product walkthrough: recording and narration master
 
-Status (2026-11-07): production script ready; no new narrated MP4 has been rendered or published. The existing `docs/assets/axiovo-tour.mp4` and `docs/assets/axiovo-tour.vtt` are not present in the repository.
+The homepage uses the 32-scene recording and English captions checked into `docs/assets/`. Its narration uses the Neerja Indian-English voice. GitHub Pages verifies and publishes the rendered recording as part of the site.
 
 ## Delivery specification
 
