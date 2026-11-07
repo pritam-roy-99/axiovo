@@ -95,8 +95,17 @@ function actionsFor(card,item){
   save.setAttribute("aria-label",(saved?"Remove ":"Save ")+p.title+(saved?" from":" to")+" Library");
  }
  save.onclick=()=>{
+  // archive.save/unsave synchronously dispatch axiovo-library-change.
+  // Redrawing here would detach the button before this click completes.
+  // Keep this card mounted and update its pressed state in place.
   const wasSaved=archive.saved(p);
-  const ok=wasSaved?archive.unsave(p):archive.save(p);
+  let ok=false;
+  state.updatingLibraryFromFeed=true;
+  try{
+   ok=wasSaved?archive.unsave(p):archive.save(p);
+  }finally{
+   state.updatingLibraryFromFeed=false;
+  }
   if(!ok){notify("Could not update the Library on this device.");return}
   saveState();
  };
@@ -360,7 +369,11 @@ for(const tab of document.querySelectorAll("[data-view]"))tab.onclick=()=>{
  recalculate();
 };
 window.addEventListener("axiovo:author-follow-change",recalculate);
-window.addEventListener("axiovo-library-change",recalculate);
+window.addEventListener("axiovo-library-change",()=>{
+ // Other pages and controls still trigger a full feed re-evaluation.
+ // Local save clicks must not detach the active button mid-interaction.
+ if(!state.updatingLibraryFromFeed)recalculate();
+});
 window.addEventListener("storage",()=>{if(!state.refreshId)refresh();else recalculate()});
 refresh();
 })();
