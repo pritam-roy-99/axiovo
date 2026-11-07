@@ -520,9 +520,10 @@ $("clear-sources").onclick=()=>{sources=[];renderSources();rstatus("Source list 
 $("clear-draft").onclick=()=>{$("draft").value=""};
 $("question").onkeydown=evt=>{if(evt.key==="Enter"&&!evt.shiftKey){evt.preventDefault();submit(false)}};
 const params=new URLSearchParams(location.search);
-const requestedId=window.AxiovoArxiv?.parse(params.get("id"))?.requested;
+const requestedId=window.AxiovoArxiv?.parse(params.get("id"))?.requested||Archive?.eprintIdentifier(params.get("id"));
 if(requestedId){
- $("question").value=requestedId;updateMode("claims");selectedPaperId=window.AxiovoArxiv.base(requestedId);
+ $("question").value=requestedId;updateMode("claims");
+ selectedPaperId=window.AxiovoArxiv?.parse(requestedId)?.base||"eprint:"+requestedId;
  $("paper-search").value=selectedPaperId;
 }else if(params.get("q"))$("question").value=params.get("q").slice(0,500);
 const indexReady=fetch("data/feed.json",{cache:"no-cache",signal:AbortSignal.timeout(12000)}).then(r=>{if(!r.ok)throw Error("feed unavailable");return r.json()}).then(d=>{
