@@ -22,7 +22,7 @@ VOICES = MODEL_ROOT / "voices-v1.0.bin"
 # Phonetic spellings are used only for speech synthesis; captions keep the
 # correct scientific spellings.
 REPLACEMENTS = (
-    (r"\bAxiovo\b", "Ax-ee-oh-vo"),
+    (r"\bAxiovo\b", "Ax-ee-oh-voh"),
     (r"\bbioRxiv\b", "bio archive"),
     (r"\bChemRxiv\b", "chem archive"),
     (r"\barXiv\b", "archive"),
