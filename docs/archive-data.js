@@ -171,9 +171,10 @@ function filter(papers,criteria){
  // Standalone fallback for pages that do not load the shared sorter.
  return scored.sort((a,b)=>b.score-a.score||String(b.p.date||"").localeCompare(a.p.date||"")).map(x=>x.p);
 }
-async function request(url,signal,json=true){
+async function request(url,signal,json=true,cacheMode){
  const timeout=AbortSignal.timeout(11000);
- const response=await fetch(url,{signal:signal?AbortSignal.any([signal,timeout]):timeout,cache:url.startsWith("./data/")?"no-store":"default"});
+ const response=await fetch(url,{signal:signal?AbortSignal.any([signal,timeout]):timeout,
+  cache:cacheMode|| (url.startsWith("./data/")?"no-store":"default")});
  if(!response.ok)throw Error("HTTP "+response.status);
  return json?response.json():response.text();
 }
@@ -185,7 +186,10 @@ async function snapshot(source,options={}){
  if(cached&&Date.now()-cached.at>=SNAPSHOT_TTL_MS)snapshots.delete(source);
  if(!snapshots.has(source)){
   const load=async path=>{
-   const data=await request("./data/"+path);
+   // Feed may use the normal HTTP cache for unchanged, official snapshots.
+   // Other pages retain no-store by default; a manual Feed Refresh revalidates.
+   const data=await request("./data/"+path,undefined,true,
+    options.cache==="default"?"default":undefined);
    const rows=data?.papers??data?.records??data;
    if(!Array.isArray(rows))throw Error("Invalid "+source+" snapshot");
    return {stamp:clean(data.generated_at||data.checked_at),papers:rows.map(p=>normalize(source,p)).filter(Boolean)};
