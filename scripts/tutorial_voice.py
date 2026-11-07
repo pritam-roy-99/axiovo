@@ -1,82 +1,76 @@
 #!/usr/bin/env python3
-"""Natural female narration for Axiovo's recorded research tutorial.
+"""Warm female neural voice for Axiovo's narrated research tutorial.
 
-Keep names in the captions unchanged. Only the spoken text is adjusted to
-avoid the neural synthesizer spelling technical acronyms incorrectly.
-Never silently replace natural female speech with robotic eSpeak.
+Uses local Kokoro ONNX synthesis. No remote TTS request, robotic fallback,
+or voice-cloning of the uploaded recording is performed.
 """
 from __future__ import annotations
 
-import argparse
-import asyncio
+from functools import lru_cache
 from pathlib import Path
+import os
 import re
-import time
 
-VOICE = "en-US-JennyNeural"
-VOICE_ALTERNATIVE = "en-IN-NeerjaNeural"
-VOICE_VERSION = "axiovo-female-neural-v2"
-RATE = "-4%"
-PITCH = "+0Hz"
+VOICE = "af_bella"
+VOICE_VERSION = "axiovo-kokoro-bella-v3"
+VOICE_ENGINE = "kokoro-onnx"
+SPEED = 0.96
+MODEL_ROOT = Path(os.environ.get("AXIOVO_VOICE_MODEL_DIR", ".cache/axiovo-voice"))
+MODEL = MODEL_ROOT / "kokoro-v1.0.onnx"
+VOICES = MODEL_ROOT / "voices-v1.0.bin"
 
-_REPLACEMENTS = (
-    (r"\bAxiovo\b", "Ax-ee-oh-voh"),
+# Phonetic spellings are used only for speech synthesis; captions keep the
+# correct scientific spellings.
+REPLACEMENTS = (
+    (r"\bAxiovo\b", "Ax-ee-oh-vo"),
     (r"\bbioRxiv\b", "bio archive"),
     (r"\bChemRxiv\b", "chem archive"),
     (r"\barXiv\b", "archive"),
-    (r"\bCryptology ePrint\b", "Cryptology e-print"),
-    (r"\bee print\b", "e-print"),
-    (r"\bDOI\b", "D O I"),
     (r"\bIACR\b", "I A C R"),
-    (r"\bOllama\b", "oh llama"),
+    (r"\bDOI\b", "D O I"),
+    (r"\bGPU\b", "G P U"),
+    (r"\bWebGPU\b", "Web G P U"),
+    (r"\bOllama\b", "Oh llama"),
     (r"\bQwen\b", "Q wen"),
     (r"\bKimi\b", "Kee mee"),
-    (r"\bOpenRouter\b", "Open Router"),
-    (r"\bWebGPU\b", "Web G P U"),
+    (r"\bePrint\b", "e-print"),
 )
 
-def voice_text(text: str) -> str:
-    if not isinstance(text, str) or not text.strip():
-        raise ValueError("The narration cannot be empty")
-    for pattern, spoken in _REPLACEMENTS:
-        text = re.sub(pattern, spoken, text, flags=re.IGNORECASE)
-    return text
+def voice_text(value: str) -> str:
+    if not isinstance(value, str) or not value.strip():
+        raise ValueError("Spoken text must be nonempty")
+    value = " ".join(value.split())
+    for pattern, replacement in REPLACEMENTS:
+        value = re.sub(pattern, replacement, value, flags=re.I)
+    return value
 
-async def synthesize(text: str, output: Path, *, voice: str = VOICE) -> None:
-    import edge_tts
-    await edge_tts.Communicate(
-        voice_text(text), voice=voice, rate=RATE, pitch=PITCH
-    ).save(str(output))
-    if not output.is_file() or output.stat().st_size < 1000:
-        raise RuntimeError("Neural narration is empty")
+@lru_cache(maxsize=1)
+def model():
+    if not MODEL.is_file() or not VOICES.is_file():
+        raise FileNotFoundError(
+            "Kokoro model files missing. Run scripts/download_tutorial_voice.sh first."
+        )
+    from kokoro_onnx import Kokoro
+    return Kokoro(str(MODEL), str(VOICES))
 
-def render(text: str, output: Path, *, voice: str = VOICE, attempts: int = 3) -> None:
-    """Retry recoverable network/voice failures, without downgrading quality."""
+def render(text: str, output: Path, *, voice: str = VOICE) -> None:
+    if voice != VOICE:
+        raise ValueError("The tutorial uses one consistent female voice")
+    import soundfile as sf
     output = Path(output)
     output.parent.mkdir(parents=True, exist_ok=True)
-    last_error = None
-    for attempt in range(1, attempts + 1):
-        try:
-            output.unlink(missing_ok=True)
-            asyncio.run(synthesize(text, output, voice=voice))
-            return
-        except Exception as exc:
-            last_error = exc
-            output.unlink(missing_ok=True)
-            if attempt < attempts:
-                time.sleep(min(attempt * 2, 5))
-    raise RuntimeError(
-        f"{voice} narration could not be generated after {attempts} attempts. "
-        "Refusing to replace the tutorial with robotic speech."
-    ) from last_error
+    sound, sample_rate = model().create(
+        voice_text(text), voice=voice, speed=SPEED, lang="en-us"
+    )
+    if len(sound) < sample_rate // 2:
+        raise ValueError("Generated narration is unexpectedly short")
+    sf.write(str(output), sound, sample_rate, subtype="PCM_16")
 
-def main() -> None:
+if __name__ == "__main__":
+    import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument("text")
     parser.add_argument("output", type=Path)
-    parser.add_argument("--voice", default=VOICE, choices=(VOICE, VOICE_ALTERNATIVE))
+    parser.add_argument("--voice", default=VOICE)
     args = parser.parse_args()
     render(args.text, args.output, voice=args.voice)
-
-if __name__ == "__main__":
-    main()
