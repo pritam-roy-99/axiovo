@@ -48,6 +48,19 @@ class FourArchiveUX(unittest.TestCase):
   self.assertIn('source-freshness.json',s)
   for archive in ("feed.json","eprint.json","biorxiv.json","chemrxiv.json"):
    self.assertNotIn('fetch("./data/'+archive,s)
+ def test_fourth_source_routes_use_real_crypto_page(self):
+  desk=(ROOT/"docs/research-desk.js").read_text("utf8")
+  feed=(ROOT/"docs/feed.js").read_text("utf8")
+  crypto=(ROOT/"docs/crypto.js").read_text("utf8")
+  self.assertIn('source==="eprint"?"./crypto.html"',desk)
+  self.assertIn('path.source==="eprint"?"crypto"',feed)
+  self.assertNotIn('eprint.html',desk+feed)
+  self.assertIn('feed-preview.json',crypto)
+  self.assertIn('Results are provisional',crypto)
+  self.assertIn('data.snapshot("eprint")',crypto)
+  self.assertIn('preview=false;',crypto)
+  self.assertTrue((ROOT/"docs/crypto.html").is_file())
+
  def test_saved_local_storage_api_is_untouched(self):
   html=(ROOT/"docs/workspace.html").read_text("utf8")
   self.assertIn('id="library-list"',html)
