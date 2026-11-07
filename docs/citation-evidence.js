@@ -100,6 +100,10 @@
   details.className="axiovo-citation-evidence";
   const summary=document.createElement("summary");summary.textContent="Citation sources";
   details.append(summary);
+  let mounted=false;
+  details.addEventListener("toggle",()=>{
+   if(!details.open||mounted)return;
+   mounted=true;
   const body=document.createElement("div");body.className="axiovo-citation-evidence-body";
   const links=document.createElement("div");links.className="axiovo-citation-directory-links";
   for(const {name,url,kind} of directories(p)){
@@ -140,7 +144,9 @@
    });
    body.append(button);
   }
-  details.append(body);parent.append(details);return details;
+   details.append(body);
+  });
+  parent.append(details);return details;
  }
  return {doi,identity,directories,resultsFor,lookup,add};
 });
