@@ -18,6 +18,10 @@ function app(fetcher,store={}){
   return {ok:true,json:async()=>fixture}});
  const result=await good.api.load();
  assert.equal(calls,2);
+ await good.api.load();
+ assert.equal(calls,2,"Repeated searches must reuse the verified in-memory snapshot");
+ await good.api.load({force:true});
+ assert.equal(calls,3,"Manual retry must revalidate the source");
  assert.equal(result.papers.length,1);
  assert.equal(result.papers[0].url,"https://eprint.iacr.org/2026/1234");
  assert.equal(result.papers[0].citations,null,"Unknown IACR citations must stay unknown");
