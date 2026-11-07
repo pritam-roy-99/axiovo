@@ -3,7 +3,7 @@
  "use strict";
  const data=window.AxiovoArchiveData,$=id=>document.getElementById(id);
  if(!data)return;
- let papers=[],shown=[],page=1,loaded=false,stamp="",complete=false;
+ let papers=[],shown=[],page=1,loaded=false,stamp="",complete=false,preview=false;
  const form=$("crypto-search-form");
  const fields=["query","topic","author","sort","from","to"];
  function el(tag,text,cls){
@@ -58,10 +58,10 @@
   const total=shown.length,pages=Math.max(1,Math.ceil(total/perPage));
   page=Math.max(1,Math.min(page,pages));
   const visible=shown.slice((page-1)*perPage,page*perPage);
-  status.textContent=total+" of "+papers.length+" indexed IACR records match. "+
-   (complete?"Completed all available OAI metadata-date windows. Some source records may not be exposed.":"Coverage is partial; not all historical papers are indexed.");
+  status.textContent=total+" of "+papers.length+(preview?" recent-preview IACR records match. Full available source index is still loading.":" indexed IACR records match. ")+
+   (preview?" Results are provisional until the full snapshot is checked.":complete?"Completed all available OAI metadata-date windows. Some source records may not be exposed.":"Coverage is partial; not all historical papers are indexed.");
   if(!total){
-   target.append(el("p","No match in Axiovo's available IACR metadata. This does not mean the original archive has no such paper.","rd-small"));
+   target.append(el("p",preview?"No matches in the recent preview. Searching the complete available IACR snapshot next…":"No match in Axiovo's available IACR metadata. This does not mean the original archive has no such paper.","rd-small"));
    const official=link("Search IACR ePrint directly ↗","https://eprint.iacr.org/search");
    official.target="_blank";official.rel="noopener";target.append(official);
    return;
@@ -131,15 +131,38 @@
  };
  window.addEventListener("storage",e=>{if(e.key==="axiovo-eprint-reading-v1")render()});
  fromURL();
+ // Show source-verified recent records promptly, but never replace full
+ // historical retrieval with a preview-only search. All subsequent queries
+ // and filters run again against the complete available source snapshot.
+ async function showPreview(){
+  try{
+   const response=await fetch("./data/feed-preview.json",{
+    cache:"default",signal:AbortSignal.timeout(5000)
+   });
+   if(!response.ok)return;
+   const payload=await response.json();
+   if(payload.coverage!=="recent-preview-only-full-source-snapshots-load-afterward"||
+      !Array.isArray(payload.papers)||loaded)return;
+   const first=payload.papers.filter(p=>p.source==="eprint")
+    .map(p=>data.normalize("eprint",p)).filter(Boolean);
+   if(!first.length||loaded)return;
+   papers=first;preview=true;loaded=true;
+   $("crypto-coverage-count").textContent="Recent IACR preview · loading full indexed history";
+   render();
+  }catch(_error){ /* Old sites can omit this optional preview. */ }
+ }
+ void showPreview();
  data.snapshot("eprint").then(value=>{
   papers=Array.isArray(value.papers)?value.papers:[];
-  stamp=value.stamp;complete=value.fullOaiTraversal===true;loaded=true;
-  $("crypto-coverage-count").textContent=papers.length+" verified-source records indexed"+
+  stamp=value.stamp;complete=value.fullOaiTraversal===true;
+  loaded=true;preview=false;
+  $("crypto-coverage-count").textContent=papers.length+" source-linked records indexed"+
    (stamp?" · updated "+stamp.slice(0,10):"")+(complete?" · full available OAI history traversed":" · history incomplete");
   render();
  }).catch(()=>{
-  loaded=true;papers=[];
-  $("crypto-coverage-count").textContent="IACR metadata unavailable · official archive remains accessible";
+  loaded=true;
+  $("crypto-coverage-count").textContent=preview?
+   "IACR full index unavailable · showing recent preview only":"IACR metadata unavailable · official archive remains accessible";
   render();
  });
 })();
