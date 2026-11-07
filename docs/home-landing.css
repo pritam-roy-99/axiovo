@@ -263,7 +263,8 @@ body.axiovo-home .axiovo-demo-bottom{margin-top:14px}
    line-height:1.55;
  }
 }
-@media(max-width:360px){
+/* Use two compact CTAs at 360px, stacking only on unusually narrow screens. */
+@media(max-width:319px){
  body.axiovo-home .axiovo-welcome-header .axiovo-welcome-actions {
    grid-template-columns:1fr;
  }
