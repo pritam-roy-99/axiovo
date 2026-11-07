@@ -78,8 +78,21 @@ def main():
     page.locator("#crypto-custom-kind").select_option("subtopic")
     page.locator("#crypto-custom").fill("Quantum authentication protocols")
     page.locator("#crypto-custom-add").click()
-    assert "Personal topic added" in page.locator("#crypto-personal-status").inner_text()
+    assert "Sub-subtopic added" in page.locator("#crypto-personal-status").inner_text()
     assert page.locator("#crypto-subtopic").input_value()=="Quantum authentication protocols"
+    page.locator("#crypto-custom-kind").select_option("topic")
+    page.locator("#crypto-custom").fill("Secure quantum protocols")
+    page.locator("#crypto-custom-add").click()
+    assert "Research subfield added" in page.locator("#crypto-personal-status").inner_text()
+    assert page.locator("#crypto-topic").input_value()=="Secure quantum protocols"
+    page.locator("#crypto-custom-kind").select_option("subject")
+    page.locator("#crypto-custom").fill("Personal quantum security")
+    page.locator("#crypto-custom-add").click()
+    assert "Research subject added" in page.locator("#crypto-personal-status").inner_text()
+    assert page.locator("#crypto-field").input_value()=="Personal quantum security"
+    page.reload(wait_until="domcontentloaded")
+    assert page.locator("#crypto-field").input_value()=="Personal quantum security"
+    assert page.locator("#crypto-custom-kind option").count()==3
     page.locator("#crypto-clear-path").click()
     assert page.locator("#crypto-field").input_value()==""
     assert page.locator("#crypto-topic-input").is_disabled()
