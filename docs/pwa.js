@@ -30,7 +30,10 @@
   window.addEventListener("appinstalled",()=>{installEvent=null;buttons.forEach(button=>button.hidden=true)});
   if(!("serviceWorker" in navigator)||!window.isSecureContext)return;
   window.addEventListener("load",()=>{
-   navigator.serviceWorker.register("./sw.js",{scope:"./",updateViaCache:"none"}).catch(err=>{
+   navigator.serviceWorker.register("./sw.js",{scope:"./",updateViaCache:"none"}).then(registration=>{
+    // Check for a newer offline shell on visits, without clearing Library data.
+    return registration.update();
+   }).catch(err=>{
     console.info("Axiovo offline support unavailable:",err.message||err)
    });
   });
