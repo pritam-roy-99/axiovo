@@ -12,7 +12,7 @@ concurrency:
 jobs:
   backfill:
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    timeout-minutes: 55
     steps:
       - uses: actions/checkout@v4
         with:
@@ -20,14 +20,17 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Validate OAI metadata parser
-        run: python -m unittest discover -s tests -p 'test_eprint_harvest.py' -v
-      - name: Backfill one completed OAI metadata-update year
+      - name: Verify source and resumable backfill integrity
+        run: |
+          python -m unittest discover -s tests -p 'test_eprint_harvest.py' -v
+          python -m unittest discover -s tests -p 'test_eprint_backfill.py' -v
+      - name: Traverse full available OAI history with adaptive date splitting
         env:
-          IACR_BACKFILL_WINDOWS: '1'
-          IACR_BACKFILL_PAGES: '80'
+          IACR_BACKFILL_WINDOWS: '30'
+          IACR_BACKFILL_PAGES: '70'
+          IACR_BACKFILL_SPLITS: '60'
         run: python -m scripts.backfill_eprint
-      - name: Commit only source-validated IACR metadata and checkpoint
+      - name: Commit verified IACR metadata and its non-skipping checkpoint
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -37,6 +40,6 @@ jobs:
           if ! git diff --cached --quiet; then
             git commit -m "data: advance validated IACR ePrint OAI history [skip ci]"
             git fetch origin main
-            git rebase -X theirs origin/main
+            git rebase origin/main
             git push origin HEAD:main
           fi
