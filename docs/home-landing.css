@@ -356,3 +356,15 @@ body.axiovo-home .axiovo-welcome-header .axiovo-cta:focus-visible{
 .axiovo-source-pulse-note{font-size:.75rem;line-height:1.6;color:var(--rd-muted,#61788c);margin:11px 0 0}
 @media(max-width:850px){.axiovo-source-pulse-list{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:390px){.axiovo-source-pulse{padding:14px}.axiovo-source-pulse-item{padding:10px}}
+
+/* Explicit video/guide choice, consistent on first and return visits. */
+.axiovo-welcome .axiovo-tour-mode-switch{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 8px}
+.axiovo-welcome .axiovo-tour-mode-switch button{min-height:40px;white-space:normal}
+.axiovo-welcome .axiovo-tour-media-status{min-height:0;margin:5px 0 9px;color:#d6e8f6}
+.axiovo-welcome #axiovo-tour-show-video[aria-pressed="true"],
+.axiovo-welcome #axiovo-tour-show-guide[aria-pressed="true"]{background:#157ba7;color:#fff;border-color:#70c7e5}
+@media(max-width:480px){
+ .axiovo-welcome .axiovo-tour-mode-switch{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+ .axiovo-welcome #axiovo-tour-retry-video{grid-column:1/-1}
+ .axiovo-welcome .axiovo-tour-mode-switch button{font-size:.8rem;padding:9px}
+}
