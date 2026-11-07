@@ -31,6 +31,16 @@ vm.createContext(sandbox);
 for(const file of ["arxiv-versions.js","archive-taxonomy.js","archive-data.js"])
  vm.runInContext(fs.readFileSync("docs/"+file,"utf8"),sandbox);
 const data=sandbox.AxiovoArchiveData;
+for(const [source,first] of Object.entries({
+ arxiv:"1991-08-01",biorxiv:"2013-11-01",chemrxiv:"2017-01-01",eprint:"1996-01-01"
+})){
+ assert.equal(data.historyRange(source,"2026-11-07").from,first);
+ assert.equal(data.historyRange(source,"2026-11-07").to,"2026-11-07");
+}
+assert.equal(data.sourceDateWindow("biorxiv",{from:"1991-08-01"}).from,"2013-11-01");
+assert.equal(data.sourceDateWindow("chemrxiv",{from:"1991-08-01"}).from,"2017-01-01");
+assert.equal(data.sourceDateWindow("biorxiv",{from:"2020-01-01"}).from,"2020-01-01");
+
 assert.equal(storage.get("axiovo-reading-list"),'["2207.00009v1"]',"Read older saved papers when the current key is absent");
 const taxonomy=sandbox.AxiovoArchiveTaxonomy;
 assert.equal(taxonomy.directory("arxiv").length,155);
