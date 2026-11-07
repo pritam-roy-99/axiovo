@@ -48,6 +48,28 @@ def main():
     assert page.locator('.axiovo-archive-grid a').count()==4
     assert page.evaluate("document.documentElement.scrollWidth<=innerWidth+7"),("homepage overflow",width)
     page.goto(base+"crypto.html",wait_until="domcontentloaded")
+    # The three-stage topic selector must be fully initialized on mobile and desktop.
+    page.locator("#crypto-field-input").wait_for(timeout=12000)
+    assert page.locator("#crypto-field-input").is_visible()
+    assert page.locator("#crypto-topic-input").is_disabled()
+    page.locator("#crypto-field-input").click()
+    page.locator("#crypto-field-input").fill("Quantum")
+    page.get_by_role("option",name="Quantum and post-quantum security",exact=True).click()
+    assert page.locator("#crypto-field").input_value()=="Quantum and post-quantum security"
+    assert page.locator("#crypto-topic-input").is_enabled()
+    page.locator("#crypto-topic-input").click()
+    page.locator("#crypto-topic-input").fill("Quantum cryptography")
+    page.get_by_role("option",name="Quantum cryptography",exact=True).click()
+    assert page.locator("#crypto-subtopic-input").is_enabled()
+    page.locator("#crypto-subtopic-input").click()
+    page.locator("#crypto-subtopic-input").fill("Quantum key distribution")
+    page.get_by_role("option",name="Quantum key distribution",exact=True).click()
+    assert page.locator("#crypto-subtopic").input_value()=="quantum key distribution"
+    assert "Quantum key distribution" in page.locator("#crypto-scope-label").inner_text()
+    page.locator("#crypto-clear-path").click()
+    assert page.locator("#crypto-field").input_value()==""
+    assert page.locator("#crypto-topic-input").is_disabled()
+    assert page.evaluate("document.documentElement.scrollWidth<=innerWidth+7")
     page.locator(".crypto-paper").first.wait_for(timeout=15000)
     assert page.locator(".crypto-paper").count()==3
     assert all("eprint.iacr.org/" in href for href in page.locator(".crypto-paper h3 a").evaluate_all("(els)=>els.map(e=>e.href)"))
