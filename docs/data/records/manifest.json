@@ -6,49 +6,45 @@
     "arxiv": {
       "input_records": 6122,
       "invalid_or_unavailable": 0,
-      "last_sync": "2026-11-07T00:24:18.022443+00:00",
+      "last_sync": "2026-11-07T01:27:58.806372+00:00",
       "coverage": "available source snapshots, not a complete historical archive"
     },
     "biorxiv": {
-      "input_records": 3634,
+      "input_records": 3644,
       "invalid_or_unavailable": 0,
-      "last_sync": "2026-11-07T00:19:08.894809+00:00",
+      "last_sync": "2026-11-07T01:22:30.810759+00:00",
       "coverage": "available source snapshots, not a complete historical archive"
     },
     "chemrxiv": {
       "input_records": 3000,
       "invalid_or_unavailable": 0,
-      "last_sync": "2026-11-07T00:19:23.867160+00:00",
+      "last_sync": "2026-11-07T01:22:45.970949+00:00",
       "coverage": "available source snapshots, not a complete historical archive"
     }
   },
   "shards": {
     "arxiv/2026-11.json": 4532,
     "biorxiv/2026-10.json": 2015,
-    "biorxiv/2026-11.json": 1619,
-    "chemrxiv/2019-01.json": 85,
-    "chemrxiv/2019-02.json": 179,
-    "chemrxiv/2019-03.json": 161,
-    "chemrxiv/2019-04.json": 198,
-    "chemrxiv/2019-05.json": 225,
-    "chemrxiv/2019-06.json": 249,
-    "chemrxiv/2019-07.json": 323,
-    "chemrxiv/2019-08.json": 253,
-    "chemrxiv/2019-09.json": 264,
-    "chemrxiv/2019-10.json": 320,
+    "biorxiv/2026-11.json": 1629,
+    "chemrxiv/2019-10.json": 258,
     "chemrxiv/2019-11.json": 234,
-    "chemrxiv/2019-12.json": 205,
+    "chemrxiv/2019-12.json": 322,
+    "chemrxiv/2020-01.json": 285,
+    "chemrxiv/2020-02.json": 319,
+    "chemrxiv/2020-03.json": 366,
+    "chemrxiv/2020-04.json": 543,
+    "chemrxiv/2020-05.json": 369,
     "chemrxiv/2020-06.json": 1,
     "chemrxiv/2022-08.json": 1,
     "chemrxiv/2023-01.json": 1,
     "chemrxiv/2026-09.json": 1,
     "chemrxiv/2026-11.json": 300
   },
-  "record_count": 11166,
+  "record_count": 11176,
   "latest_arxiv_announcement": {
     "date": "2026-11-06",
     "count": 2622,
-    "checked_at": "2026-11-07T00:24:03.457607+00:00",
+    "checked_at": "2026-11-07T01:27:40.118100+00:00",
     "complete": true
   }
 }
