@@ -369,6 +369,14 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq ffmpeg
+      - name: Restore the current female-narrated tutorial recording
+        uses: actions/cache@v4
+        with:
+          path: |
+            docs/assets/axiovo-tour.mp4
+            docs/assets/axiovo-tour.vtt
+            docs/assets/axiovo-tour-build.json
+          key: axiovo-female-neural-v2-${{ hashFiles('scripts/build_tutorial_video.py', 'scripts/tutorial_voice.py') }}
       - name: Reuse already recorded and source-verified Axiovo tutorial
         id: existing_video
         run: |
@@ -384,7 +392,10 @@ jobs:
               valid=(mp4.is_file() and mp4.stat().st_size>100_000
                      and vtt.is_file() and vtt.read_text(encoding="utf-8").startswith("WEBVTT")
                      and len(meta.get("chapters",[]))>=20
-                     and meta.get("source")=="Real Chromium page captures")
+                     and meta.get("source")=="Real Chromium page captures"
+                     and meta.get("voice_version")=="axiovo-female-neural-v2"
+                     and meta.get("voice_engine")=="edge-tts-neural"
+                     and meta.get("voices")==["en-US-JennyNeural"])
               if valid:
                   tracks=json.loads(subprocess.check_output([
                       "ffprobe","-v","error","-show_streams","-show_format",
@@ -401,7 +412,7 @@ jobs:
       - name: Install tutorial recording dependencies only when missing
         if: steps.existing_video.outputs.reuse != 'true'
         run: |
-          sudo apt-get install -y -qq espeak-ng fonts-dejavu-core
+          sudo apt-get install -y -qq fonts-dejavu-core
           python -m pip install --disable-pip-version-check Pillow edge-tts
       # The older illustrated-video generator depends on narration .opus files
       # which are not all present. It is redundant: the recorded current-site
@@ -428,6 +439,10 @@ jobs:
           assert video.is_file() and video.stat().st_size > 100000, "Tutorial video missing/empty"
           assert caption.is_file() and caption.read_text().startswith("WEBVTT"), "Captions missing"
           assert chapter.is_file() and len(json.loads(chapter.read_text()).get("chapters",[])) >= 20, "Video chapter index missing"
+          voice_metadata=json.loads(chapter.read_text(encoding="utf-8"))
+          assert voice_metadata.get("voice_version")=="axiovo-female-neural-v2", "Old tutorial audio was reused"
+          assert voice_metadata.get("voice_engine")=="edge-tts-neural", "Narration is not neural female speech"
+          assert voice_metadata.get("voices")==["en-US-JennyNeural"], "Unexpected or mixed tutorial voices"
           probe=json.loads(subprocess.check_output([
               "ffprobe","-v","error","-show_streams","-show_format",
               "-of","json",str(video)],text=True))
