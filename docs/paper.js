@@ -28,6 +28,7 @@ const e=document.createElement("button");e.className="btn";e.textContent="Copy B
 const fields=$("fields");fields.replaceChildren();
 line(fields,"arXiv ID",baseId);if(requested?.explicit)line(fields,"Requested revision","v"+requested.version+" (verify on arXiv)");line(fields,"First submitted",p.published||"unknown");line(fields,"Last version update",p.updated||"unknown");line(fields,"arXiv categories",(p.categories||[]).join(", "));line(fields,"Inferred topics",(p.topics||[]).join(", ")||"uncategorized");
 window.AxiovoAuthorFollow?.mount(links,p.authors||[]);
+window.AxiovoCitationEvidence?.add(links,{...p,source:"arxiv",arxiv_id:baseId});
 const authors=$("author-links");authors.replaceChildren();
 for(const name of (p.authors||[]).slice(0,12)){const div=document.createElement("div");div.className="related";const query="https://arxiv.org/search/?"+new URLSearchParams({query:name,searchtype:"author"});external(div,name+" ↗",query,"");authors.append(div)}
 const related=all.filter(x=>x.id!==baseId).map(x=>({paper:x,score:overlap(p.title+" "+p.abstract,x.title+" "+x.abstract)})).filter(x=>x.score>0).sort((a,b)=>b.score-a.score).slice(0,6);
