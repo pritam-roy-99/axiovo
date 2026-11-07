@@ -12,6 +12,9 @@ class DeploymentPolicyTests(unittest.TestCase):
             self.assertRegex(WORKFLOW,pattern)
         self.assertIn("cron: '17 * * * *'",WORKFLOW)
         self.assertIn("workflow_dispatch:",WORKFLOW)
+    def test_metadata_commits_cannot_cancel_running_video_publication(self):
+        self.assertIn("group: axiovo-pages",WORKFLOW)
+        self.assertIn("cancel-in-progress: false",WORKFLOW)
     def test_code_deploys_after_successful_checks_without_external_refresh(self):
         self.assertIn("python scripts/security_audit.py",WORKFLOW)
         self.assertIn("node tests/library-outside-cache.test.js",WORKFLOW)
