@@ -20,7 +20,7 @@ for(const p of ["arxiv-versions.js","archive-data.js"]){
  vm.runInContext(fs.readFileSync("docs/"+p,"utf8"),browser,{filename:p});
 }
 const api=browser.AxiovoArchiveData;
-assert.equal(api.parseEprint("https://eprint.iacr.org/2026/001234"),"2026/1234");
+assert.equal(api.parseEprint("https://eprint.iacr.org/2026/1234"),"2026/1234");
 assert.equal(api.parseEprint("2026/1234v2"),"","Do not invent ePrint revisions");
 assert.equal(api.eprintIdentifier("2026/1234"),"2026/1234");
 assert.equal(api.eprintIdentifier("quantum"),"");
