@@ -334,8 +334,8 @@ body.axiovo-home .axiovo-welcome-header .axiovo-cta:focus-visible{
   min-height:104px;padding:12px 7px;border-radius:12px;
  }
  body.axiovo-home .axiovo-cta-icon{width:23px;height:23px}
- body.axiovo-home .axiovo-cta-copy strong{font-size:clamp(.78rem,3.5vw,1rem)!important}
- body.axiovo-home .axiovo-cta-copy small{font-size:clamp(.65rem,2.7vw,.78rem)!important}
+ body.axiovo-home .axiovo-cta-copy strong{font-size:clamp(.86rem,3.5vw,1rem)!important}
+ body.axiovo-home .axiovo-cta-copy small{font-size:clamp(.72rem,2.7vw,.8rem)!important}
 }
 @media(max-width:319px){
  body.axiovo-home .axiovo-welcome-header .axiovo-welcome-actions{
