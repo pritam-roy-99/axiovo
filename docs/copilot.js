@@ -93,6 +93,15 @@ function evidenceText(query){
   "Source evidence could not be summarized. Check the original records.";
 }
 async function findPaper(id,allowPublicLookup=false){
+ const iacr=Archive?.eprintIdentifier(id);
+ if(iacr){
+  const known=index.find(p=>p.id==="eprint:"+iacr);
+  if(known)return Archive.normalize("eprint",{id:iacr,...known});
+  try{
+   const batch=await Archive.snapshot("eprint");
+   return batch.papers.find(p=>p.id===iacr)||null;
+  }catch{return null}
+ }
  const parsed=window.AxiovoArxiv?.parse(id);
  if(!parsed)return null;
  for(const record of index){
@@ -312,8 +321,8 @@ async function submit(){
  if(busy)return;
  const question=$("question").value.trim(),draft=$("draft").value.trim();
  if(!question&&!draft){rstatus("Enter a question or paste an abstract in the optional text field.");return}
- const id=window.AxiovoArxiv?.parse(question)?.requested||directId(question);
- if(mode==="claims"&&!id&&!draft){rstatus("Paste an arXiv ID or URL, or add an abstract under Optional text.");return}
+ const id=window.AxiovoArxiv?.parse(question)?.requested||directId(question)||Archive?.eprintIdentifier(question);
+ if(mode==="claims"&&!id&&!draft){rstatus("Paste an arXiv or IACR ePrint ID or original URL, or add an abstract under Optional text.");return}
  setBusy(true);
  const query=(question||draft.slice(0,220));lastQuery=query;lastDate=new Date().toISOString();
  record("user",question||"Inspect the supplied abstract");
@@ -362,7 +371,7 @@ async function globalSearch(){
  if(q.length<3){rstatus("Enter a public search query to look up more papers.");return}
  setBusy(true);
  try{
-  const id=window.AxiovoArxiv?.parse(q)?.requested;
+  const id=window.AxiovoArxiv?.parse(q)?.requested||Archive?.eprintIdentifier(q);
   if(id){
    await indexReady;
    const paper=await findPaper(id,true);
@@ -466,6 +475,25 @@ async function loadOai(){
   if(added){pickerOptions($("paper-search").value);rstatus("Loaded "+index.length+" unique indexed arXiv records, including "+added+" OAI metadata entries. Complete historical coverage is not claimed.")}
  }catch(err){/* OAI is optional; the original Atom index remains functional */}
 }
+async function loadIacrSources(){
+ if(!Archive)return;
+ try{
+  const snap=await Archive.snapshot("eprint");
+  const known=new Set(index.map(p=>p.id));
+  let added=0;
+  for(const p of snap.papers){
+   const id="eprint:"+p.id;
+   if(known.has(id))continue;
+   index.push({...p,id,recordId:p.id,source:"eprint",provider:"IACR Cryptology ePrint OAI-PMH",
+    published:p.date||"",url:p.url});
+   known.add(id);added++;
+  }
+  if(added){
+   pickerOptions($("paper-search").value);
+   rstatus("Loaded "+added+" IACR ePrint records in addition to indexed arXiv metadata. IACR historical coverage remains partial.");
+  }
+ }catch{/* Original arXiv source retrieval remains fully available. */}
+}
 $("paper-search").addEventListener("input",()=>pickerOptions($("paper-search").value));
 $("paper-picker").addEventListener("change",()=>{selectedPaperId=$("paper-picker").value;const p=chosenPaper();if(p)$("paper-status").textContent="Selected "+p.id+": "+p.title});
 $("analyze-paper").onclick=assessPaper;
@@ -498,7 +526,7 @@ if(requestedId){
  $("paper-search").value=selectedPaperId;
 }else if(params.get("q"))$("question").value=params.get("q").slice(0,500);
 const indexReady=fetch("data/feed.json",{cache:"no-cache",signal:AbortSignal.timeout(12000)}).then(r=>{if(!r.ok)throw Error("feed unavailable");return r.json()}).then(d=>{
- index=(d.papers||[]).filter(p=>p.id&&p.title);indexVersion=d.generated_at||"unknown";rstatus(index.length+" indexed arXiv records ready.");pickerOptions($("paper-search").value);loadOai();
+ index=(d.papers||[]).filter(p=>p.id&&p.title);indexVersion=d.generated_at||"unknown";rstatus(index.length+" indexed arXiv records ready.");pickerOptions($("paper-search").value);loadOai();void loadIacrSources();
  const pair=(params.get("ids")||"").split(",").map(x=>x.trim()).filter(Boolean);
  if(pair.length===2&&pair.every(x=>arxivID.test(x))){
   const normalized=pair.map(x=>window.AxiovoArxiv?.base(x)||x);
