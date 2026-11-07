@@ -3,7 +3,7 @@
  function mount(){
   const header=document.querySelector("header");if(!header)return;
   const toggle=header.querySelector(".theme-toggle");
-  const logo=document.createElement("a");logo.className="rl-logo";logo.href="./";logo.setAttribute("aria-label","Axiovo home");
+  const logo=document.createElement("a");logo.className="rl-logo";logo.href="./index.html";logo.setAttribute("aria-label","Axiovo home");
   const mark=document.createElement("span");mark.className="rl-logo-mark";mark.textContent="A";
   logo.append(mark,document.createTextNode(" Axiovo"));
   const nav=document.createElement("nav");nav.className="rl-nav";nav.setAttribute("aria-label","Main navigation");
@@ -35,7 +35,7 @@
   // Explicit, reliable home/back controls. Back returns to the immediately
   // previous same-origin page; a direct visit falls back to the homepage.
   if(file!=="index.html"){
-   const home=document.createElement("a");home.href="./";home.className="axiovo-home-link";
+   const home=document.createElement("a");home.href="./index.html";home.className="axiovo-home-link";
    home.textContent="⌂ Home";home.setAttribute("aria-label","Back to Axiovo homepage");
    const back=document.createElement("button");back.type="button";back.className="axiovo-back-button";
    back.textContent="← Back";back.setAttribute("aria-label","Go to previous page, or Axiovo homepage");
@@ -47,8 +47,15 @@
      sameOrigin=Boolean(document.referrer)&&previous.origin===appBase.origin
       &&previous.pathname.startsWith(appBase.pathname);
     }catch{}
-    if(sameOrigin&&history.length>1)history.back();
-    else location.assign(new URL("./",location.href).href);
+    if(sameOrigin&&history.length>1){
+     // A Home reached from a fragment link may have been scrolled directly
+     // to the archive cards. Return to the actual homepage top/video instead.
+     const prior=new URL(document.referrer);
+     const appBase=new URL("./",location.href);
+     const priorFile=prior.pathname.slice(appBase.pathname.length);
+     if(!priorFile||priorFile==="index.html")location.assign(new URL("./index.html",location.href).href);
+     else history.back();
+    }else location.assign(new URL("./index.html",location.href).href);
    };
    const actions=document.createElement("div");actions.className="axiovo-nav-return";
    actions.append(back,home);
