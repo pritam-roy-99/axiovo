@@ -21,6 +21,7 @@ for(const p of ["arxiv-versions.js","archive-data.js"]){
 }
 const api=browser.AxiovoArchiveData;
 assert.equal(api.parseEprint("https://eprint.iacr.org/2026/1234"),"2026/1234");
+assert.equal(api.parseEprint("https://eprint.iacr.org/2005/001"),"2005/001");
 assert.equal(api.parseEprint("2026/1234v2"),"","Do not invent ePrint revisions");
 assert.equal(api.eprintIdentifier("2026/1234"),"2026/1234");
 assert.equal(api.eprintIdentifier("quantum"),"");
