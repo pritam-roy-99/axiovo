@@ -46,7 +46,6 @@
    // Older Feed builds left a trailing hyphen when hiding a ChemRxiv revision.
    const hiddenEarlier=paper.source==="chemrxiv"&&hidden.has(id+"-");
    if(seen.has(id)||hidden.has(id)||hiddenEarlier)continue;
-   seen.add(id);
    // Tokenize each paper once per ranking pass, even with dozens of follows.
    const prepared={title:new Set(terms(paper.title)),abstract:new Set(terms(paper.abstract))};
    const authorHit=(paper.authors||[]).filter(x=>authors.some(y=>prefs.matchesAuthor?prefs.matchesAuthor(y,x):String(y).toLowerCase()===String(x).toLowerCase()));
@@ -54,17 +53,25 @@
     ...(prefs.paths||[]).flatMap(path=>pathMatches(path,paper,prepared,queryCache))];
    const topicMatches=[...new Map(matches.filter(x=>x.matched).map(x=>[x.topic.toLowerCase(),x])).values()];
    const related=references.filter(x=>key(x)!==id).map(x=>({paper:x,...overlaps(x.title,paper.title,paper.abstract||"",prepared,queryCache)})).filter(x=>x.matched).sort((a,b)=>b.score-a.score).slice(0,1);
-   if(!authorHit.length&&!topicMatches.length&&!related.length)continue;
+   // Public preprint authors are usually strings, not verified researcher IDs.
+   // A matching name must not be treated as proof that this is the followed person.
+   // Require independent topic, Discover-path or saved-paper evidence by default.
+   // Allow uncertain name-only papers only by the user's explicit opt-in.
+   const topicalEvidence=topicMatches.length>0||related.length>0;
+   const nameOnly=authorHit.length>0&&!topicalEvidence;
+   if(nameOnly&&!prefs.includeUnverifiedNames)continue;
+   if(!authorHit.length&&!topicalEvidence)continue;
+   seen.add(id);
    const then=date(paper),days=then>0&&then<=now?(now-then)/86400000:null;
    const recency=days===null?0:days<=3?12:days<=7?9:days<=30?5:days<=90?2:0;
-   const reasons=[...authorHit.slice(0,2).map(x=>"Following author: "+x),
+   const reasons=[...authorHit.slice(0,2).map(x=>"Name match only: "+x+" (researcher identity unverified)"),
     ...topicMatches.slice(0,3).map(x=>"Following topic: "+x.topic),
     ...related.map(x=>"Similar to saved: "+x.paper.title.slice(0,65))];
    const score=authorHit.length*35+topicMatches.reduce((n,x)=>n+20+x.score,0)+
     related.reduce((n,x)=>n+12+x.score,0)+recency-
     (saved.has(id)?12:0);
    out.push({paper,score,reasons,days,authorMatch:authorHit.length>0,topicMatch:topicMatches.length>0,
-    relatedMatch:related.length>0,saved:saved.has(id),key:id});
+    relatedMatch:related.length>0,nameOnly,identityVerified:false,saved:saved.has(id),key:id});
   }
   return out.sort((a,b)=>b.score-a.score||date(b.paper)-date(a.paper)||a.key.localeCompare(b.key));
  }
