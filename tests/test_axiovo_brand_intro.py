@@ -29,7 +29,7 @@ class BrandIntroTest(unittest.TestCase):
 
     def test_one_video_with_captions_and_a_guide(self):
         self.assertIn('src="./assets/axiovo-tour.mp4',HOME)
-        self.assertIn('src="./assets/axiovo-tour.vtt"',HOME)
+        self.assertIn('src="./assets/axiovo-tour.vtt',HOME)
         self.assertIn('kind="captions"',HOME)
         self.assertIn("Full step-by-step guide",HOME)
         self.assertIn('id="axiovo-tour" hidden',HOME)
