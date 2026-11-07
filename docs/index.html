@@ -15,7 +15,7 @@
 <link rel="stylesheet" href="./home-landing.css?v=20261107-home-return-v1">
 <script defer src="./theme.js"></script>
 <script defer src="./research-entry.js"></script>
-<script defer src="./navigation.js?v=20261107-home-return-v2"></script>
+<script defer src="./navigation.js?v=20261107-home-return-v3"></script>
 <script defer src="./archive-taxonomy.js"></script>
 <script defer src="./arxiv-versions.js"></script>
 <script defer src="./archive-data.js"></script>
@@ -55,6 +55,20 @@
 @media(max-width:680px){.axiovo-home-feed-preview{grid-template-columns:1fr}}
 </style>
 
+<script>
+/* Deliberate Home returns start at the introduction and video, not restored cards. */
+(function(){
+ const returning=new URLSearchParams(location.search).has("axiovo_return");
+ if(!returning)return;
+ if("scrollRestoration" in history)history.scrollRestoration="manual";
+ const top=()=>window.scrollTo({top:0,left:0,behavior:"instant"});
+ addEventListener("pageshow",()=>{
+  top();
+  requestAnimationFrame(()=>requestAnimationFrame(top));
+ });
+ addEventListener("load",top,{once:true});
+})();
+</script>
 </head>
 <body class="axiovo-home axiovo-research">
 <header class="rl-global-header"><a class="rl-logo" href="./" aria-label="Axiovo home"><span class="rl-logo-mark" aria-hidden="true">A</span> Axiovo</a></header>
@@ -125,7 +139,7 @@
   </details>
  </div>
 </section>
-<script defer src="./home-tour.js?v=20261107-home-return-v2"></script>
+<script defer src="./home-tour.js?v=20261107-home-return-v3"></script>
 
 
 <section class="rd-home-section" aria-labelledby="axiovo-archive-title">
