@@ -33,7 +33,7 @@
   const directTopics=unique(topics);
   // Only explicit follows are interests. The last browsed path is navigation state.
   const paths=[];
-  for(const source of ["arxiv","biorxiv","chemrxiv"]){
+  for(const source of ["arxiv","biorxiv","chemrxiv","eprint"]){
    const saved=read(storage,"axiovo-topic-explorer-"+source+"-v1",{});
    for(const row of (Array.isArray(saved?.followed)?saved.followed:[])){
     if(typeof row?.category!=="string"||!row.category)continue;
