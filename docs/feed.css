@@ -174,3 +174,23 @@
 .axiovo-feed-page .feed-uncertain-option{display:flex;flex-wrap:wrap;align-items:flex-start;gap:7px;font-size:12px;line-height:1.5;padding:11px 12px;margin:8px 0 15px;border:1px solid var(--rl-border,#cbdde9);border-radius:10px;color:var(--rl-text,#17324a);cursor:pointer}
 .axiovo-feed-page .feed-uncertain-option input{flex:none;width:17px;height:17px;margin:1px 0 0;accent-color:var(--axiovo-accent,#126f9c)}
 .axiovo-feed-page .feed-uncertain-option small{flex-basis:100%;margin-left:24px;color:var(--rl-muted,#607a91);font-size:11px}
+
+/* Mobile feed: clearer separation between paper identity and actions. */
+@media(max-width:760px){
+ .axiovo-feed-page .feed-page {padding-inline:12px!important}
+ .axiovo-feed-page .feed-hero {border-radius:14px;padding:16px!important}
+ .axiovo-feed-page .feed-card {
+   min-width:0;max-width:100%;padding:14px!important;
+   border-radius:14px!important;
+ }
+ .axiovo-feed-page .feed-card :is(h2,h3,a) {overflow-wrap:anywhere}
+ .axiovo-feed-page .feed-post-header {gap:9px}
+ .axiovo-feed-page .feed-card-actions {gap:7px}
+ .axiovo-feed-page .feed-card-actions > :is(a,button) {
+   min-width:0;min-height:44px;
+   border-radius:10px;line-height:1.35;
+ }
+ .axiovo-feed-page .feed-toolbar {padding:8px 0}
+ .axiovo-feed-page .feed-tabs {padding-bottom:4px;scroll-snap-type:x proximity}
+ .axiovo-feed-page .feed-tabs button {scroll-snap-align:start;border-radius:10px}
+}
