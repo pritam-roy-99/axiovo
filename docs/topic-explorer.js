@@ -283,7 +283,7 @@ function paperCard(p,c){
   relatedButton.setAttribute("aria-label","Show source-backed related papers for "+p.title);
   actions.append(relatedButton);
  }
- card.append(actions);window.AxiovoAuthorFollow?.attach(card,p.authors);
+ card.append(actions);window.AxiovoCitationEvidence?.add(card,p);window.AxiovoAuthorFollow?.attach(card,p.authors);
  window.AxiovoTopicReport?.attach(card,p,pathText());return card;
 }
 function filtered(state){

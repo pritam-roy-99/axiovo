@@ -24,7 +24,7 @@ function card(p){
  const link=document.createElement("a");link.textContent="Read on ChemRxiv";link.href=p.url;link.target="_blank";link.rel="noopener noreferrer";link.className="btn primary";
  const save=document.createElement("button");save.type="button";save.className="btn";save.textContent=saved().some(x=>x.doi===p.doi)?"✓ Saved":"☆ Save paper";save.onclick=()=>updateSaved(p,save);
  const copy=document.createElement("button");copy.type="button";copy.className="btn";copy.textContent="Copy DOI";copy.onclick=()=>navigator.clipboard?.writeText(p.doi);
- actions.append(link,save,copy);art.append(meta,title,authors,summary,actions);return art;
+ actions.append(link,save,copy);art.append(meta,title,authors,summary,actions);window.AxiovoCitationEvidence?.add(art,{...p,source:"chemrxiv"});return art;
 }
 let papers=[],date="";
 function draw(){

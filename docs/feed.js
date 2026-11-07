@@ -187,6 +187,7 @@ function renderCard(item){
  if(typeof p.citations==="number"&&p.citations>=0)
   el(card,"small",p.citations+" citations (source metadata)","feed-citations");
  actionsFor(card,item);
+ window.AxiovoCitationEvidence?.add(card,p);
  if(p.authors?.length&&follow){
   const details=el(card,"details","","feed-follow-details");
   el(details,"summary","Follow an author from this paper");

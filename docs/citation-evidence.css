@@ -1,0 +1,14 @@
+/* Citation evidence is opt-in: no API fetch or layout cost for unopened panels. */
+.axiovo-citation-evidence{margin:10px 0 4px;max-width:100%;border:1px solid var(--rd-border,var(--rl-border,#cbdde9));border-radius:10px;padding:0 11px;background:var(--rd-panel,var(--rl-panel,transparent));color:var(--rd-ink,var(--rl-text,inherit));font:inherit}
+.axiovo-citation-evidence>summary{cursor:pointer;font-size:.83rem;line-height:1.5;min-height:42px;display:list-item;align-content:center;font-weight:740;color:var(--rd-ink,var(--rl-text,inherit))}
+.axiovo-citation-evidence>summary:focus-visible,.axiovo-citation-evidence :is(a,button):focus-visible{outline:3px solid #28a4cb;outline-offset:3px}
+.axiovo-citation-evidence-body{display:grid;gap:11px;padding:2px 0 14px}
+.axiovo-citation-directory-links{display:flex;flex-wrap:wrap;gap:7px}
+.axiovo-citation-directory-links a{display:inline-flex;min-height:36px;align-items:center;padding:6px 10px;border-radius:9px;border:1px solid var(--rd-border,#a9c9dc);background:var(--rd-panel,transparent);color:var(--rd-ink,var(--rl-text,#123a58));font-size:.78rem;font-weight:690;text-decoration:none}
+.axiovo-citation-directory-links a:hover{text-decoration:underline}
+.axiovo-citation-evidence-body p{font-size:.75rem;line-height:1.55;margin:0;color:var(--rd-muted,var(--rl-muted,#526c83))}
+.axiovo-citation-evidence-body button{width:max-content;max-width:100%;min-height:40px;border:1px solid #80c3d7;border-radius:9px;background:#0c5276;color:#fff;padding:8px 13px;font-weight:740;font-size:.82rem;cursor:pointer}
+.axiovo-citation-evidence-body button:disabled{opacity:.6;cursor:progress}
+.axiovo-citation-status{display:flex;gap:5px;flex-wrap:wrap}
+.axiovo-citation-count{display:inline-block;background:var(--rd-panel,transparent);border:1px solid var(--rd-border,#a9c9dc);border-radius:7px;padding:6px 8px;color:var(--rd-ink,var(--rl-text,#1a374e));font-weight:750}
+@media(max-width:550px){.axiovo-citation-evidence{margin-top:10px;padding:0 9px}.axiovo-citation-directory-links a{font-size:.74rem}}

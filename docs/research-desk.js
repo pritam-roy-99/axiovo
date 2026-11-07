@@ -171,7 +171,7 @@ function recordCard(p){
   }else status(result==="full"?"The shortlist holds five papers. Remove one to add another.":"Browser storage is unavailable.");
  });
  if(p.abstract&&window.AxiovoAbstractAudio)actions.append(button("Listen to abstract",()=>window.AxiovoAbstractAudio.play([p])));
- actions.append(save,compare);article.append(actions);window.AxiovoAuthorFollow?.attach(article,p.authors);return article;
+ actions.append(save,compare);article.append(actions);window.AxiovoCitationEvidence?.add(article,p);window.AxiovoAuthorFollow?.attach(article,p.authors);return article;
 }
 function makeLane(source,criteria){
  const section=node("section",undefined,"rd-panel rd-result-section");section.id="rd-source-"+source;
