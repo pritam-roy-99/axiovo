@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0b2239">
+<meta name="description" content="Discover IACR Cryptology ePrint research on cryptography, quantum security and cryptanalysis using source-linked metadata.">
+<title>Cryptology ePrint Discover | Axiovo</title>
+<link rel="icon" href="./icons/axiovo.svg" type="image/svg+xml">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="stylesheet" href="./theme.css">
+<link rel="stylesheet" href="./research-entry.css">
+<link rel="stylesheet" href="./axiovo-shell.css">
+<link rel="stylesheet" href="./research-desk.css">
+<link rel="stylesheet" href="./crypto.css">
+<script defer src="./theme.js"></script>
+<script defer src="./navigation.js"></script>
+<script defer src="./arxiv-versions.js"></script>
+<script defer src="./archive-data.js"></script>
+<script defer src="./paper-sort.js"></script>
+<script defer src="./author-follow.js"></script>
+<script defer src="./abstract-audio.js"></script>
+<script defer src="./crypto.js"></script>
+<script defer src="./pwa.js"></script>
+</head>
+<body class="axiovo-research axiovo-crypto">
+<header></header>
+<main class="rd-page">
+<section class="crypto-hero" aria-labelledby="crypto-title">
+ <div class="crypto-heading">
+ <p class="rd-kicker">FOURTH ARCHIVE · CRYPTOGRAPHY</p>
+ <h1 id="crypto-title">Cryptology ePrint <span>Discover</span></h1>
+ <p>Discover papers in cryptography, security, quantum cryptography, and cryptanalysis from the <a href="https://eprint.iacr.org/" rel="noopener" target="_blank">IACR Cryptology ePrint Archive</a>.</p>
+ <p class="crypto-coverage"><strong>Source integrity:</strong> Axiovo searches metadata harvested from IACR OAI-PMH. The local index may be incomplete, especially for historical dates. Official records always remain available directly from IACR.</p>
+ </div>
+ <div class="crypto-hero-actions"><a href="./desk.html" class="rd-button rd-primary">Search all four archives</a><a href="https://eprint.iacr.org/search" class="rd-button rd-secondary" target="_blank" rel="noopener">Official ePrint search ↗</a></div>
+</section>
+<nav class="crypto-source-links" aria-label="Browse other preprint archives">
+<a href="./arxiv.html">arXiv</a><a href="./biorxiv.html">bioRxiv</a><a href="./chemrxiv.html">ChemRxiv</a><a href="./crypto.html" aria-current="page">Cryptology ePrint</a>
+</nav>
+<section class="rd-panel crypto-discover" aria-labelledby="crypto-discover-title">
+ <div class="crypto-section-head"><div><p class="rd-kicker">FIND PAPERS</p><h2 id="crypto-discover-title">Search cryptography research</h2></div><p id="crypto-coverage-count" class="rd-small" role="status">Checking source metadata…</p></div>
+ <form id="crypto-search-form" role="search">
+  <label for="crypto-query">Paper title, keywords, author, or IACR ID (e.g., 2026/1234)</label>
+  <div class="crypto-searchbar"><input id="crypto-query" type="search" maxlength="240" placeholder="e.g. quantum key distribution"><button type="submit" class="rd-button rd-primary">Search papers</button></div>
+  <div class="crypto-filter-grid">
+   <label>Research topic<select id="crypto-topic">
+    <option value="">All cryptography research</option>
+    <option value="post-quantum cryptography">Post-quantum cryptography</option>
+    <option value="quantum cryptography">Quantum cryptography and QKD</option>
+    <option value="zero-knowledge proof">Zero-knowledge proofs</option>
+    <option value="multiparty computation">Secure multiparty computation</option>
+    <option value="lattice-based cryptography">Lattice-based cryptography</option>
+    <option value="fully homomorphic encryption">Homomorphic encryption</option>
+    <option value="digital signature">Digital signatures</option>
+    <option value="cryptanalysis">Cryptanalysis</option>
+    <option value="threshold cryptography">Threshold cryptography</option>
+    <option value="blockchain">Blockchain and protocols</option>
+   </select></label>
+   <label>Author<input id="crypto-author" type="search" maxlength="130" placeholder="Author name"></label>
+   <label>Sort<select id="crypto-sort"><option value="relevance">Relevance</option><option value="recent">Newest indexed</option><option value="oldest">Oldest indexed</option><option value="title">Title A–Z</option></select></label>
+   <label>From<input id="crypto-from" type="date"></label>
+   <label>To<input id="crypto-to" type="date"></label>
+  </div>
+  <div class="crypto-quick-actions"><button type="button" id="crypto-reset" class="rd-button rd-secondary">Clear filters</button><button type="button" id="crypto-follow" class="rd-button rd-secondary">Follow selected topic</button><a class="rd-text-link" href="./feed.html">Open My Feed ↗</a></div>
+ </form>
+</section>
+<section class="crypto-results-section" aria-labelledby="crypto-results-title">
+ <div class="crypto-section-head"><div><p class="rd-kicker">SOURCE-LINKED PAPERS</p><h2 id="crypto-results-title">Research results</h2></div><p class="rd-small" role="status" id="crypto-results-status">Loading official-source metadata…</p></div>
+ <div id="crypto-results" class="crypto-results" aria-live="polite"></div>
+ <div id="crypto-pagination" class="crypto-pagination"></div>
+</section>
+<section class="rd-panel crypto-integrity" aria-labelledby="crypto-integrity-title">
+ <h2 id="crypto-integrity-title">How to interpret coverage</h2>
+ <p>Every listed paper uses an IACR ePrint identifier and links to its official record. This archive may have papers not yet indexed in Axiovo. OAI-PMH metadata-update dates are not treated as original publication dates, and the archive's revision history is not invented.</p>
+ <p><a href="https://eprint.iacr.org/search" target="_blank" rel="noopener">Search the entire original archive ↗</a> · <a href="./methodology.html">Read Axiovo's methodology</a></p>
+</section>
+</main>
+</body></html>
