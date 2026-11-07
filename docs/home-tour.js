@@ -63,10 +63,15 @@
     video.load();
     display("video");
    });
-   window.addEventListener("pageshow",()=>{
-    // Reconcile a restored BFCache page with its visible tutorial mode.
-    if(mode==="video"&&video.readyState===0&&!unavailable)video.load();
-    display(mode);
+   window.addEventListener("pageshow",event=>{
+    // Returning from My Feed or any other page must show the actual
+    // homepage tutorial, never leave a restored interactive-guide state
+    // or a blank media surface in place of it.
+    if(event.persisted){
+     unavailable=false;
+     if(video.readyState===0)video.load();
+     display("video");
+    }else display(mode);
    });
    display("video");
   }
