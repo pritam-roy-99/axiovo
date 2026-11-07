@@ -23,6 +23,8 @@ function normalize(p){
  const authors=(Array.isArray(p.authors)?p.authors:[]).map(clean).filter(Boolean).slice(0,100);
  return {source:"eprint",id,recordId:id,title,authors,abstract:clean(p.abstract||p.summary),
   date:date(p.date||p.published),categories:Array.isArray(p.categories)?p.categories.map(clean).filter(Boolean):[],
+  affiliations:Array.isArray(p.affiliations)?p.affiliations.map(clean).filter(Boolean):[],
+  citations:null,category:clean(p.category),announcementDate:"",version:null,
   doi:"",url:"https://eprint.iacr.org/"+id,pdf:"https://eprint.iacr.org/"+id+".pdf",
   provenance:"IACR Cryptology ePrint OAI-PMH",metadataUpdated:date(p.metadata_updated)};
 }
