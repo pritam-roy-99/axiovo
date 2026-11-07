@@ -6,6 +6,7 @@ const core=window.AxiovoFeedCore,archive=window.AxiovoArchiveData,
  follow=window.AxiovoAuthorFollow,prefsAPI=window.AxiovoFeedPreferences;
 if(!core||!archive||!prefsAPI||!$("feed-results"))return;
 const HIDDEN="axiovo-feed-hidden-v1";
+const UNVERIFIED_NAMES="axiovo-feed-include-unverified-names-v1";
 const state={papers:[],items:[],view:"for-you",limit:12,loading:false,expanded:false,
  lastHidden:null,sourceErrors:[],refreshId:0};
 const read=(key,fallback)=>{try{return prefsAPI.read(localStorage,key,fallback)}catch{return fallback}};
@@ -25,7 +26,7 @@ function preferences(){
  const data=prefsAPI.derive(localStorage);
  const refs=["arxiv","biorxiv","chemrxiv"].flatMap(source=>archive.savedRecords(source));
  const saved=[...refs.map(core.key),...asArray(read("axiovo-reading-list",[])).map(x=>"arxiv:"+String(x).toLowerCase().replace(/v\d+$/,""))];
- return {...data,saved,hidden:read(HIDDEN,[]),references:refs.slice(0,20),
+ return {...data,saved,hidden:read(HIDDEN,[]),includeUnverifiedNames:read(UNVERIFIED_NAMES,false)===true,references:refs.slice(0,20),
   matchesAuthor:(a,b)=>Boolean(follow?.matchesName(a,b))||String(a).toLowerCase()===String(b).toLowerCase()};
 }
 function displayPreferences(prefs){
@@ -190,7 +191,7 @@ function recalculate(){
   const area=el($("feed-results"),"div","","feed-empty");
   el(area,"strong",personalized(prefs)?"No matching papers in the selected window.":"Build your research feed");
   el(area,"p",personalized(prefs)?
-   "Try All indexed dates, Search more literature, or follow an additional topic. This does not mean the author has no publications.":
+   "Try a precise research topic or Discover subtopic. Name-only author matches are hidden unless you explicitly enable them; this does not mean the author has no publications.":
    "Follow an author or a precise research subtopic in the panel below. Your interests automatically connect with Discover and Library.");
   anchor(area,"Follow researchers and topics","#feed-follow-tools");
  }
@@ -388,6 +389,21 @@ $("feed-topic-form").addEventListener("submit",e=>{
 });
 $("feed-more").onclick=()=>{state.limit+=12;recalculate()};
 $("feed-refresh").onclick=()=>refresh(true);
+const uncertainNames=$("feed-show-unverified-names");
+if(uncertainNames){
+ uncertainNames.checked=read(UNVERIFIED_NAMES,false)===true;
+ uncertainNames.addEventListener("change",()=>{
+  if(!write(UNVERIFIED_NAMES,uncertainNames.checked)){
+   uncertainNames.checked=!uncertainNames.checked;
+   notify("Could not save name-match preference on this device.");return;
+  }
+  state.limit=12;
+  recalculate();
+  notify(uncertainNames.checked?
+   "Showing possible author-name matches. These are not verified researcher identities.":
+   "Name-only author matches hidden. Topic-supported research remains visible.");
+ });
+}
 $("feed-search-more")?.addEventListener("click",searchMore);
 for(const id of ["feed-source","feed-window","feed-sort"])$(id).addEventListener("change",()=>{
  state.limit=12;recalculate();
