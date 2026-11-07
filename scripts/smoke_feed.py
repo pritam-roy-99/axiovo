@@ -65,9 +65,13 @@ def main():
             assert all("Magnifying Lens" not in title for title in titles), "Unverified same-name author leaked into default feed"
             assert not page.locator("#feed-show-unverified-names").is_checked()
             page.locator("#feed-show-unverified-names").check()
-            assert any("Magnifying Lens" in title for title in page.locator(".feed-card h3").all_inner_texts())
+            page.wait_for_function("""() =>
+              [...document.querySelectorAll(".feed-card h3")].some(x=>x.textContent.includes("Magnifying Lens"))
+            """,timeout=12000)
             page.locator("#feed-show-unverified-names").uncheck()
-            assert not any("Magnifying Lens" in title for title in page.locator(".feed-card h3").all_inner_texts())
+            page.wait_for_function("""() =>
+              ![...document.querySelectorAll(".feed-card h3")].some(x=>x.textContent.includes("Magnifying Lens"))
+            """,timeout=12000)
             assert "preparation contextuality" in page.locator("#feed-followed-paths").inner_text().lower()
             assert page.locator("#feed-followed-authors").inner_text().find("Majumdar")>=0
             first=page.locator(".feed-card").first
