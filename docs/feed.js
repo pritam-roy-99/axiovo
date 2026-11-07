@@ -8,7 +8,22 @@ if(!core||!archive||!prefsAPI||!$("feed-results"))return;
 const HIDDEN="axiovo-feed-hidden-v1";
 const UNVERIFIED_NAMES="axiovo-feed-include-unverified-names-v1";
 const state={papers:[],items:[],view:"for-you",limit:12,loading:false,expanded:false,
- lastHidden:null,sourceErrors:[],refreshId:0};
+ lastHidden:null,sourceErrors:[],refreshId:0,paperEpoch:0};
+const MIN_WORKER_PAPERS=1500;
+let rankWorker=null,workerUnavailable=false,rankSequence=0;
+let workerPaperEpoch=-1,rankCacheKey="",rankedPrefs=null,pendingKey="";
+let pendingPrefs=null,workerTimeout=null,rankRequestedKey="";
+function disposeRankWorker(){
+ if(workerTimeout){clearTimeout(workerTimeout);workerTimeout=null}
+ if(rankWorker){rankWorker.terminate();rankWorker=null}
+ workerPaperEpoch=-1;pendingKey="";
+}
+function sourcePapersChanged(){state.paperEpoch++;rankCacheKey="";}
+function serializablePreferences(prefs){
+ const {matchesAuthor,...plain}=prefs;
+ return plain;
+}
+
 const read=(key,fallback)=>{try{return prefsAPI.read(localStorage,key,fallback)}catch{return fallback}};
 const asArray=value=>Array.isArray(value)?value:[];
 const write=(key,val)=>{try{localStorage.setItem(key,JSON.stringify(val));return true}catch{return false}};
@@ -178,9 +193,7 @@ function renderCard(item){
   details.addEventListener("toggle",()=>{if(details.open&&!details.querySelector(".axiovo-author-follow"))follow.mount(details,p.authors) });
  }
 }
-function recalculate(){
- const prefs=preferences();displayPreferences(prefs);
- state.items=core.build(state.papers,prefs);
+function renderRanked(prefs){
  const current=core.select(state.items,state.view);
  const filtered=current.filter(x=>$("feed-source").value==="all"||x.paper.source===$("feed-source").value)
   .filter(x=>{const range=Number($("feed-window").value);return !range||(x.days!==null&&x.days<=range)});
@@ -207,8 +220,64 @@ function recalculate(){
  const errors=state.sourceErrors.length?" Unavailable: "+state.sourceErrors.join(", ")+".":"";
  $("feed-status").textContent=selected.length+" matches · "+statusText(state.papers)+errors;
 }
+function recalculate(){
+ const prefs=preferences();
+ displayPreferences(prefs);
+ const plain=serializablePreferences(prefs);
+ const key=state.paperEpoch+"|"+JSON.stringify(plain);
+ if(rankCacheKey===key){
+  renderRanked(prefs);
+  return;
+ }
+ if(!workerUnavailable&&typeof Worker!=="undefined"&&state.papers.length>=MIN_WORKER_PAPERS){
+  if(pendingKey===key)return;
+  try{
+   if(!rankWorker){
+    rankWorker=new Worker("./feed-rank-worker.js");
+    rankWorker.onmessage=event=>{
+     const msg=event.data||{};
+     if(msg.id!==rankSequence||pendingKey!==msg.key&&msg.key) return;
+     if(workerTimeout){clearTimeout(workerTimeout);workerTimeout=null}
+     if(msg.type!=="result"){
+      disposeRankWorker();workerUnavailable=true;
+      rankCacheKey="";recalculate();return;
+     }
+     pendingKey="";
+     if(msg.generation!==state.paperEpoch)return;
+     state.items=msg.items;
+     rankCacheKey=rankRequestedKey;
+     renderRanked(pendingPrefs||preferences());
+    };
+    rankWorker.onerror=()=>{
+     disposeRankWorker();workerUnavailable=true;
+     rankCacheKey="";recalculate();
+    };
+   }
+   const changed=workerPaperEpoch!==state.paperEpoch;
+   const request={type:"rank",id:++rankSequence,generation:state.paperEpoch,
+    prefs:plain,now:Date.now()};
+   if(changed){request.papers=state.papers;workerPaperEpoch=state.paperEpoch}
+   pendingKey=key;rankRequestedKey=key;pendingPrefs=prefs;
+   rankWorker.postMessage(request);
+   if(workerTimeout)clearTimeout(workerTimeout);
+   workerTimeout=setTimeout(()=>{
+    if(pendingKey!==key)return;
+    disposeRankWorker();workerUnavailable=true;
+    rankCacheKey="";recalculate();
+   },18000);
+   return;
+  }catch(error){
+   disposeRankWorker();workerUnavailable=true;
+  }
+ }
+ state.items=core.build(state.papers,prefs);
+ rankCacheKey=key;
+ renderRanked(prefs);
+}
+
 function updatePapers(incoming){
  state.papers=archive.merge(state.papers,...[incoming]);
+ sourcePapersChanged();
  recalculate();
 }
 async function liveAuthor(name,signal){
@@ -274,6 +343,7 @@ async function loadFastPreview(run){
    archive.normalize(raw.source,raw)).filter(Boolean);
   if(run!==state.refreshId||!previews.length)return;
   state.papers=archive.merge(state.papers,previews);
+  sourcePapersChanged();
   recalculate();
   $("feed-status").textContent="Showing "+state.items.length+
    " matches from a recent-paper preview. Full archive coverage is still loading…";
@@ -306,6 +376,7 @@ async function refresh(manual=false){
     received++;
     if(snap.stamp)timestamps.push(snap.stamp);
     state.papers=archive.merge(state.papers,rows);
+    sourcePapersChanged();
     state.sourceErrors=[...missing];
     recalculate();
     $("feed-status").textContent="Loaded "+received+" of 3 archives; "+state.items.length+
