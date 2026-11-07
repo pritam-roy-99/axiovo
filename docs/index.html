@@ -23,6 +23,7 @@
 <script defer src="./feed-preferences.js"></script>
 <script defer src="./feed-core.js"></script>
 <script defer src="./feed-preview.js"></script>
+<script defer src="./source-pulse.js"></script>
 <script defer src="./pwa.js"></script>
 <style>
 /* Explicit contrast: the home hero is dark in both light and dark modes. */
@@ -82,7 +83,7 @@
    <div><span class="axiovo-demo-tag">START HERE</span><h2 id="axiovo-tour-heading">See how Axiovo works</h2><p>One guided introduction to discovering, reading and organizing research.</p></div>
    <span class="axiovo-demo-subtitle">Narrated video · Real Axiovo interface</span>
   </div>
-  <video id="axiovo-home-video" class="axiovo-home-video" controls playsinline preload="metadata" poster="./assets/axiovo-tour-poster.svg?v=four-sources-2" aria-label="Narrated Axiovo website walkthrough">
+  <video id="axiovo-home-video" class="axiovo-home-video" controls playsinline preload="none" poster="./assets/axiovo-tour-poster.svg?v=four-sources-2" aria-label="Narrated Axiovo website walkthrough">
    <source src="./assets/axiovo-tour.mp4" type="video/mp4">
    <track kind="captions" src="./assets/axiovo-tour.vtt" srclang="en" label="English captions" default>
    Your browser does not support the video. Use the interactive guide.
@@ -121,6 +122,11 @@
 <script defer src="./home-tour.js?v=20261107-four-sources-2"></script>
 
 
+<section class="axiovo-source-pulse" id="axiovo-source-pulse" aria-labelledby="axiovo-source-pulse-title">
+ <div class="axiovo-source-pulse-heading"><div><p class="rd-kicker">SOURCE FRESHNESS</p><h2 id="axiovo-source-pulse-title">Latest indexed source checks</h2></div><a href="./methodology.html#axiovo-source-health" class="rd-text-link">Coverage details ↗</a></div>
+ <ul id="axiovo-source-pulse-list" class="axiovo-source-pulse-list" aria-label="Archive metadata check timestamps"><li>Reading source check times…</li></ul>
+ <p class="axiovo-source-pulse-note">Last metadata check is not the paper's submission time. Axiovo may have incomplete historical coverage. Open original archives for comprehensive searches.</p>
+</section>
 <section class="rd-home-section" aria-labelledby="axiovo-archive-title">
  <div class="rd-section-heading"><div><p class="rd-kicker">BROWSE BY SUBJECT</p><h2 id="axiovo-archive-title">Explore the archives</h2></div><a class="rd-text-link" href="./desk.html">Open Research Desk <span aria-hidden="true">→</span></a></div>
  <div class="axiovo-archive-grid rd-archives" aria-label="Choose a preprint archive">
