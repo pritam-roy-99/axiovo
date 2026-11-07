@@ -161,7 +161,8 @@ def run(max_windows=15,max_pages=70,max_splits=60,*,first=None,today=None):
     # Record data before advancing state, so an interrupted run can safely
     # repeat windows. No source records are lost if checkpoint writing fails.
     if collected:
-        source.write_snapshot(collected,since=first,complete=state["complete_oai_traversal"])
+        source.write_snapshot(collected,since=first,complete=state["complete_oai_traversal"],
+                              full_traversal=state["complete_oai_traversal"])
     if completed or splits or not STATE.exists():
         write_checkpoint(state)
     print("IACR OAI:",completed,"complete windows,",splits,"splits;",
