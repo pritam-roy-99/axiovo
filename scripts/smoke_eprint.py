@@ -64,6 +64,7 @@ def main():
     page.locator("#rd-query").fill("2026/1234")
     page.locator("#rd-search-form button[type=submit]").click()
     page.locator("#rd-source-eprint").wait_for(timeout=12000)
+    page.locator("#rd-source-eprint").get_by_text("Quantum Key Distribution",exact=False).first.wait_for(timeout=16000)
     assert "Quantum Key Distribution" in page.locator("#rd-source-eprint").inner_text()
     page.goto(base+"feed.html",wait_until="domcontentloaded")
     page.evaluate("localStorage.setItem('axiovo-followed-topics',JSON.stringify(['quantum cryptography']))")
