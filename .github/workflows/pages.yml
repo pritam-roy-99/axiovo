@@ -189,6 +189,17 @@ jobs:
         run: |
           python -m unittest discover -s tests -p test_literature_coverage.py -v
           python -m scripts.audit_literature_coverage
+      - name: Generate smaller My Feed first-paint preview
+        run: |
+          python scripts/build_feed_preview.py
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          preview=json.loads(Path("docs/data/feed-preview.json").read_text("utf8"))
+          assert preview["coverage"]=="recent-preview-only-full-source-snapshots-load-afterward"
+          assert len(preview["papers"])>0
+          assert Path("docs/data/feed-preview.json").stat().st_size<4_000_000
+          PY
       - name: Search ranking and related-paper regression gates
         run: |
           node tests/research-ranking-benchmark.test.js
