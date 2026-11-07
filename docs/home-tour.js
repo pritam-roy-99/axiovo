@@ -67,7 +67,7 @@
     // Returning from My Feed or any other page must show the actual
     // homepage tutorial, never leave a restored interactive-guide state
     // or a blank media surface in place of it.
-    if(event.persisted){
+    if(event.persisted || new URLSearchParams(location.search).has("axiovo_return")){
      unavailable=false;
      if(video.readyState===0)video.load();
      display("video");
