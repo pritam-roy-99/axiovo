@@ -12,3 +12,16 @@
 .axiovo-citation-status{display:flex;gap:5px;flex-wrap:wrap}
 .axiovo-citation-count{display:inline-block;background:var(--rd-panel,transparent);border:1px solid var(--rd-border,#a9c9dc);border-radius:7px;padding:6px 8px;color:var(--rd-ink,var(--rl-text,#1a374e));font-weight:750}
 @media(max-width:550px){.axiovo-citation-evidence{margin-top:10px;padding:0 9px}.axiovo-citation-directory-links a{font-size:.74rem}}
+
+/* Verifiable paper records, not directory search badges. */
+.axiovo-citation-heading{font-size:.84rem!important;font-weight:760;color:var(--rd-ink,var(--rl-text,inherit))!important}
+.axiovo-citation-verified{display:flex;flex-wrap:wrap;gap:8px;align-items:stretch}
+.axiovo-citation-evidence .axiovo-citation-count{
+ display:inline-flex;flex-direction:column;gap:2px;min-height:48px;
+ padding:8px 11px;border:1px solid var(--rd-border,#a9c9dc);
+ border-radius:8px;background:var(--rd-surface,transparent);
+ color:var(--rd-link,#145f8b);font-size:.85rem;font-weight:770;text-decoration:none
+}
+.axiovo-citation-evidence .axiovo-citation-count small{font-size:.69rem;font-weight:560;color:var(--rd-muted,#526c83)}
+.axiovo-citation-evidence .axiovo-citation-count:hover{text-decoration:underline}
+.axiovo-citation-evidence .axiovo-citation-status{display:block;font-size:.8rem}
