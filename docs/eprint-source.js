@@ -14,7 +14,7 @@ const ENDPOINTS=[
 const clean=x=>String(x??"").trim();
 const norm=x=>clean(x).normalize("NFKD").replace(/\p{M}/gu,"").toLowerCase();
 const date=x=>/^\d{4}-\d{2}-\d{2}/.test(clean(x))?clean(x).slice(0,10):"";
-const safeId=x=>{const m=clean(x).replace(/^https?:\/\/eprint\.iacr\.org\//i,"").match(ID);return m?m[0]:""};
+const safeId=x=>{const m=clean(x).replace(/^eprint:\s*/i,"").replace(/^https?:\/\/eprint\.iacr\.org\//i,"").replace(/\.pdf$/i,"").match(ID);return m?m[0]:""};
 function normalize(p){
  if(!p||typeof p!=="object")return null;
  const id=safeId(p.recordId||p.id||p.url||p.link);
@@ -79,10 +79,11 @@ async function load(options={}){
 }
 function filter(papers,c){
  const terms=(Array.isArray(c?.topicTerms)?c.topicTerms:[]).filter(Boolean).map(norm);
- const q=norm(c?.q),author=norm(c?.author);
+ const exact=safeId(c?.q),q=exact?"":norm(c?.q),author=norm(c?.author);
  let rows=papers.filter(p=>{
   const title=norm(p.title),abstract=norm(p.abstract),people=norm(p.authors.join(" ")),cats=norm(p.categories.join(" "));
   const id=norm(p.id),all=[title,abstract,people,cats,id].join(" ");
+  if(exact&&p.id!==exact)return false;
   if(q&&!all.includes(q))return false;
   if(author&&!people.includes(author))return false;
   if(terms.length&&!terms.every(t=>all.includes(t)))return false;
