@@ -60,7 +60,7 @@
   const crossref=responses?.crossref?.message;
   if(id.doi&&crossref&&doi(crossref.DOI).toLowerCase()===id.doi.toLowerCase()){
    add("Crossref",crossref["is-referenced-by-count"],"Publisher citation index",
-    "https://search.crossref.org/?q="+encodeURIComponent(id.doi),"Exact DOI");
+    "https://doi.org/"+encodeURIComponent(id.doi),"Exact DOI");
   }
   const openalex=responses?.openalex;
   if(id.doi&&openalex&&doi(openalex.doi).toLowerCase()===id.doi.toLowerCase()&&
