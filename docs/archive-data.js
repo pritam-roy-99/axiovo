@@ -338,7 +338,11 @@ async function bioNative(c,signal,cursor){
  const doi=parseDOI(c.q);
  const start=Number(cursor)||0;
  // An upper bound includes all earlier dates. Recent browsing uses a shorter window.
- const startDate=c.from||(c.to||c.category?.legacy?"2013-11-01":daysAgo(c.category?7:2));
+ // Without a date constraint, only browse the recent stream. Historical
+ // controls specify the full year interval explicitly, so the provider
+ // paginates that range instead of silently falling back to recent papers.
+ const historical=Boolean(c.to||c.category?.legacy||c.sort==="oldest");
+ const startDate=c.from||(historical?"2013-11-01":daysAgo(c.category?7:2));
  const interval=startDate+"/"+(c.to||today());
  const query=c.category?("?"+new URLSearchParams({category:c.category.code.toLowerCase()})):"";
  const url=endpoints.bio+(doi?doi+"/na/json":interval+"/"+start+"/json")+query;
