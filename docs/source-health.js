@@ -27,7 +27,8 @@ function label(source,data){
    "Announcement batch reported complete":"Announcement batch partial or unverified";
  else if(source==="biorxiv")coverage=data.complete_window===true?
    "Recent date window paginated in full; archive partial":"Recent date window partial; archive partial";
- else if(source==="eprint")coverage=data.complete_requested_window===true?
+ else if(source==="eprint")coverage=data.historical_oai_traversal_complete===true?
+   "Available OAI history traversed; source-wide census not guaranteed":data.complete_requested_window===true?
    "Requested OAI update window paginated; historical archive still partial":"IACR incremental metadata; history not yet fully indexed";
  else coverage=data.prefix_exhausted===true?
    "ChemRxiv DOI-prefix query exhausted; full archive unverified":"Partial DOI discovery; full archive unverified";
