@@ -96,9 +96,21 @@
  <div class="axiovo-welcome-media" id="axiovo-start-here">
   <div class="axiovo-demo-heading">
    <div><span class="axiovo-demo-tag">START HERE</span><h2 id="axiovo-tour-heading">See how Axiovo works</h2><p>One guided introduction to discovering, reading and organizing research.</p></div>
-   <span class="axiovo-demo-subtitle">Interactive, step-by-step introduction</span>
+   <span class="axiovo-demo-subtitle">Narrated video · Real Axiovo interface</span>
   </div>
-  <div class="axiovo-demo-frame" id="axiovo-tour" aria-label="Interactive Axiovo product walkthrough">
+  <video id="axiovo-home-video" class="axiovo-home-video" controls playsinline preload="metadata" poster="./assets/axiovo-tour-poster.svg?v=four-sources-2" aria-label="Narrated Axiovo website walkthrough">
+   <source src="./assets/axiovo-tour.mp4?v=20261107-video-stability-v1" type="video/mp4">
+   <track kind="captions" src="./assets/axiovo-tour.vtt?v=20261107-video-stability-v1" srclang="en" label="English captions" default>
+   Your browser does not support the video. Use the interactive guide.
+  </video>
+  <div class="axiovo-tour-mode-switch" role="group" aria-label="Choose how to learn Axiovo">
+   <button type="button" class="rd-button rd-primary" id="axiovo-tour-show-video" aria-pressed="true">Watch tutorial video</button>
+   <button type="button" class="rd-button rd-secondary" id="axiovo-tour-show-guide" aria-pressed="false">Interactive step-by-step guide</button>
+   <button type="button" class="rd-button rd-secondary" id="axiovo-tour-retry-video" hidden>Retry video</button>
+  </div>
+  <p class="axiovo-tour-media-status rd-small" id="axiovo-tour-media-status" role="status" aria-live="polite"></p>
+  <p class="rd-small axiovo-video-direct-link"><a href="./assets/axiovo-tour.mp4" target="_blank" rel="noopener">Open the recorded tutorial directly</a></p>
+  <div class="axiovo-demo-frame" id="axiovo-tour" hidden aria-label="Interactive Axiovo product walkthrough">
    <div class="axiovo-demo-top"><span class="axiovo-demo-brand"><span aria-hidden="true">A</span> AXIOVO</span><span class="axiovo-demo-stage" id="axiovo-tour-counter">1 / 6</span></div>
    <div class="axiovo-demo-screen">
     <span class="axiovo-demo-overline" id="axiovo-tour-overline">WELCOME TO AXIOVO</span>
@@ -113,7 +125,7 @@
    </div>
   </div>
   <div class="axiovo-demo-bottom">
-   <span><strong>Start here:</strong> explore the guided steps to search, verify, save and follow research.</span>
+   <span><strong>Start here:</strong> watch how to explore, search, save and follow research.</span>
    <a id="axiovo-tour-action" href="./arxiv.html">Explore archives ↗</a>
   </div>
   <details class="axiovo-transcript">
