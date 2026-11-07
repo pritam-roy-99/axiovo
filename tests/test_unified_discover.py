@@ -42,7 +42,7 @@ class UnifiedDiscoverTests(unittest.TestCase):
 
     def test_navigation_uses_one_discover_link(self):
         nav=(ROOT/"navigation.js").read_text(encoding="utf8")
-        self.assertIn('["./#axiovo-archive-title","Explore",',nav)
+        self.assertIn('[file==="index.html"?"#axiovo-archive-title":HOME,"Explore",',nav)
         self.assertNotIn('["./fields.html","Explore fields"]',nav)
         self.assertNotIn('["./","arXiv feed"]',nav)
 

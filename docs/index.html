@@ -15,7 +15,7 @@
 <link rel="stylesheet" href="./home-landing.css?v=20261107-home-return-v1">
 <script defer src="./theme.js"></script>
 <script defer src="./research-entry.js"></script>
-<script defer src="./navigation.js?v=20261107-home-return-v3"></script>
+<script defer src="./navigation.js?v=20261107-home-return-v4"></script>
 <script defer src="./archive-taxonomy.js"></script>
 <script defer src="./arxiv-versions.js"></script>
 <script defer src="./archive-data.js"></script>
@@ -59,14 +59,15 @@
 /* Deliberate Home returns start at the introduction and video, not restored cards. */
 (function(){
  const returning=new URLSearchParams(location.search).has("axiovo_return");
- if(!returning)return;
- if("scrollRestoration" in history)history.scrollRestoration="manual";
+ // BFCache can restore an old archive-card scroll position even without a query.
+ // Only reset on actual homepage navigation, not while the user scrolls this page.
  const top=()=>window.scrollTo({top:0,left:0,behavior:"instant"});
- addEventListener("pageshow",()=>{
+ addEventListener("pageshow",event=>{
+  if(!returning&&!event.persisted)return;
   top();
   requestAnimationFrame(()=>requestAnimationFrame(top));
  });
- addEventListener("load",top,{once:true});
+ if(returning)addEventListener("load",top,{once:true});
 })();
 </script>
 </head>

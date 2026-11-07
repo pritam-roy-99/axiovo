@@ -1,6 +1,8 @@
 /* One navigation language across Axiovo; local profile remains under Settings. */
 (function(){
  const HOME="./index.html?axiovo_return=1";
+ // Home is an explicit navigation destination; browser Back remains historical navigation.
+ const homeURL=()=>new URL(HOME,location.href).href;
  function mount(){
   const header=document.querySelector("header");if(!header)return;
   const toggle=header.querySelector(".theme-toggle");
@@ -41,22 +43,20 @@
    const back=document.createElement("button");back.type="button";back.className="axiovo-back-button";
    back.textContent="← Back";back.setAttribute("aria-label","Go to previous page, or Axiovo homepage");
    back.onclick=()=>{
-    let sameOrigin=false;
+    // document.referrer is not necessarily the previous history entry (BFCache,
+    // fragment navigation and reloads). Never infer the history destination from it.
+    let previous=null,appBase=null;
     try{
-     const previous=new URL(document.referrer);
-     const appBase=new URL("./",location.href);
-     sameOrigin=Boolean(document.referrer)&&previous.origin===appBase.origin
-      &&previous.pathname.startsWith(appBase.pathname);
+     previous=new URL(document.referrer);
+     appBase=new URL("./",location.href);
     }catch{}
-    if(sameOrigin&&history.length>1){
-     // A Home reached from a fragment link may have been scrolled directly
-     // to the archive cards. Return to the actual homepage top/video instead.
-     const prior=new URL(document.referrer);
-     const appBase=new URL("./",location.href);
-     const priorFile=prior.pathname.slice(appBase.pathname.length);
-     if(!priorFile||priorFile==="index.html")location.assign(new URL(HOME,location.href).href);
+    const inApp=previous&&appBase&&previous.origin===appBase.origin&&previous.pathname.startsWith(appBase.pathname);
+    if(inApp&&history.length>1){
+     // Returning to Home should show the introduction, never an old fragment.
+     const file=previous.pathname.slice(appBase.pathname.length);
+     if(!file||file==="index.html")location.assign(homeURL());
      else history.back();
-    }else location.assign(new URL(HOME,location.href).href);
+    }else location.assign(homeURL());
    };
    const actions=document.createElement("div");actions.className="axiovo-nav-return";
    actions.append(back,home);
