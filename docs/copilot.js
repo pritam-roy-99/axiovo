@@ -339,13 +339,13 @@ async function submit(){
   const paper=id?await findPaper(id,true):null;
   const found=mode==="claims"?[]:retrieved(paper?.title||query,draft);
   // Match sources to the whole question, not to a single broad word.
-  let candidates=found;
+  let candidates=found,sourceWarning="";
   // Public lookup is the normal path for questions outside the limited local
   // snapshot. Keep indexed evidence usable when a provider is down.
   if(mode!=="claims"&&!id&&question.length>=3&&!draft&&
      ($("retrieval-scope").value==="all"||candidates.length===0)){
    try{candidates=[...candidates,...await widerArxiv(question)]}
-   catch{rstatus("Public metadata could not be retrieved. Showing only matching indexed source records.");}
+   catch(error){sourceWarning="Public source unavailable ("+String(error.message||error).slice(0,100)+").";}
   }
   if(mode!=="claims"&&Core){
    candidates=Core.rank(paper?.title||query,candidates,12).map(x=>({...x.paper,score:x.score}));
@@ -354,7 +354,8 @@ async function submit(){
     (paper.source==="eprint"?"IACR Cryptology ePrint":"arXiv indexed metadata")});
   addSources(candidates,false);
   rstatus(sources.length+" relevant source"+(sources.length===1?"":"s")+
-   " from available metadata; historical coverage is not guaranteed.");
+   " from available metadata; historical coverage is not guaranteed."+
+   (sourceWarning?" "+sourceWarning+" Indexed results remain available.":""));
   if(id&&!paper)showOriginalLink(id);
   const fallback=mode==="claims"?paperSummary(paper,draft):evidenceText(query);
   if($("engine").value==="evidence"){record("assistant",fallback,sources);status("");}
@@ -399,7 +400,13 @@ async function globalSearch(){
   const combined=Core?.rank(q,[...sources,...found],12).map(x=>({...x.paper,score:x.score}))||found;
   addSources(combined,false);
   record("assistant",evidenceText(q),sources);
- }catch{rstatus("The public metadata lookup is unavailable. Use the indexed papers or Research Desk.")}
+ }catch(error){
+  const fallback=retrieved(q,"");
+  addSources(fallback,false);
+  const warning="Public metadata temporarily unavailable: "+String(error.message||error).slice(0,100)+".";
+  rstatus(warning+(sources.length?" Showing relevant indexed papers.":" No indexed match; try Research Desk or the original archive."));
+  record("assistant",evidenceText(q)+(sources.length?"":"\n\nPublic lookup failed. No relevant indexed paper was verified."),sources);
+ }
  finally{setBusy(false)}
 }
 function exportChat(){
