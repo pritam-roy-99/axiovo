@@ -416,8 +416,12 @@ async function runSearch({persist=true}={}){
   $("scope-label").textContent="Scope: exact identifier in "+name+".";
  }else $("scope-label").textContent=pathText()?"Scope: "+pathText():"Scope: the whole archive.";
  if(persist){savePrefs();syncURL(criteriaFromForm())}
+ const firstYear={arxiv:"1991-08-01",biorxiv:"2013-11-01",chemrxiv:"2017-01-01"};
+ const isHistorical=c.from===firstYear[source]&&!!c.to;
  const state=search={controller:new AbortController(),criteria:c,local:[],batch:[],remote:[],visible:12,next:null,
-  loading:true,failed:false,complete:false,coverage:"",message:"Checking available records…"};
+  loading:true,failed:false,complete:false,
+  coverage:isHistorical?"Historical-year search: provider pages are sampled incrementally; results are not a full historical census. ":"",
+  message:"Checking available records…"};
  drawResults(state);
  if(arxiv&&source!=="arxiv"||doi&&(source==="arxiv"||source==="biorxiv"&&!/^10\.(?:1101|64898)\//.test(doi)||source==="chemrxiv"&&!doi.startsWith("10.26434/"))){
   state.loading=false;state.message="This identifier belongs outside the selected archive. Switch archives using the links at the top.";drawResults(state);return;
@@ -490,6 +494,17 @@ function changeSort(mode){
 }
 $("sort").onchange=()=>changeSort($("sort").value);
 $("date-open").onclick=()=>{$("advanced").open=true;$("from").focus()};
+$("history")?.addEventListener("click",()=>{
+ // Earliest available archive dates are lower bounds, not claims of completeness.
+ datePreset++;
+ const earliest={arxiv:"1991-08-01",biorxiv:"2013-11-01",chemrxiv:"2017-01-01"};
+ $("from").value=earliest[source]||"1991-01-01";
+ $("to").value=allDates();
+ $("sort").value=$("query").value.trim()?"relevance":"oldest";
+ $("advanced").open=true;
+ runSearch();
+});
+
 $("announced")?.addEventListener("click",showLatestAnnouncement);
 $("latest").onclick=()=>{
  datePreset++;$("from").value=$("to").value="";$("sort").value="recent";runSearch();
