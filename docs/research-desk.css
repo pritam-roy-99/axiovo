@@ -253,3 +253,10 @@
 .rd-evidence-matrix tbody th{position:sticky;left:0;z-index:1;min-width:125px;max-width:155px}
 .rd-evidence-excerpt{color:var(--rd-ink);font-size:.81rem;line-height:1.52;margin:0 0 7px;white-space:normal}
 .rd-evidence-matrix a:focus-visible{outline:3px solid var(--rd-link);outline-offset:2px}
+
+/* Four-source homepage directory, balanced 2x2 at tablet/mobile. */
+.axiovo-home .axiovo-archive-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px}
+.rd-archive-icon.eprint{background:#d8f4e9;color:#15543d}
+.rd-source-dot.eprint{background:#167b61}
+@media(max-width:1080px){.axiovo-home .axiovo-archive-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:440px){.axiovo-home .axiovo-archive-grid{gap:9px}.axiovo-home .rd-archive-card{padding:13px;min-height:195px}.axiovo-home .rd-archive-card strong{font-size:1.04rem}.axiovo-home .rd-archive-card strong+span{font-size:.75rem}}
