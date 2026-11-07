@@ -83,10 +83,12 @@
 <div id="crypto-saved-paths" class="ex-personal-list" aria-live="polite"></div>
 <form id="crypto-custom-form">
 <label for="crypto-custom-kind">Add a
-<select id="crypto-custom-kind"><option value="topic">Research topic</option><option value="subtopic">Sub-subtopic under selected topic</option></select></label>
+<select id="crypto-custom-kind"><option value="subject">Research subject</option><option value="topic">Research subfield</option><option value="subtopic">Sub-subtopic</option></select></label>
+<p class="rd-small" id="crypto-custom-hint">Create a new research subject. It will be personal to this device, not an official IACR classification.</p>
 <label for="crypto-custom">Name
 <input id="crypto-custom" type="text" maxlength="90" placeholder="e.g. a method or research question" required></label>
-<button type="submit" class="rd-button rd-secondary" id="crypto-custom-add" disabled>Add to this subject</button>
+<button type="submit" class="rd-button rd-secondary" id="crypto-custom-add">Add research subject</button>
+<div id="crypto-custom-list" class="ex-personal-list" aria-live="polite"></div>
 </form>
 <p class="rd-small" id="crypto-personal-status" role="status" aria-live="polite"></p>
 </details>
