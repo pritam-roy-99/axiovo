@@ -123,6 +123,8 @@ jobs:
         id: chemrxiv
         continue-on-error: true
         run: python scripts/sync_chemrxiv.py
+      - name: Validate independent ePrint source and offline recovery (required)
+        run: node tests/eprint-independent.test.js
       - name: Validate IACR ePrint OAI-PMH metadata parser
         run: python -m unittest discover -s tests -p test_eprint_harvest.py -v
       - name: Refresh official IACR Cryptology ePrint metadata
