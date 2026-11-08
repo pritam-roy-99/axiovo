@@ -37,10 +37,10 @@ function validate(payload){
   fullOaiTraversal:payload.historical_oai_traversal_complete===true,
   source:"IACR OAI-PMH",partial:true,cache:false};
 }
-async function fetchSource(url){
+async function fetchSource(url,cache){
  const abort=new AbortController(),timer=setTimeout(()=>abort.abort(),10000);
  try{
-  const res=await fetch(url,{cache:"no-store",signal:abort.signal,headers:{Accept:"application/json"}});
+  const res=await fetch(url,{cache,signal:abort.signal,headers:{Accept:"application/json"}});
   if(!res.ok)throw Error("HTTP "+res.status);
   return validate(await res.json());
  }finally{clearTimeout(timer)}
@@ -69,12 +69,12 @@ async function load(options={}){
   const problems=[];
   for(const endpoint of ENDPOINTS){
    try{
-    const result=await fetchSource(endpoint);
+    const result=await fetchSource(endpoint,options.cache==="default"?"default":"no-store");
     remember(result);
     return {...result,endpoint};
    }catch(e){problems.push(endpoint+": "+String(e.message||e))}
   }
-  const saved=cached();
+  const saved=cached()||options.fallback;
   if(saved)return {...saved,problems,endpoint:"local cache"};
   throw Error("Official-source snapshot unavailable across configured hosts: "+problems.join("; ").slice(0,460));
  })();
@@ -88,15 +88,19 @@ async function load(options={}){
 function filter(papers,c){
  const terms=(Array.isArray(c?.topicTerms)?c.topicTerms:[]).filter(Boolean).map(norm);
  const exact=safeId(c?.q),q=exact?"":norm(c?.q),author=norm(c?.author);
- let rows=papers.filter(p=>{
-  const title=norm(p.title),abstract=norm(p.abstract),people=norm(p.authors.join(" ")),cats=norm(p.categories.join(" "));
-  const id=norm(p.id),all=[title,abstract,people,cats,id].join(" ");
+ const textSearch=Boolean(q||terms.length),titleHits=new Set();
+ const rows=papers.filter(p=>{
   if(exact&&p.id!==exact)return false;
-  if(q&&!all.includes(q))return false;
-  if(author&&!people.includes(author))return false;
-  if(terms.length&&!terms.every(t=>all.includes(t)))return false;
   if(c?.from&&(!p.date||p.date<c.from))return false;
   if(c?.to&&(!p.date||p.date>c.to))return false;
+  const people=author||textSearch?norm(p.authors.join(" ")):"";
+  if(author&&!people.includes(author))return false;
+  if(textSearch){
+   const title=norm(p.title),all=[title,norm(p.abstract),people,norm(p.categories.join(" ")),norm(p.id)].join(" ");
+   if(q&&!all.includes(q))return false;
+   if(terms.length&&!terms.every(t=>all.includes(t)))return false;
+   if(q&&title.includes(q))titleHits.add(p);
+  }
   return true;
  });
  const mode=c?.sort||"relevance";
@@ -104,9 +108,9 @@ function filter(papers,c){
   mode==="oldest"?(a.date||"9999").localeCompare(b.date||"9999"):
   mode==="recent"?(b.date||"").localeCompare(a.date||""):
   // For text search: exact title match before other metadata, then recent.
-  (Number(norm(b.title).includes(q)&&!!q)-Number(norm(a.title).includes(q)&&!!q))||
+  (Number(titleHits.has(b))-Number(titleHits.has(a)))||
   (b.date||"").localeCompare(a.date||""));
  return rows;
 }
-root.AxiovoEprintSource={load,normalize,validate,filter,sourceUrls:ENDPOINTS.slice()};
+root.AxiovoEprintSource={load,normalize,validate,filter,readFallback:cached,remember,sourceUrls:ENDPOINTS.slice()};
 })(window);

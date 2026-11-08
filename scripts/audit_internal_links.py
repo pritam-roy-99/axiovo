@@ -95,7 +95,7 @@ def audit():
             errors.append("Archive shared style is missing: " + rule)
     for name in ("arxiv.html", "biorxiv.html", "chemrxiv.html"):
         archive = (DOCS / name).read_text(encoding="utf-8")
-        if 'href="./theme.css"' not in archive or 'src="./navigation.js"' not in archive:
+        if 'href="./theme.css"' not in archive or not re.search(r'src="\./navigation\.js(?:\?[^"]*)?"', archive):
             errors.append(name + ": archive theme or shared navigation not loaded")
     if BUILD_MODE:
         video = DOCS / "assets" / "axiovo-tour.mp4"

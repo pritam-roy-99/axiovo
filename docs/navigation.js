@@ -43,20 +43,20 @@
    const back=document.createElement("button");back.type="button";back.className="axiovo-back-button";
    back.textContent="← Back";back.setAttribute("aria-label","Go to previous page, or Axiovo homepage");
    back.onclick=()=>{
-    // document.referrer is not necessarily the previous history entry (BFCache,
-    // fragment navigation and reloads). Never infer the history destination from it.
-    let previous=null,appBase=null;
-    try{
-     previous=new URL(document.referrer);
-     appBase=new URL("./",location.href);
-    }catch{}
-    const inApp=previous&&appBase&&previous.origin===appBase.origin&&previous.pathname.startsWith(appBase.pathname);
-    if(inApp&&history.length>1){
-     // Returning to Home should show the introduction, never an old fragment.
-     const file=previous.pathname.slice(appBase.pathname.length);
-     if(!file||file==="index.html")location.assign(homeURL());
-     else history.back();
-    }else location.assign(homeURL());
+    const entry=window.navigation?.currentEntry;
+    // Prefer the actual previous entry. Older browsers can use the referrer
+    // for normal link navigation.
+    const previous=entry?window.navigation.entries()[entry.index-1]?.url:document.referrer;
+    if(previous&&history.length>1){
+     const url=new URL(previous),base=new URL("./",location.href);
+     if(url.origin===base.origin&&url.pathname.startsWith(base.pathname)){
+      history.back();
+      return;
+     }
+    }
+    // Direct entry has nowhere in Axiovo to go back to. Replace it so the
+    // browser's Back button does not bounce between this page and Home.
+    location.replace(homeURL());
    };
    const actions=document.createElement("div");actions.className="axiovo-nav-return";
    actions.append(back,home);

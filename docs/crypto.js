@@ -44,7 +44,7 @@
   }
   history.replaceState(null,"",location.pathname+(p.size?"?"+p:""));
  }
- function render(){
+ function render(refilter=true){
   const target=$("crypto-results");target.replaceChildren();
   const nav=$("crypto-pagination");nav.replaceChildren();
   const status=$("crypto-results-status");
@@ -59,8 +59,10 @@
   }
   // The existing archive matcher is reused for exact-ID, dates and authors.
   // Theme selections are a transparent keyword refinement, NOT provider taxonomy.
-  shown=window.AxiovoEprintSource?.filter?window.AxiovoEprintSource.filter(papers,c):data?.filter?data.filter(papers,c):[];
-  if(c.sort==="title")shown.sort((a,b)=>a.title.localeCompare(b.title)||a.id.localeCompare(b.id));
+  if(refilter){
+   shown=window.AxiovoEprintSource?.filter?window.AxiovoEprintSource.filter(papers,c):data?.filter?data.filter(papers,c):[];
+   if(c.sort==="title")shown.sort((a,b)=>a.title.localeCompare(b.title)||a.id.localeCompare(b.id));
+  }
   const perPage=12;
   const total=shown.length,pages=Math.max(1,Math.ceil(total/perPage));
   page=Math.max(1,Math.min(page,pages));
@@ -118,8 +120,8 @@
    const previous=el("button","← Previous","rd-button rd-secondary");
    const next=el("button","Next →","rd-button rd-secondary");
    previous.disabled=page===1;next.disabled=page===pages;
-   previous.onclick=()=>{page--;render();target.scrollIntoView({block:"start"})};
-   next.onclick=()=>{page++;render();target.scrollIntoView({block:"start"})};
+   previous.onclick=()=>{page--;render(false);target.scrollIntoView({block:"start"})};
+   next.onclick=()=>{page++;render(false);target.scrollIntoView({block:"start"})};
    nav.append(previous,el("span","Page "+page+" of "+pages),next);
   }
  }
@@ -155,7 +157,7 @@
   }
   $("crypto-results-status").textContent="Following "+term+" in My Feed. Current search results remain available.";
  };
- window.addEventListener("storage",e=>{if(e.key==="axiovo-eprint-reading-v1")render()});
+ window.addEventListener("storage",e=>{if(e.key==="axiovo-eprint-reading-v1")render(false)});
  fromURL();
  function applySnapshot(value){
   papers=Array.isArray(value.papers)?value.papers:[];
@@ -176,11 +178,19 @@
  async function loadEprint(force=false){
   const button=$("crypto-retry");
   if(button)button.disabled=true;
-  loaded=false;render();
+  const hasSnapshot=loaded&&papers.length>0;
+  if(hasSnapshot)$("crypto-results-status").textContent="Checking for an updated IACR snapshot…";
+  else{loaded=false;render()}
   try{
    if(!window.AxiovoEprintSource?.load)throw Error("Independent ePrint loader unavailable");
-   applySnapshot(await window.AxiovoEprintSource.load({force}));
+   const snapshot=await window.AxiovoEprintSource.load({force});
+   if(hasSnapshot&&!offlineSubset&&snapshot.cache)throw Error("Only an offline subset is available");
+   applySnapshot(snapshot);
   }catch(error){
+   if(hasSnapshot){
+    $("crypto-results-status").textContent="Could not refresh IACR. The previously loaded results are still available.";
+    return;
+   }
    loaded=true;papers=[];offlineSubset=false;render();
    $("crypto-coverage-count").textContent="Indexed data unavailable · retry or search IACR directly";
    $("crypto-index-note").textContent="The indexed snapshot could not be retrieved. No papers or citation data were fabricated.";

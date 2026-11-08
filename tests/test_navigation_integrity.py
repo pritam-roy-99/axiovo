@@ -51,7 +51,8 @@ class NavigationTests(unittest.TestCase):
         self.assertNotIn("discover.html#",html)
     def test_back_navigation_is_scoped_to_axiovo(self):
         src=(DOCS/"navigation.js").read_text(encoding="utf8")
-        self.assertIn("previous.pathname.startsWith(appBase.pathname)",src)
+        self.assertIn("url.origin===base.origin&&url.pathname.startsWith(base.pathname)",src)
+        self.assertIn("location.replace(homeURL())",src)
         self.assertIn('a.title=purpose',src)
 
 if __name__=="__main__":
