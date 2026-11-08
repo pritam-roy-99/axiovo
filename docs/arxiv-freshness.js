@@ -34,34 +34,51 @@
    const now=new Date(),a=announcements(now);
    clock.textContent="Last scheduled announcement: "+(a.last?timeFormat.format(a.last):"unknown")+" · Next: "+(a.next?timeFormat.format(a.next):"unknown")+". arXiv normally announces Sunday–Thursday at 8 PM US Eastern.";
   }
+  function easternDate(date){
+   const parts=Object.fromEntries(new Intl.DateTimeFormat("en-US",{timeZone:ZONE,year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(date).map(p=>[p.type,p.value]));
+   return [parts.year,parts.month,parts.day].join("-");
+  }
   async function poll(manual=false){
-   if(checking)return;checking=true;
-   check.disabled=true;
+   if(checking)return;checking=true;check.disabled=true;
    try{
-    const res=await fetch("./data/feed.json?fresh="+Date.now(),{cache:"no-store"});
+    // Under 2 KB rather than redownloading a multi-megabyte arXiv feed.
+    const res=await fetch("./data/source-freshness.json?fresh="+Date.now(),{
+     cache:"no-store",signal:AbortSignal.timeout(9000)
+    });
     if(!res.ok)throw new Error("HTTP "+res.status);
-    const data=await res.json();
-    const stamp=data.generated_at||"";
+    const report=await res.json();
+    const source=report.sources?.arxiv;
+    if(!source?.available)throw new Error("arXiv snapshot unavailable");
+    const stamp=source.checked_at||"";
     const updated=stamp?new Date(stamp):null;
     const valid=updated&&!Number.isNaN(updated.getTime());
+    const date=/^\d{4}-\d{2}-\d{2}$/.test(source.announcement_date||"")?source.announcement_date:"unknown";
     const mins=valid?(Date.now()-updated.getTime())/60000:null;
-    times.textContent="Indexed: "+(data.paper_count??data.papers?.length??"unknown")+" papers · Last successful feed build: "+(valid?timeFormat.format(updated):"not recorded")+(mins!==null?" ("+relative(Math.max(0,mins))+" ago)":"")+".";
-    const a=announcements(new Date());
-    const behind=valid&&a.last&&updated<a.last;
+    times.textContent="Latest arXiv announcement batch: "+date+" · "+(source.indexed_records??"unknown")+
+      " papers · Snapshot checked: "+(valid?timeFormat.format(updated):"not recorded")+
+      (mins!==null?" ("+relative(Math.max(0,mins))+" ago)":"")+".";
+    const release=announcements(new Date()).last;
+    const lastRelease=release?easternDate(release):null;
+    // arXiv RSS can be dated one day after an evening Eastern announcement.
+    const behind=lastRelease&&date!=="unknown"&&date<lastRelease&&
+     Date.now()-release.getTime()>45*60*1000;
     if(behind){
-     notice.textContent="The published feed predates the latest scheduled arXiv announcement. Showing an older snapshot; today's announced batch is not yet verified.";
+     notice.textContent="Axiovo is behind the latest scheduled arXiv announcement. This batch may be stale. Verify against the official arXiv list.";
+    }else if(!source.announcement_complete){
+     notice.textContent="The latest arXiv batch is partial or unverified. Do not treat the paper count as complete.";
     }else{
-     notice.textContent="This feed may still be incomplete for the latest announcement. Submission-date coverage is not announcement-date coverage.";
+     notice.textContent="Announcement batch verified for the displayed date. This does not certify all historical arXiv submissions.";
     }
-    if(currentStamp&&stamp!==currentStamp){
-     notice.textContent="A newer paper index is available. Reload Axiovo to display it.";
-     if(manual&&window.confirm("New arXiv data has arrived. Reload the page now?"))window.location.reload();
+    const version=[date,stamp,source.indexed_records,source.announcement_complete].join("|");
+    if(currentStamp&&version!==currentStamp){
+     notice.textContent="A newer arXiv metadata snapshot is available. Reload Axiovo to display it.";
+     if(manual&&window.confirm("Axiovo has updated arXiv metadata. Reload now?"))window.location.reload();
     }
-    currentStamp=stamp;
-    if(manual&&valid&&stamp===currentStamp)check.textContent="Checked just now";
+    currentStamp=version;
+    if(manual)check.textContent="Checked just now";
    }catch(err){
-    times.textContent="Could not check the live feed. Previously loaded papers may still be available.";
-    notice.textContent="No freshness claim can be made while the feed is unreachable.";
+    times.textContent="Could not verify the latest arXiv metadata. Previously loaded papers may still be available.";
+    notice.textContent="No freshness claim can be made while the source manifest is unreachable.";
    }finally{checking=false;check.disabled=false}
   }
   check.addEventListener("click",()=>poll(true));
