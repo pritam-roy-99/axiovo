@@ -42,6 +42,8 @@ jobs:
           else
             python -m scripts.arxiv_announcements || python -m scripts.scirate_latest
           fi
+      - name: Protect against stale or incomplete arXiv regressions
+        run: python scripts/validate_sync_snapshots.py
       - name: Check announcement JSON integrity
         run: |
           python - <<'PY'
