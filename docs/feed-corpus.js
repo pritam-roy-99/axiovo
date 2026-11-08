@@ -19,7 +19,11 @@ root.AxiovoFeedCorpus=function(){
    if(data.schema_version!==1||
       data.coverage!=="recent-preview-only-full-source-snapshots-load-afterward"||
       !Array.isArray(data.papers))return null;
-   return merge(data.papers.map(p=>archive.normalize(p?.source,p)).filter(Boolean));
+   const preview=data.papers.map(p=>archive.normalize(p?.source,p)).filter(Boolean);
+   if(!preview.length)return null;
+   // Prefer full snapshot metadata if it has already arrived.
+   papers=archive.merge(preview,papers);
+   return papers.length;
   },
   async snapshot(source,force,fallback){
    const snap=await archive.snapshot(source,{force,cache:force?"no-store":"default",fallback});

@@ -1,29 +1,30 @@
 /* Axiovo offline shell. Scholarly metadata, video and PDFs stay network-only. */
 "use strict";
-const CACHE = "axiovo-shell-v91";
+const CACHE = "axiovo-shell-v92";
 const SHELL = [
-  "./", "./index.html", "./desk.html", "./feed.html", "./workspace.html", "./arxiv.html", "./biorxiv.html", "./chemrxiv.html", "./crypto.html",
-  "./theme.css", "./axiovo-shell.css?v=20261108-mobile-reliability-v1", "./home-landing.css?v=20261107-mobile-ui-v1", "./home-tour.js?v=20261108-video-recovery-v2", "./theme.js", "./research-entry.css", "./research-entry.js",
-  "./source-pulse.js", "./assets/axiovo-tour-poster.svg?v=four-sources-2", "./citation-evidence.js?v=20261107-verified2", "./citation-evidence.css?v=20261107-verified2", "./navigation.js?v=20261108-home-history-v5", "./pwa.js", "./copilot.js?v=20261107-research-reliability-v2", "./eprint-source.js?v=20261108-mobile-feed-v2", "./paper-sort.js", "./feed.js?v=20261108-mobile-feed-v2", "./feed-rank-worker.js?v=20261108-mobile-feed-v2", "./feed-corpus.js", "./feed-core.js", "./feed-preferences.js", "./feed-preview.js", "./feed.css?v=20261107-mobile-ui-v1", "./topic-explorer.css", "./topic-explorer.js?v=20261107-history-v1", "./topic-atlas.js",
-  "./crypto.css?v=20261107-custom-paths-v2", "./crypto-topics.js?v=20261107-custom-paths-v2", "./crypto.js?v=20261108-mobile-archive-v2", "./archive-taxonomy.js", "./archive-data.js?v=20261107-history-v2", "./arxiv-daily-archive.js", "./arxiv-versions.js", "./searchable-select.js",
-  "./data/topics/arxiv.tsv", "./data/topics/biorxiv.tsv", "./data/topics/chemrxiv.tsv",
-  "./abstract-audio.js?v=20261108-android-recovery-v6", "./author-follow.js", "./following-authors.js", "./research-workspace.css", "./research-desk.js?v=20261107-history-v2", "./research-desk.css", "./zotero-ris.js",
-  "./workspace.js", "./workspace.css", "./paper-actions.css", "./paper-card-polish.css?v=20261106-save2", "./research-workflow.css",
-  "./interests.js", "./relevance.js", "./research-intelligence.js", "./recommendation-cards.css?v=20261106-actions",
-  "./manifest.webmanifest", "./icons/axiovo.svg"
+  "./", "./index.html", "./workspace.html", "./icons/axiovo.svg",
+  "./manifest.webmanifest", "./theme.css", "./research-entry.css", "./axiovo-shell.css?v=20261108-mobile-reliability-v1",
+  "./research-desk.css", "./home-landing.css?v=20261107-mobile-ui-v1", "./theme.js", "./research-entry.js",
+  "./navigation.js?v=20261108-home-history-v5", "./archive-taxonomy.js", "./arxiv-versions.js", "./archive-data.js",
+  "./author-follow.js", "./feed-preferences.js", "./feed-core.js", "./feed-preview.js",
+  "./source-pulse.js", "./pwa.js", "./assets/axiovo-tour-poster.svg?v=four-sources-2", "./home-tour.js?v=20261108-video-recovery-v2",
+  "./workspace.css", "./paper-actions.css", "./paper-card-polish.css?v=20261106-save2", "./research-workflow.css",
+  "./citation-evidence.js?v=20261107-verified2", "./citation-evidence.css?v=20261107-verified2", "./paper-sort.js", "./abstract-audio.js?v=20261108-android-recovery-v6",
+  "./workspace.js", "./interests.js", "./relevance.js", "./research-intelligence.js",
+  "./research-workspace.css", "./recommendation-cards.css?v=20261106-actions", "./following-authors.js",
 ];
 const LEGACY = /^(?:researchlens|litveyra|axiovo)-shell-/;
 self.addEventListener("install", event => {
   event.waitUntil(
     caches.open(CACHE).then(async cache => {
-      // Only precache the navigation shell. Fetching every script, CSS and topic
-      // file concurrently on first install saturates mobile CPU/network.
-      // Other assets are still cached on demand by the fetch handler.
-      const essentials = ["./", "./index.html", "./theme.css",
-        "./navigation.js?v=20261108-home-history-v5", "./pwa.js", "./manifest.webmanifest"];
-      const results = await Promise.allSettled(essentials.map(url => cache.add(url)));
-      const failed = results.map((value,index)=>value.status==="rejected"?essentials[index]:null).filter(Boolean);
-      if(failed.length)console.warn("Axiovo: essential offline assets unavailable",failed);
+      // Install the Home and Library shell in small batches. If an asset is
+      // unavailable, keep the previous worker until a complete shell can install.
+      for (let start=0; start<SHELL.length; start+=4) {
+        const batch=SHELL.slice(start,start+4).map(url=>new Request(url,{
+          cache:url==="./"||url.endsWith(".html")?"reload":"default"
+        }));
+        await cache.addAll(batch);
+      }
     }).then(() => self.skipWaiting())
   );
 });

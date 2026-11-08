@@ -8,7 +8,7 @@ if(!core||!archive||!prefsAPI||!window.AxiovoFeedCorpus||!$("feed-results"))retu
 const HIDDEN="axiovo-feed-hidden-v1";
 const UNVERIFIED_NAMES="axiovo-feed-include-unverified-names-v1";
 const state={paperCount:0,items:[],view:"for-you",limit:12,loading:false,expanded:false,
- lastHidden:null,sourceErrors:[],sourcesLoaded:0,refreshId:0,paperEpoch:0};
+ lastHidden:null,sourceErrors:[],sourcesLoaded:0,eprintOffline:false,refreshId:0,paperEpoch:0};
 const sources=["arxiv","biorxiv","chemrxiv","eprint"];
 const fallback=window.AxiovoFeedCorpus();
 let worker=null,workerUnavailable=typeof Worker==="undefined",requestId=0;
@@ -23,7 +23,7 @@ function useFallback(){
  requests.clear();
  // Discard in-flight updates from the old worker, keeping cards visible
  // while the same sources reload through the browser fallback.
- state.refreshId++;state.loading=false;
+ state.refreshId++;state.loading=false;$("feed-refresh").disabled=false;
  rankSequence++;rankPending=false;rankCacheKey="";
  void refresh();
 }
@@ -119,7 +119,8 @@ function renderStatus(matches){
   return;
  }
  const errors=state.sourceErrors.length?" Unavailable: "+state.sourceErrors.map(s=>archive.names[s]).join(", ")+".":"";
- status.textContent=matches+" matches · "+state.paperCount+" source-linked papers indexed for this feed. Coverage is partial."+errors;
+ const offline=state.eprintOffline?" Cryptology ePrint is using a saved offline subset.":"";
+ status.textContent=matches+" matches · "+state.paperCount+" source-linked papers indexed for this feed. Coverage is partial."+errors+offline;
 }
 function dateString(p){
  return p.announcementDate?("Announced "+p.announcementDate):p.date?("Posted "+p.date):"Date unverified";
@@ -361,7 +362,7 @@ async function refresh(manual=false){
  }
  state.loading=true;$("feed-refresh").disabled=true;
  const run=++state.refreshId;
- state.sourcesLoaded=0;state.sourceErrors=[];
+ state.sourcesLoaded=0;state.sourceErrors=[];state.eprintOffline=false;
  renderStatus(state.items.length);
  // Start the small preview before the largest download on slow connections.
  const preview=manual?Promise.resolve():loadFastPreview(run);
@@ -377,7 +378,7 @@ async function refresh(manual=false){
     state.sourcesLoaded++;
     if(snap.stamp)timestamps.push(snap.stamp);
     if(worker&&snap.eprint)eprint?.remember(snap.eprint);
-    if(snap.offlineSubset)state.sourceErrors.push(source);
+    if(source==="eprint")state.eprintOffline=Boolean(snap.offlineSubset);
     sourcePapersChanged(snap.count);
    }catch{
     if(run===state.refreshId){
