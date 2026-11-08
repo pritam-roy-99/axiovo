@@ -9,7 +9,8 @@ const HIDDEN="axiovo-feed-hidden-v1";
 const UNVERIFIED_NAMES="axiovo-feed-include-unverified-names-v1";
 const state={papers:[],items:[],view:"for-you",limit:12,loading:false,expanded:false,
  lastHidden:null,sourceErrors:[],refreshId:0,paperEpoch:0};
-const MIN_WORKER_PAPERS=1500;
+// Rank off the main thread even for modest mobile feeds.
+const MIN_WORKER_PAPERS=80;
 let rankWorker=null,workerUnavailable=false,rankSequence=0;
 let workerPaperEpoch=-1,rankCacheKey="",rankedPrefs=null,pendingKey="";
 let pendingPrefs=null,workerTimeout=null,rankRequestedKey="";
