@@ -61,36 +61,83 @@ function segments(text){
  return sentences.flatMap(value=>value.trim().match(/.{1,205}(?:\s|$)|\S+/gu)||[]).map(x=>x.trim()).filter(Boolean);
 }
 let items=[],paper=0,sentence=0,revision=0,paused=false;
-function finish(message){
- revision++;synth.cancel();paused=false;items=[];caption.textContent="";
- title.textContent="Abstract audio";status.textContent=message;pause.disabled=true;skip.disabled=true;stop.textContent="Close";
+let pending=null,activeUtterance=null,failedVoice=null;
+const delay=(callback,ms=100)=>{
+ if(pending!==null)clearTimeout(pending);
+ pending=setTimeout(()=>{pending=null;callback()},ms);
+};
+function cancelActive(){
+ if(pending!==null){clearTimeout(pending);pending=null}
+ // Invalidate callbacks BEFORE cancelling; Android fires "interrupted" on cancel.
+ revision++;activeUtterance=null;synth.cancel();
 }
-function say(){
+function finish(message){
+ cancelActive();paused=false;items=[];caption.textContent="";
+ title.textContent="Abstract audio";status.textContent=message;
+ pause.disabled=true;skip.disabled=true;stop.textContent="Close";
+}
+function say(useDefault=false){
+ if(paused||!items.length)return;
  if(paper>=items.length){finish("Playback complete.");return}
  const {record,parts}=items[paper],phrase=parts[sentence];
- if(!phrase){paper++;sentence=0;say();return}
- const voices=refresh(),voice=voices.find(v=>v.voiceURI===prefs.voice)||voices[0];
- // Let the browser use its default speech voice when voices are not enumerated.
- // This is common on Android before voiceschanged fires.
+ if(!phrase){paper++;sentence=0;delay(()=>say(),100);return}
+ const voiceList=available();
+ const voice=useDefault?null:voiceList.find(v=>v.voiceURI===prefs.voice)||voiceList[0]||null;
  const run=revision,utterance=new SpeechSynthesisUtterance(pronounce(phrase));
- if(voice)utterance.voice=voice;utterance.lang=voice?.lang||"en-US";utterance.rate={slow:.80,steady:.94,brisk:1.17}[prefs.rate]||.94;
- utterance.onend=()=>{if(run===revision){sentence++;say()}};
- utterance.onerror=()=>{if(run===revision)finish("The on-device voice stopped. Select Listen to try again.")};
+ activeUtterance=utterance;
+ // Android Chrome may reject an enumerated voice that has not finished loading.
+ // When it does, retry once using the OS/browser default without setting .voice.
+ if(voice)utterance.voice=voice;
+ utterance.lang=voice?.lang||"en-US";
+ utterance.rate={slow:.80,steady:.94,brisk:1.17}[prefs.rate]||.94;
+ utterance.onend=()=>{
+  if(run!==revision||activeUtterance!==utterance)return;
+  activeUtterance=null;failedVoice=null;sentence++;
+  // Yield to Android's TTS service before scheduling the next utterance.
+  delay(()=>{if(run===revision)say()},120);
+ };
+ utterance.onerror=(event)=>{
+  if(run!==revision||activeUtterance!==utterance)return;
+  activeUtterance=null;
+  const error=event?.error||"unknown";
+  // These errors occur when the user replaces/stops playback; do not show an error.
+  if(error==="canceled"||error==="interrupted")return;
+  if(!useDefault && failedVoice!==phrase){
+   failedVoice=phrase;
+   status.textContent="Retrying with the default voice…";
+   delay(()=>{if(run===revision)say(true)},180);
+   return;
+  }
+  console.warn("Axiovo abstract audio:",error);
+  finish("Speech playback unavailable ("+error+"). Try another device voice or check Android text-to-speech settings.");
+ };
  title.textContent=record.title;caption.textContent=phrase;
  status.textContent="Paper "+(paper+1)+" of "+items.length;
- skip.disabled=paper+1>=items.length;synth.speak(utterance);
+ skip.disabled=paper+1>=items.length;
+ try{synth.speak(utterance)}
+ catch(error){
+  utterance.onerror({error:error?.name||"synthesis-failed"});
+ }
 }
 function play(records){
- items=records.filter(p=>p?.abstract).map(record=>({record,parts:[record.title,...segments(record.abstract)]}));
- if(!items.length)return;
- revision++;synth.cancel();synth.resume();paper=0;sentence=0;paused=false;
- pause.disabled=false;pause.textContent="Pause";stop.textContent="Stop";toolbar.hidden=false;say();
+ const newItems=records.filter(p=>p?.abstract).map(record=>({record,parts:[record.title,...segments(record.abstract)]}));
+ if(!newItems.length)return;
+ cancelActive();synth.resume();items=newItems;paper=0;sentence=0;paused=false;failedVoice=null;
+ pause.disabled=false;pause.textContent="Pause";stop.textContent="Stop";toolbar.hidden=false;
+ const run=revision;delay(()=>{if(run===revision)say()},150);
 }
 pause.onclick=()=>{
- paused=!paused;if(paused)synth.pause();else synth.resume();
+ if(!items.length)return;
+ paused=!paused;
+ if(paused)synth.pause();else synth.resume();
  pause.textContent=paused?"Resume":"Pause";
 };
-skip.onclick=()=>{revision++;synth.cancel();synth.resume();paused=false;pause.textContent="Pause";paper++;sentence=0;say()};
+skip.onclick=()=>{
+ if(!items.length||paper+1>=items.length)return;
+ cancelActive();synth.resume();paused=false;failedVoice=null;
+ pause.textContent="Pause";paper++;sentence=0;
+ const run=revision;delay(()=>{if(run===revision)say()},150);
+};
 stop.onclick=()=>{finish("");toolbar.hidden=true};
 window.AxiovoAbstractAudio={play};
 })();
