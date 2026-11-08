@@ -100,8 +100,8 @@ function say(useDefault=false){
   if(run!==revision||activeUtterance!==utterance)return;
   activeUtterance=null;
   const error=event?.error||"unknown";
-  // These errors occur when the user replaces/stops playback; do not show an error.
-  if(error==="canceled"||error==="interrupted")return;
+  // Deliberate cancels were invalidated above; a current-session interruption
+  // is a genuine engine failure and should receive the same fallback retry.
   if(!useDefault && failedVoice!==phrase){
    failedVoice=phrase;
    status.textContent="Retrying with the default voice…";
