@@ -46,7 +46,10 @@ if(!stored){
  }
 }
 let followed=Array.isArray(stored?.followed)?stored.followed.map(x=>({...pathFrom(x),label:clean(x?.label,170)})).filter(x=>x.category&&x.label).slice(0,30):[];
-let selected=pathFrom(params.size?Object.fromEntries(params):stored?.last);
+// A date-only or sorting deep link must not erase the last selected research
+// path. Explicit category links, including an empty category, take precedence.
+const hasPathOverride=["category","topic","subtopic","refine"].some(k=>params.has(k));
+let selected=pathFrom(hasPathOverride?Object.fromEntries(params):stored?.last);
 let catalog=new Map(), catalogReady=false, index=[], topics=[], topic, leaf, subject;
 let search=null, datePreset=0;
 const initialSort=params.get("sort");
