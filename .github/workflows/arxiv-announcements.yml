@@ -7,12 +7,6 @@ on:
       - scripts/scirate_latest.py
       - .github/workflows/arxiv-announcements.yml
   workflow_dispatch:
-  schedule:
-    # Frequent post-announcement and overnight RSS checks, UTC.
-    # arXiv's RSS snapshot is usually refreshed at midnight Eastern.
-    - cron: '25,55 0,1,2,3 * * 1-5'
-    - cron: '12,42 4,5,6,7 * * 1-5'
-    - cron: '37 9,15,21 * * 1-5'
 permissions:
   contents: write
   actions: write
