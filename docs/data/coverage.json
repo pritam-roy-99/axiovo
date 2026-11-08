@@ -9,15 +9,15 @@
       "coverage": "available source snapshots, not a complete historical archive"
     },
     "biorxiv": {
-      "input_records": 3709,
+      "input_records": 3710,
       "invalid_or_unavailable": 0,
-      "last_sync": "2026-11-08T16:46:46.102405+00:00",
+      "last_sync": "2026-11-08T18:03:30.520332+00:00",
       "coverage": "available source snapshots, not a complete historical archive"
     },
     "chemrxiv": {
       "input_records": 3000,
       "invalid_or_unavailable": 0,
-      "last_sync": "2026-11-08T17:52:38.770526+00:00",
+      "last_sync": "2026-11-08T18:04:18.700904+00:00",
       "coverage": "available source snapshots, not a complete historical archive"
     }
   },
@@ -45,7 +45,8 @@
       "2026-11-04": 364,
       "2026-11-05": 189,
       "2026-11-06": 324,
-      "2026-11-07": 38
+      "2026-11-07": 38,
+      "2026-11-08": 1
     },
     "chemrxiv": {
       "2022-10-04": 21,
@@ -351,6 +352,7 @@
       "q-fin.GN": 1
     },
     "biorxiv": {
+      "systems biology": 71,
       "microbiology": 301,
       "neuroscience": 794,
       "biophysics": 159,
@@ -364,7 +366,6 @@
       "evolutionary biology": 156,
       "plant biology": 111,
       "bioinformatics": 468,
-      "systems biology": 70,
       "genetics": 93,
       "pharmacology and toxicology": 56,
       "animal behavior and cognition": 63,
@@ -379,7 +380,7 @@
     },
     "chemrxiv": {}
   },
-  "needs_review": 10350,
+  "needs_review": 10351,
   "tagged": 0,
-  "total_indexed": 10350
+  "total_indexed": 10351
 }
