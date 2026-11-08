@@ -1,23 +1,21 @@
 {
   "schema": 1,
-  "checked_at": "2026-11-08T16:52:12.954098+00:00",
+  "checked_at": "2026-11-08T17:32:19.378259+00:00",
   "warning": "Completeness is proved only for named source windows. No source-wide recall is asserted.",
   "arxiv": {
     "status": "gaps_detected",
     "scope": "UTC submission dates; certified against arXiv Atom totalResults captured during harvesting",
-    "verified_days": 43,
+    "verified_days": 45,
     "verified_latest": "2026-11-05",
     "checked_recent_closed_days": 21,
     "missing_recent_dates": [
-      "2026-11-07",
       "2026-11-06"
     ],
     "invalid_shards": [],
     "repair_queue": [
-      "2026-11-07",
       "2026-11-06"
     ],
-    "queue_total": 2,
+    "queue_total": 1,
     "not_a_full_archive": true
   },
   "biorxiv": {
