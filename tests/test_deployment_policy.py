@@ -6,12 +6,15 @@ import unittest
 WORKFLOW=(Path(__file__).resolve().parents[1]/".github"/"workflows"/"pages.yml").read_text()
 
 class DeploymentPolicyTests(unittest.TestCase):
-    def test_metadata_runs_on_schedule_or_manual_request_only(self):
+    def test_refresh_runs_in_dedicated_scheduled_workflow(self):
+        sync=(Path(__file__).resolve().parents[1]/".github"/"workflows"/"sync-all-sources.yml").read_text()
         for label in ("Refresh research metadata", "Refresh free bioRxiv metadata"):
-            pattern=r"      - name: "+re.escape(label)+r"\n        if: github\.event_name != 'push'"
-            self.assertRegex(WORKFLOW,pattern)
-        self.assertIn("cron: '17 * * * *'",WORKFLOW)
-        self.assertIn("workflow_dispatch:",WORKFLOW)
+            # Full site deployment never blocks on an external API.
+            self.assertIn("if: github.event_name == 'schedule'",WORKFLOW)
+        self.assertNotIn("  schedule:",WORKFLOW)
+        self.assertIn("cron: '18 * * * *'",sync)
+        self.assertIn("workflow_dispatch:",sync)
+        self.assertIn("gh workflow run pages.yml",sync)
     def test_metadata_commits_cannot_cancel_running_video_publication(self):
         self.assertIn("group: axiovo-pages",WORKFLOW)
         self.assertIn("cancel-in-progress: false",WORKFLOW)
