@@ -82,7 +82,7 @@ function segments(text){
 // Keep the speech engine alive across phrases. In particular, never cancel() an
 // idle Android engine before its first speak() call.
 let items=[],paper=0,sentence=0,run=0,paused=false,active=null;
-let timer=null,watchdog=null,testing=false,lastError="",attempt=0;
+let timer=null,watchdog=null,testing=false,lastError="",attempt=0,stalled=false;
 let lastPaperText="";
 const voiceModes=["selected","default","india","us"];
 function clearTimers(){
@@ -91,9 +91,11 @@ function clearTimers(){
 }
 function interrupt(){
  run++;clearTimers();
- if(active){
-  active.onend=null;active.onerror=null;active.onstart=null;
-  active=null;
+ if(active||stalled){
+  if(active){active.onend=null;active.onerror=null;active.onstart=null;active=null}
+  stalled=false;
+  // A timed-out Android utterance can remain queued after its JS reference
+  // is cleared. Cancel that stale queue only on the next explicit action.
   try{synth.cancel()}catch(e){console.warn("Axiovo TTS cancellation failed",e)}
  }
 }
@@ -146,6 +148,7 @@ function speak(text,onComplete,isTest=false){
  try{utterance=makeUtterance(pronounce(text),mode)}
  catch(error){fail(error?.name||"utterance-error");return}
  active=utterance;
+ stalled=false;
  let started=false;
  utterance.onstart=()=>{if(generation===run&&active===utterance){started=true;clearTimers();if(!isTest)message("Reading paper "+(paper+1)+" of "+items.length)}};
  utterance.onend=()=>{
@@ -170,7 +173,7 @@ function speak(text,onComplete,isTest=false){
   // Watchdog covers Android Web Speech calls that never fire any events.
   watchdog=setTimeout(()=>{
    if(generation!==run||active!==utterance)return;
-   active=null;fail("no speech event");
+   active=null;stalled=true;fail("no speech event");
   },Math.max(12000,utterance.text.length*200));
  }catch(error){
   if(generation!==run)return;
