@@ -16,9 +16,6 @@ const symbols={"α":" alpha ","β":" beta ","γ":" gamma ","δ":" delta ","λ":"
 let prefs={voice:"",rate:"steady"};
 const android=/Android/i.test(navigator.userAgent||"");
 try{prefs={...prefs,...JSON.parse(localStorage.getItem(key)||"{}")}}catch{}
-// Discard old Android voice selection that may point to a missing TTS package.
-// Prefer the OS default on Android unless the user explicitly selects a new voice.
-if(android)prefs.voice="";
 const female=/female|samantha|victoria|karen|moira|tessa|fiona|serena|zira|hazel|jenny|aria|sonia|libby|veena|swara|ava|allison|joanna|emma|sara|aditi|raveena/i;
 const make=(tag,label)=>{
  const el=document.createElement(tag);if(label)el.textContent=label;return el;
@@ -51,7 +48,7 @@ function refresh(){
  return options;
 }
 function store(){try{localStorage.setItem(key,JSON.stringify(prefs))}catch{}}
-voiceSelect.onchange=()=>{prefs.voice=voiceSelect.value;store()};
+voiceSelect.onchange=()=>{prefs.voice=voiceSelect.value;voiceMode=prefs.voice?"selected":"default";store()};
 speed.onchange=()=>{prefs.rate=speed.value;store()};
 if(typeof synth.addEventListener==="function")synth.addEventListener("voiceschanged",refresh);
 else synth.onvoiceschanged=refresh;
@@ -82,9 +79,10 @@ function segments(text){
 // Keep the speech engine alive across phrases. In particular, never cancel() an
 // idle Android engine before its first speak() call.
 let items=[],paper=0,sentence=0,run=0,paused=false,active=null;
-let timer=null,watchdog=null,testing=false,lastError="",attempt=0;
+let timer=null,watchdog=null,testing=false,needsReset=false;
+let voiceMode=prefs.voice?"selected":"default";
 let lastPaperText="";
-const voiceModes=["selected","default","india","us"];
+const TEST_PHRASE="Hello. Axiovo audio is ready.";
 function clearTimers(){
  if(timer!==null){clearTimeout(timer);timer=null}
  if(watchdog!==null){clearTimeout(watchdog);watchdog=null}
@@ -93,15 +91,18 @@ function interrupt(){
  run++;clearTimers();
  if(active){
   active.onend=null;active.onerror=null;active.onstart=null;
-  active=null;
-  try{synth.cancel()}catch(e){console.warn("Axiovo TTS cancellation failed",e)}
+  active=null;needsReset=true;
  }
+ if(needsReset||synth.speaking||synth.pending){
+  try{synth.cancel();needsReset=false}catch(e){console.warn("Axiovo TTS cancellation failed",e)}
+ }
+ if(synth.paused){try{synth.resume()}catch{}}
 }
 function message(text){status.textContent=text}
 function closePlayer(){
  interrupt();items=[];testing=false;paused=false;
- toolbar.hidden=true;caption.textContent="";title.textContent="Abstract audio";
- pause.disabled=true;skip.disabled=true;
+ toolbar.hidden=true;caption.textContent="";title.textContent="Abstract audio";lastPaperText="";
+ pause.disabled=true;skip.disabled=true;copy.disabled=true;
 }
 function voiceFor(mode){
  if(mode!=="selected")return null;
@@ -110,8 +111,6 @@ function voiceFor(mode){
 function makeUtterance(text,mode){
  const utterance=new SpeechSynthesisUtterance(text);
  const voice=voiceFor(mode);
- // Android works differently from Settings: Web Speech must explicitly pass
- // a supported language when no voice is chosen.
  if(voice){utterance.voice=voice;utterance.lang=voice.lang}
  else if(mode==="india")utterance.lang="en-IN";
  else if(mode==="us")utterance.lang="en-US";
@@ -122,66 +121,61 @@ function makeUtterance(text,mode){
  return utterance;
 }
 function attemptModes(){
- // Explicit voice can be stale/unavailable even when its label is displayed.
- return prefs.voice?["selected","default","india","us"]:["default","india","us"];
+ return voiceFor("selected")?["selected","default","india","us"]:["default","india","us"];
 }
-function fail(error){
- lastError=error;
+function fail(error,mode){
  paused=true;pause.disabled=false;pause.textContent="Retry";
- const options=attemptModes(),mode=options[Math.min(attempt>0?attempt-1:0,options.length-1)];
- const advice=error==="not-allowed"?"Tap Retry to grant Chrome permission to start speech.":
-  "Chrome speech failed ("+error+", mode: "+mode+"). Tap Retry to try another locale, or Test voice. Copy abstract lets you use Android Select to Speak if Chrome remains unavailable.";
+ const advice=error==="not-allowed"?"Tap Retry to start speech from a new tap.":
+  "The browser voice stopped ("+error+"). Tap Retry to try another voice, or use Copy abstract.";
  message(advice);
  console.warn("Axiovo Web Speech failure:",error,{
-  android,voices:available().length,lang:navigator.language,
+  android,mode,voices:available().length,lang:navigator.language,
   speaking:synth.speaking,pending:synth.pending,paused:synth.paused
  });
 }
-function speak(text,onComplete,isTest=false){
+function speak(text,onComplete){
  const generation=run;
  const modes=attemptModes();
- let mode=modes[Math.min(attempt,modes.length-1)];
- // The direct button click must call speak() synchronously on Android.
+ const mode=modes.includes(voiceMode)?voiceMode:modes[0];
+ voiceMode=mode;
  let utterance;
  try{utterance=makeUtterance(pronounce(text),mode)}
- catch(error){fail(error?.name||"utterance-error");return}
+ catch(error){voiceMode=modes[(modes.indexOf(mode)+1)%modes.length];fail(error?.name||"utterance-error",mode);return}
  active=utterance;
- let started=false;
- utterance.onstart=()=>{if(generation===run&&active===utterance){started=true;clearTimers();if(!isTest)message("Reading paper "+(paper+1)+" of "+items.length)}};
+ const current=()=>generation===run&&active===utterance;
+ const failed=(error,stalled=false)=>{
+  if(!current())return;
+  active=null;clearTimers();needsReset=stalled;
+  // A retry is always started by a user gesture. Keep a working locale
+  // across phrases and change it only after a synthesis failure.
+  if(error!=="not-allowed")voiceMode=modes[(modes.indexOf(mode)+1)%modes.length];
+  fail(error,mode);
+ };
+ utterance.onstart=()=>{
+  if(!current())return;
+  clearTimeout(watchdog);
+  watchdog=setTimeout(()=>failed("speech stalled",true),Math.max(15000,utterance.text.length*250));
+  message(testing?"Playing voice test…":"Reading paper "+(paper+1)+" of "+items.length);
+ };
  utterance.onend=()=>{
-  if(generation!==run||active!==utterance)return;
-  active=null;clearTimers();attempt=0;lastError="";
-  if(isTest){testing=false;message("Chrome voice test successful. Tap Listen to abstract to play a paper.");return}
+  if(!current())return;
+  active=null;clearTimers();
   onComplete();
  };
- utterance.onerror=(event)=>{
-  if(generation!==run||active!==utterance)return;
-  active=null;clearTimers();
-  const error=event?.error||"unknown";
-  // A browser speech error may require another user gesture. Never silently
-  // schedule a second speak() in a timer after an Android synthesis failure.
-  attempt=Math.min(attempt+1,modes.length-1);
-  if(error==="not-allowed")fail(error);
-  else fail(error);
- };
- if(!isTest)message("Starting voice…");
+ utterance.onerror=event=>failed(event?.error||"unknown");
+ message("Starting voice…");
+ watchdog=setTimeout(()=>failed("voice did not start",true),12000);
+ // Chrome on Android needs the first speak() directly inside the tap.
  try{
   synth.speak(utterance);
-  // Watchdog covers Android Web Speech calls that never fire any events.
-  watchdog=setTimeout(()=>{
-   if(generation!==run||active!==utterance)return;
-   active=null;fail("no speech event");
-  },Math.max(12000,utterance.text.length*200));
  }catch(error){
-  if(generation!==run)return;
-  active=null;clearTimers();attempt=Math.min(attempt+1,modes.length-1);
-  fail(error?.name||error?.message||"speak-exception");
+  failed(error?.name||"speak-exception");
  }
 }
 function nextPhrase(){
  if(paused||testing||!items.length)return;
  if(paper>=items.length){
-  items=[];message("Playback complete.");pause.disabled=true;
+  items=[];message("Playback complete.");pause.disabled=true;skip.disabled=true;
   stop.textContent="Close";return
  }
  const {record,parts}=items[paper];
@@ -203,32 +197,37 @@ function play(records){
  if(!newItems.length)return;
  // Cancel only when there is an actual previous utterance.
  interrupt();
- items=newItems;paper=0;sentence=0;attempt=0;testing=false;paused=false;
+ items=newItems;paper=0;sentence=0;testing=false;paused=false;
  lastPaperText=[newItems[0].record.title||"",newItems[0].record.abstract||""].filter(Boolean).join("\n\n");
  copy.disabled=false;
  pause.disabled=false;pause.textContent="Pause";skip.disabled=newItems.length<2;
  stop.textContent="Stop";toolbar.hidden=false;
  nextPhrase();
 }
+function playTest(){
+ title.textContent="Voice test";caption.textContent=TEST_PHRASE;
+ speak(TEST_PHRASE,()=>{
+  testing=false;paused=items.length>0;
+  pause.disabled=!paused;pause.textContent="Resume";skip.disabled=paper>=items.length-1;
+  message(paused?"Voice test successful. Tap Resume to continue the abstract.":
+   "Voice test successful. Tap Listen to abstract to read a paper.");
+ });
+}
 pause.onclick=()=>{
- if(!items.length)return;
+ if(!testing&&!items.length)return;
  if(paused){
+  interrupt();
   paused=false;pause.textContent="Pause";
-  // Restart this phrase on a fresh tap. This is more reliable on Android than
-  // speechSynthesis.resume() after an error.
-  if(synth.speaking||synth.pending){
-   // Chromium may retain a stale speaking state after synthesis-failed.
-   try{synth.cancel()}catch(e){}
-  }
-  if(synth.paused){try{synth.resume()}catch(e){}}
-  nextPhrase();return;
+  if(testing)playTest();
+  else nextPhrase();
+  return;
  }
  paused=true;pause.textContent="Resume";
  interrupt();message("Paused. Resume repeats the current phrase.");
 };
 skip.onclick=()=>{
  if(paper>=items.length-1)return;
- interrupt();paused=false;testing=false;attempt=0;paper++;sentence=0;
+ interrupt();paused=false;testing=false;paper++;sentence=0;
  pause.textContent="Pause";nextPhrase();
 };
 copy.onclick=()=>{
@@ -243,13 +242,12 @@ copy.onclick=()=>{
  }else message("Expand Read abstract, select the text, and choose Copy.");
 };
 test.onclick=()=>{
- interrupt();testing=true;paused=false;attempt=0;
- if(synth.speaking||synth.pending){try{synth.cancel()}catch(e){}}
- if(synth.paused){try{synth.resume()}catch(e){}}
- title.textContent="Voice test";caption.textContent="Hello. Axiovo audio is ready.";
- toolbar.hidden=false;stop.textContent="Close";
- speak("Hello. Axiovo audio is ready.",()=>{},true);
+ interrupt();testing=true;paused=false;
+ pause.disabled=false;pause.textContent="Pause";skip.disabled=true;
+ toolbar.hidden=false;
+ playTest();
 };
 stop.onclick=closePlayer;
+window.addEventListener("pagehide",closePlayer);
 window.AxiovoAbstractAudio={play};
 })();

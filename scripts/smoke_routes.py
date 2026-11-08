@@ -30,10 +30,14 @@ def main():
     try:
         with sync_playwright() as pw:
             browser = pw.chromium.launch(headless=True, args=["--no-sandbox", "--disable-dev-shm-usage"])
-            for width in (360, 390, 768, 1360):
-                ctx = browser.new_context(viewport={"width": width, "height": 850},
+            for width, height in ((320, 740), (360, 850), (390, 850), (428, 926), (740, 390),
+                                  (768, 850), (1360, 850)):
+                mobile = pw.devices["Pixel 7"] if width <= 760 else {}
+                ctx = browser.new_context(**{**mobile, "viewport": {"width": width, "height": height}},
                                           service_workers="block", reduced_motion="reduce")
                 page = ctx.new_page()
+                errors = []
+                page.on("pageerror", lambda error: errors.append(str(error)))
                 page.set_default_timeout(12000)
                 for path in ROUTES:
                     page.goto(base + path, wait_until="domcontentloaded", timeout=25000)
@@ -145,6 +149,10 @@ def main():
                             assert abs(geometry["primary"]["top"]-geometry["secondary"]["top"])<=3,(width,"Mobile CTAs not aligned",geometry)
 
                     verified.append((width,path or "home"))
+                assert not errors, (width, height, errors)
+                if width in (320, 428, 740):
+                    ctx.close()
+                    continue
                 page.goto(base,wait_until="domcontentloaded")
                 page.locator(".axiovo-archive-card").first.wait_for()
                 assert page.locator(".axiovo-archive-card").count()==4
@@ -186,6 +194,7 @@ def main():
                 page.goto(base+"index.html#axiovo-archive-title",wait_until="domcontentloaded")
                 page.locator("a[href='./feed.html']").first.click()
                 page.wait_for_url(lambda url: urlsplit(url).path.endswith("/feed.html"))
+                history_length = page.evaluate("history.length")
                 page.locator(".axiovo-back-button").click()
                 page.wait_for_url(lambda url: urlsplit(url).path.endswith("/index.html"))
                 page.locator("#axiovo-home-video").wait_for()
@@ -193,6 +202,11 @@ def main():
                 assert not page.locator("#axiovo-home-video").is_hidden()
                 assert page.locator("#axiovo-tour").is_hidden()
                 assert page.evaluate("location.hash")=="" , "Back must not restore archive fragment"
+                assert page.evaluate("history.length") == history_length, "Back must reuse the Home entry"
+                page.go_forward(wait_until="domcontentloaded")
+                assert page.url.endswith("/feed.html"), "Browser Forward must return to My Feed"
+                page.go_back(wait_until="domcontentloaded")
+                page.wait_for_function("window.scrollY<5",timeout=5000)
                 page.locator("#axiovo-tour-show-guide").click()
                 assert page.locator("#axiovo-home-video").is_hidden()
                 assert page.locator("#axiovo-tour").is_visible()
@@ -421,6 +435,15 @@ def main():
             saved=page.locator("#library-list").get_by_role("link",name="Synthetic pinned paper for the offline Library")
             saved.wait_for()
             assert saved.get_attribute("href")=="https://arxiv.org/abs/2611.11333v2"
+            card=page.locator("#library-list article").filter(
+                has=page.get_by_role("link",name="Synthetic pinned paper for the offline Library"))
+            card.locator("summary").filter(has_text="Notes and organization").click()
+            note=card.get_by_role("textbox",name="Private note for Synthetic pinned paper for the offline Library")
+            note.fill("Verify the exact paper version offline.")
+            note.press("Tab")
+            page.reload(wait_until="domcontentloaded")
+            card.locator("summary").filter(has_text="Notes and organization").click()
+            assert note.input_value()=="Verify the exact paper version offline."
             context.close()
             browser.close()
     finally:

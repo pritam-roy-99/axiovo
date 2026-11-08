@@ -60,10 +60,15 @@
     if(mode==="video")display("video");
     else if(retry)retry.hidden=true;
    }
-   function videoError(){
-    // Source-level errors may fire while another candidate or the media
-    // element is still loading. Do not react after playable data arrives.
-    if(video.readyState>=HTMLMediaElement.HAVE_METADATA)return;
+   function videoError(event){
+    if(mode!=="video"){
+     unavailable=true;
+     if(retry)retry.hidden=false;
+     return;
+    }
+    // Ignore late source-level events if the selected media is playable.
+    // A media-element error still needs recovery after metadata has loaded.
+    if(event.target!==video&&video.readyState>=HTMLMediaElement.HAVE_METADATA)return;
     if(retryTimer!==null)return;
     if(failures<MAX_RETRIES&&navigator.onLine!==false){
      failures++;
@@ -91,13 +96,14 @@
    });
    window.addEventListener("pagehide",clearRetry);
    window.addEventListener("pageshow",event=>{
-    if(event.persisted||new URLSearchParams(location.search).has("axiovo_return")){
+    if(event.persisted||performance.getEntriesByType("navigation")[0]?.type==="back_forward"||
+       new URLSearchParams(location.search).has("axiovo_return")){
      // BFCache restores media as well as scroll position. Reset the
      // tutorial presentation without forcing autoplay or switching guides.
      clearRetry();
      failures=0;unavailable=false;
      display("video");
-     if(video.readyState===0)retryLoad();
+     if(video.error)retryLoad();
     }else display(mode);
    });
    display("video");

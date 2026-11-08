@@ -43,6 +43,10 @@ def main():
             page.route("**/data/feed.json",lambda r:r.fulfill(status=200,content_type="application/json",body=json.dumps(fixture)))
             for path in ("oai-recent.json","announcements.json","biorxiv.json","chemrxiv.json"):
                 page.route("**/data/"+path,lambda r:r.fulfill(status=200,content_type="application/json",body='{"papers":[]}'))
+            page.route("**/data/eprint.json",lambda r:r.fulfill(status=200,content_type="application/json",
+                body='{"source":"eprint","papers":[{"id":"2026/1","title":"Message authentication"}]}'))
+            page.route("https://api.openalex.org/**",lambda r:r.fulfill(status=200,content_type="application/json",
+                body='{"results":[]}'))
             # Browsing a topic does not subscribe the device to that topic.
             page.add_init_script("""() => {
               localStorage.setItem("axiovo-field-explorer-v1", JSON.stringify({topic:"Numerical relativity"}));

@@ -11,13 +11,20 @@ const core=require("../docs/feed-core.js");
 const follow=require("../docs/author-follow.js");
 const root=path.join(__dirname,"../docs");
 let last=null;
-const ctx={};
+const eprint={id:"2026/1234",title:"Quantum information cryptography",
+ abstract:"Quantum information for cryptography",authors:["A. Researcher"],date:"2026-11-07"};
+const ctx={AbortSignal,AbortController,URLSearchParams,URL,setTimeout,clearTimeout,
+ fetch:async url=>{
+  if(String(url).endsWith("/eprint.json"))return {ok:true,json:async()=>({source:"eprint",papers:[eprint]})};
+  if(String(url).endsWith("/feed.json"))return {ok:true,json:async()=>({papers})};
+  return {ok:false,status:503};
+ }};
 ctx.self=ctx;ctx.window=ctx;
 ctx.postMessage=value=>{last=value};
 vm.createContext(ctx);
 ctx.importScripts=(...files)=>{
  for(const file of files){
-  const text=fs.readFileSync(path.join(root,file),"utf8");
+  const text=fs.readFileSync(path.join(root,file.split("?")[0]),"utf8");
   vm.runInContext(text,ctx,{filename:file,timeout:10000});
  }
 };
@@ -43,27 +50,36 @@ const prefs={
  matchesAuthor:(a,b)=>Boolean(follow.matchesName(a,b))||String(a).toLowerCase()===String(b).toLowerCase()
 };
 const now=Date.parse("2026-11-07T04:00:00Z");
-const baseline=core.build(papers,prefs,now);
 const {matchesAuthor,...plain}=prefs;
-ctx.onmessage({data:{type:"rank",id:1,generation:1,papers,prefs:plain,now}});
-assert.equal(last.type,"result");
-assert.equal(last.generation,1);
-assert.deepEqual(JSON.parse(JSON.stringify(last.items)),JSON.parse(JSON.stringify(baseline)),
- "Worker must reproduce every existing ranking, score, reason, paper and ordering");
-assert.equal(last.items.length,baseline.length);
-const blocked=baseline.filter(x=>x.nameOnly);
-assert.equal(blocked.length,0,"No unverified name-only papers may enter default feed");
-ctx.onmessage({data:{type:"rank",id:2,generation:1,prefs:{...plain,
- includeUnverifiedNames:true},now}});
-const opted=core.build(papers,{...prefs,includeUnverifiedNames:true},now);
-assert.deepEqual(JSON.parse(JSON.stringify(last.items)),JSON.parse(JSON.stringify(opted)),
- "Opt-in homonym rankings must match exactly");
-ctx.onmessage({data:{type:"rank",id:3,generation:4,prefs:plain,now}});
-assert.equal(last.type,"error","Outdated metadata generation must not return stale items");
-const mutated={...papers[0],title:"New science",abstract:"Quantum information unknown"};
-const first=core.build([mutated],{topics:["quantum information"]},now);
-mutated.abstract="No scientific topic match";
-const second=core.build([mutated],{topics:["quantum information"]},now);
-assert.notDeepEqual(first.map(x=>x.key),second.map(x=>x.key),
- "Token cache must invalidate when a paper's abstract changes");
-console.log("PASS: 2,100 complete records; exact worker/main ranking parity, homonym safety, cache invalidation and stale generation.");
+const same=(a,b,message)=>assert.deepEqual(JSON.parse(JSON.stringify(a)),JSON.parse(JSON.stringify(b)),message);
+(async()=>{
+ let id=0;
+ async function request(method,...args){
+  const sent=++id;
+  await ctx.onmessage({data:{id:sent,method,args}});
+  assert.equal(last.id,sent);
+  assert.equal(last.error,undefined);
+  return last.value;
+ }
+ const loaded=await request("snapshot","arxiv",false);
+ assert.equal(loaded.count,papers.length,"Worker fetches and indexes the full snapshot");
+ assert.equal(loaded.papers,undefined,"Full snapshots stay in the worker");
+ const loadedEprint=await request("snapshot","eprint",false);
+ assert.equal(loadedEprint.count,papers.length+1);
+ assert.equal(loadedEprint.eprint.papers[0].id,eprint.id,"Verified ePrint fallback survives worker mode");
+ const archive=ctx.AxiovoArchiveData;
+ const normalized=archive.merge(papers.map(p=>archive.normalize("arxiv",p)),[ctx.AxiovoEprintSource.normalize(eprint)]);
+ const baseline=core.build(normalized,prefs,now);
+ same(await request("rank",plain,now),baseline,"Exact worker/main ranking parity");
+ assert.equal(baseline.filter(x=>x.nameOnly).length,0,"No unverified name-only papers enter default feed");
+ const opted={...plain,includeUnverifiedNames:true};
+ same(await request("rank",opted,now),core.build(normalized,{...opted,matchesAuthor},now),
+  "Opt-in homonym rankings must match exactly");
+ const mutated={...papers[0],title:"New science",abstract:"Quantum information unknown"};
+ const first=core.build([mutated],{topics:["quantum information"]},now);
+ mutated.abstract="No scientific topic match";
+ const second=core.build([mutated],{topics:["quantum information"]},now);
+ assert.notDeepEqual(first.map(x=>x.key),second.map(x=>x.key),
+  "Token cache must invalidate when a paper's abstract changes");
+ console.log("PASS: 2,101 records indexed in the worker with exact ranking parity and homonym safety.");
+})().catch(error=>{console.error(error);process.exitCode=1});
