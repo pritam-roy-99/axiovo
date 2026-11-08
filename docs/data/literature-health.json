@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "checked_at": "2026-11-08T22:20:21.000668+00:00",
+  "checked_at": "2026-11-08T23:51:24.233944+00:00",
   "warning": "Completeness is proved only for named source windows. No source-wide recall is asserted.",
   "arxiv": {
     "status": "gaps_detected",
     "scope": "UTC submission dates; certified against arXiv Atom totalResults captured during harvesting",
-    "verified_days": 57,
+    "verified_days": 59,
     "verified_latest": "2026-11-05",
     "checked_recent_closed_days": 21,
     "missing_recent_dates": [
