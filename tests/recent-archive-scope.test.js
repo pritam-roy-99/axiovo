@@ -9,7 +9,7 @@ const crypto=fs.readFileSync("docs/crypto.js","utf8");
 const archive=fs.readFileSync("docs/archive-data.js","utf8");
 assert.match(explorer,/let viewMode=params\.get\("mode"\)==="indexed"\?"indexed":"recent"/);
 assert.match(explorer,/recentOnly=\(source==="biorxiv"\|\|source==="chemrxiv"\)/);
-assert.match(explorer,/Object\.assign\(c,recentWindow\(\),\{sort:"recent",recentOnly:true\}\)/);
+assert.match(explorer,/Object\.assign\(c,recentWindow\(\),\{sort:c\.sort==="relevance"\?"recent":c\.sort,recentOnly:true\}\)/);
 assert.match(explorer,/state\.recentOnly\?"No matching papers in the latest 7 days/);
 assert.match(explorer,/viewMode=source==="arxiv"\?"indexed":"recent"/);
 assert.match(explorer,/showLatestAnnouncement\(\)/);
