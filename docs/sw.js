@@ -1,6 +1,6 @@
 /* Axiovo offline shell. Scholarly metadata, video and PDFs stay network-only. */
 "use strict";
-const CACHE = "axiovo-shell-v88";
+const CACHE = "axiovo-shell-v89";
 const SHELL = [
   "./", "./index.html", "./desk.html", "./feed.html", "./workspace.html", "./arxiv.html", "./biorxiv.html", "./chemrxiv.html", "./crypto.html",
   "./theme.css", "./axiovo-shell.css?v=20261107-mobile-ui-v1", "./home-landing.css?v=20261107-mobile-ui-v1", "./home-tour.js?v=20261107-video-stability-v1", "./theme.js", "./research-entry.css", "./research-entry.js",
@@ -16,9 +16,14 @@ const LEGACY = /^(?:researchlens|litveyra|axiovo)-shell-/;
 self.addEventListener("install", event => {
   event.waitUntil(
     caches.open(CACHE).then(async cache => {
-      const results = await Promise.allSettled(SHELL.map(url => cache.add(url)));
-      const failed = results.map((value, index) => value.status === "rejected" ? SHELL[index] : null).filter(Boolean);
-      if (failed.length) console.warn("Axiovo: optional offline assets unavailable", failed);
+      // Only precache the navigation shell. Fetching every script, CSS and topic
+      // file concurrently on first install saturates mobile CPU/network.
+      // Other assets are still cached on demand by the fetch handler.
+      const essentials = ["./", "./index.html", "./theme.css",
+        "./navigation.js", "./pwa.js", "./manifest.webmanifest"];
+      const results = await Promise.allSettled(essentials.map(url => cache.add(url)));
+      const failed = results.map((value,index)=>value.status==="rejected"?essentials[index]:null).filter(Boolean);
+      if(failed.length)console.warn("Axiovo: essential offline assets unavailable",failed);
     }).then(() => self.skipWaiting())
   );
 });
