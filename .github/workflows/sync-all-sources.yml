@@ -38,11 +38,24 @@ jobs:
         env:
           OAI_LOOKBACK_DAYS: '3'
           OAI_MAX_PAGES: '20'
-        run: timeout --signal=TERM --kill-after=15s 480s python -m scripts.oai_harvest
+        run: |
+          # arXiv has no routine weekend announcements; preserve the last
+          # published snapshot rather than claiming a fresh empty day.
+          if [ "$(date -u +%u)" -ge 6 ] && [ "$GITHUB_EVENT_NAME" != "workflow_dispatch" ]; then
+            echo "arXiv OAI: weekend announcement pause, existing snapshot retained."
+            exit 0
+          fi
+          timeout --signal=TERM --kill-after=15s 480s python -m scripts.oai_harvest
       - name: Synchronize arXiv announcements
         id: arxiv_announcements
         continue-on-error: true
         run: |
+          # US Eastern Sun-Thu 20:00 announcements appear on UTC Mon-Fri.
+          # During UTC weekends an empty RSS response is expected, not an outage.
+          if [ "$(date -u +%u)" -ge 6 ] && [ "$GITHUB_EVENT_NAME" != "workflow_dispatch" ]; then
+            echo "arXiv announcements: no routine weekend release; preserving cached batch."
+            exit 0
+          fi
           # arXiv announces at 20:00 Eastern; RSS follows at midnight Eastern.
           # Use official Atom before RSS publication, and RSS thereafter.
           hour=$(date -u +%H)
@@ -110,3 +123,24 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh workflow run pages.yml --repo "${{ github.repository }}" --ref main
+      - name: Flag degraded synchronization after publishing healthy sources
+        if: always()
+        env:
+          ARXIV_OAI: ${{ steps.arxiv_oai.outcome }}
+          ARXIV_ANNOUNCEMENTS: ${{ steps.arxiv_announcements.outcome }}
+          ARXIV_FEED: ${{ steps.arxiv_feed.outcome }}
+          BIORXIV: ${{ steps.biorxiv.outcome }}
+          CHEMRXIV: ${{ steps.chemrxiv.outcome }}
+          EPRINT: ${{ steps.eprint.outcome }}
+        run: |
+          failed=0
+          for name in ARXIV_OAI ARXIV_ANNOUNCEMENTS ARXIV_FEED BIORXIV CHEMRXIV EPRINT; do
+            if [ "${!name}" = 'failure' ]; then
+              echo "::error::${name} failed. Previously verified metadata was retained."
+              failed=1
+            fi
+          done
+          if [ "$failed" -ne 0 ]; then
+            echo '### Sync degraded: check failed upstream sources before claiming freshness' >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
