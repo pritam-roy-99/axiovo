@@ -101,7 +101,8 @@ def main():
                                 assert page.evaluate("selector => document.activeElement.matches(selector)",selector),(
                                     width,path,"Keyboard focus does not follow the mobile rows",selector)
                     elif width==1360:
-                        assert all(abs(link["y"]-a["y"])<=4 for link in links),(
+                        midpoint=(a["y"]+a["bottom"])/2
+                        assert all(abs((link["y"]+link["bottom"])/2-midpoint)<=4 for link in links),(
                             width,path,"Desktop navigation left its original row",result)
                         if path:
                             assert result["home"]["right"]<=links[0]["x"] and links[-1]["right"]<=a["x"],(
