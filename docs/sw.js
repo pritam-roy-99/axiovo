@@ -1,9 +1,9 @@
 /* Axiovo offline shell. Scholarly metadata, video and PDFs stay network-only. */
 "use strict";
-const CACHE = "axiovo-shell-v93";
+const CACHE = "axiovo-shell-v94";
 const SHELL = [
   "./", "./index.html", "./workspace.html", "./icons/axiovo.svg",
-  "./manifest.webmanifest", "./theme.css", "./research-entry.css", "./axiovo-shell.css?v=20261108-mobile-panels-v2",
+  "./manifest.webmanifest", "./theme.css", "./research-entry.css", "./axiovo-shell.css?v=20261108-mobile-research-v3",
   "./research-desk.css", "./home-landing.css?v=20261107-mobile-ui-v1", "./theme.js", "./research-entry.js",
   "./navigation.js?v=20261108-home-history-v5", "./archive-taxonomy.js", "./arxiv-versions.js", "./archive-data.js",
   "./author-follow.js", "./feed-preferences.js", "./feed-core.js", "./feed-preview.js",
@@ -11,7 +11,7 @@ const SHELL = [
   "./workspace.css", "./paper-actions.css", "./paper-card-polish.css?v=20261106-save2", "./research-workflow.css",
   "./citation-evidence.js?v=20261107-verified2", "./citation-evidence.css?v=20261107-verified2", "./paper-sort.js", "./abstract-audio.js?v=20261108-android-recovery-v6",
   "./workspace.js", "./interests.js", "./relevance.js", "./research-intelligence.js",
-  "./research-workspace.css", "./recommendation-cards.css?v=20261106-actions", "./following-authors.js",
+  "./research-workspace.css?v=20261108-mobile-research-v1", "./recommendation-cards.css?v=20261106-actions", "./following-authors.js",
 ];
 const LEGACY = /^(?:researchlens|litveyra|axiovo)-shell-/;
 self.addEventListener("install", event => {

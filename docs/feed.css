@@ -118,26 +118,7 @@
  .feed-follow-form input{flex:1 1 180px}
 }
 
-/* Mobile feed usability: make Follow controls discoverable and keep actions touchable. */
-@media(max-width:620px){
- .axiovo-feed-page .feed-layout{display:flex;flex-direction:column;gap:14px;min-width:0}
- .axiovo-feed-page .feed-sidebar{order:-1;display:block;width:100%;min-width:0}
- .axiovo-feed-page .feed-sidebar .feed-side-card:first-child{margin-bottom:0}
- .axiovo-feed-page .feed-sidebar .feed-side-card:last-child{display:none}
- .axiovo-feed-page .feed-stream{width:100%;min-width:0}
- .axiovo-feed-page .feed-toolbar{min-width:0;max-width:100%}
- .axiovo-feed-page .feed-tabs{display:flex;max-width:100%;min-width:0;overflow-x:auto;
-  -webkit-overflow-scrolling:touch;scrollbar-width:thin;gap:3px}
- .axiovo-feed-page .feed-tabs button{min-height:44px;flex:0 0 auto;white-space:nowrap}
- .axiovo-feed-page .feed-filters{min-width:0;max-width:100%}
- .axiovo-feed-page .feed-filters select{min-width:0;max-width:100%}
- .axiovo-feed-page .feed-follow-form input{font-size:16px}
- .axiovo-feed-page .feed-card-actions>a,.axiovo-feed-page .feed-card-actions>button{
-  min-height:44px;overflow-wrap:anywhere}
- .axiovo-feed-page :is(.feed-card,.feed-stream,.feed-follow-tools,.feed-follow-form){min-width:0}
-}
-
-/* Mobile feed usability: controls must not sit below a long timeline. */
+/* Keep a stacked layout when there is no room for a sidebar. */
 @media(max-width:900px){
  .axiovo-feed-page .feed-layout{display:flex;flex-direction:column;gap:12px}
  .axiovo-feed-page .feed-sidebar{order:-1;display:block;width:100%;min-width:0}
@@ -146,26 +127,9 @@
  .axiovo-feed-page #feed-about-heading{font-size:16px}
 }
 @media(max-width:620px){
- .axiovo-feed-page .feed-page{width:100%;max-width:100%;box-sizing:border-box;overflow-x:clip}
  .axiovo-feed-page .feed-sidebar .feed-side-card:not(#feed-follow-tools){display:none}
- .axiovo-feed-page .feed-hero{padding:16px;border-radius:14px}
- .axiovo-feed-page .feed-hero h1{font-size:30px}
- .axiovo-feed-page .feed-insight{min-height:0}
- .axiovo-feed-page .feed-toolbar{margin:12px 0;gap:8px}
- .axiovo-feed-page .feed-tabs{display:flex;flex-wrap:nowrap;width:100%;max-width:100%;box-sizing:border-box;overflow-x:auto;scrollbar-width:thin;justify-content:flex-start}
- .axiovo-feed-page .feed-tabs button{flex:0 0 auto;min-width:82px;min-height:44px}
- .axiovo-feed-page .feed-filters{display:grid;grid-template-columns:1fr 1fr;gap:7px;width:100%}
- .axiovo-feed-page .feed-filters label{align-self:end;min-width:0}
- .axiovo-feed-page .feed-filters select{width:100%;min-width:0;max-width:100%;box-sizing:border-box}
- .axiovo-feed-page .feed-filters #feed-refresh{grid-column:1/-1;width:100%;min-height:44px}
- .axiovo-feed-page #feed-follow-tools{padding:15px}
  .axiovo-feed-page .feed-follow-form input{min-width:0;flex:1 1 110px}
  .axiovo-feed-page .feed-follow-form button{flex:0 0 auto}
- .axiovo-feed-page .feed-results,.axiovo-feed-page .feed-card{min-width:0;max-width:100%}
- .axiovo-feed-page .feed-card-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
- .axiovo-feed-page .feed-card-actions>a,.axiovo-feed-page .feed-card-actions>button{display:flex;width:100%;min-width:0;max-width:100%;box-sizing:border-box;min-height:44px;overflow-wrap:anywhere}
- .axiovo-feed-page .feed-post-header{min-width:0}
- .axiovo-feed-page .feed-post-identity{min-width:0}
  .axiovo-feed-page .feed-post-header .feed-source{max-width:80px;white-space:normal;text-align:center}
 }
 
@@ -175,24 +139,68 @@
 .axiovo-feed-page .feed-uncertain-option input{flex:none;width:17px;height:17px;margin:1px 0 0;accent-color:var(--axiovo-accent,#126f9c)}
 .axiovo-feed-page .feed-uncertain-option small{flex-basis:100%;margin-left:24px;color:var(--rl-muted,#607a91);font-size:11px}
 
-/* Mobile feed: clearer separation between paper identity and actions. */
+/* Put papers first, with feed settings one jump away from the page intro. */
 @media(max-width:760px){
- .axiovo-feed-page .feed-page {padding-inline:12px!important}
- .axiovo-feed-page .feed-hero {border-radius:14px;padding:16px!important}
+ .axiovo-feed-page .feed-page {padding-inline:12px!important;overflow-x:clip}
+ .axiovo-feed-page .feed-sidebar {order:0}
+ .axiovo-feed-page #feed-follow-tools {padding:15px;scroll-margin-top:12px}
+ .axiovo-feed-page .feed-hero {
+   grid-template-columns:minmax(0,1fr);gap:12px;border-radius:14px;padding:14px;
+ }
+ .axiovo-feed-page .feed-hero h1 {font-size:clamp(1.85rem,7vw,2.35rem);margin:4px 0 7px}
+ .axiovo-feed-page .feed-hero p:not(.rd-kicker) {line-height:1.5}
+ .axiovo-feed-page .feed-hero-actions {
+   display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-top:11px;
+ }
+ .axiovo-feed-page .feed-hero-actions a {
+   display:flex;align-items:center;justify-content:center;min-height:44px;
+   padding:6px;text-align:center;overflow-wrap:anywhere;
+ }
+ .axiovo-feed-page .feed-hero-actions a:last-child {grid-column:1/-1}
+ .axiovo-feed-page .feed-insight {
+   display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;
+   min-height:0;padding:10px 12px;gap:4px 10px;border-radius:11px;
+ }
+ .axiovo-feed-page .feed-insight strong {font-size:28px}
+ .axiovo-feed-page .feed-insight>span,.axiovo-feed-page #feed-pulse-synced {grid-column:1/-1}
+ .axiovo-feed-page .feed-toolbar {margin:12px 0;gap:8px}
+ .axiovo-feed-page .feed-tabs {
+   display:grid;grid-template-columns:repeat(4,minmax(0,1fr));width:100%;
+   min-width:0;overflow:visible;padding:4px;
+ }
+ .axiovo-feed-page .feed-tabs button {
+   min-width:0;min-height:44px;padding:6px 3px;
+   white-space:normal;overflow-wrap:anywhere;
+ }
+ .axiovo-feed-page .feed-filters {
+   display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:100%;gap:5px 8px;
+   grid-template-areas:"archive-label date-label" "archive date" "order-label refresh" "order refresh";
+ }
+ .feed-filters label[for="feed-source"] {grid-area:archive-label}
+ .feed-filters label[for="feed-window"] {grid-area:date-label}
+ .feed-filters label[for="feed-sort"] {grid-area:order-label}
+ .feed-filters #feed-source {grid-area:archive}
+ .feed-filters #feed-window {grid-area:date}
+ .feed-filters #feed-sort {grid-area:order}
+ .feed-filters #feed-refresh {grid-area:refresh;align-self:end}
+ .axiovo-feed-page .feed-filters :is(select,button) {
+   width:100%;min-height:44px;min-width:0;padding-inline:7px;
+ }
  .axiovo-feed-page .feed-card {
-   min-width:0;max-width:100%;padding:14px!important;
-   border-radius:14px!important;
+   min-width:0;max-width:100%;border-radius:14px;
  }
  .axiovo-feed-page .feed-card :is(h2,h3,a) {overflow-wrap:anywhere}
  .axiovo-feed-page .feed-post-header {gap:9px}
- .axiovo-feed-page .feed-card-actions {gap:7px}
- .axiovo-feed-page .feed-card-actions > :is(a,button) {
-   min-width:0;min-height:44px;
-   border-radius:10px;line-height:1.35;
+ .axiovo-feed-page .feed-card-actions {
+   display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;
  }
- .axiovo-feed-page .feed-toolbar {padding:8px 0}
- .axiovo-feed-page .feed-tabs {padding-bottom:4px;scroll-snap-type:x proximity}
- .axiovo-feed-page .feed-tabs button {scroll-snap-align:start;border-radius:10px}
+ .axiovo-feed-page .feed-card-actions > :is(a,button) {
+   min-width:0;min-height:44px;padding-inline:7px;
+   border-radius:10px;line-height:1.35;overflow-wrap:anywhere;
+ }
+ .axiovo-feed-page .feed-card-actions>.feed-dismiss {margin-left:0}
+ .axiovo-feed-page .feed-card details>summary {min-height:44px;padding-block:11px;line-height:1.5}
+ .axiovo-feed-page .feed-follow-form :is(input,button) {min-height:44px}
 }
 
 /* Mobile performance: defer paint for feed cards outside the viewport.
