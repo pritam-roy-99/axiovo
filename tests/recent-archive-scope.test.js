@@ -18,7 +18,7 @@ assert.match(archive,/criteria\.recentOnly\|\|parseDOI\(criteria\.q\)/,
 assert.match(crypto,/recentOnly=viewMode==="recent"/);
 assert.match(crypto,/c\.from=daysBefore\(6\);c\.to=utcDay\(\)/);
 assert.match(crypto,/viewMode="indexed"/);
-assert.match(crypto,/firstPathNotification/,"Restoring a saved topic must retain an indexed-history deep link");
+assert.match(crypto,/document\.addEventListener\("axiovo:crypto-path-change",\(\)=>search\(\)\)/,"Changing a research path must preserve the selected recent or indexed mode");
 for(const file of ["arxiv","biorxiv","chemrxiv","crypto"]){
  const html=fs.readFileSync("docs/"+file+".html","utf8");
  assert.match(html,/recent-scope-v5/,"Archive cache version must be refreshed: "+file);
