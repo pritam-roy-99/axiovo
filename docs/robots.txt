@@ -1,0 +1,5 @@
+# Project-path crawler guidance. On GitHub Pages project sites, the host-level
+# /robots.txt is outside this repository's control.
+User-agent: *
+Allow: /
+Sitemap: https://pritam-roy-99.github.io/axiovo/sitemap.xml
