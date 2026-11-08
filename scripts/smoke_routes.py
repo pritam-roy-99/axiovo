@@ -23,6 +23,51 @@ FEATURES = ("Explore", "Research Desk", "My Feed", "Library", "Research Assistan
 class Quiet(SimpleHTTPRequestHandler):
     def log_message(self, *_): pass
 
+def check_phone_content(page, path, width):
+    def boxes(selector, count):
+        controls=page.locator(selector).evaluate_all("""nodes=>nodes.map(el=>{
+          const {x,y,width,height,right}=el.getBoundingClientRect();
+          return {x,y,width,height,right};
+        })""")
+        assert len(controls)==count,(width,path,selector,controls)
+        assert all(c["height"]>=44 and c["x"]>=0 and c["right"]<=width+1 for c in controls),(
+            width,path,"Clipped or undersized phone controls",selector,controls)
+        return controls
+
+    if path=="desk.html":
+        sources=boxes("#rd-search-form .rd-sources label",4)
+        assert sources[0]["y"]==sources[1]["y"]<sources[2]["y"]==sources[3]["y"],(width,path,sources)
+        boxes("#rd-advanced>summary",1)
+    elif path=="feed.html":
+        tabs=boxes(".feed-tabs button",4)
+        assert all(tab["y"]==tabs[0]["y"] for tab in tabs),(width,path,tabs)
+        assert page.locator(".feed-tabs").evaluate("el=>el.scrollWidth<=el.clientWidth+1")
+        boxes(".feed-filters :is(select,button)",4)
+        assert page.locator(".feed-filters").evaluate("""el=>[...el.querySelectorAll('label')].every(label=>{
+          const a=label.getBoundingClientRect(),b=label.control.getBoundingClientRect();
+          return Math.abs(a.x-b.x)<=1&&a.bottom<=b.top;
+        })"""),(width,path,"Feed labels are separated from their filters")
+        assert page.locator(".feed-layout").evaluate("""el=>
+          el.querySelector('.feed-stream').getBoundingClientRect().top<
+          el.querySelector('#feed-follow-tools').getBoundingClientRect().top"""),(width,path,"Settings precede papers")
+        if width==390:
+            page.locator('.feed-hero-actions a[href="#feed-follow-tools"]').click()
+            page.wait_for_url("**/feed.html#feed-follow-tools")
+            assert page.locator("#feed-author-input").is_visible()
+    elif path in ("arxiv.html","biorxiv.html","chemrxiv.html","crypto.html"):
+        archives=boxes(".ex-archives a",4)
+        assert all(link["y"]==archives[0]["y"] for link in archives),(width,path,archives)
+        assert page.locator(".ex-archives").evaluate("el=>el.scrollWidth<=el.clientWidth+1")
+    elif path=="workspace.html":
+        tabs=boxes(".library-tabs a",3)
+        assert tabs[0]["y"]==tabs[1]["y"]<tabs[2]["y"],(width,path,tabs)
+        boxes("#export-library, #export-citations",2)
+    elif path=="copilot.html":
+        modes=boxes(".assistant-task-row :is(button,a)",3)
+        assert modes[0]["y"]==modes[1]["y"]<modes[2]["y"],(width,path,modes)
+        boxes("#ask",1)
+        assert page.locator("#ask").evaluate("el=>el.offsetWidth===el.parentElement.clientWidth")
+
 def main():
     server = ThreadingHTTPServer(("127.0.0.1", 0), functools.partial(Quiet, directory=str(DOCS)))
     Thread(target=server.serve_forever, daemon=True).start()
@@ -107,6 +152,8 @@ def main():
                         if path:
                             assert result["home"]["right"]<=links[0]["x"] and links[-1]["right"]<=a["x"],(
                                 width,path,"Desktop navigation changed its position",result)
+                    if width<=428:
+                        check_phone_content(page,path,width)
                     if not path:
                         # The unified hero has a dark gradient, and the name
                         # meaning is inline text rather than a separate panel.
@@ -466,12 +513,14 @@ def main():
             assert saved.get_attribute("href")=="https://arxiv.org/abs/2611.11333v2"
             card=page.locator("#library-list article").filter(
                 has=page.get_by_role("link",name="Synthetic pinned paper for the offline Library"))
-            card.locator("summary").filter(has_text="Notes and organization").click()
+            notes=card.locator("summary").filter(has_text="Notes and organization")
+            assert notes.bounding_box()["height"]>=44
+            notes.click()
             note=card.get_by_role("textbox",name="Private note for Synthetic pinned paper for the offline Library")
             note.fill("Verify the exact paper version offline.")
             note.press("Tab")
             page.reload(wait_until="domcontentloaded")
-            card.locator("summary").filter(has_text="Notes and organization").click()
+            notes.click()
             assert note.input_value()=="Verify the exact paper version offline."
             context.close()
             browser.close()

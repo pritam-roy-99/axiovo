@@ -24,8 +24,25 @@ ROWS=[
 ]
 FIXTURE=json.dumps({"source":"eprint","coverage":"incremental-OAI-PMH-snapshot-not-full-history",
  "generated_at":"2026-11-07T00:00:00Z","papers":ROWS})
+FIXTURES={"/data/"+filename:'{"papers":[]}' for filename in
+ ("feed.json","oai-recent.json","announcements.json","biorxiv.json","chemrxiv.json")}
+FIXTURES["/data/eprint.json"]=FIXTURE
 class Quiet(SimpleHTTPRequestHandler):
  def log_message(self,*args):pass
+ def do_GET(self):
+  path=self.path.partition("?")[0]
+  if path=="/data/feed-preview.json":
+   self.send_error(404)
+   return
+  if path not in FIXTURES:
+   return super().do_GET()
+  # Page scripts and the Feed worker must see the same synthetic snapshots.
+  payload=FIXTURES[path].encode("utf-8")
+  self.send_response(200)
+  self.send_header("Content-Type","application/json")
+  self.send_header("Content-Length",str(len(payload)))
+  self.end_headers()
+  self.wfile.write(payload)
 
 def main():
  server=ThreadingHTTPServer(("127.0.0.1",0),functools.partial(Quiet,directory=str(ROOT)))
@@ -39,10 +56,6 @@ def main():
     page=context.new_page()
     errors=[]
     page.on("pageerror",lambda e:errors.append(str(e)))
-    page.route("**/data/eprint.json",lambda route:route.fulfill(status=200,content_type="application/json",body=FIXTURE))
-    for filename in ("feed.json","oai-recent.json","announcements.json","biorxiv.json","chemrxiv.json"):
-     page.route("**/data/"+filename,lambda route:route.fulfill(status=200,content_type="application/json",body='{"papers":[]}'))
-    page.route("**/data/feed-preview.json",lambda route:route.fulfill(status=404,body=""))
     page.goto(base,wait_until="domcontentloaded")
     assert page.locator('.axiovo-archive-card[data-archive="eprint"]').count()==1
     assert page.locator('.axiovo-archive-grid a').count()==4
@@ -107,6 +120,10 @@ def main():
     assert page.evaluate("document.documentElement.scrollWidth<=innerWidth+7")
     page.locator(".crypto-paper").first.wait_for(timeout=15000)
     assert page.locator(".crypto-paper").count()==3
+    if width==390:
+     actions=page.locator(".crypto-paper").first.locator(".crypto-paper-actions > :is(a,button)")
+     assert actions.count()>2 and actions.evaluate_all(
+      "nodes=>nodes.every(el=>el.getBoundingClientRect().height>=44)")
     assert all("eprint.iacr.org/" in href for href in page.locator(".crypto-paper h3 a").evaluate_all("(els)=>els.map(e=>e.href)"))
     assert page.evaluate("document.documentElement.scrollWidth<=innerWidth+7"),("IACR overflow",width)
     page.locator("#crypto-query").fill("2026/1234")
@@ -126,10 +143,11 @@ def main():
     page.goto(base+"feed.html",wait_until="domcontentloaded")
     page.evaluate("localStorage.setItem('axiovo-followed-topics',JSON.stringify(['quantum cryptography']))")
     page.reload(wait_until="domcontentloaded")
-    page.locator(".feed-card h3").first.wait_for(timeout=20000)
-    assert "Quantum Key Distribution" in page.locator(".feed-card h3").first.inner_text()
+    paper=page.locator('.feed-card h3 a[href="https://eprint.iacr.org/2026/1234"]')
+    paper.wait_for(timeout=20000)
+    assert "Quantum Key Distribution" in paper.inner_text()
     page.locator("#feed-source").select_option("eprint")
-    assert page.locator(".feed-card").count()>=1
+    paper.wait_for(timeout=12000)
     assert not errors,(width,errors[:5])
     context.close()
    browser.close()

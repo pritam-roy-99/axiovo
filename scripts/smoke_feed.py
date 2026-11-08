@@ -79,6 +79,9 @@ def main():
             assert "preparation contextuality" in page.locator("#feed-followed-paths").inner_text().lower()
             assert page.locator("#feed-followed-authors").inner_text().find("Majumdar")>=0
             first=page.locator(".feed-card").first
+            actions=first.locator(".feed-card-actions > :is(a,button)")
+            assert actions.count()>2 and actions.evaluate_all(
+                "nodes=>nodes.every(el=>el.getBoundingClientRect().height>=44)")
             button=first.locator(".feed-save")
             button.click()
             assert button.get_attribute("aria-pressed")=="true"

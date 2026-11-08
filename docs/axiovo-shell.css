@@ -522,21 +522,38 @@ body.axiovo-home .rd-home-section {margin-top:24px}
   .axiovo-research :is(.rd-section-heading h2,.ex-hero h1) {
     overflow-wrap:anywhere;
   }
+  .axiovo-research .rd-desk-heading {margin-bottom:14px}
+  .axiovo-research .rd-desk-heading h1 {font-size:clamp(1.9rem,6.8vw,2.4rem)}
 
-  /* Archive switcher: compact pill row with horizontal scrolling rather
-     than four squeezed labels or cards wrapping unpredictably. */
-  .axiovo-explore .ex-archives,.axiovo-crypto .ex-archives {
-    display:flex!important;flex-wrap:nowrap!important;
-    gap:7px;overflow-x:auto;overflow-y:hidden;
-    max-width:100%;min-width:0;margin-bottom:12px;
-    padding:2px 0 7px;scroll-snap-type:x proximity;
-    scrollbar-width:thin;-webkit-overflow-scrolling:touch;
+  #rd-search-form .rd-sources {
+    display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:8px;min-width:0;
   }
-  .axiovo-explore .ex-archives a,.axiovo-crypto .ex-archives a {
-    flex:0 0 auto!important;scroll-snap-align:start;
-    min-height:42px;padding:8px 12px;font-size:12px;
-    border-radius:12px;white-space:nowrap;
+  #rd-search-form .rd-sources label {
+    min-height:44px;padding:7px 8px;border-radius:10px;overflow-wrap:anywhere;
   }
+  #rd-search-form .rd-sources input {
+    flex:none;width:16px;height:16px;margin:0;
+  }
+  #rd-search-form .rd-sources .rd-source-dot {flex:none}
+  #rd-search-form #rd-history {width:100%}
+  .axiovo-research .rd-advanced>summary {
+    width:100%;min-height:44px;padding:11px 10px;border-radius:9px;
+    background:var(--rd-soft);line-height:1.45;
+  }
+
+  /* Keep every archive visible. Longer names can wrap in their own slot. */
+  :is(.axiovo-explore,.axiovo-crypto) .ex-archives {
+    display:grid!important;
+    grid-template-columns:minmax(0,.9fr) minmax(0,.95fr) minmax(0,1.1fr) minmax(0,1.35fr);
+    gap:5px;max-width:100%;min-width:0;margin-bottom:12px;
+  }
+  :is(.axiovo-explore,.axiovo-crypto) .ex-archives a {
+    justify-content:center;min-width:0;min-height:44px;
+    padding:6px 4px;font-size:clamp(11px,3.1vw,13px);line-height:1.2;
+    border-radius:10px;text-align:center;white-space:normal;overflow-wrap:anywhere;
+  }
+  :is(.axiovo-explore,.axiovo-crypto) .ex-archives .rd-source-dot {flex:none}
   .axiovo-explore .ex-hero,.axiovo-crypto .ex-hero {margin-bottom:13px}
   .axiovo-explore .ex-hero-copy h1,.axiovo-crypto .ex-hero-copy h1 {
     font-size:clamp(1.75rem,7vw,2.5rem);letter-spacing:-.045em;line-height:1.08;
@@ -566,13 +583,16 @@ body.axiovo-home .rd-home-section {margin-top:24px}
   .axiovo-research :is(.rd-paper-card,.ex-paper,.crypto-paper) :is(h3,h4,a) {
     overflow-wrap:anywhere;
   }
-  .axiovo-research :is(.rd-paper-actions,.crypto-paper-actions,.ex-paper-actions) {
-    display:flex;flex-wrap:wrap;gap:6px;
+  .axiovo-research :is(.rd-result-card>.rd-actions,.rd-paper-actions,.crypto-paper-actions,.ex-paper-actions) {
+    display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;align-items:stretch;
   }
-  .axiovo-research :is(.rd-paper-actions,.crypto-paper-actions,.ex-paper-actions) :is(a,button) {
-    min-height:43px;flex:1 1 132px;
+  .axiovo-research :is(.rd-result-card>.rd-actions,.rd-paper-actions,.crypto-paper-actions,.ex-paper-actions)>:is(a,button) {
+    min-width:0;min-height:44px;
     display:inline-flex;align-items:center;justify-content:center;
-    text-align:center;white-space:normal;
+    text-align:center;white-space:normal;overflow-wrap:anywhere;
+  }
+  .axiovo-research :is(.rd-result-card,.ex-paper,.crypto-paper) details>summary {
+    width:100%;min-height:44px;padding-block:11px;line-height:1.45;
   }
   .paper-sort-toolbar{padding:11px;border-radius:12px}
   .paper-sort-toolbar select{width:100%;min-height:44px;font-size:16px!important}
@@ -610,4 +630,5 @@ body.axiovo-home .rd-home-section {margin-top:24px}
 }
 @media(max-width:390px) {
   .axiovo-research .rd-page {padding-inline:10px!important}
+  :is(.axiovo-explore,.axiovo-crypto) .ex-archives a {flex-direction:column;gap:3px}
 }
