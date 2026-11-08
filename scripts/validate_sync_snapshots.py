@@ -17,8 +17,13 @@ FILES = ("announcements.json", "feed.json", "oai-recent.json",
 TEMPORAL = {"checked_at", "generated_at"}
 
 def read_old(path: str):
-    result = subprocess.run(["git", "show", f"HEAD:docs/data/{path}"],
+    # The checkout can lag another running harvester. Prefer the freshly
+    # fetched remote main so a late job cannot roll back a newer snapshot.
+    result = subprocess.run(["git", "show", f"origin/main:docs/data/{path}"],
                             cwd=ROOT, capture_output=True, check=False)
+    if result.returncode:
+        result = subprocess.run(["git", "show", f"HEAD:docs/data/{path}"],
+                                cwd=ROOT, capture_output=True, check=False)
     if result.returncode:
         return None, None
     try:
