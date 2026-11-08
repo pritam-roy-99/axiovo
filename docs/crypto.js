@@ -20,7 +20,14 @@
  // Topic picker and saved-path features live in crypto-topics.js and
  // function independently of source metadata availability.
  const getPath=()=>window.AxiovoCryptoTopics?.path?.()||{field:"",topic:"",subtopic:""};
- document.addEventListener("axiovo:crypto-path-change",()=>{if(!$("crypto-from").value&&!$("crypto-to").value)viewMode="recent";search()});
+ let firstPathNotification=true;
+ document.addEventListener("axiovo:crypto-path-change",()=>{
+  // The initial path restoration is not a researcher selecting a new topic.
+  // Do not erase an explicitly shared ?mode=indexed link on page load.
+  if(firstPathNotification){firstPathNotification=false;search();return}
+  if(!$("crypto-from").value&&!$("crypto-to").value)viewMode="recent";
+  search();
+ });
  function filters(){
   return {q:$("crypto-query").value.trim(),author:$("crypto-author").value.trim(),
    topicTerms:getPath().subtopic?[getPath().subtopic]:[],
