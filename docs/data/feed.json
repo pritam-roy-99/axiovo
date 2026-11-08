@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-07T23:54:53.656381+00:00",
+  "generated_at": "2026-11-08T02:38:10.985495+00:00",
   "source": "official arXiv OAI-PMH and verified submission-date Atom batches, with category fallback",
   "index_scope": "all-category recent OAI harvest (partial if incomplete) and independently verified full submission-day shards; older history remains partial",
   "refresh_methods": [
@@ -49733,6 +49733,50 @@
       "metadata_source": "arXiv OAI-PMH"
     },
     {
+      "id": "2611.01993",
+      "version": 1,
+      "title": "Seeing Why: Exact Evidence Maps for Quantum and Optical Image Classifiers",
+      "abstract": "When an image classifier decides, we can usually only estimate why. For quantum and all-optical classifiers that act linearly on amplitude-encoded pictures up to the measurement, with no trained classical network before or after them, each class's Born probability above its no-information share, $P_g - b_g$, splits exactly into contributions of the encoded amplitudes, shown as Born evidence maps (BEM). The split itself follows from known results on quadratic forms: with the transmitted light held fixed, it is what Integrated Gradients from a zero baseline and the Shapley value give. What we add is a way to measure it on the hardware that classifies, from class probabilities on a quantum chip or, in simulation, from camera frames on a lens bench, with no gradient circuit and no light sent backwards; a $g\\times g$ map takes $1 + 2g^2$ runs. Deleting the 5% of pixels with the highest evidence drops accuracy from 73% to 9% (one seed), as occlusion and gradient $\\times$ input do, while plain gradients remove much less. The classifiers share one architecture, a Fourier-plane mask followed by a brickwall circuit on qubits or by phase plates on a lens bench, read by a fixed Born headroom readout with no trained parameter; centring each picture on its own mean lets dark features count as much as bright ones. In simulation, four phase plates at one wavelength reach 72.3% on Caltech-10 colour photographs. On IBM's ibm_kingston, with the mask computed classically before approximate loading, 300 test pictures were classified at 37.7% against 10% chance (56.3% in exact simulation), and $2\\times2$ maps of the filtered input of 30 test pictures drawn at random in advance, measured on the chip, agreed with the exact ones ($r = 0.88$; standard estimator 0.82). The maps also revealed a shortcut in the data; as the trim that removed it was chosen on test pictures, the Caltech-10 results are exploratory.",
+      "authors": [
+        "Teerawat Tongloy",
+        "Rangsan Jomtarak"
+      ],
+      "categories": [
+        "quant-ph",
+        "cs.LG",
+        "physics.optics"
+      ],
+      "primary_category": "quant-ph",
+      "published": "2026-11-05T00:00:00Z",
+      "published_date_precision": "day",
+      "updated": "2026-11-06T00:00:00Z",
+      "link": "https://arxiv.org/abs/2611.01993",
+      "topics": [],
+      "doi": "",
+      "metadata_source": "arXiv OAI-PMH"
+    },
+    {
+      "id": "2611.01519",
+      "version": 1,
+      "title": "Write Facts the Way Models Read Them: Lifting the Two-Hop Curse",
+      "abstract": "A language model that learns a new fact by fine-tuning can repeat it but cannot reason with it: taught that a person is a citizen of a new country, it still cannot say, without chain-of-thought, who the head of state of that person's country is. This two-hop curse is widely treated as a reasoning deficit, and the strongest knowledge editors answer it with synthesized reasoning data. We show that the reasoning is intact and the writing is wrong. Fine-tuning writes a new fact as an answer to be said, whereas the second hop reads the bridge (\"that person's country\") as an entity, from the middle layers on: patching the model's own representation of the entity into the bridge at those layers largely restores the second hop, yet after fine-tuning the bridge there is no closer to the new entity than before the edit. We therefore propose read-equivalent writing (Legible): one loss term makes the bridge phrase, at the layer where the second hop finishes reading it, match the model's own reading of the new entity, and keeps the same relation's other subjects unchanged. Phrases and targets come from the edited model itself, and no multi-hop training data is used. Across Qwen2.5, Llama-3 and Qwen3, Legible (I) composes learned facts more often than the model composes its own knowledge, on MQuAKE's two-hop-curse questions; (II) reaches 1.8-2.6x the bridge accuracy of CaKE, whose reasoning data composes no better than plain fine-tuning, and has the best average over composition, accuracy and locality against four families of writers; and (III) lifts the curse on RippleEdits, on the benchmark of Balesni et al., who named the curse, and at 14B.",
+      "authors": [
+        "Zhiyun Shi"
+      ],
+      "categories": [
+        "cs.CL",
+        "cs.LG"
+      ],
+      "primary_category": "cs.CL",
+      "published": "2026-11-05T00:00:00Z",
+      "published_date_precision": "day",
+      "updated": "2026-11-06T00:00:00Z",
+      "link": "https://arxiv.org/abs/2611.01519",
+      "topics": [],
+      "doi": "",
+      "metadata_source": "arXiv OAI-PMH"
+    },
+    {
       "id": "2611.06849",
       "version": 2,
       "title": "Trainspotting: Learning Object-Centric 3D Reconstruction from Found Photos",
@@ -87414,57 +87458,6 @@
       "published_date_precision": "day",
       "updated": "2026-11-05T00:00:00Z",
       "link": "https://arxiv.org/abs/2611.05919",
-      "topics": [],
-      "doi": "",
-      "metadata_source": "arXiv OAI-PMH"
-    },
-    {
-      "id": "2611.05918",
-      "version": 1,
-      "title": "Autonomous ETL Pipelines for Salesforce M&A Consolidation: A Reference Framework, Jitterbit Mapping, and Reproducible Simulation Study",
-      "abstract": "Merging companies that each run Salesforce must consolidate their customer data into a single organization while both source systems remain in use. This requires reconciling different schemas and picklists, resolving duplicate customers across and within organizations, preserving relationships between records, and keeping the target current until cutover. This article proposes a reference framework for an autonomous extract-transform-load pipeline for this task. It combines partitioned bulk extraction, declarative mapping templates, rule-based and statistical quality gates, master data management with deterministic and blocked fuzzy matching, constrained loading with per-record error capture, and change data capture guarded by a data-health circuit breaker. Each stage is mapped to Jitterbit Integration Studio constructs. The framework was implemented as an open reference prototype and evaluated on synthetic two-organization scenarios with known ground truth at three scales, from 32,040 to 383,973 source records, over five random seeds. At a preset threshold, hybrid matching reached pairwise F1 scores of 0.918 for accounts and 0.885 for contacts; calibrating the threshold per object would raise these to 0.938 and 0.963. The quality gates prevented all load failures and all silent loss of unmapped picklist values without wrongly flagging any clean record, whereas removing them produced about 1,000 load failures per run. Over five simulated days of hourly incremental synchronization, replayed events were ignored, an injected upstream fault was contained in the batch in which it occurred, and the target agreed with a full rebuild on more than 99.3 percent of field values. Validation on a production deployment remains future work.",
-      "authors": [
-        "Imran Basha Shaik",
-        "Sahla Sultana",
-        "Khader Moinuddin Shaik"
-      ],
-      "categories": [
-        "cs.DB",
-        "cs.AI",
-        "cs.ET"
-      ],
-      "primary_category": "cs.DB",
-      "published": "2026-11-04T00:00:00Z",
-      "published_date_precision": "day",
-      "updated": "2026-11-05T00:00:00Z",
-      "link": "https://arxiv.org/abs/2611.05918",
-      "topics": [],
-      "doi": "",
-      "metadata_source": "arXiv OAI-PMH"
-    },
-    {
-      "id": "2611.05917",
-      "version": 1,
-      "title": "DecoupAttn: Decoupled Sparse Attention for Training-Free Acceleration of Video Diffusion",
-      "abstract": "Sparse attention accelerates few-step video diffusion transformers by computing a few key blocks exactly and compensating for the rest. However, existing sparse attention still faces key challenges, including identification overhead from finding critical blocks at every denoising step, suboptimal budget allocation that sets sparsity budgets uniformly or by local metrics, and cross-step error accumulation as reused masks or clusters go stale. Observing that the errors left on skipped blocks cancel each other once every key is compensated, we propose DecoupAttn, a new paradigm of decoupled sparse attention: semantic clusters compensate every key, and exact attention corrects their error on a few blocks fixed once offline by position. To support this paradigm, we introduce Distortion Budget, a rate-distortion objective for budget allocation that places exact computation across timesteps, layers, and heads where it removes the most distortion that compensation leaves in the final latent. Built on this budget, we further propose Reassign Cache, in which each step reassigns the drifting keys to cached centroids and refreshes compensation while the budgeted blocks stay fixed. Moreover, DecoupAttn is training-free: a few calibration clips compile one plan offline, and inference runs standard block-sparse kernels with one fused compensation kernel. Our code will be released after submission.",
-      "authors": [
-        "Yanjin Li",
-        "Bingbing Qiu",
-        "Qiang Huang",
-        "Rui Qian",
-        "Yanfeng Li",
-        "Jian Wang",
-        "Xiaoying Tang",
-        "Mingda Zhang"
-      ],
-      "categories": [
-        "cs.CV"
-      ],
-      "primary_category": "cs.CV",
-      "published": "2026-11-04T00:00:00Z",
-      "published_date_precision": "day",
-      "updated": "2026-11-05T00:00:00Z",
-      "link": "https://arxiv.org/abs/2611.05917",
       "topics": [],
       "doi": "",
       "metadata_source": "arXiv OAI-PMH"
