@@ -16,6 +16,8 @@ const symbols={"α":" alpha ","β":" beta ","γ":" gamma ","δ":" delta ","λ":"
 let prefs={voice:"",rate:"steady"};
 const android=/Android/i.test(navigator.userAgent||"");
 try{prefs={...prefs,...JSON.parse(localStorage.getItem(key)||"{}")}}catch{}
+// Discard old Android voice selection that may point to a missing TTS package.
+if(android)prefs.voice="";
 const female=/female|samantha|victoria|karen|moira|tessa|fiona|serena|zira|hazel|jenny|aria|sonia|libby|veena|swara|ava|allison|joanna|emma|sara|aditi|raveena/i;
 const make=(tag,label)=>{
  const el=document.createElement(tag);if(label)el.textContent=label;return el;
