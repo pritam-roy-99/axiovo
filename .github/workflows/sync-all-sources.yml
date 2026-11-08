@@ -42,7 +42,15 @@ jobs:
       - name: Synchronize arXiv announcements
         id: arxiv_announcements
         continue-on-error: true
-        run: python -m scripts.arxiv_announcements
+        run: |
+          # arXiv announces at 20:00 Eastern; RSS follows at midnight Eastern.
+          # Use official Atom before RSS publication, and RSS thereafter.
+          hour=$(date -u +%H)
+          if [ "$hour" -lt 4 ]; then
+            python -m scripts.scirate_latest || python -m scripts.arxiv_announcements
+          else
+            python -m scripts.arxiv_announcements || python -m scripts.scirate_latest
+          fi
       - name: Rebuild arXiv rolling feed
         id: arxiv_feed
         continue-on-error: true
