@@ -20,7 +20,8 @@
  document.addEventListener("axiovo:crypto-path-change",()=>search());
  function filters(){
   return {q:$("crypto-query").value.trim(),author:$("crypto-author").value.trim(),
-   topicTerms:getPath().subtopic?[getPath().subtopic]:getPath().topic?[getPath().topic]:[],
+   topicTerms:getPath().subtopic?[getPath().subtopic]:[],
+   topicAnyTerms:window.AxiovoCryptoTopics?.termsForPath?.()||[],
    from:$("crypto-from").value,to:$("crypto-to").value,
    sort:$("crypto-sort").value};
  }
@@ -67,7 +68,9 @@
   const total=shown.length,pages=Math.max(1,Math.ceil(total/perPage));
   page=Math.max(1,Math.min(page,pages));
   const visible=shown.slice((page-1)*perPage,page*perPage);
-  status.textContent=total+" of "+papers.length+" "+(offlineSubset?"locally saved source-verified records":"indexed IACR records")+" match. "+
+  const newest=shown.map(p=>p.date||"").filter(Boolean).sort().at(-1)||"date unavailable";
+  const scope=[getPath().field,getPath().topic,getPath().subtopic].filter(Boolean).join(" › ")||"all indexed cryptography";
+  status.textContent=total+" of "+papers.length+" "+(offlineSubset?"locally saved source-verified records":"indexed IACR records")+" match "+scope+". Latest matching source date: "+newest+". "+
    (offlineSubset?"Offline subset: coverage is limited and may be outdated.":complete?"Completed available OAI metadata-date windows. Some source records may not be exposed.":"Coverage is partial; not all historical papers are indexed.");
   if(!total){
    target.append(el("p","No match in Axiovo's available IACR metadata. This does not mean the original archive has no such paper.","rd-small"));
@@ -132,7 +135,11 @@
  for(const key of ["sort","from","to"])
   $("crypto-"+key).addEventListener("change",search);
  $("crypto-result-sort").addEventListener("change",()=>{$("crypto-sort").value=$("crypto-result-sort").value;search()});
- $("crypto-latest").onclick=()=>{$("crypto-from").value="";$("crypto-to").value="";$("crypto-sort").value="recent";search()};
+ $("crypto-latest").onclick=()=>{
+  // Keep the selected field, subfield, subtopic, author and keyword search.
+  $("crypto-from").value="";$("crypto-to").value="";
+  $("crypto-sort").value="recent";search();
+ };
  $("crypto-week").onclick=()=>{const d=new Date();$("crypto-to").value=d.toISOString().slice(0,10);d.setUTCDate(d.getUTCDate()-7);$("crypto-from").value=d.toISOString().slice(0,10);search()};
  $("crypto-date-open").onclick=()=>{$("crypto-advanced").open=true;$("crypto-from").focus()};
  $("crypto-history")?.addEventListener("click",()=>{
