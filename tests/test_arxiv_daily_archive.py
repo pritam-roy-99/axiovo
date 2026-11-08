@@ -137,7 +137,7 @@ class DailyArchiveTests(unittest.TestCase):
         # queue. Repair priority is tested separately in test_literature_coverage.
         with tempfile.TemporaryDirectory() as tmp, patch.object(ar,"ROOT",Path(tmp)):
             days=ar.select_days(dt.date(2026,11,5),{"days":{"2026-11-02":{"complete":True}}},count=5)
-        self.assertEqual(days[:4],[dt.date(2026,11,4),dt.date(2026,11,3),dt.date(2026,11,2),dt.date(2026,11,1)])
+        self.assertEqual(days[:4],[dt.date(2026,11,4),dt.date(2026,11,3),dt.date(2026,11,2),dt.date(2026,10,30)])
         self.assertEqual(len(days),5)
 
     def test_bad_legacy_zero_day_gets_revalidated(self):
