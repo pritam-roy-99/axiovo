@@ -144,3 +144,11 @@
 .ex-report-topic input {min-width:0;min-height:42px;border:1px solid var(--rd-border);border-radius:8px;padding:9px 11px;background:var(--rd-surface);color:var(--rd-ink);font:inherit}
 .ex-report-topic a,.ex-report-topic button {justify-self:start;max-width:100%;white-space:normal}
 .ex-report-topic :is(summary,input,a,button):focus-visible {outline:3px solid var(--rd-link);outline-offset:3px}
+
+/* Reduce paint/layout cost for long archive result lists on mobile. */
+@supports (content-visibility: auto) {
+ #archive-results > :is(article,section,div) {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 400px;
+ }
+}
