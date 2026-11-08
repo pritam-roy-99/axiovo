@@ -15,6 +15,15 @@ assert.ok(release.includes("syncAnnouncementURL(c)"));
 assert.ok(!release.includes("selected=pathFrom({})"),"Release must not reset the chosen field");
 assert.ok(!release.includes('$("query").value=""'),"Release must not clear the keyword");
 assert.ok(!release.includes('$("author").value=""'),"Release must not clear author filtering");
+assert.match(explorer,/function shouldBrowseAnnouncements\(\)/,"Scoped announcement routing must exist");
+assert.match(explorer,/else if\(shouldBrowseAnnouncements\(\)\)showLatestAnnouncement\(\)/,
+ "Searching a selected topic without a date must use the announcement batch");
+assert.match(explorer,/if\(source==="arxiv"\)\{\s*const hasDates=Boolean/,
+ "Startup routing must select announcement mode after loading the taxonomy");
+assert.match(explorer,/mode:source==="arxiv"&&!criteria\.from&&!criteria\.to\?"indexed"/,
+ "Explicit indexed searches must remain distinguishable from announcements");
+assert.match(explorer,/indexed search across available years/,"Result count must disclose historical scope");
+
 
 const context={URL,URLSearchParams,AbortSignal,window:null,localStorage:{
  getItem(){return null},setItem(){}},fetch(){throw Error("No network in filter test")}};
