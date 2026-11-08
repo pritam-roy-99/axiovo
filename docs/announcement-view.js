@@ -57,9 +57,9 @@ function start(){
   const counter=document.createElement("span");counter.className="small";counter.textContent="Page "+(page+1)+" of "+n;
   pages.append(prev,counter,next);
  }
- async function open(){
+ async function open(scroll=true){
   main.hidden=true;if(history)history.hidden=true;section.hidden=false;
-  section.scrollIntoView({behavior:"smooth",block:"start"});
+  if(scroll)section.scrollIntoView({behavior:"smooth",block:"start"});
   // Revalidate on every opening: a previous in-memory batch can be stale.
   try{
    const response=await fetch("./data/announcements.json?fresh="+Date.now(),{cache:"no-store"});
@@ -81,10 +81,10 @@ function start(){
   }
  }
  function close(){section.hidden=true;main.hidden=false}
- button.addEventListener("click",open);
+ button.addEventListener("click",()=>open());
  // Refresh the visible announcement view periodically and when the tab regains focus.
  // Never poll in the background when the page or panel is hidden.
- setInterval(()=>{if(!document.hidden&&!section.hidden)open()},5*60*1000);
+ setInterval(()=>{if(!document.hidden&&!section.hidden)open(false)},5*60*1000);
  document.addEventListener("visibilitychange",()=>{if(!document.hidden&&!section.hidden)open()});
  section.querySelector("#axiovo-return-feed").addEventListener("click",close);
  query.addEventListener("input",()=>{page=0;draw()});
