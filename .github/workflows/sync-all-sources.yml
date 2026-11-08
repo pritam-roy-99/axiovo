@@ -38,7 +38,7 @@ jobs:
         env:
           OAI_LOOKBACK_DAYS: '3'
           OAI_MAX_PAGES: '20'
-        run: python -m scripts.oai_harvest
+        run: timeout --signal=TERM --kill-after=15s 480s python -m scripts.oai_harvest
       - name: Synchronize arXiv announcements
         id: arxiv_announcements
         continue-on-error: true
@@ -54,25 +54,27 @@ jobs:
       - name: Rebuild arXiv rolling feed
         id: arxiv_feed
         continue-on-error: true
-        run: python -m scripts.sync
+        run: timeout --signal=TERM --kill-after=15s 360s python -m scripts.sync
       - name: Synchronize official bioRxiv API
         id: biorxiv
         continue-on-error: true
-        run: python -m scripts.sync_biorxiv
+        run: timeout --signal=TERM --kill-after=15s 660s python -m scripts.sync_biorxiv
       - name: Synchronize verified ChemRxiv records
         id: chemrxiv
         continue-on-error: true
-        run: python -m scripts.sync_chemrxiv
+        run: timeout --signal=TERM --kill-after=15s 480s python -m scripts.sync_chemrxiv
       - name: Synchronize Cryptology ePrint OAI
         id: eprint
         continue-on-error: true
         env:
           IACR_LOOKBACK_DAYS: '21'
           IACR_MAX_PAGES: '20'
-        run: python -m scripts.sync_eprint
+        run: timeout --signal=TERM --kill-after=15s 480s python -m scripts.sync_eprint
       - name: Validate and preserve source integrity
         id: integrity
-        run: python scripts/validate_sync_snapshots.py
+        run: |
+          git fetch origin main
+          python scripts/validate_sync_snapshots.py
       - name: Summarize synchronization outcomes
         if: always()
         env:
