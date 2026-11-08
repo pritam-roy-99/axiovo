@@ -47,7 +47,7 @@ function refresh(){
  return options;
 }
 function store(){try{localStorage.setItem(key,JSON.stringify(prefs))}catch{}}
-voiceSelect.onchange=()=>{prefs.voice=voiceSelect.value;store()};
+voiceSelect.onchange=()=>{prefs.voice=voiceSelect.value;defaultVoice=false;store()};
 speed.onchange=()=>{prefs.rate=speed.value;store()};
 if(typeof synth.addEventListener==="function")synth.addEventListener("voiceschanged",refresh);
 else synth.onvoiceschanged=refresh;
@@ -61,7 +61,12 @@ function segments(text){
  return sentences.flatMap(value=>value.trim().match(/.{1,205}(?:\s|$)|\S+/gu)||[]).map(x=>x.trim()).filter(Boolean);
 }
 let items=[],paper=0,sentence=0,revision=0,paused=false;
-let pending=null,activeUtterance=null,failedVoice=null;
+let pending=null,activeUtterance=null,failedVoice=null,defaultVoice=false,watchdog=null;
+function clearWatchdog(){if(watchdog!==null){clearTimeout(watchdog);watchdog=null}}
+function recover(message){
+ cancelActive();paused=true;pause.disabled=false;pause.textContent="Retry";
+ status.textContent=message;
+}
 const delay=(callback,ms=100)=>{
  if(pending!==null)clearTimeout(pending);
  pending=setTimeout(()=>{pending=null;callback()},ms);
@@ -69,14 +74,14 @@ const delay=(callback,ms=100)=>{
 function cancelActive(){
  if(pending!==null){clearTimeout(pending);pending=null}
  // Invalidate callbacks BEFORE cancelling; Android fires "interrupted" on cancel.
- revision++;activeUtterance=null;synth.cancel();
+ clearWatchdog();revision++;activeUtterance=null;synth.cancel();
 }
 function finish(message){
  cancelActive();paused=false;items=[];caption.textContent="";
  title.textContent="Abstract audio";status.textContent=message;
  pause.disabled=true;skip.disabled=true;stop.textContent="Close";
 }
-function say(useDefault=false){
+function say(useDefault=defaultVoice){
  if(paused||!items.length)return;
  if(paper>=items.length){finish("Playback complete.");return}
  const {record,parts}=items[paper],phrase=parts[sentence];
@@ -92,51 +97,60 @@ function say(useDefault=false){
  utterance.rate={slow:.80,steady:.94,brisk:1.17}[prefs.rate]||.94;
  utterance.onend=()=>{
   if(run!==revision||activeUtterance!==utterance)return;
-  activeUtterance=null;failedVoice=null;sentence++;
+  clearWatchdog();activeUtterance=null;failedVoice=null;sentence++;
   // Yield to Android's TTS service before scheduling the next utterance.
   delay(()=>{if(run===revision)say()},120);
  };
  utterance.onerror=(event)=>{
   if(run!==revision||activeUtterance!==utterance)return;
-  activeUtterance=null;
+  clearWatchdog();activeUtterance=null;
   const error=event?.error||"unknown";
   // Deliberate cancels were invalidated above; a current-session interruption
   // is a genuine engine failure and should receive the same fallback retry.
-  if(!useDefault && failedVoice!==phrase){
-   failedVoice=phrase;
+  if(!useDefault && failedVoice!==phrase && error!=="not-allowed" && error!=="audio-busy"){
+   failedVoice=phrase;defaultVoice=true;
    status.textContent="Retrying with the default voice…";
    delay(()=>{if(run===revision)say(true)},180);
    return;
   }
   console.warn("Axiovo abstract audio:",error);
-  finish("Speech playback unavailable ("+error+"). Try another device voice or check Android text-to-speech settings.");
+  recover(error==="not-allowed"?"Tap Retry to allow speech playback.":"Voice unavailable ("+error+"). Choose another voice, then tap Retry. If it persists, check Android text-to-speech settings.");
  };
  title.textContent=record.title;caption.textContent=phrase;
  status.textContent="Paper "+(paper+1)+" of "+items.length;
  skip.disabled=paper+1>=items.length;
+ // Recover even when the device engine never sends start/end/error events.
+ watchdog=setTimeout(()=>{
+  if(run===revision&&activeUtterance===utterance)recover("The voice did not respond. Tap Retry or select another voice.");
+ },Math.max(15000,utterance.text.length*160));
  try{synth.speak(utterance)}
  catch(error){
   utterance.onerror({error:error?.name||"synthesis-failed"});
  }
 }
 function play(records){
- const newItems=records.filter(p=>p?.abstract).map(record=>({record,parts:[record.title,...segments(record.abstract)]}));
+ const newItems=records.filter(p=>p?.abstract).map(record=>({record,parts:[...segments(record.title||""),...segments(record.abstract)]}));
  if(!newItems.length)return;
- cancelActive();synth.resume();items=newItems;paper=0;sentence=0;paused=false;failedVoice=null;
+ cancelActive();synth.resume();items=newItems;paper=0;sentence=0;paused=false;failedVoice=null;defaultVoice=false;
  pause.disabled=false;pause.textContent="Pause";stop.textContent="Stop";toolbar.hidden=false;
- const run=revision;delay(()=>{if(run===revision)say()},150);
+ // Keep the first speak call inside the user gesture.
+ say();
 }
 pause.onclick=()=>{
  if(!items.length)return;
- paused=!paused;
- if(paused)synth.pause();else synth.resume();
- pause.textContent=paused?"Resume":"Pause";
+ paused=!paused;pause.textContent=paused?"Resume":"Pause";
+ // Android pause() can cancel speech without resumable state. Keep the
+ // current short phrase and replay it on Resume instead.
+ if(paused){cancelActive();status.textContent="Paused. Resume repeats the current phrase."}
+ else{cancelActive();synth.resume();say()}
+
 };
 skip.onclick=()=>{
  if(!items.length||paper+1>=items.length)return;
  cancelActive();synth.resume();paused=false;failedVoice=null;
  pause.textContent="Pause";paper++;sentence=0;
- const run=revision;delay(()=>{if(run===revision)say()},150);
+ // Keep the first speak call inside the user gesture.
+ say();
 };
 stop.onclick=()=>{finish("");toolbar.hidden=true};
 window.AxiovoAbstractAudio={play};
