@@ -52,6 +52,8 @@ const hasPathOverride=["category","topic","subtopic","refine"].some(k=>params.ha
 let selected=pathFrom(hasPathOverride?Object.fromEntries(params):stored?.last);
 let catalog=new Map(), catalogReady=false, index=[], topics=[], topic, leaf, subject;
 let search=null, datePreset=0;
+let viewMode=params.get("mode")==="indexed"?"indexed":"recent";
+const recentWindow=()=>({from:shiftDate(allDates(),-6),to:allDates()});
 const initialSort=params.get("sort");
 $("sort").value=["recent","oldest","cited"].includes(initialSort)?initialSort:"relevance";
 $("match").value=params.get("match")==="title"?"title":"metadata";
@@ -69,7 +71,8 @@ function savePrefs(){
 function syncURL(criteria){
  const url=new URL(location.href);
  const next={...selected,q:criteria.q,author:criteria.author,affiliation:criteria.affiliation,
-  from:criteria.from,to:criteria.to,mode:source==="arxiv"&&!criteria.from&&!criteria.to?"indexed":"",
+  from:$("from").value,to:$("to").value,
+  mode:!$("from").value&&!$("to").value?(viewMode==="indexed"?"indexed":source==="arxiv"?"":"recent"):"",
   sort:criteria.sort==="relevance"?"":criteria.sort,
   match:criteria.match==="title"?"title":"",crosslisted:criteria.crosslisted?"1":""};
  if((topic?.personal||leaf?.personal)&&!next.refine)next.refine=leaf?.name||topic.name;
@@ -94,7 +97,7 @@ function currentPath(){
 const pathId=path=>[path.category,path.topic,path.subtopic,path.refine].join("|");
 function shouldBrowseAnnouncements(){
  if(source!=="arxiv"||$("from").value||$("to").value)return false;
- if(new URLSearchParams(location.search).get("mode")==="indexed")return false;
+ if(viewMode==="indexed")return false;
  const id=data.identifier($("query").value);
  return !id.arxiv&&!id.doi;
 }
@@ -104,6 +107,7 @@ function selectPath(path){
  const inRelease=source==="arxiv"&&search?.announcementOnly;
  if(!inRelease)datePreset++;
  selected=pathFrom(path);
+ if(!$("from").value&&!$("to").value)viewMode="recent";
  drawPath();
  if(inRelease&&!$("from").value&&!$("to").value){
   search.criteria=criteriaFromForm();search.visible=12;
@@ -314,6 +318,7 @@ function drawResults(state){
  if(state!==search)return;
  if(state.announcementOnly)$("scope-label").textContent="Scope: latest official announcement · "+(pathText()||"all arXiv categories")+".";
  const c=state.criteria,sorter=$("result-sort");
+ if(state.recentOnly)$("scope-label").textContent="Scope: latest 7 source-posting days ("+c.from+" to "+c.to+") · "+(pathText()||"all "+name+" topics")+".";
  if(!state.announcementOnly&&source==="arxiv"&&!c.from&&!c.to){
   $("scope-label").textContent="Scope: indexed metadata across available years · "+(pathText()||"all arXiv categories")+".";
  }
@@ -321,16 +326,17 @@ function drawResults(state){
  const rows=filtered(state),results=$("results"),actions=$("result-actions");
  if($("sort-note"))$("sort-note").textContent=window.AxiovoPaperSort?.note(rows,c.sort)||"";
  $("result-count").textContent=rows.length.toLocaleString()+" matching "+name+" record"+(rows.length===1?"":"s")+
-  (state.announcementOnly?" · latest official announcement":source==="arxiv"&&!c.from&&!c.to?" · indexed search across available years":"")+
+  (state.announcementOnly?" · latest official announcement":state.recentOnly?" · latest 7 days":source==="arxiv"&&!c.from&&!c.to?" · indexed search across available years":"")+
   (state.loading?" · checking source…":"");
  $("sync-status").textContent=state.message;
  $("match-details").hidden=!c.topicTerms.length;
  $("match-terms").textContent=c.topicTerms.length?"Papers match at least one of these terms in the title or abstract: "+c.topicTerms.join(" · ")+".":"";
  results.replaceChildren(...rows.slice(0,state.visible).map(p=>paperCard(p,c)));actions.replaceChildren();
  if(!rows.length&&!state.loading){
-  const note=state.announcementOnly?"No papers in the latest available arXiv announcement match this selected field or topic. Try the parent topic or check source coverage.":state.complete?"No papers in the verified dates match these filters.":"No matches in the available records for this search.";
+  const note=state.announcementOnly?"No papers in the latest available arXiv announcement match this selected field or topic. Try the parent topic or check source coverage.":state.recentOnly?"No matching papers in the latest 7 days of available "+name+" source metadata. This does not mean the archive has no papers. Try another date range.":state.complete?"No papers in the verified dates match these filters.":"No matches in the available records for this search.";
   results.append(element("p",note,"rd-panel rd-small"));
-  if(c.from||c.to)actions.append(button("Search any date",()=>{$("from").value=$("to").value="";runSearch()}));
+  if(state.recentOnly)actions.append(button("Search indexed history for this topic",()=>{viewMode="indexed";runSearch()}));
+  else if(c.from||c.to)actions.append(button("Search any date",()=>{$("from").value=$("to").value="";viewMode="indexed";runSearch()}));
   if(leaf)actions.append(button("Search the parent topic",()=>selectPath({...selected,subtopic:"",refine:""})));
   if(subject||topic||selected.refine)actions.append(button("Broaden across all "+name+" subjects",()=>{
    selected=pathFrom({});
@@ -391,6 +397,7 @@ async function loadLive(state,more=false){
 async function showLatestAnnouncement(){
  if(source!=="arxiv")return;
  const stamp=++datePreset;
+ viewMode="recent";
  search?.controller.abort();
  // Announcement filtering must never apply first-submission-day inputs.
  $("from").value="";$("to").value="";
@@ -423,6 +430,14 @@ async function showLatestAnnouncement(){
 }
 async function runSearch({persist=true}={}){
  const c=criteriaFromForm();
+ const idForScope=data.identifier(c.q);
+ const hasExact=Boolean(idForScope.arxiv||idForScope.doi);
+ const recentOnly=(source==="biorxiv"||source==="chemrxiv")&&viewMode!=="indexed"&&
+  !c.from&&!c.to&&!hasExact;
+ if(recentOnly){
+  Object.assign(c,recentWindow(),{sort:"recent",recentOnly:true});
+  $("sort").value="recent";
+ }
  search?.controller.abort();
  if(c.from&&c.to&&c.from>c.to||c.from>allDates()||c.to>allDates()){
   $("result-count").textContent="Choose valid dates";
@@ -438,9 +453,9 @@ async function runSearch({persist=true}={}){
  if(persist){savePrefs();syncURL(criteriaFromForm())}
  const isHistorical=c.from===data.historicalStart[source]&&!!c.to;
  const state=search={controller:new AbortController(),criteria:c,local:[],batch:[],remote:[],visible:12,next:null,
-  loading:true,failed:false,complete:false,mode:"indexed",
+  loading:true,failed:false,complete:false,mode:recentOnly?"recent":"indexed",recentOnly,
   coverage:isHistorical?"Historical-year search: provider pages are sampled incrementally; results are not a full historical census. ":"",
-  message:source==="arxiv"&&!c.from&&!c.to?"Searching indexed arXiv metadata across available years (not the latest announcement)…":"Checking available records…"};
+  message:recentOnly?"Checking "+name+" records posted during the last 7 days; live coverage can be partial…":source==="arxiv"&&!c.from&&!c.to?"Searching indexed arXiv metadata across available years (not the latest announcement)…":"Checking available records…"};
  drawResults(state);
  if(arxiv&&source!=="arxiv"||doi&&(source==="arxiv"||source==="biorxiv"&&!/^10\.(?:1101|64898)\//.test(doi)||source==="chemrxiv"&&!doi.startsWith("10.26434/"))){
   state.loading=false;state.message="This identifier belongs outside the selected archive. Switch archives using the links at the top.";drawResults(state);return;
@@ -522,6 +537,7 @@ $("history")?.addEventListener("click",()=>{
  // Earliest available archive dates are lower bounds, not claims of completeness.
  datePreset++;
  const years=data.historyRange(source,allDates());
+ viewMode="indexed";
  $("from").value=years.from;
  $("to").value=years.to;
  $("sort").value=$("query").value.trim()?"relevance":"oldest";
@@ -531,7 +547,8 @@ $("history")?.addEventListener("click",()=>{
 
 $("announced")?.addEventListener("click",showLatestAnnouncement);
 $("latest").onclick=()=>{
- datePreset++;$("from").value=$("to").value="";$("sort").value="recent";runSearch();
+ datePreset++;$("from").value=$("to").value="";$("sort").value="recent";
+ viewMode=source==="arxiv"?"indexed":"recent";runSearch();
 };
 $("latest-verified")?.addEventListener("click",async()=>{
  const stamp=++datePreset;
@@ -545,12 +562,13 @@ $("latest-verified")?.addEventListener("click",async()=>{
   const latest=Object.entries(manifest.days||{}).filter(([,row])=>row?.complete&&row.count>0)
    .map(([day])=>day).sort().at(-1);
   if(!latest)throw Error("No verified dates");
-  $("from").value=$("to").value=latest;$("advanced").open=true;runSearch();
+  viewMode="indexed";$("from").value=$("to").value=latest;$("advanced").open=true;runSearch();
  }catch{
   if(stamp==datePreset)$("sync-status").textContent="No verified day is available right now. Use Latest papers to browse indexed records.";
  }finally{control.disabled=false}
 });
 $("week").onclick=()=>{
+ viewMode="recent";
  datePreset++;
  const end=source==="arxiv"?shiftDate(allDates(),-1):allDates();
  $("from").value=shiftDate(end,-6);$("to").value=end;$("advanced").open=true;runSearch();
@@ -602,9 +620,8 @@ fetch("./data/topics/"+source+".tsv",{signal:AbortSignal.timeout(6500)})
  .finally(()=>{
   const needsBioScope=source==="biorxiv"&&selected.category&&($("query").value||$("author").value);
   if(source==="arxiv"){
-   const hasDates=Boolean($("from").value||$("to").value);
-   if(params.get("announced")==="latest"||!hasDates&&!params.has("mode")&&
-      !params.has("q")&&!params.has("query")&&Boolean(selected.category))showLatestAnnouncement();
+   if((params.get("announced")==="latest"||(!params.has("mode")&&shouldBrowseAnnouncements()))&&
+      !$("from").value&&!$("to").value)showLatestAnnouncement();
    else runSearch({persist:false});
   }else if(!search||selected.topic||selected.refine||needsBioScope)runSearch({persist:false});
  });
