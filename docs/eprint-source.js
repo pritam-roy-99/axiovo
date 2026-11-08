@@ -87,8 +87,9 @@ async function load(options={}){
 }
 function filter(papers,c){
  const terms=(Array.isArray(c?.topicTerms)?c.topicTerms:[]).filter(Boolean).map(norm);
+ const anyTerms=(Array.isArray(c?.topicAnyTerms)?c.topicAnyTerms:[]).filter(Boolean).map(norm);
  const exact=safeId(c?.q),q=exact?"":norm(c?.q),author=norm(c?.author);
- const textSearch=Boolean(q||terms.length),titleHits=new Set();
+ const textSearch=Boolean(q||terms.length||anyTerms.length),titleHits=new Set();
  const rows=papers.filter(p=>{
   if(exact&&p.id!==exact)return false;
   if(c?.from&&(!p.date||p.date<c.from))return false;
@@ -99,6 +100,7 @@ function filter(papers,c){
    const title=norm(p.title),all=[title,norm(p.abstract),people,norm(p.categories.join(" ")),norm(p.id)].join(" ");
    if(q&&!all.includes(q))return false;
    if(terms.length&&!terms.every(t=>all.includes(t)))return false;
+   if(anyTerms.length&&!anyTerms.some(t=>all.includes(t)))return false;
    if(q&&title.includes(q))titleHits.add(p);
   }
   return true;
