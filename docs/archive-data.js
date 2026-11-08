@@ -425,7 +425,7 @@ function live(source,criteria,signal,cursor){
   criteria=sourceDateWindow(source,criteria);
   const browse=!criteria.q&&!criteria.author&&!criteria.refinement&&!criteria.topicTerms?.length;
   const orderedSearch=!criteria.category&&(criteria.sort==="oldest"||criteria.sort==="cited");
-  return parseDOI(criteria.q)||(browse&&!orderedSearch)?bioNative(criteria,signal,cursor):bioIndex(criteria,signal,cursor);
+  return criteria.recentOnly||parseDOI(criteria.q)||(browse&&!orderedSearch)?bioNative(criteria,signal,cursor):bioIndex(criteria,signal,cursor);
  }
  return chemLive(sourceDateWindow(source,criteria),signal,cursor);
 }
