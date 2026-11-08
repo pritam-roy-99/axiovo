@@ -94,7 +94,7 @@ function currentPath(){
 const pathId=path=>[path.category,path.topic,path.subtopic,path.refine].join("|");
 function shouldBrowseAnnouncements(){
  if(source!=="arxiv"||$("from").value||$("to").value)return false;
- if(search?.mode==="indexed"||new URLSearchParams(location.search).get("mode")==="indexed")return false;
+ if(new URLSearchParams(location.search).get("mode")==="indexed")return false;
  const id=data.identifier($("query").value);
  return !id.arxiv&&!id.doi;
 }
