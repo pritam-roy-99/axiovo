@@ -157,7 +157,10 @@ def select_days(today: dt.date, existing: dict, count: int = 5) -> list[dt.date]
     # API snapshot at fetched_at, not a promise that arXiv will never change it.
     # Never mark an in-progress UTC day as fully covered.
     # Three recently closed days are checked again for late metadata revisions.
-    selected = [today - dt.timedelta(days=i) for i in (1, 2, 3)]
+    # Only Mon-Fri UTC correspond to the routine arXiv announcement days.
+    # Weekend gaps are expected and should not consume verification retries.
+    selected = [d for i in range(1, 6)
+                if (d := today - dt.timedelta(days=i)).weekday() < 5][:3]
     # Prioritize previously detected missing/corrupt batches before older
     # historical dates. The audit report contains no unsupported paper claims.
     try:
@@ -170,12 +173,14 @@ def select_days(today: dt.date, existing: dict, count: int = 5) -> list[dt.date]
             day = validate_date(candidate)
         except (ValueError, TypeError):
             continue
-        if day < today and (today-day).days <= BACKFILL_DAYS and day not in selected:
+        if day < today and day.weekday() < 5 and (today-day).days <= BACKFILL_DAYS and day not in selected:
             selected.append(day)
             if len(selected) >= count:
                 return selected[:count]
     for age in range(4, BACKFILL_DAYS + 1):
         day = today - dt.timedelta(days=age)
+        if day.weekday() >= 5:
+            continue
         record = existing.get("days", {}).get(day.isoformat(), {})
         if not record.get("complete") or not isinstance(record.get("count"), int) or record["count"] <= 0:
             selected.append(day)
