@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1280 720" width="1280" height="720" role="img" aria-label="Axiovo scientific literature navigator cover showing four preprint archives, personalized library, abstract audio, and research topic filters">
+<title>Axiovo — Explore research across four archives</title>
+<defs>
+ <linearGradient id="bg" x2="1" y2="1"><stop stop-color="#051426"/><stop offset=".58" stop-color="#092b43"/><stop offset="1" stop-color="#086f78"/></linearGradient>
+ <radialGradient id="glow"><stop stop-color="#17e5da" stop-opacity=".48"/><stop offset="1" stop-color="#0a314c" stop-opacity="0"/></radialGradient>
+ <linearGradient id="accent" x1="0" x2="1"><stop stop-color="#63fff3"/><stop offset="1" stop-color="#20a6d9"/></linearGradient>
+ <linearGradient id="panel" x1="0" x2="0" y1="0" y2="1"><stop stop-color="#153c54"/><stop offset="1" stop-color="#0a2035"/></linearGradient>
+ <linearGradient id="book" x1="0" x2="1"><stop stop-color="#12445a"/><stop offset=".5" stop-color="#6ffff5"/><stop offset="1" stop-color="#14526b"/></linearGradient>
+ <filter id="soft"><feGaussianBlur stdDeviation="14"/></filter>
+ <filter id="shadow"><feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#000" flood-opacity=".55"/></filter>
+ <pattern id="grid" width="54" height="54" patternUnits="userSpaceOnUse"><path d="M54 0H0V54" stroke="#55d9df" stroke-opacity=".055" fill="none"/></pattern>
+</defs>
+<rect width="1280" height="720" fill="url(#bg)"/>
+<rect width="1280" height="720" fill="url(#grid)"/>
+<circle cx="1050" cy="330" r="420" fill="url(#glow)"/>
+<circle cx="715" cy="570" r="245" fill="url(#glow)" opacity=".5"/>
+<g opacity=".35" fill="none" stroke="#63d8e6" stroke-width="1.2">
+ <path d="M545 95L628 55L720 109L800 34L906 100L1014 53L1122 123L1240 61"/>
+ <path d="M605 600L690 640L811 587L902 672L1031 623L1161 685"/>
+ <path d="M1183 115L1238 194L1170 264L1252 356"/>
+</g>
+<g fill="#56e9ed" opacity=".75"><circle cx="628" cy="55" r="3"/><circle cx="720" cy="109" r="4"/><circle cx="906" cy="100" r="3"/><circle cx="1122" cy="123" r="4"/><circle cx="811" cy="587" r="4"/><circle cx="1161" cy="685" r="3"/></g>
+<!-- Wordmark -->
+<g transform="translate(54 57)">
+ <path d="M0 51L26 6Q31 -2 37 9L70 58L44 48L29 28L15 48Z" fill="url(#accent)"/>
+ <path d="M4 61L32 42L58 53L43 58L27 53Z" fill="#1db6d9"/>
+ <text x="92" y="51" font-family="Arial,Helvetica,sans-serif" font-size="57" font-weight="800" letter-spacing="4" fill="#f6fdff">AXIOVO</text>
+ <text x="95" y="83" font-family="Arial,Helvetica,sans-serif" font-size="19" font-style="italic" fill="#8cefe8">From Knowledge to Discovery</text>
+</g>
+<!-- Main message -->
+<rect x="58" y="225" width="6" height="94" rx="3" fill="url(#accent)"/>
+<g font-family="Arial,Helvetica,sans-serif" font-weight="750">
+ <text x="82" y="260" font-size="39" fill="#ffffff">Navigate scientific</text>
+ <text x="82" y="309" font-size="39" fill="#5af1e6">literature, your way.</text>
+</g>
+<!-- Features -->
+<g font-family="Arial,Helvetica,sans-serif" font-size="23" fill="#effcff" font-weight="600">
+ <g transform="translate(64 362)"><rect width="49" height="49" rx="12" fill="#0f465a" stroke="#5fdedb" stroke-opacity=".6"/><path d="M14 19l11-7 11 7-11 7zM14 27l11 7 11-7M14 34l11 7 11-7" fill="none" stroke="#8afff2" stroke-width="2.6" stroke-linejoin="round"/><text x="67" y="33">Field → Subfield → Subtopic</text></g>
+ <g transform="translate(64 428)"><rect width="49" height="49" rx="12" fill="#0f465a" stroke="#5fdedb" stroke-opacity=".6"/><path d="M10 18h10l5 5h14v17H10z" fill="none" stroke="#8afff2" stroke-width="2.7" stroke-linejoin="round"/><text x="67" y="33">Personal research library</text></g>
+ <g transform="translate(64 494)"><rect width="49" height="49" rx="12" fill="#0f465a" stroke="#5fdedb" stroke-opacity=".6"/><path d="M12 21h8l9-8v27l-9-8h-8zM34 19q9 7 0 14" fill="none" stroke="#8afff2" stroke-width="2.7" stroke-linecap="round"/><text x="67" y="33">Listen to abstracts</text></g>
+ <g transform="translate(64 560)"><rect width="49" height="49" rx="12" fill="#0f465a" stroke="#5fdedb" stroke-opacity=".6"/><circle cx="23" cy="18" r="7" stroke="#8afff2" fill="none" stroke-width="2.6"/><path d="M12 38q0-13 11-13 7 0 10 6M36 11l-22 31" fill="none" stroke="#8afff2" stroke-width="2.6"/><text x="67" y="33">No mandatory signup</text></g>
+</g>
+<!-- Four source pills around dashboard -->
+<g fill="none" stroke="#32e0db" stroke-width="3" opacity=".75"><path d="M711 157Q990 72 1154 212Q1247 330 1153 488" stroke-dasharray="3 7"/><path d="M752 502Q628 390 754 222" opacity=".6"/></g>
+<g font-family="Arial,Helvetica,sans-serif" text-anchor="middle" font-weight="700" fill="#f8ffff" filter="url(#shadow)">
+ <rect x="670" y="115" width="147" height="64" rx="19" fill="#0f4b60" stroke="#5dfff0" stroke-width="1.6"/><text x="744" y="156" font-size="28">arXiv</text>
+ <rect x="871" y="84" width="158" height="64" rx="19" fill="#0f4b60" stroke="#5dfff0" stroke-width="1.6"/><text x="950" y="126" font-size="27">bioRxiv</text>
+ <rect x="1063" y="170" width="178" height="64" rx="19" fill="#0f4b60" stroke="#5dfff0" stroke-width="1.6"/><text x="1152" y="212" font-size="26">ChemRxiv</text>
+ <rect x="1078" y="427" width="174" height="89" rx="19" fill="#0f4b60" stroke="#5dfff0" stroke-width="1.6"/><text x="1165" y="463" font-size="24">Cryptology</text><text x="1165" y="493" font-size="24">ePrint</text>
+</g>
+<!-- laptop screen, no fake screenshots -->
+<g filter="url(#shadow)">
+ <path d="M677 238Q678 217 703 215L1056 200Q1077 200 1075 224L1051 540L656 553Z" fill="#020e19" stroke="#9eeaf0" stroke-width="3"/>
+ <path d="M697 240L1050 226L1029 515L676 530Z" fill="url(#panel)"/>
+ <path d="M645 551L1053 535L1106 570Q1106 582 1091 585L610 590Q595 585 612 574Z" fill="#294a60" stroke="#80d7dc" stroke-width="2"/>
+ <path d="M738 555L999 545L1025 563L706 573Z" fill="#092c43"/>
+ <text x="723" y="275" fill="#76f5ef" font-family="Arial,Helvetica,sans-serif" font-size="19" font-weight="800">AXIOVO</text>
+ <text x="739" y="319" fill="#f9ffff" font-family="Arial,Helvetica,sans-serif" font-size="23" font-weight="700">Explore scientific preprints</text>
+ <rect x="720" y="339" width="281" height="39" rx="11" fill="#193d55" stroke="#418ba0"/>
+ <circle cx="742" cy="357" r="7" fill="none" stroke="#b9f8f8" stroke-width="2"/><path d="M747 363l8 8" stroke="#b9f8f8" stroke-width="2"/>
+ <text x="765" y="364" fill="#cce6ef" font-family="Arial,Helvetica,sans-serif" font-size="13">Search papers and topics...</text>
+ <rect x="728" y="393" width="65" height="22" rx="11" fill="#40d7cd"/><text x="741" y="408" fill="#07314b" font-size="12" font-family="Arial,Helvetica,sans-serif" font-weight="700">All fields</text>
+ <rect x="802" y="393" width="73" height="22" rx="11" fill="#24546b"/><text x="813" y="408" fill="#d8f7f8" font-size="12" font-family="Arial,Helvetica,sans-serif">Physics</text>
+ <rect x="883" y="393" width="90" height="22" rx="11" fill="#24546b"/><text x="894" y="408" fill="#d8f7f8" font-size="12" font-family="Arial,Helvetica,sans-serif">Chemistry</text>
+ <g fill="#17364d" stroke="#2c5b72"><rect x="719" y="430" width="273" height="30" rx="7"/><rect x="716" y="466" width="273" height="30" rx="7"/></g>
+ <g fill="#8eb1c5"><rect x="746" y="440" width="146" height="6" rx="3"/><rect x="746" y="451" width="197" height="3" rx="1.5"/><rect x="743" y="476" width="186" height="6" rx="3"/><rect x="743" y="487" width="123" height="3" rx="1.5"/></g>
+ <g fill="none" stroke="#79d1de" stroke-width="2"><path d="M732 437v12h-10v-12z"/><path d="M729 473v12h-10v-12z"/></g>
+</g>
+<text x="67" y="673" fill="#8de8e8" font-family="Arial,Helvetica,sans-serif" font-size="17">Explore research across four archives</text>
+<!-- stylized open book -->
+<g opacity=".75" fill="none" stroke="url(#book)" stroke-width="3">
+ <path d="M568 644Q734 596 833 673Q914 602 1080 644"/>
+ <path d="M570 652Q733 609 833 683Q927 609 1081 652"/>
+ <path d="M570 660Q735 622 833 692Q927 622 1081 660"/>
+</g>
+<path d="M565 676Q738 653 833 696Q926 653 1087 676" stroke="#5dfff0" stroke-width="2" fill="none"/>
+</svg>
