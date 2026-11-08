@@ -17,7 +17,8 @@ let prefs={voice:"",rate:"steady"};
 const android=/Android/i.test(navigator.userAgent||"");
 try{prefs={...prefs,...JSON.parse(localStorage.getItem(key)||"{}")}}catch{}
 // Discard old Android voice selection that may point to a missing TTS package.
-if(android&&!prefs.voice)prefs.voice="";
+// Prefer the OS default on Android unless the user explicitly selects a new voice.
+if(android)prefs.voice="";
 const female=/female|samantha|victoria|karen|moira|tessa|fiona|serena|zira|hazel|jenny|aria|sonia|libby|veena|swara|ava|allison|joanna|emma|sara|aditi|raveena/i;
 const make=(tag,label)=>{
  const el=document.createElement(tag);if(label)el.textContent=label;return el;
@@ -32,9 +33,9 @@ for(const [value,label] of [["steady","Steady"],["slow","Slow"],["brisk","Brisk"
  const option=make("option",label);option.value=value;speed.append(option);
 }
 speed.value=["steady","slow","brisk"].includes(prefs.rate)?prefs.rate:"steady";
-const pause=make("button","Pause"),skip=make("button","Next paper"),test=make("button","Test voice"),stop=make("button","Stop");
-for(const b of [pause,skip,test,stop])b.type="button";
-const controls=make("div");controls.append(voiceSelect,speed,pause,skip,test,stop);
+const pause=make("button","Pause"),skip=make("button","Next paper"),test=make("button","Test voice"),copy=make("button","Copy abstract"),stop=make("button","Stop");
+for(const b of [pause,skip,test,copy,stop])b.type="button";
+const controls=make("div");controls.append(voiceSelect,speed,pause,skip,test,copy,stop);
 toolbar.append(title,status,caption,controls);document.body.append(toolbar);
 // Android/Chrome may expose English voices without localService=true.
 const available=()=>{
@@ -44,7 +45,7 @@ const available=()=>{
 const voiceScore=v=>Number(female.test(v.name))*4+Number(/natural|premium|enhanced/i.test(v.name))*2;
 function refresh(){
  const options=available().sort((a,b)=>voiceScore(b)-voiceScore(a));
- const initial=make("option","Auto-select voice");initial.value="";
+ const initial=make("option","System default (recommended)");initial.value="";
  voiceSelect.replaceChildren(initial,...options.map(v=>{const option=make("option",v.name);option.value=v.voiceURI;return option}));
  voiceSelect.value=options.some(v=>v.voiceURI===prefs.voice)?prefs.voice:"";
  return options;
@@ -82,7 +83,8 @@ function segments(text){
 // idle Android engine before its first speak() call.
 let items=[],paper=0,sentence=0,run=0,paused=false,active=null;
 let timer=null,watchdog=null,testing=false,lastError="",attempt=0;
-const voiceModes=["selected","default","us","india"];
+let lastPaperText="";
+const voiceModes=["selected","default","india","us"];
 function clearTimers(){
  if(timer!==null){clearTimeout(timer);timer=null}
  if(watchdog!==null){clearTimeout(watchdog);watchdog=null}
@@ -112,20 +114,23 @@ function makeUtterance(text,mode){
  // a supported language when no voice is chosen.
  if(voice){utterance.voice=voice;utterance.lang=voice.lang}
  else if(mode==="india")utterance.lang="en-IN";
- else utterance.lang="en-US";
+ else if(mode==="us")utterance.lang="en-US";
+ // For "default", leave .voice and .lang unset so Android chooses its
+ // installed TTS voice instead of an unsupported Chrome-advertised locale.
  utterance.rate={slow:0.85,steady:1,brisk:1.12}[prefs.rate]||1;
  utterance.pitch=1;utterance.volume=1;
  return utterance;
 }
 function attemptModes(){
  // Explicit voice can be stale/unavailable even when its label is displayed.
- return prefs.voice?["selected","default","india"]:["default","india"];
+ return prefs.voice?["selected","default","india","us"]:["default","india","us"];
 }
 function fail(error){
  lastError=error;
  paused=true;pause.disabled=false;pause.textContent="Retry";
+ const options=attemptModes(),mode=options[Math.min(attempt>0?attempt-1:0,options.length-1)];
  const advice=error==="not-allowed"?"Tap Retry to grant Chrome permission to start speech.":
-  "Chrome could not start speech ("+error+"). Tap Test voice. If it also fails, try another voice or update Chrome and Google's Speech Recognition and Synthesis app.";
+  "Chrome speech failed ("+error+", mode: "+mode+"). Tap Retry to try another locale, or Test voice. Copy abstract lets you use Android Select to Speak if Chrome remains unavailable.";
  message(advice);
  console.warn("Axiovo Web Speech failure:",error,{
   android,voices:available().length,lang:navigator.language,
@@ -146,7 +151,7 @@ function speak(text,onComplete,isTest=false){
  utterance.onend=()=>{
   if(generation!==run||active!==utterance)return;
   active=null;clearTimers();attempt=0;lastError="";
-  if(isTest){testing=false;message("Voice test successful. Tap Listen to abstract to play a paper.");return}
+  if(isTest){testing=false;message("Chrome voice test successful. Tap Listen to abstract to play a paper.");return}
   onComplete();
  };
  utterance.onerror=(event)=>{
@@ -183,6 +188,7 @@ function nextPhrase(){
  if(sentence>=parts.length){paper++;sentence=0;nextPhrase();return}
  const phrase=parts[sentence];
  title.textContent=record.title||"Abstract audio";caption.textContent=phrase;
+ lastPaperText=[record.title||"",record.abstract||""].filter(Boolean).join("\n\n");
  skip.disabled=paper>=items.length-1;
  speak(phrase,()=>{
   sentence++;
@@ -198,6 +204,8 @@ function play(records){
  // Cancel only when there is an actual previous utterance.
  interrupt();
  items=newItems;paper=0;sentence=0;attempt=0;testing=false;paused=false;
+ lastPaperText=[newItems[0].record.title||"",newItems[0].record.abstract||""].filter(Boolean).join("\n\n");
+ copy.disabled=false;
  pause.disabled=false;pause.textContent="Pause";skip.disabled=newItems.length<2;
  stop.textContent="Stop";toolbar.hidden=false;
  nextPhrase();
@@ -208,6 +216,10 @@ pause.onclick=()=>{
   paused=false;pause.textContent="Pause";
   // Restart this phrase on a fresh tap. This is more reliable on Android than
   // speechSynthesis.resume() after an error.
+  if(synth.speaking||synth.pending){
+   // Chromium may retain a stale speaking state after synthesis-failed.
+   try{synth.cancel()}catch(e){}
+  }
   if(synth.paused){try{synth.resume()}catch(e){}}
   nextPhrase();return;
  }
@@ -219,8 +231,21 @@ skip.onclick=()=>{
  interrupt();paused=false;testing=false;attempt=0;paper++;sentence=0;
  pause.textContent="Pause";nextPhrase();
 };
+copy.onclick=()=>{
+ if(!lastPaperText)return;
+ // This is a manual, privacy-preserving fallback. Do not send abstracts
+ // to a third-party TTS endpoint without the user's consent.
+ const text=lastPaperText;
+ if(navigator.clipboard?.writeText){
+  navigator.clipboard.writeText(text)
+   .then(()=>message("Abstract copied. Use Android Select to Speak or paste it into a reader."))
+   .catch(()=>message("Clipboard blocked by Chrome. Expand Read abstract and select the text."));
+ }else message("Expand Read abstract, select the text, and choose Copy.");
+};
 test.onclick=()=>{
  interrupt();testing=true;paused=false;attempt=0;
+ if(synth.speaking||synth.pending){try{synth.cancel()}catch(e){}}
+ if(synth.paused){try{synth.resume()}catch(e){}}
  title.textContent="Voice test";caption.textContent="Hello. Axiovo audio is ready.";
  toolbar.hidden=false;stop.textContent="Close";
  speak("Hello. Axiovo audio is ready.",()=>{},true);
