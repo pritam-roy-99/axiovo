@@ -18,9 +18,9 @@ assert.ok(!release.includes('$("author").value=""'),"Release must not clear auth
 assert.match(explorer,/function shouldBrowseAnnouncements\(\)/,"Scoped announcement routing must exist");
 assert.match(explorer,/else if\(shouldBrowseAnnouncements\(\)\)showLatestAnnouncement\(\)/,
  "Searching a selected topic without a date must use the announcement batch");
-assert.match(explorer,/if\(source==="arxiv"\)\{\s*const hasDates=Boolean/,
+assert.match(explorer,/if\(source==="arxiv"\)\{\s*if\(\(params\.get\("announced"\)==="latest"/,
  "Startup routing must select announcement mode after loading the taxonomy");
-assert.match(explorer,/mode:source==="arxiv"&&!criteria\.from&&!criteria\.to\?"indexed"/,
+assert.match(explorer,/viewMode==="indexed"\?"indexed":source==="arxiv"/,
  "Explicit indexed searches must remain distinguishable from announcements");
 assert.match(explorer,/indexed search across available years/,"Result count must disclose historical scope");
 
