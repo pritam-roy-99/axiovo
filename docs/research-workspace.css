@@ -24,7 +24,7 @@
 .library-following #following-results h3 {font-size:1.02rem;margin-bottom:6px}
 .library-following #following-results .rd-result-card>button {min-height:34px;margin-top:5px}
 @media(max-width:640px){
- .library-tabs {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+ .library-tabs {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;align-items:stretch}
  .library-tabs a {
   min-width:0;min-height:44px;justify-content:center;text-align:center;overflow-wrap:anywhere;
  }
@@ -92,13 +92,14 @@
 .axiovo-assistant .assistant-results .source {padding:11px 0}
 @media (max-width:690px) {
  .axiovo-assistant .assistant-task-row {
-  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;align-items:stretch;
  }
  .axiovo-assistant .assistant-task-row>.rd-text-link {
   display:flex;align-items:center;min-height:44px;grid-column:1/-1;justify-self:start;
  }
  .axiovo-assistant .assistant-compose #question {min-height:88px}
  .axiovo-assistant .assistant-compose>.rd-actions {display:grid;grid-template-columns:minmax(0,1fr)}
+ .axiovo-assistant .assistant-compose>.rd-actions>button {min-height:44px}
  .axiovo-assistant .assistant-compose #busy:empty {display:none}
  .axiovo-assistant .assistant-results :is(#conversation,#evidence-list) {
   max-height:none;overflow:visible;min-width:0;

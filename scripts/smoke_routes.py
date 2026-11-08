@@ -65,6 +65,7 @@ def check_phone_content(page, path, width):
     elif path=="copilot.html":
         modes=boxes(".assistant-task-row :is(button,a)",3)
         assert modes[0]["y"]==modes[1]["y"]<modes[2]["y"],(width,path,modes)
+        boxes("#ask",1)
         assert page.locator("#ask").evaluate("el=>el.offsetWidth===el.parentElement.clientWidth")
 
 def main():

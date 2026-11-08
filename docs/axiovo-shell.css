@@ -584,7 +584,7 @@ body.axiovo-home .rd-home-section {margin-top:24px}
     overflow-wrap:anywhere;
   }
   .axiovo-research :is(.rd-result-card>.rd-actions,.rd-paper-actions,.crypto-paper-actions,.ex-paper-actions) {
-    display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;
+    display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;align-items:stretch;
   }
   .axiovo-research :is(.rd-result-card>.rd-actions,.rd-paper-actions,.crypto-paper-actions,.ex-paper-actions)>:is(a,button) {
     min-width:0;min-height:44px;
