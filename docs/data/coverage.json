@@ -9,15 +9,15 @@
       "coverage": "available source snapshots, not a complete historical archive"
     },
     "biorxiv": {
-      "input_records": 3710,
+      "input_records": 3711,
       "invalid_or_unavailable": 0,
-      "last_sync": "2026-11-08T18:03:30.520332+00:00",
+      "last_sync": "2026-11-08T22:18:18.956136+00:00",
       "coverage": "available source snapshots, not a complete historical archive"
     },
     "chemrxiv": {
       "input_records": 3000,
       "invalid_or_unavailable": 0,
-      "last_sync": "2026-11-08T18:04:18.700904+00:00",
+      "last_sync": "2026-11-08T22:18:35.828431+00:00",
       "coverage": "available source snapshots, not a complete historical archive"
     }
   },
@@ -46,7 +46,7 @@
       "2026-11-05": 189,
       "2026-11-06": 324,
       "2026-11-07": 38,
-      "2026-11-08": 1
+      "2026-11-08": 2
     },
     "chemrxiv": {
       "2022-10-04": 21,
@@ -352,6 +352,7 @@
       "q-fin.GN": 1
     },
     "biorxiv": {
+      "immunology": 151,
       "systems biology": 71,
       "microbiology": 301,
       "neuroscience": 794,
@@ -359,7 +360,6 @@
       "genomics": 149,
       "cancer biology": 141,
       "molecular biology": 143,
-      "immunology": 150,
       "cell biology": 195,
       "ecology": 133,
       "bioengineering": 158,
@@ -380,7 +380,7 @@
     },
     "chemrxiv": {}
   },
-  "needs_review": 10351,
+  "needs_review": 10352,
   "tagged": 0,
-  "total_indexed": 10351
+  "total_indexed": 10352
 }

@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "checked_at": "2026-11-08T18:07:38.796481+00:00",
+  "checked_at": "2026-11-08T22:20:21.000668+00:00",
   "warning": "Completeness is proved only for named source windows. No source-wide recall is asserted.",
   "arxiv": {
     "status": "gaps_detected",
     "scope": "UTC submission dates; certified against arXiv Atom totalResults captured during harvesting",
-    "verified_days": 55,
+    "verified_days": 57,
     "verified_latest": "2026-11-05",
     "checked_recent_closed_days": 21,
     "missing_recent_dates": [
@@ -20,19 +20,19 @@
   },
   "biorxiv": {
     "status": "window_verified",
-    "official_window_total": 3376,
-    "paginated_records": 3377,
-    "cached_unique_records": 3710,
+    "official_window_total": 3378,
+    "paginated_records": 3378,
+    "cached_unique_records": 3711,
     "requested_from": "2026-10-25",
     "requested_through": "2026-11-08",
-    "last_success": "2026-11-08T18:03:30.520332+00:00",
+    "last_success": "2026-11-08T22:18:18.956136+00:00",
     "not_a_full_archive": true
   },
   "chemrxiv": {
     "status": "prefix_incomplete",
     "cached_unique_records": 3000,
     "prefix_pages_checked": 8,
-    "last_success": "2026-11-08T18:04:18.700904+00:00",
+    "last_success": "2026-11-08T22:18:35.828431+00:00",
     "scope": "Crossref ChemRxiv DOI-prefix results; not official full ChemRxiv totals",
     "not_a_full_archive": true
   }
