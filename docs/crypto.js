@@ -20,7 +20,7 @@
  // Topic picker and saved-path features live in crypto-topics.js and
  // function independently of source metadata availability.
  const getPath=()=>window.AxiovoCryptoTopics?.path?.()||{field:"",topic:"",subtopic:""};
- let firstPathNotification=true;
+ let firstPathNotification=!window.AxiovoCryptoTopics?.ready;
  document.addEventListener("axiovo:crypto-path-change",()=>{
   // The initial path restoration is not a researcher selecting a new topic.
   // Do not erase an explicitly shared ?mode=indexed link on page load.
