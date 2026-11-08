@@ -21,7 +21,7 @@ assert.match(crypto,/viewMode="indexed"/);
 assert.match(crypto,/firstPathNotification/,"Restoring a saved topic must retain an indexed-history deep link");
 for(const file of ["arxiv","biorxiv","chemrxiv","crypto"]){
  const html=fs.readFileSync("docs/"+file+".html","utf8");
- assert.match(html,/recent-scope-v4/,"Archive cache version must be refreshed: "+file);
+ assert.match(html,/recent-scope-v5/,"Archive cache version must be refreshed: "+file);
 }
 const storage=new Map();
 const root={
