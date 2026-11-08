@@ -69,7 +69,8 @@ function savePrefs(){
 function syncURL(criteria){
  const url=new URL(location.href);
  const next={...selected,q:criteria.q,author:criteria.author,affiliation:criteria.affiliation,
-  from:criteria.from,to:criteria.to,sort:criteria.sort==="relevance"?"":criteria.sort,
+  from:criteria.from,to:criteria.to,mode:source==="arxiv"&&!criteria.from&&!criteria.to?"indexed":"",
+  sort:criteria.sort==="relevance"?"":criteria.sort,
   match:criteria.match==="title"?"title":"",crosslisted:criteria.crosslisted?"1":""};
  if((topic?.personal||leaf?.personal)&&!next.refine)next.refine=leaf?.name||topic.name;
  url.search=new URLSearchParams(Object.entries(next).filter(([,value])=>value));
@@ -91,6 +92,12 @@ function currentPath(){
  return {...selected,refine:selected.refine||((leaf?.personal||topic?.personal)&&(leaf?.name||topic.name))||""};
 }
 const pathId=path=>[path.category,path.topic,path.subtopic,path.refine].join("|");
+function shouldBrowseAnnouncements(){
+ if(source!=="arxiv"||$("from").value||$("to").value)return false;
+ if(search?.mode==="indexed"||new URLSearchParams(location.search).get("mode")==="indexed")return false;
+ const id=data.identifier($("query").value);
+ return !id.arxiv&&!id.doi;
+}
 function selectPath(path){
  // Keep selected subject/subtopic within the official release if that is
  // what the researcher is browsing. Category selection is not a date change.
@@ -101,7 +108,8 @@ function selectPath(path){
  if(inRelease&&!$("from").value&&!$("to").value){
   search.criteria=criteriaFromForm();search.visible=12;
   savePrefs();syncAnnouncementURL(search.criteria);drawResults(search);
- }else runSearch();
+ }else if(shouldBrowseAnnouncements())showLatestAnnouncement();
+ else runSearch();
 }
 function drawPersonal(){
  const item=currentPath();
@@ -306,6 +314,9 @@ function drawResults(state){
  if(state!==search)return;
  if(state.announcementOnly)$("scope-label").textContent="Scope: latest official announcement · "+(pathText()||"all arXiv categories")+".";
  const c=state.criteria,sorter=$("result-sort");
+ if(!state.announcementOnly&&source==="arxiv"&&!c.from&&!c.to){
+  $("scope-label").textContent="Scope: indexed metadata across available years · "+(pathText()||"all arXiv categories")+".";
+ }
  if(sorter&&sorter.value!==c.sort)sorter.value=c.sort||"relevance";
  const rows=filtered(state),results=$("results"),actions=$("result-actions");
  if($("sort-note"))$("sort-note").textContent=window.AxiovoPaperSort?.note(rows,c.sort)||"";
@@ -386,7 +397,7 @@ async function showLatestAnnouncement(){
  savePrefs();syncAnnouncementURL(c);
  $("scope-label").textContent="Scope: latest official announcement · "+(pathText()||"all arXiv categories")+".";
  const state=search={controller:new AbortController(),criteria:c,local:[],batch:[],remote:[],visible:12,next:null,
-  loading:true,failed:false,complete:false,announcementOnly:true,
+  loading:true,failed:false,complete:false,mode:"announcement",announcementOnly:true,
   coverage:"",message:"Loading latest official arXiv papers for the selected research scope…"};
  drawResults(state);
  try{
@@ -425,9 +436,9 @@ async function runSearch({persist=true}={}){
  if(persist){savePrefs();syncURL(criteriaFromForm())}
  const isHistorical=c.from===data.historicalStart[source]&&!!c.to;
  const state=search={controller:new AbortController(),criteria:c,local:[],batch:[],remote:[],visible:12,next:null,
-  loading:true,failed:false,complete:false,
+  loading:true,failed:false,complete:false,mode:"indexed",
   coverage:isHistorical?"Historical-year search: provider pages are sampled incrementally; results are not a full historical census. ":"",
-  message:"Checking available records…"};
+  message:source==="arxiv"&&!c.from&&!c.to?"Searching indexed arXiv metadata across available years (not the latest announcement)…":"Checking available records…"};
  drawResults(state);
  if(arxiv&&source!=="arxiv"||doi&&(source==="arxiv"||source==="biorxiv"&&!/^10\.(?:1101|64898)\//.test(doi)||source==="chemrxiv"&&!doi.startsWith("10.26434/"))){
   state.loading=false;state.message="This identifier belongs outside the selected archive. Switch archives using the links at the top.";drawResults(state);return;
@@ -466,7 +477,8 @@ $("show-results").onclick=()=>{
   if(search?.announcementOnly&&!$("from").value&&!$("to").value){
    search.criteria=criteriaFromForm();search.visible=12;
    savePrefs();syncAnnouncementURL(search.criteria);drawResults(search);
-  }else{datePreset++;runSearch()}
+  }else if(shouldBrowseAnnouncements())showLatestAnnouncement();
+  else{datePreset++;runSearch()}
  const heading=$("results-heading");
  if(!heading)return;
  heading.setAttribute("tabindex","-1");
@@ -488,7 +500,8 @@ $("search-form").onsubmit=e=>{
  if(search?.announcementOnly&&!search.loading&&!$("from").value&&!$("to").value){
   search.criteria=criteriaFromForm();search.visible=12;
    savePrefs();syncAnnouncementURL(search.criteria);drawResults(search);
-  }else{datePreset++;runSearch()}
+  }else if(shouldBrowseAnnouncements())showLatestAnnouncement();
+  else{datePreset++;runSearch()}
 };
 function changeSort(mode){
  $("sort").value=mode;
@@ -586,8 +599,12 @@ fetch("./data/topics/"+source+".tsv",{signal:AbortSignal.timeout(6500)})
  })
  .finally(()=>{
   const needsBioScope=source==="biorxiv"&&selected.category&&($("query").value||$("author").value);
-  if(source==="arxiv"&&params.get("announced")==="latest")showLatestAnnouncement();
-  else if(!search||selected.topic||selected.refine||needsBioScope)runSearch({persist:false});
+  if(source==="arxiv"){
+   const hasDates=Boolean($("from").value||$("to").value);
+   if(params.get("announced")==="latest"||!hasDates&&!params.has("mode")&&
+      !params.has("q")&&!params.has("query")&&Boolean(selected.category))showLatestAnnouncement();
+   else runSearch({persist:false});
+  }else if(!search||selected.topic||selected.refine||needsBioScope)runSearch({persist:false});
  });
-if((source!=="arxiv"||params.get("announced")!=="latest")&&!selected.topic&&!selected.refine)runSearch({persist:false});
+if(source!=="arxiv"&&!selected.topic&&!selected.refine)runSearch({persist:false});
 })();
