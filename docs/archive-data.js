@@ -362,7 +362,7 @@ async function bioNative(c,signal,cursor){
  const historical=Boolean(c.to||c.category?.legacy||c.sort==="oldest");
  const startDate=c.from||(historical?"2013-11-01":daysAgo(c.category?7:2));
  const interval=startDate+"/"+(c.to||today());
- const query=c.category?("?"+new URLSearchParams({category:c.category.code.toLowerCase()})):"";
+ const query=c.category&&!c.category.codes?("?"+new URLSearchParams({category:c.category.code.toLowerCase()})):"";
  const url=endpoints.bio+(doi?doi+"/na/json":interval+"/"+start+"/json")+query;
  const data=await request(url,signal);
  const meta=data.messages?.[0];
