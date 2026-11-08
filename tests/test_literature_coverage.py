@@ -20,6 +20,12 @@ class LiteratureHealthTests(unittest.TestCase):
             self.assertEqual(result["verified_days"],1)
             self.assertIn("2026-11-05",result["repair_queue"])
             self.assertNotIn("2026-11-04",result["repair_queue"])
+    def test_weekend_is_not_a_missing_arxiv_release(self):
+        with tempfile.TemporaryDirectory() as temp:
+            result=audit_arxiv(Path(temp),dt.date(2026,11,8),recent_days=3)
+            self.assertNotIn("2026-11-07",result["repair_queue"])
+            self.assertIn("2026-11-06",result["repair_queue"])
+
     def test_duplicate_papers_fail_source_count_check(self):
         with tempfile.TemporaryDirectory() as temp:
             folder=Path(temp)
