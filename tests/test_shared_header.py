@@ -17,9 +17,10 @@ class SharedHeaderTests(unittest.TestCase):
     def test_mobile_layout_keeps_appearance_in_first_row(self):
         css = (DOCS / "axiovo-shell.css").read_text(encoding="utf-8")
         self.assertIn('header.rl-global-header > .axiovo-header-appearance', css)
-        self.assertIn('grid-column:2!important', css)
-        self.assertIn('grid-row:1!important', css)
-        self.assertIn('grid-template-columns:minmax(0,1fr) auto!important', css)
+        self.assertIn('grid-column:3!important;grid-row:1!important', css)
+        self.assertIn('grid-column:2!important;grid-row:1!important', css)
+        self.assertIn('grid-column:1/-1!important;grid-row:2!important', css)
+        self.assertIn('grid-template-columns:auto minmax(0,1fr) auto!important', css)
         self.assertIn('flex-wrap:nowrap!important', css)
 
     def test_all_major_pages_load_shared_header_assets(self):

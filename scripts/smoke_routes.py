@@ -18,6 +18,7 @@ ROUTES = ("", "arxiv.html", "biorxiv.html", "chemrxiv.html", "crypto.html", "des
           "workspace.html", "copilot.html", "profiles.html", "lab.html",
           "paper.html", "compare.html", "methodology.html", "privacy.html",
           "community.html")
+FEATURES = ("Explore", "Research Desk", "My Feed", "Library", "Research Assistant")
 
 class Quiet(SimpleHTTPRequestHandler):
     def log_message(self, *_): pass
@@ -30,9 +31,10 @@ def main():
     try:
         with sync_playwright() as pw:
             browser = pw.chromium.launch(headless=True, args=["--no-sandbox", "--disable-dev-shm-usage"])
-            for width, height in ((320, 740), (360, 850), (390, 850), (428, 926), (740, 390),
+            for width, height in ((320, 740), (360, 850), (390, 850), (428, 926), (740, 390), (844, 390),
                                   (768, 850), (1360, 850)):
-                mobile = pw.devices["Pixel 7"] if width <= 760 else {}
+                phone = width <= 760 or (width, height) == (844, 390)
+                mobile = pw.devices["Pixel 7"] if phone else {}
                 ctx = browser.new_context(**{**mobile, "viewport": {"width": width, "height": height}},
                                           service_workers="block", reduced_motion="reduce")
                 page = ctx.new_page()
@@ -45,9 +47,11 @@ def main():
                     page.locator(".axiovo-header-appearance .theme-toggle").wait_for()
                     result = page.evaluate("""() => {
                       const qs = s => document.querySelector(s);
-                      const box = s => {const r=qs(s)?.getBoundingClientRect();return r&&{
+                      const rect = el => {const r=el?.getBoundingClientRect();return r&&{
                         x:r.x,y:r.y,right:r.right,bottom:r.bottom,width:r.width,height:r.height
                       }};
+                      const box = s => rect(qs(s));
+                      const nav=qs('.rl-nav');
                       return {
                         settings:box('.axiovo-header-appearance .rl-settings-link'),
                         theme:box('.axiovo-header-appearance .theme-toggle'),
@@ -56,28 +60,52 @@ def main():
                         home:box('.axiovo-home-link'),
                         navigation:box('.rl-nav'),
                         overflow:document.documentElement.scrollWidth - window.innerWidth,
-                        nav:document.querySelectorAll('.rl-nav a').length,
+                        links:[...nav.querySelectorAll('a')].map(a=>({
+                          ...rect(a),label:a.textContent,overflow:a.scrollWidth-a.clientWidth
+                        })),
+                        navOverflow:nav.scrollWidth-nav.clientWidth,
                         header:box('header.rl-global-header')
                       };
                     }""")
-                    assert result["nav"] == 5, (width,path,"Incorrect global navigation, expected Explore, Research Desk, My Feed, Library, Research Assistant",result)
+                    links=result["links"]
+                    assert tuple(link["label"] for link in links)==FEATURES,(width,path,"Incorrect global navigation",result)
                     assert result["settings"] and result["theme"],(width,path,"Appearance actions absent")
                     a,b=result["settings"],result["theme"]
                     assert abs(a["y"]-b["y"])<=2, (width,path,"Settings and theme not in same row",result)
                     assert 0<=a["x"] and b["right"]<=width+2,(width,path,"Appearance outside viewport",result)
                     assert result["overflow"]<=7,(width,path,"Page has horizontal overflow",result)
-                    if width<=760:
+                    if phone:
                         assert abs(result["logo"]["y"]-a["y"])<=7,(width,path,"Mobile header shifted",result)
-                        assert result["navigation"],(width,path,"Mobile navigation missing")
-                        assert result["header"]["height"]<=160,(width,path,"Mobile header too tall",result)
+                        nav=result["navigation"]
+                        assert nav and nav["y"]>=a["bottom"]+4,(width,path,"Research links must be below the utility row",result)
+                        assert nav["x"]<=16 and nav["right"]>=width-16,(width,path,"Research panel does not span the header",result)
+                        assert result["navOverflow"]<=1,(width,path,"Research links require horizontal scrolling",result)
+                        assert result["header"]["height"]<=140,(width,path,"Mobile header too tall",result)
+                        controls=[a,b]
                         if path:
                             assert result["back"] and result["home"],(width,path,"Back/Home missing")
-                            nav_mid=(result["navigation"]["y"]+result["navigation"]["bottom"])/2
-                            back_mid=(result["back"]["y"]+result["back"]["bottom"])/2
-                            assert abs(nav_mid-back_mid)<=8,(
-                                width,path,"Back and navigation are not in a consistent second row",result)
-                            assert result["navigation"]["right"]<=width+2,(
-                                width,path,"Mobile navigation exceeds viewport",result)
+                            controls=[result["back"],result["home"],*controls]
+                        assert all(abs(c["y"]-a["y"])<=2 for c in controls),(width,path,"Utility buttons split across rows",result)
+                        assert all(left["right"]<=right["x"] for left,right in zip(controls,controls[1:])),(
+                            width,path,"Utility controls overlap or are out of order",result)
+                        assert all(c["width"]>=44 and c["height"]>=44 for c in [*controls,*links]),(
+                            width,path,"Tap target smaller than 44px",result)
+                        assert all(nav["x"]<=link["x"] and link["right"]<=nav["right"] and
+                                   abs(link["y"]-links[0]["y"])<=2 and link["overflow"]<=1 for link in links),(
+                            width,path,"A research link is off-screen, clipped, or on the wrong row",result)
+                        if width==390 and path=="desk.html" and page.evaluate("CSS.supports('reading-flow','grid-rows')"):
+                            page.locator(".rl-logo").focus()
+                            for selector in (".axiovo-back-button",".axiovo-home-link",".rl-settings-link",
+                                             ".theme-toggle",".rl-nav a:first-child"):
+                                page.keyboard.press("Tab")
+                                assert page.evaluate("selector => document.activeElement.matches(selector)",selector),(
+                                    width,path,"Keyboard focus does not follow the mobile rows",selector)
+                    elif width==1360:
+                        assert all(abs(link["y"]-a["y"])<=4 for link in links),(
+                            width,path,"Desktop navigation left its original row",result)
+                        if path:
+                            assert result["home"]["right"]<=links[0]["x"] and links[-1]["right"]<=a["x"],(
+                                width,path,"Desktop navigation changed its position",result)
                     if not path:
                         # The unified hero has a dark gradient, and the name
                         # meaning is inline text rather than a separate panel.
@@ -150,7 +178,7 @@ def main():
 
                     verified.append((width,path or "home"))
                 assert not errors, (width, height, errors)
-                if width in (320, 428, 740):
+                if width in (320, 428, 740, 844):
                     ctx.close()
                     continue
                 page.goto(base,wait_until="domcontentloaded")
