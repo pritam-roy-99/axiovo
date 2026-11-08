@@ -1,3 +1,18 @@
+# Axiovo | Free Open-Source Research Paper Discovery
+
+[**Open Axiovo**](https://pritam-roy-99.github.io/axiovo/) · [**Why Axiovo?**](https://pritam-roy-99.github.io/axiovo/why-axiovo.html) · [**Research Desk**](https://pritam-roy-99.github.io/axiovo/desk.html) · [**Report an issue**](https://github.com/pritam-roy-99/axiovo/issues)
+
+Axiovo is a free, independently developed research workspace for finding preprints from **arXiv, bioRxiv, ChemRxiv and Cryptology ePrint**, checking the original source, and organizing reading in a browser-local Library.
+
+**Get started:** Open the [website](https://pritam-roy-99.github.io/axiovo/), choose a source or use Research Desk, open the original paper, and save useful records. Core features do not require an Axiovo account.
+
+**What it does:** archive navigation, source-linked paper search, personal reading tools, and an optional Research Assistant for metadata-level inspection. **What it does not guarantee:** a complete historical index, verified novel scientific results, automatically synchronized local notes, or AI inference on every device.
+
+Developed with assistance from ChatGPT by OpenAI. Axiovo is an independent open-source project, not an official OpenAI or archive product.
+
+<details>
+<summary>Technical documentation and development notes</summary>
+
 ## 2026 data-trust upgrade and reproducible build
 
 The current source-trust pipeline is additive and free to operate on GitHub Pages.
@@ -428,3 +443,5 @@ Broader full-text retrieval; verified citation networks; evidence-linked claim c
 ## License
 
 MIT for original application source code. The original publications and third-party content retain their own rights and license conditions.
+
+</details>
