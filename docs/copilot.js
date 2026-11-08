@@ -92,6 +92,36 @@ function evidenceText(query){
  return Core?.evidenceAnswer?Core.evidenceAnswer(query,sources):
   "Source evidence could not be summarized. Check the original records.";
 }
+async function exactPublicArxiv(parsed){
+ const base=parsed.base;
+ // Exact-ID services are fallbacks, not proof of requested revision content.
+ const endpoints=[
+  ["semantic","https://api.semanticscholar.org/graph/v1/paper/ARXIV:"+encodeURIComponent(base)+"?fields=title,abstract,authors,publicationDate,externalIds"],
+  ["openalex","https://api.openalex.org/works/https://doi.org/10.48550/arXiv."+encodeURIComponent(base)]
+ ];
+ for(const [provider,url] of endpoints){
+  try{
+   const response=await fetch(url,{headers:{Accept:"application/json"},signal:AbortSignal.timeout(10000)});
+   if(!response.ok)continue;
+   const data=await response.json();
+   if(provider==="semantic"){
+    const actual=String(data.externalIds?.ArXiv||data.externalIds?.ARXIV||"");
+    if(actual.toLowerCase()!==base.toLowerCase()||!data.title)continue;
+    return {id:base,recordId:base,title:data.title,abstract:data.abstract||"",
+     authors:(data.authors||[]).map(a=>a.name).filter(Boolean),date:data.publicationDate||"",
+     url:arxivUrl(base),source:"arxiv",provenance:"Semantic Scholar arXiv-linked metadata"};
+   }
+   const actual=String(data.doi||"").toLowerCase().replace(/^https?:\/\/doi.org\//,"");
+   if(actual!=="10.48550/arxiv."+base.toLowerCase()||!data.display_name)continue;
+   return {id:base,recordId:base,title:data.display_name,
+    abstract:abstractFromIndex(data.abstract_inverted_index),
+    authors:(data.authorships||[]).map(a=>a.author?.display_name).filter(Boolean).slice(0,12),
+    date:data.publication_date||"",url:arxivUrl(base),source:"arxiv",
+    provenance:"OpenAlex arXiv DOI metadata"};
+  }catch{ /* Offline and rate-limited services must not crash inspection. */ }
+ }
+ return null;
+}
 async function findPaper(id,allowPublicLookup=false){
  const cryptoId=Archive?.eprintIdentifier?.(id);
  if(cryptoId){
@@ -112,13 +142,13 @@ async function findPaper(id,allowPublicLookup=false){
   if(cached&&(!parsed.explicit||cached.recordId.toLowerCase()===parsed.requested.toLowerCase()))
    return cached;
  }
- if(!allowPublicLookup||!Archive?.live)return null;
+ if(!allowPublicLookup)return null;
+ const exact=await exactPublicArxiv(parsed);
+ if(exact)return exact;
+ if(!Archive?.live)return null;
  try{
   const result=await Archive.live("arxiv",{q:parsed.base});
-  // Never treat the first bibliographic hit as a verified exact-ID result.
-  // An explicit revision cannot be authenticated by an unversioned DOI record.
-  if(parsed.explicit)return null;
-  return result.papers.find(p=>p.source==="arxiv"&&p.id===parsed.base)||null;
+  return result.papers.find(p=>p.source==="arxiv"&&window.AxiovoArxiv?.base(p.id)===parsed.base)||null;
  }catch{return null}
 }
 
@@ -213,7 +243,11 @@ async function checkOllama(){
 }
 async function loadBrowserModel(){
  if(modelLoading||webEngine)return;
- if(!navigator.gpu){status("WebGPU is not supported on this browser/device. Use evidence-only mode or local Ollama.");return}
+ if(!navigator.gpu){
+  $("engine").value="evidence";engineChange();
+  status("WebGPU is unsupported on this device. Switched to Source evidence; literature search and paper inspection remain available.");
+  return;
+ }
  modelLoading=true;$("load-browser").disabled=true;status("Downloading WebGPU runtime and model files…");
  try{
   const lib=await import("https://esm.sh/@mlc-ai/web-llm@0.2.86");
@@ -221,7 +255,11 @@ async function loadBrowserModel(){
   if(!lib.prebuiltAppConfig.model_list.some(x=>x.model_id===id))throw Error("Model not found in this WebLLM release");
   webEngine=await lib.CreateMLCEngine(id,{initProgressCallback:p=>{status((p.text||"Loading model")+" "+(Number.isFinite(p.progress)?Math.floor(p.progress*100)+"%":""))}});
   status("On-device model loaded: "+id+". Answers are experimental.");
- }catch(err){webEngine=null;$("load-browser").disabled=false;status("WebGPU model unavailable: "+String(err.message||err).slice(0,200))}
+ }catch(err){
+  webEngine=null;$("load-browser").disabled=false;
+  $("engine").value="evidence";engineChange();
+  status("Browser model unavailable; switched to Source evidence. Details: "+String(err.message||err).slice(0,130));
+ }
  finally{modelLoading=false}
 }
 
@@ -330,6 +368,7 @@ async function submit(){
  const question=$("question").value.trim(),draft=$("draft").value.trim();
  if(!question&&!draft){rstatus("Enter a question or paste an abstract in the optional text field.");return}
  const id=window.AxiovoArxiv?.parse(question)?.requested||directId(question)||Archive?.eprintIdentifier(question);
+ if(id&&mode==="literature")updateMode("claims");
  if(mode==="claims"&&!id&&!draft){rstatus("Paste an arXiv or IACR ePrint ID or original URL, or add an abstract under Optional text.");return}
  setBusy(true);
  const query=(question||draft.slice(0,220));lastQuery=query;lastDate=new Date().toISOString();
@@ -357,7 +396,10 @@ async function submit(){
    " from available metadata; historical coverage is not guaranteed."+
    (sourceWarning?" "+sourceWarning+" Indexed results remain available.":""));
   if(id&&!paper)showOriginalLink(id);
-  const fallback=mode==="claims"?paperSummary(paper,draft):evidenceText(query);
+  let fallback=mode==="claims"?paperSummary(paper,draft):evidenceText(query);
+  if(id&&!paper&&!draft)fallback="Exact metadata could not be verified using available sources. Open the original paper from the link in Sources. A missing local record does not mean the paper is absent from arXiv.";
+  if(id&&paper&&window.AxiovoArxiv?.parse(id)?.explicit)
+   fallback="Revision note: public bibliographic metadata does not establish the text of "+id+". Verify revision-specific claims in the original arXiv version.\n\n"+fallback;
   if($("engine").value==="evidence"){record("assistant",fallback,sources);status("");}
   else{
    status($("engine").value==="hosted"?"Sending the selected source evidence to the chosen AI provider…":"Generating a response with the selected local model…");
@@ -393,7 +435,7 @@ async function globalSearch(){
    addSources(paper?[{...paper,provider:paper.provenance||"arXiv indexed metadata"}]:[],false);
    rstatus(paper?"Source metadata found.":"Source metadata unavailable for this identifier.");
    if(!paper)showOriginalLink(id);
-   record("assistant",paperSummary(paper,""),sources);
+   record("assistant",paper?paperSummary(paper,""):"Exact metadata could not be verified. Open the original arXiv link under Sources.",sources);
    return;
   }
   const found=await widerArxiv(q);
