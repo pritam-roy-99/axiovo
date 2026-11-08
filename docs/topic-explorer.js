@@ -72,6 +72,14 @@ function syncURL(criteria){
  url.search=new URLSearchParams(Object.entries(next).filter(([,value])=>value));
  history.replaceState(null,"",url);
 }
+function syncAnnouncementURL(criteria){
+ const url=new URL(location.href);
+ const next={...currentPath(),announced:"latest",q:criteria.q,author:criteria.author,
+  affiliation:criteria.affiliation,sort:criteria.sort==="recent"?"":criteria.sort,
+  match:criteria.match==="title"?"title":"",crosslisted:criteria.crosslisted?"1":""};
+ url.search=new URLSearchParams(Object.entries(next).filter(([,value])=>value));
+ history.replaceState(null,"",url);
+}
 const personalStatus=message=>{$("personal-status").textContent=message};
 function pathText(){
  return [subject?.name,topic?.name,leaf?.name,selected.refine&&!topic?selected.refine:""].filter(Boolean).join(" › ");
@@ -87,10 +95,9 @@ function selectPath(path){
  if(!inRelease)datePreset++;
  selected=pathFrom(path);
  drawPath();
- if(inRelease){
-  search.criteria=criteriaFromForm();
-  search.visible=12;
-  drawResults(search);
+ if(inRelease&&!$("from").value&&!$("to").value){
+  search.criteria=criteriaFromForm();search.visible=12;
+  savePrefs();syncAnnouncementURL(search.criteria);drawResults(search);
  }else runSearch();
 }
 function drawPersonal(){
@@ -305,7 +312,7 @@ function drawResults(state){
  $("match-terms").textContent=c.topicTerms.length?"Papers match at least one of these terms in the title or abstract: "+c.topicTerms.join(" · ")+".":"";
  results.replaceChildren(...rows.slice(0,state.visible).map(p=>paperCard(p,c)));actions.replaceChildren();
  if(!rows.length&&!state.loading){
-  const note=state.complete?"No papers in the verified dates match these filters.":"No matches in the available records for this search.";
+  const note=state.announcementOnly?"No papers in the latest available arXiv announcement match this selected field or topic. Try the parent topic or check source coverage.":state.complete?"No papers in the verified dates match these filters.":"No matches in the available records for this search.";
   results.append(element("p",note,"rd-panel rd-small"));
   if(c.from||c.to)actions.append(button("Search any date",()=>{$("from").value=$("to").value="";runSearch()}));
   if(leaf)actions.append(button("Search the parent topic",()=>selectPath({...selected,subtopic:"",refine:""})));
@@ -362,27 +369,22 @@ async function loadLive(state,more=false){
  if(more&&checked)state.visible+=12;
  state.loading=false;drawResults(state);
 }
-/* Announced releases are explicitly separate from UTC first-submission
- * search. This view shows all official arXiv announcement records across
- * categories, not an empty/older first-submission day.
+/* Official arXiv announcement dates differ from UTC first-submission dates.
+ * Apply the selected hierarchy to the official announced batch.
  */
 async function showLatestAnnouncement(){
  if(source!=="arxiv")return;
  const stamp=++datePreset;
  search?.controller.abort();
- selected=pathFrom({});
- drawPath();
- $("query").value="";$("author").value="";$("affiliation").value="";
+ // Announcement filtering must never apply first-submission-day inputs.
  $("from").value="";$("to").value="";
- if($("crosslisted"))$("crosslisted").checked=false;
  $("sort").value="recent";
- $("scope-label").textContent="Scope: latest official announcement · all arXiv categories.";
  const c=criteriaFromForm();
+ savePrefs();syncAnnouncementURL(c);
+ $("scope-label").textContent="Scope: latest official announcement · "+(pathText()||"all arXiv categories")+".";
  const state=search={controller:new AbortController(),criteria:c,local:[],batch:[],remote:[],visible:12,next:null,
   loading:true,failed:false,complete:false,announcementOnly:true,
-  coverage:"",message:"Loading the latest official arXiv announcement (all categories)…"};
- const url=new URL(location.href);url.search=new URLSearchParams({announced:"latest"});
- history.replaceState(null,"",url);
+  coverage:"",message:"Loading latest official arXiv papers for the selected research scope…"};
  drawResults(state);
  try{
   const batch=await data.latestArxivAnnouncement(state.controller.signal);
@@ -458,9 +460,10 @@ $("topic").onchange=()=>selectPath({category:selected.category,topic:$("topic").
 $("subfield").onchange=()=>selectPath({category:selected.category,topic:selected.topic,subtopic:$("subfield").value});
 $("clear-path").onclick=()=>selectPath({});
 $("show-results").onclick=()=>{
- // This is a real search action, not a decorative anchor.
- datePreset++;
- runSearch();
+  if(search?.announcementOnly&&!$("from").value&&!$("to").value){
+   search.criteria=criteriaFromForm();search.visible=12;
+   savePrefs();syncAnnouncementURL(search.criteria);drawResults(search);
+  }else{datePreset++;runSearch()}
  const heading=$("results-heading");
  if(!heading)return;
  heading.setAttribute("tabindex","-1");
@@ -480,8 +483,9 @@ $("topic-find").onkeydown=e=>{
 $("search-form").onsubmit=e=>{
  e.preventDefault();
  if(search?.announcementOnly&&!search.loading&&!$("from").value&&!$("to").value){
-  search.criteria=criteriaFromForm();search.visible=12;drawResults(search);
- }else{datePreset++;runSearch()}
+  search.criteria=criteriaFromForm();search.visible=12;
+   savePrefs();syncAnnouncementURL(search.criteria);drawResults(search);
+  }else{datePreset++;runSearch()}
 };
 function changeSort(mode){
  $("sort").value=mode;
@@ -489,8 +493,9 @@ function changeSort(mode){
  if(search?.announcementOnly||search?.complete){
   search.criteria={...search.criteria,sort:mode};
   search.visible=12;
-  if(!search.announcementOnly)syncURL(criteriaFromForm());
-  drawResults(search);
+  if(search.announcementOnly)syncAnnouncementURL(criteriaFromForm());
+   else syncURL(criteriaFromForm());
+   drawResults(search);
  }else{datePreset++;runSearch()}
 }
 $("sort").onchange=()=>changeSort($("sort").value);
@@ -578,8 +583,8 @@ fetch("./data/topics/"+source+".tsv",{signal:AbortSignal.timeout(6500)})
  })
  .finally(()=>{
   const needsBioScope=source==="biorxiv"&&selected.category&&($("query").value||$("author").value);
-  if(!(source==="arxiv"&&params.get("announced")==="latest")&&(!search||selected.topic||selected.refine||needsBioScope))runSearch({persist:false});
+  if(source==="arxiv"&&params.get("announced")==="latest")showLatestAnnouncement();
+  else if(!search||selected.topic||selected.refine||needsBioScope)runSearch({persist:false});
  });
-if(source==="arxiv"&&params.get("announced")==="latest")showLatestAnnouncement();
-else if(!selected.topic&&!selected.refine)runSearch({persist:false});
+if((source!=="arxiv"||params.get("announced")!=="latest")&&!selected.topic&&!selected.refine)runSearch({persist:false});
 })();
