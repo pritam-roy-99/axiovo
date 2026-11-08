@@ -21,7 +21,7 @@ assert.match(crypto,/viewMode="indexed"/);
 assert.match(crypto,/document\.addEventListener\("axiovo:crypto-path-change",\(\)=>search\(\)\)/,"Changing a research path must preserve the selected recent or indexed mode");
 for(const file of ["arxiv","biorxiv","chemrxiv","crypto"]){
  const html=fs.readFileSync("docs/"+file+".html","utf8");
- assert.match(html,/recent-scope-v5/,"Archive cache version must be refreshed: "+file);
+ assert.match(html,/recent-scope-v6/,"Archive cache version must be refreshed: "+file);
 }
 const storage=new Map();
 const root={
