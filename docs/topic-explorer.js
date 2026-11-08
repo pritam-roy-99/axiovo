@@ -107,7 +107,7 @@ function selectPath(path){
  const inRelease=source==="arxiv"&&search?.announcementOnly;
  if(!inRelease)datePreset++;
  selected=pathFrom(path);
- if(!$("from").value&&!$("to").value)viewMode="recent";
+ // Changing the research path retains the explicitly chosen date/search mode.
  drawPath();
  if(inRelease&&!$("from").value&&!$("to").value){
   search.criteria=criteriaFromForm();search.visible=12;
