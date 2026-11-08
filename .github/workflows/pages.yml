@@ -57,6 +57,7 @@ jobs:
           node tests/search-recall.test.js
           node tests/search-accuracy.test.js
           node tests/latest-topic-scope.test.js
+          node tests/recent-archive-scope.test.js
           node tests/topic-report.test.js
       - name: Check source-backed five-paper comparison extraction
         id: comparison_extraction
