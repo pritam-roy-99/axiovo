@@ -6,19 +6,19 @@
     "arxiv": {
       "input_records": 6122,
       "invalid_or_unavailable": 0,
-      "last_sync": "2026-11-08T10:29:04.201597+00:00",
+      "last_sync": "2026-11-08T11:39:55.865995+00:00",
       "coverage": "available source snapshots, not a complete historical archive"
     },
     "biorxiv": {
       "input_records": 3709,
       "invalid_or_unavailable": 0,
-      "last_sync": "2026-11-08T10:24:04.381428+00:00",
+      "last_sync": "2026-11-08T11:34:16.594475+00:00",
       "coverage": "available source snapshots, not a complete historical archive"
     },
     "chemrxiv": {
       "input_records": 3000,
       "invalid_or_unavailable": 0,
-      "last_sync": "2026-11-08T10:24:35.768291+00:00",
+      "last_sync": "2026-11-08T11:34:53.100281+00:00",
       "coverage": "available source snapshots, not a complete historical archive"
     }
   },
