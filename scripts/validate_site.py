@@ -19,11 +19,18 @@ def main():
         html=(DOCS/name).read_text(encoding="utf-8")
         if "<title>" not in html:
             raise RuntimeError(name+" has no title")
-        for code in re.findall(r"<script(?:\s[^>]*)?>([\s\S]*?)</script>",html):
+        for match in re.finditer(r"<script\b([^>]*)>([\s\S]*?)</script\s*>",html,re.I):
+            attrs,code=match.group(1),match.group(2)
             if not code.strip():continue
-            with tempfile.NamedTemporaryFile(mode="w",suffix=".js",encoding="utf-8") as tmp:
-                tmp.write(code);tmp.flush()
-                subprocess.run(["node","--check",tmp.name],check=True)
+            # JSON-LD is structured metadata, not executable JavaScript.
+            is_jsonld=bool(re.search(r'type\s*=\s*["\']application/ld\+json["\']',attrs,re.I))
+            if is_jsonld:
+                import json
+                json.loads(code)
+            else:
+                with tempfile.NamedTemporaryFile(mode="w",suffix=".js",encoding="utf-8") as tmp:
+                    tmp.write(code);tmp.flush()
+                    subprocess.run(["node","--check",tmp.name],check=True)
             checks+=1
     external=["ai.js","paper.js","profiles.js","theme.js","social-config.js","social.js","profiles-social.js","copilot.js","assistant-core.js","history.js","arxiv-versions.js","fields.js","workspace.js","navigation.js","relevance.js","research-intelligence.js","interests.js","lab.js","cloud-sync.js","discover.js","scholarly.js","scholar-search.js","cached-arxiv-search.js","semantic-search.js","research-fields.js","focus-bar.js","research-entry.js","discover-layout.js","discover-modes.js","paper-research.js","compare.js","archive-focus.js","chemrxiv.js","archive-data.js","topic-atlas.js","topic-explorer.js","following-authors.js","author-follow.js","research-desk.js"]
     for name in external:
