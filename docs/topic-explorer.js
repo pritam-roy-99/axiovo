@@ -320,7 +320,9 @@ function drawResults(state){
  if(sorter&&sorter.value!==c.sort)sorter.value=c.sort||"relevance";
  const rows=filtered(state),results=$("results"),actions=$("result-actions");
  if($("sort-note"))$("sort-note").textContent=window.AxiovoPaperSort?.note(rows,c.sort)||"";
- $("result-count").textContent=rows.length.toLocaleString()+" matching "+name+" record"+(rows.length===1?"":"s")+(state.loading?" · checking source…":"");
+ $("result-count").textContent=rows.length.toLocaleString()+" matching "+name+" record"+(rows.length===1?"":"s")+
+  (state.announcementOnly?" · latest official announcement":source==="arxiv"&&!c.from&&!c.to?" · indexed search across available years":"")+
+  (state.loading?" · checking source…":"");
  $("sync-status").textContent=state.message;
  $("match-details").hidden=!c.topicTerms.length;
  $("match-terms").textContent=c.topicTerms.length?"Papers match at least one of these terms in the title or abstract: "+c.topicTerms.join(" · ")+".":"";
