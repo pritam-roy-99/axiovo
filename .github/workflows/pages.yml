@@ -3,15 +3,6 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
-  schedule:
-    # Hourly checks; extra post-announcement polls improve freshness.
-    # GitHub scheduled workflows run on a best-effort basis and may be delayed.
-    - cron: '17 * * * *'
-    # 20:00 America/New_York is 00:00 UTC in EDT, 01:00 UTC in EST.
-    # Dense post-release checks, including late upstream metadata propagation.
-    - cron: '10,35 0,1,2,3 * * 1-5'
-    # RSS feeds refresh around 00:00 US Eastern, roughly 04:00/05:00 UTC.
-    - cron: '5 4,5,6 * * 1-5'
 permissions:
   contents: write
   pages: write
@@ -118,7 +109,7 @@ jobs:
         id: source_harvest
         run: python -m unittest discover -s tests -p test_source_harvest.py -v
       - name: Refresh free bioRxiv metadata
-        if: github.event_name != 'push'
+        if: github.event_name == 'schedule'
         id: biorxiv
         continue-on-error: true
         run: python scripts/sync_biorxiv.py
@@ -131,7 +122,7 @@ jobs:
       - name: Refresh verified ChemRxiv DOI metadata
         # Code pushes publish the last verified snapshot; scheduled/manual
         # refreshes contact the scholarly source independently.
-        if: github.event_name != 'push'
+        if: github.event_name == 'schedule'
         id: chemrxiv
         continue-on-error: true
         run: python scripts/sync_chemrxiv.py
@@ -142,7 +133,7 @@ jobs:
         id: eprint_parser
         run: python -m unittest discover -s tests -p test_eprint_harvest.py -v
       - name: Refresh official IACR Cryptology ePrint metadata
-        if: github.event_name != 'push'
+        if: github.event_name == 'schedule'
         id: eprint
         continue-on-error: true
         env:
@@ -188,7 +179,7 @@ jobs:
         run: |
           echo '::warning::Complete daily archive harvesting was unavailable; earlier verified day shards remain.'
       - name: Refresh all-category arXiv OAI-PMH metadata
-        if: github.event_name != 'push'
+        if: github.event_name == 'schedule'
         id: oai
         continue-on-error: true
         env:
@@ -203,7 +194,7 @@ jobs:
       - name: Harvest official arXiv announcement-day RSS
         # Code pushes deploy existing verified announcements immediately.
         # Scheduled sync and the dedicated announcement workflow update data.
-        if: github.event_name != 'push'
+        if: github.event_name == 'schedule'
         id: announcements
         continue-on-error: true
         run: python -m scripts.arxiv_announcements
@@ -211,7 +202,7 @@ jobs:
         if: steps.announcements.outcome == 'failure'
         run: echo '::warning::Official daily announcement RSS unavailable; preserving last verified announcement snapshot.'
       - name: Refresh research metadata
-        if: github.event_name != 'push'
+        if: github.event_name == 'schedule'
         id: refresh
         continue-on-error: true
         run: python scripts/sync.py
