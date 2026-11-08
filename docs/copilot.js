@@ -143,8 +143,14 @@ async function findPaper(id,allowPublicLookup=false){
    return cached;
  }
  if(!allowPublicLookup)return null;
- const exact=await exactPublicArxiv(parsed);
- if(exact)return exact;
+ // A bibliographic record does not verify a specific submitted revision.
+ // Keep exact-version inspection conservative until revision-specific data is available.
+ if(parsed.explicit)return null;
+ // The retrieval regression harness isolates findPaper; the helper may be absent there.
+ if(typeof exactPublicArxiv==="function"){
+  const exact=await exactPublicArxiv(parsed);
+  if(exact)return exact;
+ }
  if(!Archive?.live)return null;
  try{
   const result=await Archive.live("arxiv",{q:parsed.base});
