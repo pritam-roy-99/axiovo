@@ -287,7 +287,9 @@ function paperCard(p,c){
  window.AxiovoTopicReport?.attach(card,p,pathText());return card;
 }
 function filtered(state){
- const groups=(state.complete?[state.batch]:[state.local,state.batch,state.remote]).map(records=>data.filter(records,state.criteria));
+ // Merge source records first, then score and sort once. Filtering each source
+ // separately creates redundant full-text passes and blocks mobile scrolling.
+ const groups=state.complete?[state.batch]:[state.local,state.batch,state.remote];
  return data.filter(data.merge(...groups),state.criteria);
 }
 function drawResults(state){
