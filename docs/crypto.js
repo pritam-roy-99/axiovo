@@ -59,7 +59,7 @@
   }
   const c=filters();
   const recentOnly=viewMode==="recent"&&!c.from&&!c.to&&!data?.parseEprint?.(c.q);
-  if(recentOnly){c.from=daysBefore(6);c.to=utcDay();c.sort="recent";}
+  if(recentOnly){c.from=daysBefore(6);c.to=utcDay();if(c.sort==="relevance")c.sort="recent";}
   $("crypto-result-sort").value=c.sort;
   if(c.from&&c.to&&c.from>c.to){
    status.textContent="Choose an end date on or after the start date.";return;
