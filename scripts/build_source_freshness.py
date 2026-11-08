@@ -40,6 +40,8 @@ def generate(root=ROOT):
                                  indexed_records=len(records))
                     if key=="arxiv":
                         state["coverage"]="announcement-batch" if raw.get("complete") is True else "partial-or-unverified-announcements"
+                        state["announcement_date"]=str(raw.get("announcement_date") or "")
+                        state["announcement_complete"]=raw.get("complete") is True and raw.get("count")==len(records)
                     elif key=="biorxiv":
                         state["coverage"]="bounded-recent-window" if raw.get("complete_window") is True else "partial-window"
                     elif key=="chemrxiv":
