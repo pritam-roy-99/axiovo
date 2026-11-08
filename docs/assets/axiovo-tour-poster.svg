@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1280 720" width="1280" height="720" role="img" aria-label="Axiovo scientific literature navigator cover showing four preprint archives, personalized library, abstract audio, and research topic filters">
-<title>Axiovo — From Knowledge to Discovery</title>
+<title>Axiovo — Explore research across four archives</title>
 <defs>
  <linearGradient id="bg" x2="1" y2="1"><stop stop-color="#051426"/><stop offset=".58" stop-color="#092b43"/><stop offset="1" stop-color="#086f78"/></linearGradient>
  <radialGradient id="glow"><stop stop-color="#17e5da" stop-opacity=".48"/><stop offset="1" stop-color="#0a314c" stop-opacity="0"/></radialGradient>
@@ -66,6 +66,7 @@
  <g fill="#8eb1c5"><rect x="746" y="440" width="146" height="6" rx="3"/><rect x="746" y="451" width="197" height="3" rx="1.5"/><rect x="743" y="476" width="186" height="6" rx="3"/><rect x="743" y="487" width="123" height="3" rx="1.5"/></g>
  <g fill="none" stroke="#79d1de" stroke-width="2"><path d="M732 437v12h-10v-12z"/><path d="M729 473v12h-10v-12z"/></g>
 </g>
+<text x="67" y="673" fill="#8de8e8" font-family="Arial,Helvetica,sans-serif" font-size="17">Explore research across four archives</text>
 <!-- stylized open book -->
 <g opacity=".75" fill="none" stroke="url(#book)" stroke-width="3">
  <path d="M568 644Q734 596 833 673Q914 602 1080 644"/>
