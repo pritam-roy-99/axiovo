@@ -60,7 +60,7 @@ function start(){
  async function open(){
   main.hidden=true;if(history)history.hidden=true;section.hidden=false;
   section.scrollIntoView({behavior:"smooth",block:"start"});
-  if(snapshot){draw();return}
+  // Revalidate on every opening: a previous in-memory batch can be stale.
   try{
    const response=await fetch("./data/announcements.json?fresh="+Date.now(),{cache:"no-store"});
    if(!response.ok)throw Error("HTTP "+response.status);
@@ -68,9 +68,13 @@ function start(){
    if(!Array.isArray(data.papers)||!data.papers.length||!data.announcement_date)throw Error("No validated announcement batch");
    snapshot=data;
    const archives=[...new Set(data.papers.flatMap(p=>p.categories||[]))].sort();
+   const previousCategory=category.value;
+   category.replaceChildren(new Option('All archives',''));
    for(const a of archives){const opt=document.createElement("option");opt.value=a;opt.textContent=a;category.append(opt)}
+   if(archives.includes(previousCategory))category.value=previousCategory;
    draw();
   }catch(e){
+   if(snapshot){status.textContent='Could not refresh the official announcement snapshot. Displaying the previously loaded data.';draw();return;}
    status.textContent="The official announcement snapshot has not been harvested yet. Check the GitHub Actions synchronization logs.";
    cards.replaceChildren();
    const link=document.createElement("a");link.className="btn primary";link.textContent="Open arXiv’s official new-paper list";link.href="https://arxiv.org/list/quant-ph/new";link.target="_blank";link.rel="noopener noreferrer";cards.append(link);
@@ -78,6 +82,10 @@ function start(){
  }
  function close(){section.hidden=true;main.hidden=false}
  button.addEventListener("click",open);
+ // Refresh the visible announcement view periodically and when the tab regains focus.
+ // Never poll in the background when the page or panel is hidden.
+ setInterval(()=>{if(!document.hidden&&!section.hidden)open()},5*60*1000);
+ document.addEventListener("visibilitychange",()=>{if(!document.hidden&&!section.hidden)open()});
  section.querySelector("#axiovo-return-feed").addEventListener("click",close);
  query.addEventListener("input",()=>{page=0;draw()});
  category.addEventListener("change",()=>{page=0;draw()});
