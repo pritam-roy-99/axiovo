@@ -435,8 +435,8 @@ async function runSearch({persist=true}={}){
  const recentOnly=(source==="biorxiv"||source==="chemrxiv")&&viewMode!=="indexed"&&
   !c.from&&!c.to&&!hasExact;
  if(recentOnly){
-  Object.assign(c,recentWindow(),{sort:"recent",recentOnly:true});
-  $("sort").value="recent";
+  Object.assign(c,recentWindow(),{sort:c.sort==="relevance"?"recent":c.sort,recentOnly:true});
+  $("sort").value=c.sort;
  }
  search?.controller.abort();
  if(c.from&&c.to&&c.from>c.to||c.from>allDates()||c.to>allDates()){
@@ -514,11 +514,12 @@ $("topic-find").onkeydown=e=>{
 };
 $("search-form").onsubmit=e=>{
  e.preventDefault();
- if(search?.announcementOnly&&!search.loading&&!$("from").value&&!$("to").value){
+ if(search?.announcementOnly&&!search.loading&&!$("from").value&&!$("to").value&&
+    !data.identifier($("query").value).arxiv&&!data.identifier($("query").value).doi){
   search.criteria=criteriaFromForm();search.visible=12;
    savePrefs();syncAnnouncementURL(search.criteria);drawResults(search);
   }else if(shouldBrowseAnnouncements())showLatestAnnouncement();
-  else{datePreset++;runSearch()}
+  else{if(data.identifier($("query").value).arxiv||data.identifier($("query").value).doi)viewMode="indexed";datePreset++;runSearch()}
 };
 function changeSort(mode){
  $("sort").value=mode;
