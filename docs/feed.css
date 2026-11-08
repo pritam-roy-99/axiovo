@@ -194,3 +194,12 @@
  .axiovo-feed-page .feed-tabs {padding-bottom:4px;scroll-snap-type:x proximity}
  .axiovo-feed-page .feed-tabs button {scroll-snap-align:start;border-radius:10px}
 }
+
+/* Mobile performance: defer paint for feed cards outside the viewport.
+   Content remains in the DOM and available to keyboard navigation/search. */
+@supports (content-visibility: auto) {
+ .axiovo-feed-page .feed-card {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 420px;
+ }
+}
