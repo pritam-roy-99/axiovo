@@ -50,7 +50,11 @@ def audit_arxiv(folder, today, recent_days=21):
             errors.append({"date":day,"issue":"source_count_or_record_mismatch"})
             uncertain.append(day)
     # Audit only recent CLOSED UTC dates; older unharvested dates are explicitly outside scope.
-    expected=[(today-dt.timedelta(days=n)).isoformat() for n in range(1,recent_days+1)]
+    # The arXiv daily public release is Sun-Thu 20:00 US Eastern,
+    # mapping to Mon-Fri UTC. Weekend UTC dates without an announcement
+    # must not be classified as missing source batches.
+    expected=[day.isoformat() for n in range(1,recent_days+1)
+              if (day := today-dt.timedelta(days=n)).weekday() < 5]
     missing=[day for day in expected if day not in certified]
     repair=sorted(set(missing+uncertain),reverse=True)
     return {"status":"gaps_detected" if repair or errors else "recent_window_verified",
