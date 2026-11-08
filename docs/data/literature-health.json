@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "checked_at": "2026-11-08T11:39:56.191677+00:00",
+  "checked_at": "2026-11-08T16:52:12.954098+00:00",
   "warning": "Completeness is proved only for named source windows. No source-wide recall is asserted.",
   "arxiv": {
     "status": "gaps_detected",
@@ -27,14 +27,14 @@
     "cached_unique_records": 3709,
     "requested_from": "2026-10-25",
     "requested_through": "2026-11-08",
-    "last_success": "2026-11-08T11:34:16.594475+00:00",
+    "last_success": "2026-11-08T16:46:46.102405+00:00",
     "not_a_full_archive": true
   },
   "chemrxiv": {
     "status": "prefix_incomplete",
     "cached_unique_records": 3000,
     "prefix_pages_checked": 8,
-    "last_success": "2026-11-08T11:34:53.100281+00:00",
+    "last_success": "2026-11-08T16:47:41.478735+00:00",
     "scope": "Crossref ChemRxiv DOI-prefix results; not official full ChemRxiv totals",
     "not_a_full_archive": true
   }
