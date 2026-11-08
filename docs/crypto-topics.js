@@ -69,6 +69,17 @@ function init(){
   sync();
  }
  const path=()=>({field:field.value,topic:topic.value,subtopic:leaf.value});
+ // No official IACR subject taxonomy exists in these metadata. Broad
+ // selected paths match any curated descendant keyword, not all records.
+ function termsForPath(){
+  const p=path();
+  if(p.subtopic)return [];
+  const branches=p.field?taxonomy[p.field]:null;
+  if(!branches)return [];
+  const groups=p.topic?[[p.topic,branches[p.topic]||[]]]:Object.entries(branches);
+  const terms=groups.flatMap(([title,leaves])=>[title,...leaves.map(row=>row[1])]);
+  return [...new Set(terms.map(clean).filter(Boolean))].slice(0,120);
+ }
  const pathKey=storageKey+"-current";
  function rememberPath(){try{localStorage.setItem(pathKey,JSON.stringify(path()))}catch{}}
  function restorePath(){try{return JSON.parse(localStorage.getItem(pathKey)||"null")||{}}catch{return {}}}
@@ -228,7 +239,7 @@ function init(){
   }
   sync();
  }
- window.AxiovoCryptoTopics={ready:true,select:applyField,clear:()=>{applyField();notify()},path,refresh:notify};
+ window.AxiovoCryptoTopics={ready:true,select:applyField,clear:()=>{applyField();notify()},path,termsForPath,refresh:notify};
  notify();
 }
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init,{once:true});else init();
