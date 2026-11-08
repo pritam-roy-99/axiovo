@@ -65,6 +65,10 @@ def main():
             for filename in ("oai-recent.json","announcements.json","biorxiv.json","chemrxiv.json"):
                 page.route("**/data/"+filename,lambda req:req.fulfill(
                     status=200,content_type="application/json",body='{"papers":[]}'))
+            page.route("**/data/eprint.json",lambda req:req.fulfill(status=200,content_type="application/json",
+                body='{"source":"eprint","papers":[{"id":"2026/1","title":"Message authentication"}]}'))
+            page.route("https://api.openalex.org/**",lambda req:req.fulfill(status=200,content_type="application/json",
+                body='{"results":[]}'))
             page.goto(base+"feed.html",wait_until="domcontentloaded")
             page.wait_for_function("""() =>
               document.querySelector("#feed-match-count")?.textContent?.includes("matching") &&

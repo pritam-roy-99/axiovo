@@ -435,7 +435,8 @@ def main():
             saved=page.locator("#library-list").get_by_role("link",name="Synthetic pinned paper for the offline Library")
             saved.wait_for()
             assert saved.get_attribute("href")=="https://arxiv.org/abs/2611.11333v2"
-            card=page.locator("#library-list article").filter(has=saved)
+            card=page.locator("#library-list article").filter(
+                has=page.get_by_role("link",name="Synthetic pinned paper for the offline Library"))
             card.locator("summary").filter(has_text="Notes and organization").click()
             note=card.get_by_role("textbox",name="Private note for Synthetic pinned paper for the offline Library")
             note.fill("Verify the exact paper version offline.")
