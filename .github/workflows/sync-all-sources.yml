@@ -1,0 +1,96 @@
+name: Synchronize all scholarly archives
+on:
+  workflow_dispatch:
+  schedule:
+    # Hourly source polling, with extra polls after US Eastern arXiv releases.
+    - cron: '18 * * * *'
+    - cron: '8,38 0,1,2,3,4,5 * * 1-5'
+permissions:
+  contents: write
+  actions: write
+concurrency:
+  group: axiovo-all-sources
+  cancel-in-progress: false
+jobs:
+  synchronize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Test metadata harvesters
+        run: |
+          python -m unittest discover -s tests -p 'test_source_harvest.py' -v
+          python -m unittest discover -s tests -p 'test_eprint_harvest.py' -v
+      - name: Synchronize arXiv all-category OAI metadata
+        id: arxiv_oai
+        continue-on-error: true
+        env:
+          OAI_LOOKBACK_DAYS: '3'
+          OAI_MAX_PAGES: '20'
+        run: python -m scripts.oai_harvest
+      - name: Synchronize arXiv announcements
+        id: arxiv_announcements
+        continue-on-error: true
+        run: python -m scripts.arxiv_announcements
+      - name: Rebuild arXiv rolling feed
+        id: arxiv_feed
+        continue-on-error: true
+        run: python -m scripts.sync
+      - name: Synchronize official bioRxiv API
+        id: biorxiv
+        continue-on-error: true
+        run: python -m scripts.sync_biorxiv
+      - name: Synchronize verified ChemRxiv records
+        id: chemrxiv
+        continue-on-error: true
+        run: python -m scripts.sync_chemrxiv
+      - name: Synchronize Cryptology ePrint OAI
+        id: eprint
+        continue-on-error: true
+        env:
+          IACR_LOOKBACK_DAYS: '21'
+          IACR_MAX_PAGES: '20'
+        run: python -m scripts.sync_eprint
+      - name: Validate and preserve source integrity
+        id: integrity
+        run: python scripts/validate_sync_snapshots.py
+      - name: Summarize synchronization outcomes
+        if: always()
+        env:
+          ARXIV_OAI: ${{ steps.arxiv_oai.outcome }}
+          ARXIV_ANNOUNCEMENTS: ${{ steps.arxiv_announcements.outcome }}
+          ARXIV_FEED: ${{ steps.arxiv_feed.outcome }}
+          BIORXIV: ${{ steps.biorxiv.outcome }}
+          CHEMRXIV: ${{ steps.chemrxiv.outcome }}
+          EPRINT: ${{ steps.eprint.outcome }}
+        run: |
+          echo '## Archive source synchronization' >> "$GITHUB_STEP_SUMMARY"
+          for name in ARXIV_OAI ARXIV_ANNOUNCEMENTS ARXIV_FEED BIORXIV CHEMRXIV EPRINT; do
+            echo "- ${name}: ${!name}" >> "$GITHUB_STEP_SUMMARY"
+          done
+          echo 'An unsuccessful source retains its previously verified snapshot. Source availability is not proof of complete historical coverage.' >> "$GITHUB_STEP_SUMMARY"
+      - name: Publish new verified source snapshots
+        id: publication
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add docs/data/announcements.json docs/data/feed.json docs/data/oai-recent.json docs/data/biorxiv.json docs/data/chemrxiv.json docs/data/eprint.json
+          if git diff --cached --quiet; then
+            echo 'changed=false' >> "$GITHUB_OUTPUT"
+          else
+            git commit -m 'data: synchronize verified scholarly sources [skip ci]'
+            git fetch origin main
+            git rebase -X theirs origin/main
+            git push origin HEAD:main
+            echo 'changed=true' >> "$GITHUB_OUTPUT"
+          fi
+      - name: Trigger full site publication after source update
+        if: steps.publication.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run pages.yml --repo "${{ github.repository }}" --ref main
