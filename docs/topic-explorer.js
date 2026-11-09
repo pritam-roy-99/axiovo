@@ -582,14 +582,29 @@ $("history")?.addEventListener("click",()=>{
  runSearch();
 });
 
-$("announced")?.addEventListener("click",showLatestAnnouncement);
+$("announced")?.addEventListener("click",()=>{
+ if(source==="arxiv"){showLatestAnnouncement();return;}
+ datePreset++;viewMode="recent";$("from").value=$("to").value="";$("sort").value="recent";runSearch();
+});
 $("latest").onclick=()=>{
  datePreset++;$("from").value=$("to").value="";$("sort").value="recent";
- viewMode=source==="arxiv"?"indexed":"recent";runSearch();
+ viewMode="indexed";runSearch();
 };
 $("latest-verified")?.addEventListener("click",async()=>{
  const stamp=++datePreset;
  const control=$("latest-verified");
+ if(source!=="arxiv"){
+  control.disabled=true;
+  try{
+   const snapshot=await data.snapshot(source);
+   if(stamp!==datePreset)return;
+   const latest=(snapshot.papers||[]).map(p=>p.date).filter(d=>/^\d{4}-\d{2}-\d{2}$/.test(d)).sort().at(-1);
+   if(!latest)throw Error("No verified source dates");
+   viewMode="indexed";$("from").value=$("to").value=latest;$("sort").value="recent";$("advanced").open=true;runSearch();
+  }catch{if(stamp===datePreset)$("sync-status").textContent="No verified source day is available in the current index."}
+  finally{control.disabled=false}
+  return;
+ }
  control.disabled=true;
  try{
   const response=await fetch("./data/arxiv-days/manifest.json",{signal:AbortSignal.timeout(6500)});
