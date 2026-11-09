@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""SciRate-style latest-paper ingestion for static Axiovo.
+"""Latest-paper ingestion for static Axiovo.
 
 Harvests official arXiv Atom first-publication timestamps in paginated
 all-category date windows, then writes a bounded recent announcements index.
