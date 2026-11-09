@@ -391,6 +391,21 @@ async function loadLive(state,more=false){
  if(more&&checked)state.visible+=12;
  state.loading=false;drawResults(state);
 }
+/* arXiv's 20:00 US Eastern public announcement precedes midnight RSS.
+ * Use this estimate only as a lag warning, not proof of a release on holidays.
+ */
+function expectedCatchupDay(now=new Date()){
+ const items=Object.fromEntries(new Intl.DateTimeFormat("en-US",{
+  timeZone:"America/New_York",year:"numeric",month:"2-digit",day:"2-digit",
+  weekday:"short",hour:"2-digit",hourCycle:"h23"
+ }).formatToParts(now).filter(p=>p.type!=="literal").map(p=>[p.type,p.value]));
+ const day=new Date(Date.UTC(Number(items.year),Number(items.month)-1,Number(items.day)));
+ const week=day.getUTCDay(),hour=Number(items.hour);
+ if(week>=0&&week<=4&&hour>=20)day.setUTCDate(day.getUTCDate()+1);
+ else if(week===6)day.setUTCDate(day.getUTCDate()-1);
+ else if(week===0)day.setUTCDate(day.getUTCDate()-2);
+ return day.toISOString().slice(0,10);
+}
 /* Official arXiv announcement dates differ from UTC first-submission dates.
  * Apply the selected hierarchy to the official announced batch.
  */
@@ -421,7 +436,18 @@ async function showLatestAnnouncement(){
     (early?" Preliminary source listing before midnight US Eastern RSS refresh; completeness not yet verified.":
       batch.complete?" All official archive RSS feeds were verified.":" Partial source coverage; not all archive feeds were verified.")+
     " This is the announcement date, not the first-submission date.";
+  const expected=expectedCatchupDay();
+  if(batch.date<expected){
+   state.message+=" A newer public catch-up listing may exist; this Axiovo snapshot has not yet been verified as current.";
+  }
   drawResults(state);
+  if(batch.date<expected){
+   const category=subject?.codes?.[0]||subject?.code;
+   const official=category&&/^[A-Za-z0-9.-]+$/.test(category)
+    ?"https://arxiv.org/catchup/"+encodeURIComponent(category)+"/"+expected+"?abs=False"
+    :"https://arxiv.org/list/all/new";
+   $("result-actions").prepend(link("Check official newer catch-up ↗",official,"rd-button"));
+  }
   $("results-heading").scrollIntoView({behavior:"smooth",block:"start"});
  }catch(e){
   if(stamp!==datePreset||state!==search||state.controller.signal.aborted)return;
