@@ -54,7 +54,11 @@ def acceptable(name, older, newer):
                 return False, "Older arXiv announcement date"
             if day == prior_day and older.get("complete") is True and newer.get("complete") is not True:
                 return False, "Completeness regression on same announcement day"
-            if day == prior_day and len(papers) < len(older.get("papers") or []):
+            # RSS is the authoritative complete daily listing. A provisional
+            # catch-up HTML batch may contain extra or duplicated records;
+            # permit a complete RSS reconciliation even when its count differs.
+            final_rss = newer.get("complete") is True and older.get("early_release") is True
+            if day == prior_day and len(papers) < len(older.get("papers") or []) and not final_rss:
                 return False, "Missing records from an existing announcement batch"
     elif name == "feed.json":
         if newer.get("paper_count") != len(papers):
