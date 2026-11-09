@@ -35,15 +35,21 @@ async function checkAnnouncement(){
  const target=document.getElementById("axiovo-release-status");
  if(!target)return;
  try{
-  const response=await fetch("./data/records/manifest.json",{cache:"no-cache",signal:AbortSignal.timeout(10000)});
+  // The records manifest is a derived historical index and can lag behind
+  // the canonical daily announcement snapshot. Read the source of truth first.
+  const response=await fetch("./data/announcements.json",{cache:"no-store",signal:AbortSignal.timeout(10000)});
   if(!response.ok)throw Error("HTTP "+response.status);
-  const batch=(await response.json()).latest_arxiv_announcement;
-  if(!batch?.date||!Number.isInteger(batch.count))throw Error("No verified announcement metadata");
+  const snapshot=await response.json();
+  if(!/^\\d{4}-\\d{2}-\\d{2}$/.test(String(snapshot.announcement_date||""))||
+     !Array.isArray(snapshot.papers))throw Error("Invalid official announcement snapshot");
+  const batch={date:snapshot.announcement_date,count:snapshot.papers.length,
+   complete:snapshot.complete===true,checked_at:snapshot.checked_at,
+   early_release:snapshot.early_release===true};
   const updated=batch.checked_at||"";
   const checked=updated?new Date(updated):null;
   const last=checked&&!Number.isNaN(checked.valueOf())?checked.toLocaleString():"not supplied";
   target.textContent="Announcement "+batch.date+" · "+batch.count.toLocaleString()+
-   " indexed records · "+(batch.complete?"all archive feeds verified":"partial archive coverage")+
+   " indexed records · "+(batch.complete?"all archive feeds verified":batch.early_release?"early official catch-up, provisional":"partial archive coverage")+
    " · last source check: "+last+".";
  }catch{
   target.textContent="Open the latest announcement to see its date, source records and coverage.";
