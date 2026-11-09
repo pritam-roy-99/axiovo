@@ -11,6 +11,9 @@ ENDPOINTS = (
     ("oai_identify", "https://oaipmh.arxiv.org/oai?verb=Identify"),
     ("oai_alternate", "https://export.arxiv.org/oai2?verb=Identify"),
     ("arxiv_home", "https://arxiv.org/"),
+    ("oai_list_identifiers", "https://oaipmh.arxiv.org/oai?verb=ListIdentifiers&metadataPrefix=arXiv&from=2026-10-01&until=2026-10-01"),
+    ("oai_list_records", "https://oaipmh.arxiv.org/oai?verb=ListRecords&metadataPrefix=arXiv&from=2026-10-01&until=2026-10-01"),
+    ("alternate_list_records", "https://export.arxiv.org/oai2?verb=ListRecords&metadataPrefix=arXiv&from=2026-10-01&until=2026-10-01"),
 )
 
 
