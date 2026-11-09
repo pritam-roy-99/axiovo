@@ -40,6 +40,10 @@ class Quiet(SimpleHTTPRequestHandler):
  def log_message(self,*args):pass
 
 def check_searchable_path(page,base,source,touch):
+ # Isolate this baseline test from the path saved by the previous deep-link test.
+ # Keep production persistence unchanged.
+ page.goto(base+source+".html",wait_until="domcontentloaded")
+ page.evaluate("(source) => localStorage.removeItem('axiovo-topic-explorer-' + source + '-v1')",source)
  page.goto(base+source+".html?sort=relevance",wait_until="domcontentloaded")
  expect(page.locator("#archive-topic-input")).to_be_disabled()
  expect(page.locator("#archive-subfield-input")).to_be_disabled()
