@@ -111,12 +111,8 @@ jobs:
           OAI_LOOKBACK_DAYS: '3'
           OAI_MAX_PAGES: '20'
         run: |
-          # arXiv has no routine weekend announcements; preserve the last
-          # published snapshot rather than claiming a fresh empty day.
-          if [ "$(date -u +%u)" -ge 6 ] && [ "$GITHUB_EVENT_NAME" != "workflow_dispatch" ]; then
-            echo "arXiv OAI: weekend announcement pause, existing snapshot retained."
-            exit 0
-          fi
+          # OAI datestamps reflect metadata changes, not announcement days.
+          # Harvest every scheduled run, including weekends, to catch revisions.
           timeout --signal=TERM --kill-after=10s 180s python -m scripts.oai_harvest
       - name: Rebuild arXiv rolling feed
         id: arxiv_feed
