@@ -2,9 +2,9 @@ name: Archive synchronization watchdog
 on:
   workflow_dispatch:
   schedule:
-    # Independent fallback, seven minutes after the primary 15-minute cadence.
+    # Independent fallback, fifteen minutes after the primary 30-minute cadence.
     # GitHub-hosted cron is best-effort and can be delayed or skipped.
-    - cron: '14,29,44,59 * * * *'
+    - cron: '22,52 * * * *'
 permissions:
   actions: write
   contents: read
@@ -31,9 +31,9 @@ jobs:
             [.workflow_runs[] |
               select(.event == "schedule" or .event == "workflow_dispatch" or .event == "push") |
               select(($now - (.created_at | sub("Z$"; "Z") | fromdateiso8601)) >= 0) |
-              select(($now - (.created_at | sub("Z$"; "Z") | fromdateiso8601)) < 1200)
+              select(($now - (.created_at | sub("Z$"; "Z") | fromdateiso8601)) < 2400)
             ] | length' <<< "$runs")
-          echo "- Recent primary attempts (past 20 min): $recent" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Recent primary attempts (past 40 min): $recent" >> "$GITHUB_STEP_SUMMARY"
           if [ "$recent" -eq 0 ]; then
             gh workflow run sync-all-sources.yml --repo "$GH_REPO" --ref main
             echo "- Recovery: dispatched primary synchronization." >> "$GITHUB_STEP_SUMMARY"
