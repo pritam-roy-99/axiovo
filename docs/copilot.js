@@ -42,7 +42,7 @@ function renderSources(){
    if(s.authors.length)append("p",s.authors.slice(0,3).join(", ")+(s.authors.length>3?" et al.":""),item);
    const details=document.createElement("details");details.className="assistant-source-details";
    append("summary","Abstract and author actions",details);
-   if(s.abstract)append("p",s.abstract.slice(0,900)+(s.abstract.length>900?"…":""),details);
+   if(s.abstract){const abstract=append("p",s.abstract.slice(0,900)+(s.abstract.length>900?"…":""),details);window.AxiovoAssistantMath?.typeset(abstract);}
    window.AxiovoAuthorFollow?.attach(details,s.authors);
    item.append(details);
   });
@@ -59,7 +59,8 @@ function renderSources(){
 function message(role,content){
  const box=append("div","",$("conversation"),"message "+role);
  append("h4",role==="user"?"You":role==="assistant"?"Copilot":"System",box);
- append("div",content,box);
+ const body=append("div",content,box);
+ if(role!=="user")window.AxiovoAssistantMath?.typeset(body);
 
  $("conversation").scrollTop=$("conversation").scrollHeight;
 }
