@@ -415,8 +415,11 @@ async function showLatestAnnouncement(){
   state.local=batch.papers;
   state.loading=false;
   state.complete=false;
-  state.message="Official arXiv release: "+batch.date+" · "+batch.papers.length.toLocaleString()+" source-linked records."+
-    (batch.complete?" All official archive RSS feeds were verified.":" Partial source coverage; not all archive feeds were verified.")+
+  const early=String(batch.source||"").includes("arxiv.org/catchup/");
+  state.message=(early?"Official arXiv early catch-up release: ":"Official arXiv release: ")+batch.date+
+    " · "+batch.papers.length.toLocaleString()+" source-linked records."+
+    (early?" Preliminary source listing before midnight US Eastern RSS refresh; completeness not yet verified.":
+      batch.complete?" All official archive RSS feeds were verified.":" Partial source coverage; not all archive feeds were verified.")+
     " This is the announcement date, not the first-submission date.";
   drawResults(state);
   $("results-heading").scrollIntoView({behavior:"smooth",block:"start"});
