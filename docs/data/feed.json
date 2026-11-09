@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-09T04:27:39.139365+00:00",
+  "generated_at": "2026-11-09T13:34:15.543267+00:00",
   "source": "official arXiv OAI-PMH and verified submission-date Atom batches, with category fallback",
   "index_scope": "all-category recent OAI harvest (partial if incomplete) and independently verified full submission-day shards; older history remains partial",
   "refresh_methods": [
@@ -29591,108 +29591,6 @@
       "metadata_source": "arXiv OAI-PMH"
     },
     {
-      "id": "2611.08255",
-      "version": 1,
-      "title": "Nowcasting of Tropical Cyclone Wind Fields and Intensity from Geostationary Imagery",
-      "abstract": "High-resolution tropical cyclone surface wind speeds derived from synthetic aperture radar (SAR) observations can support storm structure and intensity modelling, but remain spatially and temporally sparse and unavailable near-real-time. Geostationary satellites capture cloud tops continuously in space and time, but do not directly resolve surface winds. Here, we present simple neural networks to predict 2D wind fields and storm-scale intensity metrics from geostationary imagery. Through a series of ablation studies, we find that joint prediction of 2D fields and scalar metrics from the model latent space improves the retrieval of the (radius of) maximum wind, especially for rapid intensification events.",
-      "authors": [
-        "Simon Donike",
-        "Pritthijit Nath",
-        "Cristina Radin",
-        "Arthur Avenas",
-        "Ruben Cartuyvels",
-        "Emiliano Diaz",
-        "William K. Jones",
-        "Anna Jungbluth"
-      ],
-      "categories": [
-        "cs.LG"
-      ],
-      "primary_category": "cs.LG",
-      "published": "2026-11-06T00:00:00Z",
-      "published_date_precision": "day",
-      "updated": "2026-11-09T00:00:00Z",
-      "link": "https://arxiv.org/abs/2611.08255",
-      "topics": [],
-      "doi": "",
-      "metadata_source": "arXiv OAI-PMH"
-    },
-    {
-      "id": "2611.08162",
-      "version": 1,
-      "title": "RouteAlign: Aligning Task Requirements with Model Profiles for LLM Service Selection",
-      "abstract": "LLM service selection requires performance evidence that reflects the demands of the current task. Aggregate scores obscure differences in capability and difficulty, while semantically related examples can involve different combinations of skills. We present RouteAlign, which uses task requirements to structure both the measurement of model performance and the selection of services. Task requirements describe capability demand and difficulty, enabling alignment with corresponding model performance measurements. Historical requirements determine how outcomes contribute to global profiles and local capability estimates; incoming requirements determine how those measurements inform the current decision. A shared scorer integrates the evidence, and a generation-cost preference controls selection among eligible services. Evaluation across diverse tasks and heterogeneous LLM services shows that RouteAlign extends the empirical quality-cost frontier toward higher task quality. Comparisons with open Jev-style decision backends show consistent quality gains, with lower generation cost than their strongest tested configuration. Ablations support the contribution of local performance evidence, while catalog-update experiments demonstrate effective reuse of the fitted scorer with refreshed model measurements.",
-      "authors": [
-        "Jihao Zhao",
-        "Ding Chen",
-        "Yanfang Chen",
-        "Bo Tang",
-        "Feiyu Xiong",
-        "Junchi Yan",
-        "Zhiyu Li"
-      ],
-      "categories": [
-        "cs.SE",
-        "cs.CL"
-      ],
-      "primary_category": "cs.SE",
-      "published": "2026-11-06T00:00:00Z",
-      "published_date_precision": "day",
-      "updated": "2026-11-09T00:00:00Z",
-      "link": "https://arxiv.org/abs/2611.08162",
-      "topics": [],
-      "doi": "",
-      "metadata_source": "arXiv OAI-PMH"
-    },
-    {
-      "id": "2611.08126",
-      "version": 1,
-      "title": "The first gap for minimal submanifolds in spheres",
-      "abstract": "Let $f:M^n\\to\\Sn^{n+q}(1)$ be a minimal immersion of a closed connected manifold with $n\\ge3$ and $q\\ge2$, and let $S$ be the squared length of its second fundamental form. We prove an integral inequality that gives $\\max_M S\\ge n$ if the immersion is not totally geodesic. If $n\\ne4$ or $q=2$, equality $\\max_M S=n$ holds if and only if the immersion is a Clifford minimal hypersurface; if $n=4$ and $q\\ge3$, equality holds if and only if the immersion is a Clifford minimal hypersurface or the standard minimal embedding of $\\mathbb{CP}^2$ in $\\Sn^7(1)$. Both classifications are understood up to an ambient isometry, a totally geodesic inclusion, and a finite covering. We construct the integral inequalities using polynomial weights and divergence identities. The required algebraic estimates are proved by sums of squared tensor norms.",
-      "authors": [
-        "Jianquan Ge",
-        "Kai Jia",
-        "Fagui Li"
-      ],
-      "categories": [
-        "math.DG"
-      ],
-      "primary_category": "math.DG",
-      "published": "2026-11-06T00:00:00Z",
-      "published_date_precision": "day",
-      "updated": "2026-11-09T00:00:00Z",
-      "link": "https://arxiv.org/abs/2611.08126",
-      "topics": [],
-      "doi": "",
-      "metadata_source": "arXiv OAI-PMH"
-    },
-    {
-      "id": "2611.07393",
-      "version": 1,
-      "title": "CacheGraft: Enhancing Retrieval-Augmented Generation via Latent-Space Document Enrichment",
-      "abstract": "Recent work in machine learning has demonstrated that transformer-based language model agents can communicate state not only through text, but also directly in latent space via key-value (KV) caches. In this paper, we argue that such cache-to-cache translation can provide utility beyond the original motivating application of real-time agent communication and can instead be utilized for retrieval-augmented generation (RAG). Building on the Cache-to-Cache (C2C) fusion framework, our proposed system CacheGraft encodes each corpus passage offline into a fused KV cache representation between a larger sharer model (4B parameters in our experiments) and a smaller receiver model (0.6B parameters) such that this cache can be injected into the receiver at query time with no need for the larger model. Across five QA benchmarks and two independent locally-run judges, CacheGraft improves answer quality over the text-only receiver baseline in 29 out of 30 comparisons, of which 17 of the 30 are statistically significant. Notably, these gains are zero-shot with respect to the fuser, which was never trained on retrieval data. These initial results suggest that latent-space document enrichment may be a promising avenue for enhancing the performance of RAG systems, particularly in compute-constrained settings where it is only feasible to deploy a small model at inference time.",
-      "authors": [
-        "Vihan Lakshman",
-        "Peter Baile Chen",
-        "Zhuohan Gu",
-        "Michael Cafarella"
-      ],
-      "categories": [
-        "cs.IR",
-        "cs.LG"
-      ],
-      "primary_category": "cs.IR",
-      "published": "2026-11-06T00:00:00Z",
-      "published_date_precision": "day",
-      "updated": "2026-11-09T00:00:00Z",
-      "link": "https://arxiv.org/abs/2611.07393",
-      "topics": [
-        "computer-ai"
-      ],
-      "doi": "",
-      "metadata_source": "arXiv OAI-PMH"
-    },
-    {
       "id": "2611.05463",
       "version": 1,
       "title": "Top Spin and CP from Equivariant Transformers",
@@ -35285,33 +35183,6 @@
       "link": "https://arxiv.org/abs/1303.7276",
       "topics": [],
       "doi": "10.1007/s11340-010-9347-1",
-      "metadata_source": "arXiv OAI-PMH"
-    },
-    {
-      "id": "2611.08293",
-      "version": 1,
-      "title": "Dualities in one-dimensional quantum lattice models: Lie groups, Schur-Weyl duality and symmetry breaking",
-      "abstract": "We present a systematic framework for gauging continuous symmetries, and show that the Schur-Weyl duality arises naturally as a realization of this construction with open boundary conditions. Restricting to compact Lie group symmetries, we construct dual models for one-dimensional quantum lattice models exhibiting those symmetries. We demonstrate that matrix product operators enable the explicit construction of intertwiners between the dual theories and their (non-invertible) symmetries. With closed boundary conditions, we can relate the full spectrum of these dual theories by considering all possible twisted boundary conditions. We illustrate how the Peter-Weyl transform appears when the duality acts on the boundary Hilbert space of a $G$-symmetric model. The presented framework generalizes previous work on dualities for unitary fusion category symmetric models. It exemplifies how dualities for both finite and continuous symmetries rely on the relation between a bond algebra and a representation of the symmetry in the lattice as double centralizers. We argue that dual non-invertible spontaneous symmetry breaking is the mechanism that underlies symmetric tensor network algorithms. We illustrate these results for $U(1)$- and $SU(2)$-symmetric quantum lattice models.",
-      "authors": [
-        "Dante Bosgoed",
-        "Frank Verstraete",
-        "Laurens Lootens"
-      ],
-      "categories": [
-        "quant-ph",
-        "cond-mat.str-el",
-        "math-ph",
-        "math.MP"
-      ],
-      "primary_category": "quant-ph",
-      "published": "2026-11-06T00:00:00Z",
-      "published_date_precision": "day",
-      "updated": "2026-11-09T00:00:00Z",
-      "link": "https://arxiv.org/abs/2611.08293",
-      "topics": [
-        "many-body"
-      ],
-      "doi": "",
       "metadata_source": "arXiv OAI-PMH"
     },
     {
@@ -46009,6 +45880,55 @@
       "doi": ""
     },
     {
+      "id": "2611.08293",
+      "version": 2,
+      "title": "Dualities in one-dimensional quantum lattice models: Lie groups, Schur-Weyl duality and symmetry breaking",
+      "abstract": "We present a systematic framework for gauging continuous symmetries, and show that the Schur-Weyl duality arises naturally as a realization of this construction with open boundary conditions. Restricting to compact Lie group symmetries, we construct dual models for one-dimensional quantum lattice models exhibiting those symmetries. We demonstrate that matrix product operators enable the explicit construction of intertwiners between the dual theories and their (non-invertible) symmetries. With closed boundary conditions, we can relate the full spectrum of these dual theories by considering all possible twisted boundary conditions. We illustrate how the Peter-Weyl transform appears when the duality acts on the boundary Hilbert space of a $G$-symmetric model. The presented framework generalizes previous work on dualities for unitary fusion category symmetric models. It exemplifies how dualities for both finite and continuous symmetries rely on the relation between a bond algebra and a representation of the symmetry in the lattice as double centralizers. We argue that dual non-invertible spontaneous symmetry breaking is the mechanism that underlies symmetric tensor network algorithms. We illustrate these results for $U(1)$- and $SU(2)$-symmetric quantum lattice models.",
+      "authors": [
+        "Dante Bosgoed",
+        "Frank Verstraete",
+        "Laurens Lootens"
+      ],
+      "categories": [
+        "quant-ph",
+        "cond-mat.str-el",
+        "math-ph"
+      ],
+      "primary_category": "quant-ph",
+      "published": "2026-11-05T16:55:32Z",
+      "updated": "2026-11-06T17:30:48Z",
+      "link": "https://arxiv.org/abs/2611.08293",
+      "topics": [
+        "many-body"
+      ],
+      "doi": ""
+    },
+    {
+      "id": "2611.08255",
+      "version": 2,
+      "title": "Nowcasting of Tropical Cyclone Wind Fields and Intensity from Geostationary Imagery",
+      "abstract": "High-resolution tropical cyclone surface wind speeds derived from synthetic aperture radar (SAR) observations can support storm structure and intensity modelling, but remain spatially and temporally sparse and unavailable near-real-time. Geostationary satellites capture cloud tops continuously in space and time, but do not directly resolve surface winds. Here, we present simple neural networks to predict 2D wind fields and storm-scale intensity metrics from geostationary imagery. Through a series of ablation studies, we find that joint prediction of 2D fields and scalar metrics from the model latent space improves the retrieval of the (radius of) maximum wind, especially for rapid intensification events.",
+      "authors": [
+        "Simon Donike",
+        "Pritthijit Nath",
+        "Cristina Radin",
+        "Arthur Avenas",
+        "Ruben Cartuyvels",
+        "Emiliano Diaz",
+        "William K. Jones",
+        "Anna Jungbluth"
+      ],
+      "categories": [
+        "cs.LG"
+      ],
+      "primary_category": "cs.LG",
+      "published": "2026-11-05T16:31:38Z",
+      "updated": "2026-11-06T14:26:06Z",
+      "link": "https://arxiv.org/abs/2611.08255",
+      "topics": [],
+      "doi": ""
+    },
+    {
       "id": "2611.08251",
       "version": 2,
       "title": "VoxCanvas-41M: A Large-Scale Bilingual Dataset for Instruction-Based Speech Editing and Its Learning Dynamics",
@@ -46101,6 +46021,51 @@
       "published": "2026-11-05T15:27:56Z",
       "updated": "2026-11-06T09:54:13Z",
       "link": "https://arxiv.org/abs/2611.08169",
+      "topics": [],
+      "doi": ""
+    },
+    {
+      "id": "2611.08162",
+      "version": 2,
+      "title": "RouteAlign: Aligning Task Requirements with Model Profiles for LLM Service Selection",
+      "abstract": "LLM service selection requires performance evidence that reflects the demands of the current task. Aggregate scores obscure differences in capability and difficulty, while semantically related examples can involve different combinations of skills. We present RouteAlign, which uses task requirements to structure both the measurement of model performance and the selection of services. Task requirements describe capability demand and difficulty, enabling alignment with corresponding model performance measurements. Historical requirements determine how outcomes contribute to global profiles and local capability estimates; incoming requirements determine how those measurements inform the current decision. A shared scorer integrates the evidence, and a generation-cost preference controls selection among eligible services. Evaluation across diverse tasks and heterogeneous LLM services shows that RouteAlign extends the empirical quality-cost frontier toward higher task quality. Comparisons with open Jev-style decision backends show consistent quality gains, with lower generation cost than their strongest tested configuration. Ablations support the contribution of local performance evidence, while catalog-update experiments demonstrate effective reuse of the fitted scorer with refreshed model measurements.",
+      "authors": [
+        "Jihao Zhao",
+        "Ding Chen",
+        "Yanfang Chen",
+        "Bo Tang",
+        "Feiyu Xiong",
+        "Junchi Yan",
+        "Zhiyu Li"
+      ],
+      "categories": [
+        "cs.SE",
+        "cs.CL"
+      ],
+      "primary_category": "cs.SE",
+      "published": "2026-11-05T15:21:16Z",
+      "updated": "2026-11-06T14:19:36Z",
+      "link": "https://arxiv.org/abs/2611.08162",
+      "topics": [],
+      "doi": ""
+    },
+    {
+      "id": "2611.08126",
+      "version": 2,
+      "title": "The first gap for minimal submanifolds in spheres",
+      "abstract": "Let $f:M^n\\to\\Sn^{n+q}(1)$ be a minimal immersion of a closed connected manifold with $n\\ge3$ and $q\\ge2$, and let $S$ be the squared length of its second fundamental form. We prove an integral inequality that gives $\\max_M S\\ge n$ if the immersion is not totally geodesic. If $n\\ne4$ or $q=2$, equality $\\max_M S=n$ holds if and only if the immersion is a Clifford minimal hypersurface; if $n=4$ and $q\\ge3$, equality holds if and only if the immersion is a Clifford minimal hypersurface or the standard minimal embedding of $\\mathbb{CP}^2$ in $\\Sn^7(1)$. Both classifications are understood up to an ambient isometry, a totally geodesic inclusion, and a finite covering. We construct the integral inequalities using polynomial weights and divergence identities. The required algebraic estimates are proved by sums of squared tensor norms.",
+      "authors": [
+        "Jianquan Ge",
+        "Kai Jia",
+        "Fagui Li"
+      ],
+      "categories": [
+        "math.DG"
+      ],
+      "primary_category": "math.DG",
+      "published": "2026-11-05T14:56:47Z",
+      "updated": "2026-11-06T15:31:41Z",
+      "link": "https://arxiv.org/abs/2611.08126",
       "topics": [],
       "doi": ""
     },
@@ -46307,6 +46272,30 @@
       "updated": "2026-11-06T08:48:20Z",
       "link": "https://arxiv.org/abs/2611.07430",
       "topics": [],
+      "doi": ""
+    },
+    {
+      "id": "2611.07393",
+      "version": 2,
+      "title": "CacheGraft: Enhancing Retrieval-Augmented Generation via Latent-Space Document Enrichment",
+      "abstract": "Recent work in machine learning has demonstrated that transformer-based language model agents can communicate state not only through text, but also directly in latent space via key-value (KV) caches. In this paper, we argue that such cache-to-cache translation can provide utility beyond the original motivating application of real-time agent communication and can instead be utilized for retrieval-augmented generation (RAG). Building on the Cache-to-Cache (C2C) fusion framework, our proposed system CacheGraft encodes each corpus passage offline into a fused KV cache representation between a larger sharer model (4B parameters in our experiments) and a smaller receiver model (0.6B parameters) such that this cache can be injected into the receiver at query time with no need for the larger model. Across five QA benchmarks and two independent locally-run judges, CacheGraft improves answer quality over the text-only receiver baseline in 29 out of 30 comparisons, of which 17 of the 30 are statistically significant. Notably, these gains are zero-shot with respect to the fuser, which was never trained on retrieval data. These initial results suggest that latent-space document enrichment may be a promising avenue for enhancing the performance of RAG systems, particularly in compute-constrained settings where it is only feasible to deploy a small model at inference time.",
+      "authors": [
+        "Vihan Lakshman",
+        "Peter Baile Chen",
+        "Zhuohan Gu",
+        "Michael Cafarella"
+      ],
+      "categories": [
+        "cs.IR",
+        "cs.LG"
+      ],
+      "primary_category": "cs.IR",
+      "published": "2026-11-05T03:43:22Z",
+      "updated": "2026-11-06T15:33:28Z",
+      "link": "https://arxiv.org/abs/2611.07393",
+      "topics": [
+        "computer-ai"
+      ],
       "doi": ""
     },
     {
@@ -57817,6 +57806,80 @@
         "many-body",
         "quantum-computing"
       ],
+      "doi": "",
+      "metadata_source": "arXiv OAI-PMH"
+    },
+    {
+      "id": "2611.07571",
+      "version": 1,
+      "title": "Bernstein-Sato polynomials of generic Pfaffian ideals",
+      "abstract": "We determine all roots and their multiplicities in the Bernstein--Sato polynomial of every generic Pfaffian ideal. In the nonmaximal case, the roots lie in explicit rational windows indexed by the rank strata. Integral roots retain their label multiplicities, whereas every nonintegral root is simple, including values with several labels. The proof combines graph-module relations, skew Capelli operators, central characters, and a weighted Mellin integral. We deduce the strong motivic monodromy conjecture for Pfaffian ideals, with pole orders bounded by Bernstein--Sato root multiplicities. For Pfaffians of size $2r$, the largest possible root multiplicity as the matrix size varies is $\\lfloor(\\sqrt{8r+1}-1)/2\\rfloor$. In the nonmaximal case we also prove that the nonunipotent part of the Verdier specialization has zero nilpotent monodromy. Keywords. Bernstein-Sato polynomial, Pfaffian ideal, root multiplicities, strong monodromy conjecture.",
+      "authors": [
+        "Yifan Chen",
+        "Huaiqing Zuo"
+      ],
+      "categories": [
+        "math.AG"
+      ],
+      "primary_category": "math.AG",
+      "published": "2026-11-05T00:00:00Z",
+      "published_date_precision": "day",
+      "updated": "2026-11-09T00:00:00Z",
+      "link": "https://arxiv.org/abs/2611.07571",
+      "topics": [],
+      "doi": "",
+      "metadata_source": "arXiv OAI-PMH"
+    },
+    {
+      "id": "2610.16621",
+      "version": 1,
+      "title": "AgentCue: Statistical Summaries for Guiding Decentralized Multi-Agent Self-Organization",
+      "abstract": "Multi-agent systems (MAS) combine multiple agents to solve complex tasks, and recent MAS scale to more than a thousand agents. At this scale, decentralized MAS remove the central orchestrator that assigns sub-tasks, and the agents, which we call workers, self-organize through their own choices of sub-tasks and collaborators on a shared board. As workers keep adding participation and collaboration records, however, the information explodes: workers spend more and more effort on reading the records of other workers, and self-organization loses efficiency. In the statistical view, we represent the execution history of an MAS by two continually updated networks, a collaboration network among workers and a participation network between workers and task types. We then propose AgentCue, a method built on a new latent space model that places workers and task types in a shared latent space. At each checkpoint, that is, after a fixed number of sessions of the workers, the estimated parameters of the latent space model form a compact and interpretable statistical summary, and workers use the statistical summary to choose sub-tasks and collaborators without repeated searches of the shared board. We also provide theoretical results on model identifiability and estimation accuracy for continually updated networks. Experiments on three benchmarks for cross-document reasoning, mathematical theorem proving, and software patch generation show that AgentCue improves the efficiency, accuracy, and interpretability of self-organization.",
+      "authors": [
+        "Guojun Zhu",
+        "Xinyou Chen",
+        "Kejian Zhang",
+        "Sanguo Zhang",
+        "Zhi Zhang",
+        "Doudou Zhou"
+      ],
+      "categories": [
+        "cs.MA",
+        "cs.GR"
+      ],
+      "primary_category": "cs.MA",
+      "published": "2026-11-05T00:00:00Z",
+      "published_date_precision": "day",
+      "updated": "2026-11-09T00:00:00Z",
+      "link": "https://arxiv.org/abs/2610.16621",
+      "topics": [],
+      "doi": "",
+      "metadata_source": "arXiv OAI-PMH"
+    },
+    {
+      "id": "2402.17595",
+      "version": 1,
+      "title": "Implicit Bias via Spectral Neural Networks and Non-linear Matrix Sensing",
+      "abstract": "The phenomenon of implicit bias has attracted interest in recent years as a fundamental aspect of the remarkable generalizing ability of neural networks. In a nutshell, it entails that gradient descent dynamics in many neural nets, even without any explicit regularizer in the loss function, converges to the solution of a regularized learning problem. In this work, we show that this phenomenon extends to non-linear spectral parameterizations in matrix sensing. More precisely, we propose a matrix network architecture called Spectral Neural Networks (abbrv. SNN) where each neuron applies nonlinear activation to the singular values of the input matrix. Conceptually, this entails coordinatizing the space of matrices by their singular values and singular vectors, as opposed to by their entries, a potentially fruitful perspective for matrix learning. We prove the exponentially fast decay of squared loss during the training dynamics of an SNN parameterized matrix sensing model under gradient flow (which is a continuous approximation of the discrete gradient descent), and also that the training implicitly selects an approximate solution that minimizes nuclear norm. We also demonstrate the effectiveness of the SNN architecture in the context of matrix sensing by empirical investigations. We believe that the SNN architecture has the potential to be of wide applicability in a broad class of matrix learning scenarios.",
+      "authors": [
+        "Hong T. M. Chu",
+        "Xiaoyu Dong",
+        "Subhro Ghosh",
+        "Chi Thanh Lam",
+        "Soumendu Sundar Mukherjee"
+      ],
+      "categories": [
+        "cs.LG",
+        "cs.AI",
+        "cs.NE",
+        "stat.ML"
+      ],
+      "primary_category": "cs.LG",
+      "published": "2026-11-05T00:00:00Z",
+      "published_date_precision": "day",
+      "updated": "2026-11-09T00:00:00Z",
+      "link": "https://arxiv.org/abs/2402.17595",
+      "topics": [],
       "doi": "",
       "metadata_source": "arXiv OAI-PMH"
     },
@@ -79777,26 +79840,6 @@
       "metadata_source": "arXiv OAI-PMH"
     },
     {
-      "id": "2611.07571",
-      "version": 1,
-      "title": "Bernstein-Sato polynomials of generic Pfaffian ideals",
-      "abstract": "We determine all roots and their multiplicities in the Bernstein--Sato polynomial of every generic Pfaffian ideal. In the nonmaximal case, the roots lie in explicit rational windows indexed by the rank strata. Integral roots retain their label multiplicities, whereas every nonintegral root is simple, including values with several labels. The proof combines graph-module relations, skew Capelli operators, central characters, and a weighted Mellin integral. We deduce the strong motivic monodromy conjecture for Pfaffian ideals, with pole orders bounded by Bernstein--Sato root multiplicities. For Pfaffians of size $2r$, the largest possible root multiplicity as the matrix size varies is $\\lfloor(\\sqrt{8r+1}-1)/2\\rfloor$. In the nonmaximal case we also prove that the nonunipotent part of the Verdier specialization has zero nilpotent monodromy. Keywords. Bernstein-Sato polynomial, Pfaffian ideal, root multiplicities, strong monodromy conjecture.",
-      "authors": [
-        "Yifan Chen Huaiqing Zuo"
-      ],
-      "categories": [
-        "math.AG"
-      ],
-      "primary_category": "math.AG",
-      "published": "2026-11-05T00:00:00Z",
-      "published_date_precision": "day",
-      "updated": "2026-11-06T00:00:00Z",
-      "link": "https://arxiv.org/abs/2611.07571",
-      "topics": [],
-      "doi": "",
-      "metadata_source": "arXiv OAI-PMH"
-    },
-    {
       "id": "2611.07570",
       "version": 1,
       "title": "ACSeL: Adaptive Configuration Search for Hardware-Constrained LLM Inference",
@@ -86929,48 +86972,6 @@
       "published_date_precision": "day",
       "updated": "2026-11-06T00:00:00Z",
       "link": "https://arxiv.org/abs/2611.07274",
-      "topics": [],
-      "doi": "",
-      "metadata_source": "arXiv OAI-PMH"
-    },
-    {
-      "id": "2611.07273",
-      "version": 1,
-      "title": "Clouded Representatives and Score Matching for Distributed Quantile Regression",
-      "abstract": "Quantile regression is widely used in high-stakes applications where the data are distributed across many sites and the individual records cannot be shared. The existing distributed methods for quantile regression typically require homogeneous sites, large sites, or synchronous communication, which are rarely all satisfied in practice. In this paper, we propose a new method named cloudqr. Each site summarizes its observations by a few Gaussian clouds, each given by the size, center, and covariance of a group of observations, such that the clouds match the score of the raw data exactly. A central server then fits the quantile regression on the clouds from all sites. We establish the convergence of cloudqr under mild conditions. With simulation studies and two real-world applications, we demonstrate the superior performance of cloudqr over the existing distributed methods.",
-      "authors": [
-        "Keren Li",
-        "Boxiang Wang"
-      ],
-      "categories": [
-        "stat.ME"
-      ],
-      "primary_category": "stat.ME",
-      "published": "2026-11-05T00:00:00Z",
-      "published_date_precision": "day",
-      "updated": "2026-11-06T00:00:00Z",
-      "link": "https://arxiv.org/abs/2611.07273",
-      "topics": [],
-      "doi": "",
-      "metadata_source": "arXiv OAI-PMH"
-    },
-    {
-      "id": "2611.07272",
-      "version": 1,
-      "title": "VREgo: Consumer VR Headsets for Learning Robot Manipulation from Egocentric Demonstrations",
-      "abstract": "VREgo trains manipulation policies from demonstrations recorded on consumer VR headsets; we instantiate it with EgoKit on one such headset, the PICO 4 Ultra. On-device head and hand tracking and stereo object localisation allow the operator to begin a demonstration at the table. We adapt HumanEgo's preprocessing to estimate grasp thresholds per recording, update object positions after release, and propagate segmentation masks between keyframes. We evaluate policies in simulation on two tabletop tasks recorded by one operator. For cube placement, we compare PICO and Project Aria recordings of the same 41 layouts. With 40 training demonstrations, the PICO policies placed the cube on the tray in 67, 74, and 60 of 100 evaluation layouts across three training seeds. The corresponding Aria results were 73, 78, and 0. For a two-stage stacking task recorded with the PICO alone, the baseline placed the block on the tray in 94 of 100 layouts and met the end-of-episode criterion for both placements in two. In one diagnostic episode, repeated replanning deferred release beyond the eight executed steps. Demonstration replays also showed that the open gripper could displace the cube before grasping it. After adapting the training trajectories and adding task-specific execution rules that use simulator object positions, the system met both placement criteria in 93.8% of episodes across four evaluation noise seeds. The same 100 layouts informed rule development and evaluation. VREgo is available at https://vrego.chuange.org/.",
-      "authors": [
-        "Liuchuan Yu"
-      ],
-      "categories": [
-        "cs.RO",
-        "cs.HC"
-      ],
-      "primary_category": "cs.RO",
-      "published": "2026-11-05T00:00:00Z",
-      "published_date_precision": "day",
-      "updated": "2026-11-06T00:00:00Z",
-      "link": "https://arxiv.org/abs/2611.07272",
       "topics": [],
       "doi": "",
       "metadata_source": "arXiv OAI-PMH"
