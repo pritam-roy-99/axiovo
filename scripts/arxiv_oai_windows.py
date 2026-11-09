@@ -50,8 +50,8 @@ def harvest_window(root, start, end, max_pages=5, fetch=fetch_window_page, delay
         except RuntimeError as exc:
             if "badResumptionToken" not in str(exc):
                 raise
-            # Replay only this bounded window. Keep the old page files until
-            # each replacement has been successfully fetched and written.
+            # Replay only this bounded window. Stale shards are cleared on
+            # the next invocation before any replacement is written.
             state = {"next_token": "", "pages": 0, "complete": False,
                      "replays": state.get("replays", 0) + 1,
                      "replay_pending": True}
