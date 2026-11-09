@@ -10,12 +10,24 @@ window.MathJax={
 function load(){
  if(loader)return loader;
  loader=new Promise((resolve,reject)=>{
-  const script=document.createElement("script");
-  script.src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js";
-  script.async=true;
-  script.onload=()=>window.MathJax?.startup?.promise?.then(resolve,reject) || resolve();
-  script.onerror=()=>reject(Error("MathJax CDN unavailable"));
-  document.head.append(script);
+  const urls=[
+   "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js",
+   "https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-chtml.min.js"
+  ];
+  function trySource(index){
+   if(index>=urls.length){reject(Error("Both MathJax sources unavailable"));return}
+   const script=document.createElement("script");
+   script.src=urls[index];script.async=true;
+   script.onload=()=>{
+    if(typeof window.MathJax?.typesetPromise!=="function"){
+     trySource(index+1);return;
+    }
+    Promise.resolve(window.MathJax.startup?.promise).then(resolve,reject);
+   };
+   script.onerror=()=>trySource(index+1);
+   document.head.append(script);
+  }
+  trySource(0);
  });
  return loader;
 }
