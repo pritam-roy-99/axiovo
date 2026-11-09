@@ -105,11 +105,14 @@
 <label class="rd-label" for="crypto-query">Keywords, title, author, or IACR identifier</label>
 <div class="rd-searchbar crypto-searchbar"><input id="crypto-query" type="search" maxlength="240" placeholder="Search within the selected path"><button type="submit" class="rd-button rd-primary">Search papers</button></div>
 <div class="ex-date-presets" role="group" aria-label="Date shortcuts">
-<button type="button" id="crypto-latest" class="rd-button rd-secondary">Latest 7 days in this topic</button>
+<button type="button" id="crypto-topic-latest" class="rd-button rd-primary">Latest papers in this topic</button>
+<button type="button" id="crypto-latest" class="rd-button rd-secondary">Latest indexed papers</button>
+<button type="button" id="crypto-latest-verified" class="rd-button rd-secondary">Latest verified source day</button>
 <button type="button" id="crypto-week" class="rd-button rd-secondary">Past 7 days</button>
 <button type="button" id="crypto-date-open" class="rd-button rd-secondary">Choose dates</button>
-<button type="button" id="crypto-history" class="rd-button rd-secondary" title="Search the currently indexed IACR history; full coverage is not guaranteed">Search indexed history</button>
+<button type="button" id="crypto-history" class="rd-button rd-secondary" title="Search the currently indexed IACR history; full coverage is not guaranteed">Search historical years</button>
 </div>
+<p class="rd-small">Latest topic papers use the past 7 source-date days. Verified source day uses dated records in the available index; IACR coverage may be partial.</p>
 <details class="rd-advanced" id="crypto-advanced">
 <summary>Author, dates and other filters</summary>
 <div class="rd-filter-grid">
