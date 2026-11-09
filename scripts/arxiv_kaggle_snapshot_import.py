@@ -59,7 +59,10 @@ def ingest(snapshot, database, max_lines=1000):
                 lines += 1
                 try:
                     paper = json.loads(raw)
-                    arxiv_id = str(paper["id"]).strip()
+                    raw_id = paper["id"]
+                    if not isinstance(raw_id, str):
+                        raise ValueError("arXiv ID must be a string")
+                    arxiv_id = raw_id.strip()
                     if not arxiv_id or not isinstance(paper.get("title"), str):
                         raise ValueError("invalid arXiv record")
                     batch.append((arxiv_id, paper["title"], str(paper.get("abstract") or ""),
@@ -85,7 +88,8 @@ def ingest(snapshot, database, max_lines=1000):
                 imported=excluded.imported,rejected=excluded.rejected""",
                 (key, new_offset, lines, imported, rejected))
         return {"lines": lines, "imported": imported, "rejected": rejected,
-                "offset": new_offset, "complete": complete, "batch": len(batch)}
+                "offset": new_offset, "complete": complete, "verified_complete": complete and rejected == 0,
+                "batch": len(batch)}
     finally:
         db.close()
 
