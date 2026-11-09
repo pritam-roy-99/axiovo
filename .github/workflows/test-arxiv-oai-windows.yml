@@ -7,6 +7,7 @@ on:
       - 'tests/test_arxiv_oai_completed_import.py'
       - 'scripts/arxiv_oai_history.py'
       - 'tests/test_arxiv_oai_windows.py'
+      - 'tests/test_arxiv_oai_network_retry.py'
       - '.github/workflows/test-arxiv-oai-windows.yml'
   workflow_dispatch:
 permissions:
@@ -24,4 +25,5 @@ jobs:
         run: |
           python -m unittest discover -s tests -p 'test_arxiv_oai_windows.py' -v
           python -m unittest discover -s tests -p 'test_arxiv_oai_completed_import.py' -v
+          python -m unittest discover -s tests -p 'test_arxiv_oai_network_retry.py' -v
           python -m py_compile scripts/arxiv_oai_windows.py scripts/arxiv_oai_completed_import.py
