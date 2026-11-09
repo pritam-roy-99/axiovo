@@ -1,0 +1,23 @@
+name: Test arXiv historical OAI worker
+on:
+  pull_request:
+    paths:
+      - 'scripts/arxiv_oai_history.py'
+      - 'tests/test_arxiv_oai_history.py'
+      - '.github/workflows/test-arxiv-oai-history.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Test checkpoint resume and OAI error handling
+        run: python -m unittest discover -s tests -p 'test_arxiv_oai_history.py' -v
+      - name: Compile worker
+        run: python -m py_compile scripts/arxiv_oai_history.py
