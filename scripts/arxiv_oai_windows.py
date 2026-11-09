@@ -11,6 +11,8 @@ import os
 from pathlib import Path
 import time
 import urllib.parse
+import urllib.error
+import socket
 import urllib.request
 
 from scripts.arxiv_oai_history import BASE, parse
@@ -23,8 +25,22 @@ def fetch_window_page(start, end, token, opener=urllib.request.urlopen):
     request = urllib.request.Request(
         BASE + "?" + urllib.parse.urlencode(params),
         headers={"User-Agent": "Axiovo/0.8 (https://github.com/pritam-roy-99/axiovo; metadata harvesting)"})
-    with opener(request, timeout=90) as response:
-        return response.read()
+    # Retry only transient network/server failures, never malformed OAI records.
+    # A bounded timeout prevents a stalled upstream from blocking Actions forever.
+    for attempt in range(3):
+        try:
+            with opener(request, timeout=40) as response:
+                return response.read()
+        except (TimeoutError, socket.timeout, ConnectionError, urllib.error.URLError,
+                urllib.error.HTTPError) as exc:
+            if isinstance(exc, urllib.error.HTTPError) and exc.code not in (429, 500, 502, 503, 504):
+                raise
+            if attempt == 2:
+                raise RuntimeError(
+                    "arXiv OAI-PMH unavailable after 3 attempts; "
+                    "checkpoint remains unchanged"
+                ) from exc
+            time.sleep(5 * (attempt + 1))
 
 
 def harvest_window(root, start, end, max_pages=5, fetch=fetch_window_page, delay=4):
