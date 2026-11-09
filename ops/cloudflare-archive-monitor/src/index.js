@@ -20,7 +20,7 @@ export async function checkAndDispatch(env, now = Date.now()) {
   const active = runs.some(r => r.status === "queued" || r.status === "in_progress" || r.status === "waiting" || r.status === "pending");
   const recent = runs.some(r => {
     const elapsed = now - Date.parse(r.created_at);
-    return elapsed >= 0 && elapsed < 20 * 60 * 1000;
+    return elapsed >= 0 && elapsed < 40 * 60 * 1000;
   });
   if (active || recent) {
     console.log(JSON.stringify({ outcome: "skip", active, recent, checked_at: new Date(now).toISOString() }));
