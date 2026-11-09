@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "checked_at": "2026-11-09T01:58:47.911213+00:00",
+  "checked_at": "2026-11-09T02:31:55.999390+00:00",
   "warning": "Completeness is proved only for named source windows. No source-wide recall is asserted.",
   "arxiv": {
     "status": "gaps_detected",
     "scope": "UTC submission dates; certified against arXiv Atom totalResults captured during harvesting",
-    "verified_days": 63,
+    "verified_days": 65,
     "verified_latest": "2026-11-05",
     "checked_recent_closed_days": 21,
     "missing_recent_dates": [
@@ -32,7 +32,7 @@
     "status": "prefix_incomplete",
     "cached_unique_records": 3000,
     "prefix_pages_checked": 8,
-    "last_success": "2026-11-09T01:57:17.382548+00:00",
+    "last_success": "2026-11-09T02:29:44.859989+00:00",
     "scope": "Crossref ChemRxiv DOI-prefix results; not official full ChemRxiv totals",
     "not_a_full_archive": true
   }
