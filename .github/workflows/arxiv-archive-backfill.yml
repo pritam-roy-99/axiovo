@@ -10,7 +10,7 @@ on:
       - scripts/audit_literature_coverage.py
       - tests/test_literature_coverage.py
   schedule:
-    # Independent SciRate-style ingestion: revisit closed UTC dates and
+    # Independent arXiv ingestion: revisit closed UTC dates and
     # gradually backfill older gaps without competing with hourly OAI pulls.
     - cron: '23 4,12,20 * * *'
   workflow_dispatch:
