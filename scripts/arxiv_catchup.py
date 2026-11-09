@@ -185,7 +185,7 @@ def main():
         try:
             old = json.loads(TARGET.read_text(encoding="utf-8"))
             prev = str(old.get("announcement_date") or "")
-            if prev > payload["announcement_date"] or (prev == payload["announcement_date"] and old.get("complete")):
+            if prev > payload["announcement_date"] or (prev == payload["announcement_date"] and (old.get("complete") or len(old.get("papers") or []) >= len(payload["papers"]))):
                 print("Retaining newer or complete official RSS batch", prev)
                 return
         except (ValueError, OSError):
