@@ -148,6 +148,18 @@ def main():
         "count": len(papers), "papers": papers,
         "note": "arXiv RSS is published at midnight US Eastern, later than the initial announcement. Crosslists and replacements are included."
     }
+    # An early catch-up batch can already describe tomorrow's official
+    # announcement while RSS still describes the preceding release.
+    # Never overwrite a newer batch or a complete same-day RSS snapshot.
+    if TARGET.is_file():
+        try:
+            existing = json.loads(TARGET.read_text(encoding="utf-8"))
+            prior_day = str(existing.get("announcement_date") or "")
+            if prior_day > latest or (prior_day == latest and existing.get("complete") and not complete):
+                print("RSS has not caught up; preserving existing", prior_day)
+                return
+        except (OSError, ValueError):
+            pass
     TARGET.parent.mkdir(parents=True, exist_ok=True)
     with tempfile.NamedTemporaryFile("w", dir=TARGET.parent, encoding="utf-8", delete=False) as f:
         json.dump(payload, f, ensure_ascii=False, separators=(",", ":"))
