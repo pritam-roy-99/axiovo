@@ -269,6 +269,8 @@ async function latestArxivAnnouncement(signal){
   .map(p=>normalize("arxiv",p)).filter(Boolean);
  return {date:payload.announcement_date,checkedAt:clean(payload.checked_at),
   total:payload.count,complete:payload.complete===true&&papers.length===payload.count,
+  earlyRelease:payload.early_release===true,
+  coveredArchives:Object.keys(payload.catchup_listed_counts||{}),
   papers,source:clean(payload.source)};
 }
 async function datedArxiv(criteria,signal){
