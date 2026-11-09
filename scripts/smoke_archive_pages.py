@@ -38,7 +38,7 @@ PICKER_CASES={
 
 # Synthetic announcement fixture, served only by this local test server.
 # A narrow subtopic can legitimately have zero papers on a real release day.
-ANNOUNCEMENT_FIXTURE={"source":"https://rss.arxiv.org/rss/",
+ANNOUNCEMENT_FIXTURE={"date_type":"announcement","source":"https://rss.arxiv.org/rss/",
  "announcement_date":"2026-11-09","complete":True,"count":2,"papers":[
  {"id":"2611.00001","title":"Lieb-Robinson bounds for quantum many-body theory",
   "abstract":"Lieb-Robinson bounds on information propagation in quantum many-body systems.",
