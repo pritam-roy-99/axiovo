@@ -38,7 +38,8 @@ RECORDS_PER_PAGE = 1000
 RETRY_DELAYS = (12, 30, 60)  # Respect arXiv rate limits rather than immediately hammering a shared IP
 REQUEST_DELAY = 3.2
 MAX_PAGES_PER_DAY = 20
-BACKFILL_DAYS = 3650  # Gradual historical coverage; older dates remain explicitly unindexed
+ARXIV_EARLIEST_DATE = dt.date(1991, 1, 1)  # Historical search boundary, not a completeness claim
+BACKFILL_DAYS = (dt.datetime.now(dt.timezone.utc).date() - ARXIV_EARLIEST_DATE).days
 
 
 def validate_date(value: str) -> dt.date:
