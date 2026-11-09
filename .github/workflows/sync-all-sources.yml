@@ -8,9 +8,9 @@ on:
       - 'scripts/validate_sync_snapshots.py'
   workflow_dispatch:
   schedule:
-    # Every 15 minutes; publication occurs only when validated source files change.
+    # Every 30 minutes; publication occurs only when validated source files change.
     # GitHub Actions scheduled start times are approximate, not guaranteed.
-    - cron: '7,22,37,52 * * * *'
+    - cron: '7,37 * * * *'
 permissions:
   contents: write
   actions: write
@@ -34,7 +34,7 @@ jobs:
           echo "## Archive scheduler" >> "$GITHUB_STEP_SUMMARY"
           echo "- Trigger: ${{ github.event_name }}" >> "$GITHUB_STEP_SUMMARY"
           echo "- Started (UTC): $(date -u +'%Y-%m-%d %H:%M:%S')" >> "$GITHUB_STEP_SUMMARY"
-          echo "- Expected schedule: minute 07, 22, 37, 52 of each UTC hour (15-minute cadence)" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Expected schedule: minute 07 and 37 of each UTC hour (30-minute cadence)" >> "$GITHUB_STEP_SUMMARY"
           echo "- A successful run does not guarantee newer source records." >> "$GITHUB_STEP_SUMMARY"
       - name: Verify announcement ingestion
         run: python -m unittest discover -s tests -p 'test_arxiv*.py' -v
