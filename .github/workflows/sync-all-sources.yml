@@ -8,9 +8,9 @@ on:
       - 'scripts/validate_sync_snapshots.py'
   workflow_dispatch:
   schedule:
-    # Hourly source polling, with extra polls after US Eastern arXiv releases.
-    - cron: '18 * * * *'
-    - cron: '8,38 0,1,2,3,4,5 * * 1-5'
+    # Every 15 minutes; publication occurs only when validated source files change.
+    # GitHub Actions scheduled start times are approximate, not guaranteed.
+    - cron: '7,22,37,52 * * * *'
 permissions:
   contents: write
   actions: write
