@@ -140,7 +140,7 @@ def fetch_category(archive, date):
         uri = root + suffix
         try:
             request = urllib.request.Request(uri, headers=headers)
-            with urllib.request.urlopen(request, timeout=35) as response:
+            with urllib.request.urlopen(request, timeout=12) as response:
                 page = response.read()
             return parse_listing(page, archive, date)
         except (OSError, ValueError, urllib.error.HTTPError) as exc:
