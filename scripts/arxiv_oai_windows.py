@@ -37,6 +37,13 @@ def harvest_window(root, start, end, max_pages=5, fetch=fetch_window_page, delay
         "next_token": "", "pages": 0, "complete": False, "replays": 0}
     if state["complete"]:
         return state
+    # A restarted window must not retain stale shards from an earlier attempt.
+    # Remove them before the first replay request so a partial replay cannot
+    # accidentally be interpreted as a complete dataset.
+    if state.get("replay_pending"):
+        for stale in directory.glob("page-*.jsonl"):
+            stale.unlink()
+        state["replay_pending"] = False
     for _ in range(max_pages):
         try:
             records, token = parse(fetch(start, end, state["next_token"]))
@@ -46,7 +53,8 @@ def harvest_window(root, start, end, max_pages=5, fetch=fetch_window_page, delay
             # Replay only this bounded window. Keep the old page files until
             # each replacement has been successfully fetched and written.
             state = {"next_token": "", "pages": 0, "complete": False,
-                     "replays": state.get("replays", 0) + 1}
+                     "replays": state.get("replays", 0) + 1,
+                     "replay_pending": True}
             if state["replays"] > 3:
                 raise RuntimeError("Window exceeded token-recovery limit") from exc
             checkpoint.write_text(json.dumps(state) + "\n")
