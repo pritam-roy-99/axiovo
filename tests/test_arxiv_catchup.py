@@ -37,6 +37,20 @@ class EarlyArxivCatchupTests(unittest.TestCase):
         self.assertEqual(rows[1]["announce_type"], "cross")
         self.assertEqual(rows[1]["categories"], ["quant-ph"])
 
+    def test_official_hyphenated_subject_codes(self):
+        categorized = HTML.replace(
+            '<p class="mathjax">An experimental witness of quantum steering.</p>',
+            '<div class="list-subjects">Subjects: '
+            '<span class="primary-subject">Quantum Physics (quant-ph)</span>; '
+            'Atomic and Molecular Clusters (physics.atm-clus); '
+            'Electronic Structure (cond-mat.mes-hall)</div>'
+            '<p class="mathjax">An experimental witness of quantum steering.</p>'
+        )
+        rows, _ = parse_listing(categorized, "quant-ph", "2026-11-09")
+        self.assertEqual(rows[0]["primary_category"], "quant-ph")
+        self.assertIn("physics.atm-clus", rows[0]["categories"])
+        self.assertIn("cond-mat.mes-hall", rows[0]["categories"])
+
     def test_never_invent_empty_source_papers(self):
         with self.assertRaises(ValueError):
             parse_listing("<html><body><p>No papers</p></body></html>", "quant-ph", "2026-11-09")
