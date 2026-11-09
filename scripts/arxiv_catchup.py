@@ -32,6 +32,8 @@ BLOCK = re.compile(r"(?is)<(?:div|p)\b[^>]*class\s*=\s*['\"][^'\"]*\b%s\b[^'\"]*
 TAGS = re.compile(r"(?s)<[^>]*>")
 SPACE = re.compile(r"\s+")
 ANNOUNCE_TYPES = {"new", "cross", "replace", "replace-cross"}
+CATEGORY = re.compile(r"\b(?:astro-ph|cond-mat|cs|econ|eess|math|nlin|q-bio|q-fin|stat)\.[A-Za-z]{2,7}\b|\bphysics\.[a-z-]+\b|\b(?:quant-ph|gr-qc|hep-ex|hep-lat|hep-ph|hep-th|math-ph|nucl-ex|nucl-th)\b")
+PRIMARY = re.compile(r"(?is)<span\b[^>]*class\s*=\s*['\"][^'\"]*primary-subject[^'\"]*['\"][^>]*>(.*?)</span>")
 
 
 def text(value):
@@ -103,10 +105,15 @@ def parse_listing(raw, archive, date):
         author_text = re.sub(r"(?i)^authors?:\s*", "", block(ddpart, "list-authors"))
         authors = [name.strip() for name in author_text.split(",") if name.strip()]
         abstract = block(ddpart, "mathjax") or block(ddpart, "list-abstract")
+        subject_html = block(ddpart, "list-subjects")
+        categories = sorted(set([archive] + CATEGORY.findall(subject_html)))
+        primary_match = PRIMARY.search(ddpart)
+        primary_candidates = CATEGORY.findall(text(primary_match.group(1))) if primary_match else []
+        primary = primary_candidates[0] if primary_candidates else archive
         result = {
             "id": base, "version": int(version.group(1)) if version else 1,
             "title": title, "authors": authors, "abstract": abstract[:9000],
-            "categories": [archive], "primary_category": archive,
+            "categories": categories, "primary_category": primary,
             "link": "https://arxiv.org/abs/" + revision,
             "announcement_date": date, "announce_type": section,
             "metadata_source": "official arXiv catch-up listing"
