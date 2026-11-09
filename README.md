@@ -66,7 +66,7 @@ recommends OAI-PMH for bulk synchronization. Its Atom search API supports
 `submittedDate` and pagination, but GitHub-hosted requests can receive
 HTTP 429. Neither Axiovo nor SciRate guarantees instant availability after
 arXiv's announcement. Date batches refer to **first submission (UTC)**, not
-the SciRate-style announcement date.
+the arXiv announcement date.
 
 # Axiovo
 
@@ -324,7 +324,7 @@ Scientific explanations, model comparisons, and citations are generated from **l
 
 [Model and browser setup instructions](COPILOT_SETUP.md)
 
-## New SciRate-style discovery and community workflow
+## Paper discovery and community workflow
 
 - **Date browsing:** The research feed filters by a date range of first arXiv submission, for records present in its local snapshot. Global OpenAlex search also supports inclusive publication-date ranges.
 - **Historical arXiv:** The homepage builds a direct arXiv advanced-search link using the selected dates and keywords; it also links to [OpenAlex global search](https://pritam-roy-99.github.io/axiovo/search.html), which supports date-only queries. Axiovo does not locally mirror every paper in arXiv; historical links go to their authoritative records.
