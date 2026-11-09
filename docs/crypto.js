@@ -147,10 +147,23 @@
  for(const key of ["sort","from","to"])
   $("crypto-"+key).addEventListener("change",search);
  $("crypto-result-sort").addEventListener("change",()=>{$("crypto-sort").value=$("crypto-result-sort").value;search()});
+ $("crypto-topic-latest").onclick=()=>{
+  viewMode="recent";$("crypto-from").value="";$("crypto-to").value="";$("crypto-sort").value="recent";search();
+ };
  $("crypto-latest").onclick=()=>{
-  viewMode="recent";
+  viewMode="indexed";
   $("crypto-from").value="";$("crypto-to").value="";
   $("crypto-sort").value="recent";search();
+ };
+ $("crypto-latest-verified").onclick=async()=>{
+  const button=$("crypto-latest-verified");button.disabled=true;
+  try{
+   const snapshot=await window.AxiovoArchiveData.snapshot("eprint");
+   const latest=(snapshot.papers||[]).map(p=>p.date).filter(d=>/^\d{4}-\d{2}-\d{2}$/.test(d)).sort().at(-1);
+   if(!latest)throw Error("No verified source day");
+   viewMode="indexed";$("crypto-from").value=latest;$("crypto-to").value=latest;$("crypto-sort").value="recent";search();
+  }catch{$("crypto-results-status").textContent="No verified source day is available in the indexed IACR records."}
+  finally{button.disabled=false}
  };
  $("crypto-week").onclick=()=>{viewMode="recent";const d=new Date();$("crypto-to").value=d.toISOString().slice(0,10);d.setUTCDate(d.getUTCDate()-7);$("crypto-from").value=d.toISOString().slice(0,10);search()};
  $("crypto-date-open").onclick=()=>{$("crypto-advanced").open=true;$("crypto-from").focus()};
