@@ -3,6 +3,8 @@ on:
   pull_request:
     paths:
       - 'scripts/arxiv_oai_windows.py'
+      - 'scripts/arxiv_oai_completed_import.py'
+      - 'tests/test_arxiv_oai_completed_import.py'
       - 'scripts/arxiv_oai_history.py'
       - 'tests/test_arxiv_oai_windows.py'
       - '.github/workflows/test-arxiv-oai-windows.yml'
@@ -21,4 +23,5 @@ jobs:
       - name: Verify window recovery and syntax
         run: |
           python -m unittest discover -s tests -p 'test_arxiv_oai_windows.py' -v
-          python -m py_compile scripts/arxiv_oai_windows.py
+          python -m unittest discover -s tests -p 'test_arxiv_oai_completed_import.py' -v
+          python -m py_compile scripts/arxiv_oai_windows.py scripts/arxiv_oai_completed_import.py
