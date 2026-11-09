@@ -36,6 +36,15 @@ class SnapshotIntegrityTests(unittest.TestCase):
         current={"announcement_date":"2026-11-06","count":3,"complete":True,"papers":papers(3)}
         self.assertTrue(acceptable("announcements.json",prior,current)[0])
 
+    def test_final_rss_can_reconcile_early_catchup_count(self):
+        prior={"announcement_date":"2026-11-09","count":3,"complete":False,
+               "early_release":True,"papers":papers(3)}
+        current={"announcement_date":"2026-11-09","count":2,"complete":True,
+                 "source":"https://rss.arxiv.org/rss/","papers":papers(2)}
+        self.assertTrue(acceptable("announcements.json",prior,current)[0])
+        current["complete"]=False
+        self.assertFalse(acceptable("announcements.json",prior,current)[0])
+
     def test_ignores_timestamp_only_changes(self):
         previous={"papers":papers(2),"generated_at":"2026-11-07T00:00:00Z"}
         updated={"papers":papers(2),"generated_at":"2026-11-08T00:00:00Z"}
