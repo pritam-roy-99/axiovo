@@ -31,6 +31,7 @@ jobs:
       - name: Test metadata harvesters
         run: |
           python -m unittest discover -s tests -p 'test_source_harvest.py' -v
+          python -m unittest discover -s tests -p 'test_arxiv_catchup.py' -v
           python -m unittest discover -s tests -p 'test_eprint_harvest.py' -v
           python -m unittest discover -s tests -p 'test_sync_snapshots.py' -v
       - name: Synchronize arXiv all-category OAI metadata
