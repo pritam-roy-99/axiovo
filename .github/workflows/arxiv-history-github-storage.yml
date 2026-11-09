@@ -4,6 +4,8 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/arxiv-history-github-storage.yml'
+      - 'scripts/arxiv_oai_windows.py'
+      - 'scripts/arxiv_oai_history.py'
   workflow_dispatch:
     inputs:
       month:
@@ -75,7 +77,9 @@ jobs:
           from scripts.arxiv_oai_windows import harvest_window
           year, month = map(int, os.environ["MONTH"].split("-"))
           start = datetime.date(year, month, 1)
-          end = datetime.date(year, month, calendar.monthrange(year, month)[1])
+          end = (start if os.environ.get("GITHUB_EVENT_NAME") == "push" else
+                 datetime.date(year, month, calendar.monthrange(year, month)[1]))
+          print(f"Harvest OAI datestamp window: {start} to {end}", flush=True)
           try:
               print(harvest_window("history/windows", start, end, int(os.environ["MAX_PAGES"])))
           except Exception as exc:
