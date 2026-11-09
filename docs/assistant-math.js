@@ -14,7 +14,9 @@ function load(){
  return loading;
 }
 function typeset(node){
- if(!node||!/(\\\\\(|\\\\\[|\\$)/.test(node.textContent||""))return;
+ if(!node)return;
+ const value=node.textContent||"";
+ if(!value.includes("\\(")&&!value.includes("\\[")&&!value.includes("$"))return;
  load().then(()=>window.MathJax.typesetPromise([node])).catch(()=>{
   node.title="Mathematical notation is shown as source LaTeX because the math renderer could not load.";
  });
