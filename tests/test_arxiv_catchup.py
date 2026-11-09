@@ -38,6 +38,11 @@ class EarlyArxivCatchupTests(unittest.TestCase):
         self.assertEqual(rows[1]["announce_type"], "cross")
         self.assertEqual(rows[1]["categories"], ["quant-ph"])
 
+    def test_unversioned_listing_does_not_invent_v1(self):
+        rows, _ = parse_listing(HTML.replace("2611.01234v1", "2611.01234"), "quant-ph", "2026-11-09")
+        self.assertIsNone(rows[0]["version"])
+        self.assertEqual(rows[0]["link"], "https://arxiv.org/abs/2611.01234")
+
     def test_official_hyphenated_subject_codes(self):
         categorized = HTML.replace(
             '<p class="mathjax">An experimental witness of quantum steering.</p>',

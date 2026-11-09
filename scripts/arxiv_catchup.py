@@ -114,7 +114,7 @@ def parse_listing(raw, archive, date):
         primary_candidates = CATEGORY.findall(text(primary_match.group(1))) if primary_match else []
         primary = primary_candidates[0] if primary_candidates else archive
         result = {
-            "id": base, "version": int(version.group(1)) if version else 1,
+            "id": base, "version": int(version.group(1)) if version else None,
             "title": title, "authors": authors, "abstract": abstract[:9000],
             "categories": categories, "primary_category": primary,
             "link": "https://arxiv.org/abs/" + revision,
@@ -122,7 +122,7 @@ def parse_listing(raw, archive, date):
             "metadata_source": "official arXiv catch-up listing"
         }
         prior = records.get(base)
-        if not prior or result["version"] >= prior["version"]:
+        if not prior or (result["version"] or 0) >= (prior["version"] or 0):
             records[base] = result
     if listed == 0 or not records or len(records) < listed * 0.75:
         raise ValueError(f"Unusable {archive} catch-up HTML: {len(records)}/{listed} parsed")
@@ -170,7 +170,7 @@ def harvest(now=None, fetch=fetch_category, archives=ARCHIVES):
                 else:
                     previous = merged[id_]
                     previous["categories"] = sorted(set(previous["categories"] + p["categories"]))
-                    if p["version"] > previous["version"]:
+                    if (p["version"] or 0) > (previous["version"] or 0):
                         previous.update({k:v for k,v in p.items() if k!="categories"})
         except (OSError, ValueError, RuntimeError) as exc:
             errors.append(archive + ": " + str(exc)[:140])
@@ -201,7 +201,7 @@ def main():
         try:
             old = json.loads(TARGET.read_text(encoding="utf-8"))
             prev = str(old.get("announcement_date") or "")
-            if prev > payload["announcement_date"] or (prev == payload["announcement_date"] and (old.get("complete") or len(old.get("papers") or []) >= len(payload["papers"]))):
+            if prev > payload["announcement_date"] or (prev == payload["announcement_date"] and (old.get("complete") or len(old.get("papers") or []) > len(payload["papers"]))):
                 print("Retaining newer or complete official RSS batch", prev)
                 return
         except (ValueError, OSError):
