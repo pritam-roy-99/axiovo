@@ -155,7 +155,10 @@ def main():
         try:
             existing = json.loads(TARGET.read_text(encoding="utf-8"))
             prior_day = str(existing.get("announcement_date") or "")
-            if prior_day > latest or (prior_day == latest and existing.get("complete") and not complete):
+            if prior_day > latest or (prior_day == latest and (
+                (existing.get("complete") and not complete)
+                or (not complete and len(existing.get("papers") or []) >= len(papers))
+            )):
                 print("RSS has not caught up; preserving existing", prior_day)
                 return
         except (OSError, ValueError):
