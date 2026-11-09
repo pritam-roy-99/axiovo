@@ -6,12 +6,18 @@ on:
       - 'tests/test_arxiv_oai_history.py'
       - '.github/workflows/test-arxiv-oai-history.yml'
   workflow_dispatch:
+    inputs:
+      smoke_test:
+        description: 'Run one live arXiv OAI page and upload a temporary verification artifact'
+        type: boolean
+        required: false
+        default: false
 permissions:
   contents: read
 jobs:
   unit-tests:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 8
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -21,3 +27,35 @@ jobs:
         run: python -m unittest discover -s tests -p 'test_arxiv_oai_history.py' -v
       - name: Compile worker
         run: python -m py_compile scripts/arxiv_oai_history.py
+  live-smoke:
+    if: github.event_name == 'workflow_dispatch' && inputs.smoke_test == true
+    needs: unit-tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Harvest one real OAI-PMH page
+        run: python -m scripts.arxiv_oai_history --output "$RUNNER_TEMP/arxiv-oai-history" --max-pages 1
+      - name: Validate checkpoint and records
+        env:
+          HARVEST_DIR: ${{ runner.temp }}/arxiv-oai-history
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          directory = Path(os.environ["HARVEST_DIR"])
+          state = json.loads((directory / "checkpoint.json").read_text())
+          pages = list(directory.glob("page-*.jsonl"))
+          assert state["pages"] == 1 and len(pages) == 1
+          records = [json.loads(line) for line in pages[0].read_text().splitlines()]
+          assert records and all("oai_identifier" in r for r in records)
+          print("Validated one page with", len(records), "records; complete=", state["complete"])
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: arxiv-oai-history-smoke
+          path: ${{ runner.temp }}/arxiv-oai-history/
+          retention-days: 7
