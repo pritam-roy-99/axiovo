@@ -35,20 +35,6 @@ jobs:
           python -m unittest discover -s tests -p 'test_arxiv_announcement_order.py' -v
           python -m unittest discover -s tests -p 'test_eprint_harvest.py' -v
           python -m unittest discover -s tests -p 'test_sync_snapshots.py' -v
-      - name: Synchronize arXiv all-category OAI metadata
-        id: arxiv_oai
-        continue-on-error: true
-        env:
-          OAI_LOOKBACK_DAYS: '3'
-          OAI_MAX_PAGES: '20'
-        run: |
-          # arXiv has no routine weekend announcements; preserve the last
-          # published snapshot rather than claiming a fresh empty day.
-          if [ "$(date -u +%u)" -ge 6 ] && [ "$GITHUB_EVENT_NAME" != "workflow_dispatch" ]; then
-            echo "arXiv OAI: weekend announcement pause, existing snapshot retained."
-            exit 0
-          fi
-          timeout --signal=TERM --kill-after=10s 180s python -m scripts.oai_harvest
       - name: Synchronize arXiv announcements
         id: arxiv_announcements
         continue-on-error: true
@@ -69,6 +55,20 @@ jobs:
             timeout --signal=TERM --kill-after=10s 150s python -m scripts.arxiv_announcements || true
             timeout --signal=TERM --kill-after=10s 150s python -m scripts.arxiv_catchup || timeout --signal=TERM --kill-after=10s 150s python -m scripts.arxiv_announcements
           fi
+      - name: Synchronize arXiv all-category OAI metadata
+        id: arxiv_oai
+        continue-on-error: true
+        env:
+          OAI_LOOKBACK_DAYS: '3'
+          OAI_MAX_PAGES: '20'
+        run: |
+          # arXiv has no routine weekend announcements; preserve the last
+          # published snapshot rather than claiming a fresh empty day.
+          if [ "$(date -u +%u)" -ge 6 ] && [ "$GITHUB_EVENT_NAME" != "workflow_dispatch" ]; then
+            echo "arXiv OAI: weekend announcement pause, existing snapshot retained."
+            exit 0
+          fi
+          timeout --signal=TERM --kill-after=10s 180s python -m scripts.oai_harvest
       - name: Rebuild arXiv rolling feed
         id: arxiv_feed
         continue-on-error: true
