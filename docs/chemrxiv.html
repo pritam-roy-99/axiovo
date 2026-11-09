@@ -91,13 +91,15 @@
      <label class="rd-label" for="archive-query">Keywords, title or paper identifier</label>
      <div class="rd-searchbar"><input id="archive-query" type="search" maxlength="220" placeholder="Search within the selected path"><button class="rd-button rd-primary" type="submit">Search papers</button></div>
      <div class="ex-date-presets" role="group" aria-label="Date shortcuts">
-      <button class="rd-button rd-secondary" id="archive-latest" type="button">Latest 7 days in this topic</button>
-      <span class="rd-small">Uses source posting dates; no older papers are substituted if the last 7 days contain no matches.</span>
+      <button class="rd-button rd-primary" id="archive-announced" type="button" aria-describedby="archive-announced-help">Latest papers in this topic</button>
+      <button class="rd-button rd-secondary" id="archive-latest" type="button">Latest indexed papers</button>
+      <button class="rd-button rd-secondary" id="archive-latest-verified" type="button">Latest verified source day</button>
 
       <button class="rd-button rd-secondary" id="archive-week" type="button">Past 7 days</button>
       <button class="rd-button rd-secondary" id="archive-date-open" type="button">Choose dates</button>
       <button class="rd-button rd-secondary" id="archive-history" type="button" title="Search historical years using verified source metadata; results may be incomplete">Search historical years</button>
      </div>
+     <p id="archive-announced-help" class="rd-small">Uses source posting dates for the selected research path. Latest papers are limited to the past 7 days; older papers are not substituted when there are no matches.</p>
      <details class="rd-advanced" id="archive-advanced"><summary>Author, dates and other filters</summary>
       <div class="rd-filter-grid">
        <label>Author<input id="archive-author" type="search" maxlength="100" placeholder="Given name and surname" list="archive-author-options"></label>
