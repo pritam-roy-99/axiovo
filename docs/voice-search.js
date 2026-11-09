@@ -2,7 +2,7 @@
 (() => {
   'use strict';
   const Speech = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!Speech) return;
+  // Keep microphone discoverable even when browser recognition is unavailable.
   let active = null;
   const style = document.createElement('style');
   style.textContent = '.axiovo-voice-wrap{position:relative!important;display:inline-flex;align-items:center;min-width:0;max-width:100%}.axiovo-voice-wrap>input,.axiovo-voice-wrap>textarea{padding-right:2.8rem!important;min-width:0}.axiovo-voice-button{position:absolute;right:.35rem;top:50%;transform:translateY(-50%);border:0;border-radius:50%;background:transparent;color:inherit;cursor:pointer;padding:.38rem;display:grid;place-items:center;z-index:2}.axiovo-voice-button:focus-visible{outline:2px solid #28b9d6;outline-offset:2px}.axiovo-voice-button[aria-pressed="true"]{color:#d43d52;background:rgba(212,61,82,.12)}.axiovo-voice-button svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}';
@@ -21,6 +21,8 @@
     wrap.className = 'axiovo-voice-wrap';
     const computed = getComputedStyle(el);
     wrap.style.width = computed.width === 'auto' ? '100%' : computed.width;
+    wrap.style.flex = computed.flexGrow !== '0' ? '1 1 auto' : '0 1 auto';
+    el.style.width = '100%';
     if (el.tagName === 'TEXTAREA') wrap.style.alignItems = 'stretch';
     parent.insertBefore(wrap,el);
     wrap.append(el);
@@ -31,6 +33,7 @@
     button.setAttribute('aria-pressed','false');
     wrap.append(button);
     button.addEventListener('click',()=>{
+      if (!Speech) { window.alert('Voice search is unavailable in this browser. Open Axiovo in an up-to-date Google Chrome browser and allow microphone access, or continue typing.'); return; }
       if(active){active.recognition.abort();if(active.button===button){active=null;button.setAttribute('aria-pressed','false');return;}active.button.setAttribute('aria-pressed','false');active=null;}
       if(!window.confirm('Voice input uses your browser’s speech recognition service, which may send audio to its provider. Axiovo does not record or store audio. Continue?'))return;
       const recognition = new Speech();
