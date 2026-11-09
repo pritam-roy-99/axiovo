@@ -31,6 +31,7 @@ class EarlyArxivCatchupTests(unittest.TestCase):
         rows, listed = parse_listing(HTML, "quant-ph", "2026-11-09")
         self.assertEqual((len(rows), listed), (2, 2))
         self.assertEqual(rows[0]["title"], "Quantum steering witnesses")
+        self.assertEqual(rows[0]["abstract"], "An experimental witness of quantum steering.")
         self.assertEqual(rows[0]["authors"], ["Alice Example", "Bob Example"])
         self.assertEqual(rows[0]["announcement_date"], "2026-11-09")
         self.assertEqual(rows[0]["announce_type"], "new")

@@ -1,13 +1,8 @@
-name: Harvest arXiv OAI metadata
+name: Diagnose arXiv OAI metadata (read-only)
 on:
   workflow_dispatch:
-  schedule:
-    # Poll shortly after OAI publication in both EDT and EST.
-    - cron: '21 3,4,5 * * 1-5'
-    # Allow occasional weekend metadata corrections.
-    - cron: '21 5 * * 0,6'
 permissions:
-  contents: write
+  contents: read
 concurrency:
   group: axiovo-oai-mirror
   cancel-in-progress: false
@@ -24,14 +19,3 @@ jobs:
         run: python -m unittest discover -s tests -v
       - name: Harvest recent OAI records
         run: python -m scripts.oai_harvest
-      - name: Commit mirror when changed
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docs/data/oai-recent.json
-          if ! git diff --cached --quiet; then
-            git commit -m "data: update bounded OAI mirror [skip ci]"
-            git fetch origin main
-            git rebase -X theirs origin/main
-            git push origin HEAD:main
-          fi

@@ -104,7 +104,10 @@ def parse_listing(raw, archive, date):
             continue
         author_text = re.sub(r"(?i)^authors?:\s*", "", block(ddpart, "list-authors"))
         authors = [name.strip() for name in author_text.split(",") if name.strip()]
-        abstract = block(ddpart, "mathjax") or block(ddpart, "list-abstract")
+        abstract = block(ddpart, "list-abstract")
+        if not abstract:
+            paragraph = re.search(r'(?is)<p\b[^>]*class=["\'][^"\']*mathjax[^"\']*["\'][^>]*>(.*?)</p>', ddpart)
+            abstract = text(paragraph.group(1)) if paragraph else ""
         subject_html = block(ddpart, "list-subjects")
         categories = sorted(set([archive] + CATEGORY.findall(subject_html)))
         primary_match = PRIMARY.search(ddpart)

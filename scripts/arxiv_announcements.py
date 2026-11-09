@@ -20,6 +20,7 @@ import time
 import urllib.request
 import urllib.error
 import xml.etree.ElementTree as ET
+from zoneinfo import ZoneInfo
 
 ROOT = Path(__file__).resolve().parents[1]
 TARGET = ROOT / "docs" / "data" / "announcements.json"
@@ -46,14 +47,21 @@ def parse_feed(raw: bytes, archive: str):
     stamp = email.utils.parsedate_to_datetime(announced)
     if stamp.tzinfo is None:
         raise ValueError("Timezone absent for " + archive)
-    day = stamp.date().isoformat()
+    day = stamp.astimezone(ZoneInfo("America/New_York")).date().isoformat()
     records = []
     for item in channel.findall("item"):
         link = (item.findtext("link") or "").strip()
         match = ID.search(link)
         if not match:
             continue
-        versioned = match.group(0)
+        # RSS abstract links omit revisions; GUID/description carry the exact version.
+        base_id = re.sub(r"v\d+$", "", match.group(0))
+        declared = ID.search(item.findtext("guid") or "")
+        if not declared:
+            declared = ID.search(clean(item.findtext("description") or ""))
+        if declared and re.sub(r"v\d+$", "", declared.group(0)) != base_id:
+            raise ValueError("RSS identifier mismatch")
+        versioned = declared.group(0) if declared else match.group(0)
         base = re.sub(r"v\d+$", "", versioned)
         version = re.search(r"v(\d+)$", versioned)
         description = clean(item.findtext("description") or "")
@@ -79,7 +87,7 @@ def parse_feed(raw: bytes, archive: str):
             "id": base, "version": int(version.group(1)) if version else 1,
             "title": title, "abstract": abstract[:9000], "authors": creators,
             "categories": sorted(set(categories)), "primary_category": archive,
-            "link": "https://arxiv.org/abs/" + base,
+            "link": "https://arxiv.org/abs/" + versioned,
             "announcement_date": day, "announce_type": announce_type,
             "metadata_source": "official arXiv RSS"
         })
@@ -109,9 +117,14 @@ def main():
     by_day = {}
     failed = []
     retrieved = 0
+    feed_days = []
+    capped = []
     for i, archive in enumerate(ARCHIVES):
         try:
             day, papers = get(archive)
+            feed_days.append(day)
+            if len(papers) >= 2000:
+                capped.append(archive)
             if papers:
                 retrieved += 1
                 bucket = by_day.setdefault(day, {})
@@ -135,7 +148,7 @@ def main():
     latest = sorted(by_day)[-1]
     papers = sorted(by_day[latest].values(), key=lambda p: p["id"], reverse=True)
     # Never mark complete when a category fails or source feeds disagree.
-    complete = len(failed) == 0 and retrieved == len(ARCHIVES) and len(by_day) == 1
+    complete = not failed and not capped and len(feed_days) == len(ARCHIVES) and set(feed_days) == {latest}
     payload = {
         "source": "https://rss.arxiv.org/rss/", "date_type": "announcement",
         "announcement_date": latest,
@@ -144,6 +157,7 @@ def main():
         "archive_feeds_attempted": len(ARCHIVES),
         "archive_feeds_with_records": retrieved,
         "failed_archives": failed,
+        "capped_archives": capped,
         "other_announcement_days": sorted(d for d in by_day if d != latest),
         "count": len(papers), "papers": papers,
         "note": "arXiv RSS is published at midnight US Eastern, later than the initial announcement. Crosslists and replacements are included."

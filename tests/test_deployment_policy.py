@@ -8,9 +8,10 @@ WORKFLOW=(Path(__file__).resolve().parents[1]/".github"/"workflows"/"pages.yml")
 class DeploymentPolicyTests(unittest.TestCase):
     def test_refresh_runs_in_dedicated_scheduled_workflow(self):
         sync=(Path(__file__).resolve().parents[1]/".github"/"workflows"/"sync-all-sources.yml").read_text()
-        for label in ("Refresh research metadata", "Refresh free bioRxiv metadata"):
-            # Full site deployment never blocks on an external API.
-            self.assertIn("if: github.event_name == 'schedule'",WORKFLOW)
+        for command in ("scripts.sync", "scripts.oai_harvest", "scripts.arxiv_daily_archive",
+                        "scripts.sync_biorxiv", "scripts/sync_biorxiv.py"):
+            self.assertNotIn(command, WORKFLOW)
+        self.assertNotIn("git rebase", WORKFLOW)
         self.assertNotIn("  schedule:",WORKFLOW)
         self.assertIn("cron: '18 * * * *'",sync)
         self.assertIn("workflow_dispatch:",sync)
@@ -22,7 +23,9 @@ class DeploymentPolicyTests(unittest.TestCase):
         self.assertIn("python scripts/security_audit.py",WORKFLOW)
         self.assertIn("node tests/library-outside-cache.test.js",WORKFLOW)
         self.assertIn("steps.deployment.outputs.page_url",WORKFLOW)
-        self.assertIn("if: steps.refresh.outcome == 'success'",WORKFLOW)
+        oai=(Path(__file__).resolve().parents[1]/".github/workflows/oai.yml").read_text()
+        self.assertNotIn("schedule:",oai)
+        self.assertNotIn("git push",oai)
 
 if __name__=="__main__":
     unittest.main()

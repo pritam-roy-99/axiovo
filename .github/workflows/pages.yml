@@ -1,10 +1,10 @@
-name: Refresh scholarly metadata and deploy Axiovo
+name: Verify and deploy Axiovo
 on:
   push:
     branches: [main]
   workflow_dispatch:
 permissions:
-  contents: write
+  contents: read
   pages: write
   id-token: write
 # Video generation and browser audits are long-running. Source metadata pushes
@@ -110,43 +110,12 @@ jobs:
       - name: Verify three-source metadata harvester regression tests (required)
         id: source_harvest
         run: python -m unittest discover -s tests -p test_source_harvest.py -v
-      - name: Refresh free bioRxiv metadata
-        if: github.event_name == 'schedule'
-        id: biorxiv
-        continue-on-error: true
-        run: python scripts/sync_biorxiv.py
-      - name: Report failed bioRxiv synchronization
-        if: steps.biorxiv.outcome == 'failure'
-        run: |
-          echo '### bioRxiv metadata synchronization failed' >> "$GITHUB_STEP_SUMMARY"
-          echo 'No live bioRxiv results were available. Cached records are preserved, if any.' >> "$GITHUB_STEP_SUMMARY"
-          echo '::warning::bioRxiv synchronization unsuccessful; review diagnostics in logs.'
-      - name: Refresh verified ChemRxiv DOI metadata
-        # Code pushes publish the last verified snapshot; scheduled/manual
-        # refreshes contact the scholarly source independently.
-        if: github.event_name == 'schedule'
-        id: chemrxiv
-        continue-on-error: true
-        run: python scripts/sync_chemrxiv.py
       - name: Validate independent ePrint source and offline recovery (required)
         id: eprint_independent
         run: node tests/eprint-independent.test.js
       - name: Validate IACR ePrint OAI-PMH metadata parser
         id: eprint_parser
         run: python -m unittest discover -s tests -p test_eprint_harvest.py -v
-      - name: Refresh official IACR Cryptology ePrint metadata
-        if: github.event_name == 'schedule'
-        id: eprint
-        continue-on-error: true
-        env:
-          IACR_MAX_PAGES: '8'
-          IACR_LOOKBACK_DAYS: '21'
-        run: python scripts/sync_eprint.py
-      - name: Report unavailable IACR source metadata
-        if: steps.eprint.outcome == 'failure'
-        run: |
-          echo '::warning::Official IACR OAI metadata was unavailable. Existing verified ePrint records, if any, are retained.'
-          echo '### IACR ePrint metadata unavailable or incomplete' >> "$GITHUB_STEP_SUMMARY"
       - name: Summarize bioRxiv and ChemRxiv source coverage
         if: always()
         run: |
@@ -166,54 +135,6 @@ jobs:
                   except (OSError,ValueError) as error:
                       out.write(f"- {name}: unavailable; {error}\n")
           PY
-      - name: Report unavailable ChemRxiv metadata
-        if: steps.chemrxiv.outcome == 'failure'
-        run: echo '::warning::ChemRxiv DOI metadata source unavailable; no unverified papers will be displayed.'
-      - name: Harvest every arXiv first submission for selected UTC days
-        # The independent arXiv archive job runs twice daily; do not make
-        # hourly metadata refresh compete for the same upstream API quota.
-        if: github.event_name == 'workflow_dispatch'
-        id: daily_archive
-        continue-on-error: true
-        run: python -m scripts.arxiv_daily_archive
-      - name: Report incomplete daily archive coverage
-        if: steps.daily_archive.outcome == 'failure'
-        run: |
-          echo '::warning::Complete daily archive harvesting was unavailable; earlier verified day shards remain.'
-      - name: Refresh all-category arXiv OAI-PMH metadata
-        if: github.event_name == 'schedule'
-        id: oai
-        continue-on-error: true
-        env:
-          OAI_MAX_PAGES: '20'
-          OAI_LOOKBACK_DAYS: '2'
-        run: python -m scripts.oai_harvest
-      - name: Report OAI-PMH ingestion gaps
-        if: steps.oai.outcome == 'failure'
-        run: |
-          echo '::warning::arXiv OAI-PMH ingestion unavailable. Existing OAI snapshot preserved.'
-          echo '### All-category OAI source unavailable' >> "$GITHUB_STEP_SUMMARY"
-      - name: Harvest official arXiv announcement-day RSS
-        # Code pushes deploy existing verified announcements immediately.
-        # Scheduled sync and the dedicated announcement workflow update data.
-        if: github.event_name == 'schedule'
-        id: announcements
-        continue-on-error: true
-        run: python -m scripts.arxiv_announcements
-      - name: Report unavailable RSS announcements
-        if: steps.announcements.outcome == 'failure'
-        run: echo '::warning::Official daily announcement RSS unavailable; preserving last verified announcement snapshot.'
-      - name: Refresh research metadata
-        if: github.event_name == 'schedule'
-        id: refresh
-        continue-on-error: true
-        run: python scripts/sync.py
-      - name: Report synchronization outcome
-        if: steps.refresh.outcome == 'failure'
-        run: |
-          echo '### arXiv synchronization failed' >> "$GITHUB_STEP_SUMMARY"
-          echo 'The previous feed is preserved. Check the refresh step logs and retry.' >> "$GITHUB_STEP_SUMMARY"
-          echo '::warning::Could not refresh arXiv data. Existing records are preserved.'
       - name: Audit source-count completeness and publish repair queue
         id: coverage_audit
         run: |
@@ -284,28 +205,6 @@ jobs:
         id: audit_internal_routes_and_html_assets
         continue-on-error: true
         run: python scripts/audit_internal_links.py
-      - name: Optional citation metadata enrichment
-        if: steps.refresh.outcome == 'success'
-        continue-on-error: true
-        env:
-          OPENALEX_API_KEY: ${{ secrets.OPENALEX_API_KEY }}
-          OPENALEX_BATCH_SIZE: '10'
-        run: python -m scripts.enrich
-      - name: Commit refreshed feed to default branch
-        if: github.event_name != 'push'
-        continue-on-error: true
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docs/data/source-freshness.json
-          git add docs/data/literature-health.json docs/data/feed.json docs/data/biorxiv.json docs/data/chemrxiv.json docs/data/arxiv-days/ docs/data/oai-recent.json docs/data/announcements.json docs/data/records/ docs/data/coverage.json docs/data/needs_review.json docs/data/taxonomy.json docs/data/index/v1/ docs/data/taxonomy/v1.json
-          git add -A docs/data/eprint.json docs/data/eprint-backfill-state.json 2>/dev/null || true
-          if ! git diff --cached --quiet; then
-            git commit -m "data: refresh arXiv index [skip ci]"
-            git fetch origin main
-            git rebase -X theirs origin/main
-            git push origin HEAD:main
-          fi
       - name: Explain any failed required deployment gate
         if: always()
         run: |
@@ -433,6 +332,8 @@ jobs:
           if [ "${{ steps.atom_feeds.outcome }}" = "failure" ]; then
             echo '::warning::Atom feed generation failed; video and main website will still deploy.'
           fi
+      - name: Identify tested release artifact
+        run: python scripts/verify_release.py build
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
@@ -440,6 +341,9 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+      - name: Verify public release matches tested artifact
+        timeout-minutes: 4
+        run: python scripts/verify_release.py
       - name: Audit deployed Axiovo pages, live links, navigation and video
         id: postdeploy_audit
         continue-on-error: true
