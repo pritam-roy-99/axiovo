@@ -1,25 +1,43 @@
-/* Optional math typesetting: source text remains inert and readable if CDN is unavailable. */
+/* MathJax renderer for untrusted scholarly text. Never insert raw source as HTML. */
 (function(){
 "use strict";
-let loading=null;
-window.MathJax={tex:{inlineMath:[["\\(","\\)"],["$","$"]],displayMath:[["\\[","\\]"],["$$","$$"]],processEscapes:true},options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},startup:{typeset:false}};
+let loader;
+window.MathJax={
+ tex:{inlineMath:[["\\(","\\)"],["$","$"]],displayMath:[["\\[","\\]"],["$$","$$"]],processEscapes:true},
+ options:{skipHtmlTags:["script","noscript","style","textarea","pre","code"]},
+ startup:{typeset:false}
+};
 function load(){
- if(loading)return loading;
- loading=new Promise((resolve,reject)=>{
+ if(loader)return loader;
+ loader=new Promise((resolve,reject)=>{
   const script=document.createElement("script");
   script.src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js";
-  script.async=true;script.onload=resolve;script.onerror=()=>reject(Error("Math rendering unavailable"));
+  script.async=true;
+  script.onload=()=>window.MathJax?.startup?.promise?.then(resolve,reject) || resolve();
+  script.onerror=()=>reject(Error("MathJax CDN unavailable"));
   document.head.append(script);
  });
- return loading;
+ return loader;
+}
+function normalize(source){
+ let s=String(source||"");
+ // Some scholarly feeds escape TeX backslashes a second time.
+ s=s.replace(/\\\\(?=[()[\]{}]|(?:mathsf|mathrm|mathbf|mathbb|mathcal|frac|sqrt|alpha|beta|gamma|delta|theta|sigma|omega|sum|prod|left|right|text|begin|end)\b)/g,"\\");
+ return s;
 }
 function typeset(node){
  if(!node)return;
- const value=node.textContent||"";
- if(!value.includes("\\(")&&!value.includes("\\[")&&!value.includes("$"))return;
- load().then(()=>window.MathJax.typesetPromise([node])).catch(()=>{
-  node.title="Mathematical notation is shown as source LaTeX because the math renderer could not load.";
+ const original=node.textContent||"";
+ const value=normalize(original);
+ if(!/\$|\\\(|\\\[/.test(value))return;
+ if(value!==original)node.textContent=value;
+ load().then(()=>{
+  if(!node.isConnected)return;
+  return window.MathJax.typesetPromise([node]);
+ }).catch(error=>{
+  node.title="Equation formatting unavailable. Original LaTeX remains readable.";
+  console.warn("Axiovo equation rendering:",error);
  });
 }
-window.AxiovoAssistantMath={typeset};
+window.AxiovoAssistantMath={typeset,normalize};
 })();
