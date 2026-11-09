@@ -4,9 +4,9 @@
   "note": "Counts describe indexed records only, not archive-wide totals.",
   "archives": {
     "arxiv": {
-      "input_records": 6122,
+      "input_records": 4307,
       "invalid_or_unavailable": 0,
-      "last_sync": "2026-11-09T02:18:30.168157+00:00",
+      "last_sync": "2026-11-09T02:32:26.757914+00:00",
       "coverage": "available source snapshots, not a complete historical archive"
     },
     "biorxiv": {
@@ -18,12 +18,12 @@
     "chemrxiv": {
       "input_records": 3000,
       "invalid_or_unavailable": 0,
-      "last_sync": "2026-11-09T02:29:44.859989+00:00",
+      "last_sync": "2026-11-09T02:44:00.310469+00:00",
       "coverage": "available source snapshots, not a complete historical archive"
     }
   },
   "shards": {
-    "arxiv/2026-11.json": 3652,
+    "arxiv/2026-11.json": 3886,
     "biorxiv/2026-10.json": 2009,
     "biorxiv/2026-11.json": 1702,
     "chemrxiv/2022-10.json": 550,
@@ -35,11 +35,11 @@
     "chemrxiv/2026-09.json": 1,
     "chemrxiv/2026-11.json": 300
   },
-  "record_count": 10363,
+  "record_count": 10597,
   "latest_arxiv_announcement": {
-    "date": "2026-11-06",
-    "count": 2622,
-    "checked_at": "2026-11-07T01:27:40.118100+00:00",
-    "complete": true
+    "date": "2026-11-09",
+    "count": 807,
+    "checked_at": "2026-11-09T02:32:26.757914+00:00",
+    "complete": false
   }
 }
