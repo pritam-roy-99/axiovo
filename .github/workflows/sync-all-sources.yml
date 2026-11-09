@@ -20,7 +20,7 @@ concurrency:
 jobs:
   synchronize:
     runs-on: ubuntu-latest
-    timeout-minutes: 55
+    timeout-minutes: 28
     steps:
       - uses: actions/checkout@v4
         with:
@@ -48,7 +48,7 @@ jobs:
             echo "arXiv OAI: weekend announcement pause, existing snapshot retained."
             exit 0
           fi
-          timeout --signal=TERM --kill-after=15s 480s python -m scripts.oai_harvest
+          timeout --signal=TERM --kill-after=10s 180s python -m scripts.oai_harvest
       - name: Synchronize arXiv announcements
         id: arxiv_announcements
         continue-on-error: true
@@ -62,32 +62,32 @@ jobs:
           fi
           hour=$(date -u +%H)
           if [ "$hour" -lt 5 ]; then
-            python -m scripts.arxiv_catchup || python -m scripts.arxiv_announcements
+            timeout --signal=TERM --kill-after=10s 150s python -m scripts.arxiv_catchup || timeout --signal=TERM --kill-after=10s 150s python -m scripts.arxiv_announcements
           else
             # RSS is the official completeness check. If it is stale or not
             # available, the direct catch-up pages can still advance the day.
-            python -m scripts.arxiv_announcements || true
-            python -m scripts.arxiv_catchup || python -m scripts.arxiv_announcements
+            timeout --signal=TERM --kill-after=10s 150s python -m scripts.arxiv_announcements || true
+            timeout --signal=TERM --kill-after=10s 150s python -m scripts.arxiv_catchup || timeout --signal=TERM --kill-after=10s 150s python -m scripts.arxiv_announcements
           fi
       - name: Rebuild arXiv rolling feed
         id: arxiv_feed
         continue-on-error: true
-        run: timeout --signal=TERM --kill-after=15s 360s python -m scripts.sync
+        run: timeout --signal=TERM --kill-after=10s 120s python -m scripts.sync
       - name: Synchronize official bioRxiv API
         id: biorxiv
         continue-on-error: true
-        run: timeout --signal=TERM --kill-after=15s 660s python -m scripts.sync_biorxiv
+        run: timeout --signal=TERM --kill-after=10s 180s python -m scripts.sync_biorxiv
       - name: Synchronize verified ChemRxiv records
         id: chemrxiv
         continue-on-error: true
-        run: timeout --signal=TERM --kill-after=15s 480s python -m scripts.sync_chemrxiv
+        run: timeout --signal=TERM --kill-after=10s 150s python -m scripts.sync_chemrxiv
       - name: Synchronize Cryptology ePrint OAI
         id: eprint
         continue-on-error: true
         env:
           IACR_LOOKBACK_DAYS: '21'
           IACR_MAX_PAGES: '20'
-        run: timeout --signal=TERM --kill-after=15s 480s python -m scripts.sync_eprint
+        run: timeout --signal=TERM --kill-after=10s 150s python -m scripts.sync_eprint
       - name: Validate and preserve source integrity
         id: integrity
         run: |
