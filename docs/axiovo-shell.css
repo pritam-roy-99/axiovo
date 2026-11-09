@@ -632,3 +632,34 @@ body.axiovo-home .rd-home-section {margin-top:24px}
   .axiovo-research .rd-page {padding-inline:10px!important}
   :is(.axiovo-explore,.axiovo-crypto) .ex-archives a {flex-direction:column;gap:3px}
 }
+
+
+/* Mobile tab polish: scrollable, touch-friendly navigation without layout jumps. */
+@media (max-width:760px) {
+  html { -webkit-text-size-adjust:100%; }
+  body :is(.rl-nav,.ex-choices,.rd-tabs,[role="tablist"]) {
+    -webkit-overflow-scrolling:touch;
+    overscroll-behavior-x:contain;
+    scroll-behavior:smooth;
+    scrollbar-width:none;
+  }
+  body :is(.rl-nav,.ex-choices,.rd-tabs,[role="tablist"])::-webkit-scrollbar {display:none}
+  body :is(.rl-nav,.rd-tabs,[role="tablist"]) > :is(a,button,[role="tab"]) {
+    min-height:44px;
+    touch-action:manipulation;
+    -webkit-tap-highlight-color:transparent;
+    transition:background-color .16s ease,color .16s ease,border-color .16s ease,box-shadow .16s ease;
+  }
+  body :is(.rl-nav,.rd-tabs,[role="tablist"]) > :is(a,button,[role="tab"]):focus-visible {
+    outline:2px solid var(--axiovo-accent,#126f9c);
+    outline-offset:2px;
+  }
+  body :is(.rl-nav,.rd-tabs,[role="tablist"]) > :is(a,button,[role="tab"]):active {
+    filter:brightness(.96);
+  }
+  body :is(.rd-tabs,[role="tablist"]) {max-width:100%;min-width:0}
+}
+@media (prefers-reduced-motion:reduce) {
+  body :is(.rl-nav,.ex-choices,.rd-tabs,[role="tablist"]) {scroll-behavior:auto!important}
+  body :is(.rl-nav,.rd-tabs,[role="tablist"]) > :is(a,button,[role="tab"]) {transition:none!important}
+}
