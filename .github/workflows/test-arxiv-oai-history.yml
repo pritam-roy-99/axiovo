@@ -4,6 +4,8 @@ on:
     paths:
       - 'scripts/arxiv_oai_history.py'
       - 'tests/test_arxiv_oai_history.py'
+      - 'scripts/arxiv_oai_sqlite.py'
+      - 'tests/test_arxiv_oai_sqlite.py'
       - '.github/workflows/test-arxiv-oai-history.yml'
   workflow_dispatch:
     inputs:
@@ -24,9 +26,11 @@ jobs:
         with:
           python-version: '3.12'
       - name: Test checkpoint resume and OAI error handling
-        run: python -m unittest discover -s tests -p 'test_arxiv_oai_history.py' -v
+        run: |
+          python -m unittest discover -s tests -p 'test_arxiv_oai_history.py' -v
+          python -m unittest discover -s tests -p 'test_arxiv_oai_sqlite.py' -v
       - name: Compile worker
-        run: python -m py_compile scripts/arxiv_oai_history.py
+        run: python -m py_compile scripts/arxiv_oai_history.py scripts/arxiv_oai_sqlite.py
   live-smoke:
     # Validate one real source page on PR updates as well as explicit dispatch.
     if: github.event_name == 'pull_request' || (github.event_name == 'workflow_dispatch' && inputs.smoke_test == true)
