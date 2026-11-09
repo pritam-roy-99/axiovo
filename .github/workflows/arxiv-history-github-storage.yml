@@ -66,7 +66,7 @@ jobs:
           git -C history status --short --branch
       - name: Harvest bounded historical window
         env:
-          MONTH: ${{ inputs.month }}
+          MONTH: ${{ inputs.month || '2026-10' }}
           MAX_PAGES: ${{ inputs.max_pages || '1' }}
           PYTHONPATH: ${{ github.workspace }}/code
         run: |
@@ -82,7 +82,7 @@ jobs:
               import traceback
               traceback.print_exc()
               with open(os.environ["GITHUB_STEP_SUMMARY"], "a") as summary:
-                  summary.write(f"### Harvest failed\\n\\nMonth: {os.environ['MONTH']}\\n\\nError: \\`{type(exc).__name__}: {exc}\\`\\n")
+                  summary.write(f"### Harvest failed\\n\\nMonth: {os.environ['MONTH']}\\n\\nError: {type(exc).__name__}: {exc}\\n")
               raise
           PY
       - name: Enforce repository data budget and commit
