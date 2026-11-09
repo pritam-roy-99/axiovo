@@ -13,7 +13,7 @@ class DeploymentPolicyTests(unittest.TestCase):
             self.assertNotIn(command, WORKFLOW)
         self.assertNotIn("git rebase", WORKFLOW)
         self.assertNotIn("  schedule:",WORKFLOW)
-        self.assertIn("cron: '7,22,37,52 * * * *'",sync)
+        self.assertIn("cron: '7,37 * * * *'",sync)
         self.assertEqual(sync.count("    - cron:"),1)
         self.assertIn("cancel-in-progress: false",sync)
         self.assertIn("workflow_dispatch:",sync)
