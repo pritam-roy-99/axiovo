@@ -1,0 +1,19 @@
+name: Test arXiv snapshot streaming importer
+on:
+  pull_request:
+    paths:
+      - 'scripts/arxiv_kaggle_snapshot_import.py'
+      - 'tests/test_arxiv_kaggle_snapshot_import.py'
+      - '.github/workflows/test-arxiv-snapshot-import.yml'
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - run: python -m unittest discover -s tests -p 'test_arxiv_kaggle_snapshot_import.py' -v
