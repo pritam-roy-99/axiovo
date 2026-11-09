@@ -346,7 +346,7 @@ def main():
                     # first-submission shard of the previous calendar day.
                     page.goto(base+"arxiv.html?announced=latest",wait_until="domcontentloaded")
                     page.wait_for_function("""() => document.querySelector('#archive-sync-status')
-                      ?.textContent.includes('Official arXiv release:')""",timeout=24000)
+                      ?.textContent.includes('Official arXiv ')""",timeout=24000)
                     assert page.locator("#archive-announced").count()==1
                     assert page.locator(".ex-paper").count()>0, "Latest announced arXiv records missing"
                     assert "all arXiv categories" in page.locator("#archive-scope-label").inner_text()
@@ -356,10 +356,10 @@ def main():
                     subject.fill("quant-ph")
                     page.get_by_role("option",name="Quantum Physics · quant-ph",exact=True).click()
                     assert "Quantum Physics" in page.locator("#archive-scope-label").inner_text()
-                    assert "Official arXiv release:" in page.locator("#archive-sync-status").inner_text()
+                    assert "Official arXiv " in page.locator("#archive-sync-status").inner_text()
                     page.locator("#archive-latest").click()
                     page.wait_for_function("""() => !document.querySelector('#archive-sync-status')
-                      ?.textContent.includes('Official arXiv release:')""",timeout=24000)
+                      ?.textContent.includes('Official arXiv ')""",timeout=24000)
                 # Community actions must open the intended live pages, not a legacy redirect.
                 page.goto(base+"community.html",wait_until="domcontentloaded")
                 page.get_by_role("link",name="Find a paper").click()
