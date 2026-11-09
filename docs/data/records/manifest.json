@@ -6,7 +6,7 @@
     "arxiv": {
       "input_records": 4307,
       "invalid_or_unavailable": 0,
-      "last_sync": "2026-11-09T02:46:31.591530+00:00",
+      "last_sync": "2026-11-09T03:00:28.202392+00:00",
       "coverage": "available source snapshots, not a complete historical archive"
     },
     "biorxiv": {
@@ -18,7 +18,7 @@
     "chemrxiv": {
       "input_records": 3000,
       "invalid_or_unavailable": 0,
-      "last_sync": "2026-11-09T02:57:52.113166+00:00",
+      "last_sync": "2026-11-09T03:11:46.469057+00:00",
       "coverage": "available source snapshots, not a complete historical archive"
     }
   },
