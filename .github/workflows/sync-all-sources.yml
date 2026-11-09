@@ -128,7 +128,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh workflow run pages.yml --repo "${{ github.repository }}" --ref main
-      - name: Flag degraded synchronization after publishing healthy sources
+      - name: Report degraded synchronization without blocking verified archives
         if: always()
         env:
           ARXIV_OAI: ${{ steps.arxiv_oai.outcome }}
@@ -141,11 +141,12 @@ jobs:
           failed=0
           for name in ARXIV_OAI ARXIV_ANNOUNCEMENTS ARXIV_FEED BIORXIV CHEMRXIV EPRINT; do
             if [ "${!name}" = 'failure' ]; then
-              echo "::error::${name} failed. Previously verified metadata was retained."
+              echo "::warning::${name} failed. Previously verified metadata was retained."
               failed=1
             fi
           done
           if [ "$failed" -ne 0 ]; then
-            echo '### Sync degraded: check failed upstream sources before claiming freshness' >> "$GITHUB_STEP_SUMMARY"
-            exit 1
+            echo '### Sync degraded: at least one upstream source failed; cached data retained and freshness must not be claimed.' >> "$GITHUB_STEP_SUMMARY"
           fi
+          # Source outages are reported as degraded, not a false deployment failure.
+          # Integrity checks and required parser tests remain blocking.
