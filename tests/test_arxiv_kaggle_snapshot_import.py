@@ -20,6 +20,7 @@ class SnapshotImportTests(unittest.TestCase):
             self.assertEqual(one["imported"], 1)
             two = ingest(src, db, 1)
             self.assertTrue(two["complete"])
+            self.assertTrue(two["verified_complete"])
             self.assertEqual(two["imported"], 2)
             three = ingest(src, db, 1)
             self.assertEqual(three["batch"], 0)
@@ -35,6 +36,7 @@ class SnapshotImportTests(unittest.TestCase):
             self.assertEqual(result["rejected"], 1)
             self.assertEqual(result["imported"], 1)
             self.assertTrue(result["complete"])
+            self.assertFalse(result["verified_complete"])
 
     def test_batch_limit(self):
         with tempfile.TemporaryDirectory() as tmp:
