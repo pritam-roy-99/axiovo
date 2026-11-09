@@ -13,7 +13,9 @@ class DeploymentPolicyTests(unittest.TestCase):
             self.assertNotIn(command, WORKFLOW)
         self.assertNotIn("git rebase", WORKFLOW)
         self.assertNotIn("  schedule:",WORKFLOW)
-        self.assertIn("cron: '18 * * * *'",sync)
+        self.assertIn("cron: '7,22,37,52 * * * *'",sync)
+        self.assertEqual(sync.count("    - cron:"),1)
+        self.assertIn("cancel-in-progress: false",sync)
         self.assertIn("workflow_dispatch:",sync)
         self.assertIn("gh workflow run pages.yml",sync)
     def test_announcements_publish_independently_of_historical_and_other_archives(self):
