@@ -333,7 +333,12 @@ function drawResults(state){
  $("match-terms").textContent=c.topicTerms.length?"Papers match at least one of these terms in the title or abstract: "+c.topicTerms.join(" · ")+".":"";
  results.replaceChildren(...rows.slice(0,state.visible).map(p=>paperCard(p,c)));actions.replaceChildren();
  if(!rows.length&&!state.loading){
-  const note=state.announcementOnly?"No papers in the latest available arXiv announcement match this selected field or topic. Try the parent topic or check source coverage.":state.recentOnly?"No matching papers in the latest 7 days of available "+name+" source metadata. This does not mean the archive has no papers. Try another date range.":state.complete?"No papers in the verified dates match these filters.":"No matches in the available records for this search.";
+  const code=subject?.codes?.[0]||subject?.code||"";
+  const archive=["astro-ph","cond-mat","math-ph","quant-ph","gr-qc","hep-ex","hep-lat","hep-ph","hep-th","nucl-ex","nucl-th","q-bio","q-fin","physics","math","nlin","eess","econ","stat","cs"]
+   .find(group=>code===group||code.startsWith(group+"."))||"";
+  const missingEarlyArchive=state.earlyRelease&&archive&&!(state.coveredArchives||[]).includes(archive);
+  const note=missingEarlyArchive?"The official early catch-up listing for "+archive+" has not yet been retrieved. No matches here does not mean arXiv has no new papers. Use the original archive until synchronization completes.":
+   state.announcementOnly?"No papers in the latest available arXiv announcement match this selected field or topic. Try the parent topic or check source coverage.":state.recentOnly?"No matching papers in the latest 7 days of available "+name+" source metadata. This does not mean the archive has no papers. Try another date range.":state.complete?"No papers in the verified dates match these filters.":"No matches in the available records for this search.";
   results.append(element("p",note,"rd-panel rd-small"));
   if(state.recentOnly)actions.append(button("Search indexed history for this topic",()=>{viewMode="indexed";runSearch()}));
   else if(c.from||c.to)actions.append(button("Search any date",()=>{$("from").value=$("to").value="";viewMode="indexed";runSearch()}));
@@ -428,12 +433,14 @@ async function showLatestAnnouncement(){
   const batch=await data.latestArxivAnnouncement(state.controller.signal);
   if(stamp!==datePreset||state!==search||state.controller.signal.aborted)return;
   state.local=batch.papers;
+  state.earlyRelease=batch.earlyRelease;
+  state.coveredArchives=batch.coveredArchives;
   state.loading=false;
   state.complete=false;
   const early=String(batch.source||"").includes("arxiv.org/catchup/");
   state.message=(early?"Official arXiv early catch-up release: ":"Official arXiv release: ")+batch.date+
     " · "+batch.papers.length.toLocaleString()+" source-linked records."+
-    (early?" Preliminary source listing before midnight US Eastern RSS refresh; completeness not yet verified.":
+    (early?" Preliminary source listing from "+(batch.coveredArchives?.length||0)+" of 20 top-level archives before midnight US Eastern RSS refresh; completeness not yet verified.":
       batch.complete?" All official archive RSS feeds were verified.":" Partial source coverage; not all archive feeds were verified.")+
     " This is the announcement date, not the first-submission date.";
   const expected=expectedCatchupDay();
