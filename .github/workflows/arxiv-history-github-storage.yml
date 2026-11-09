@@ -35,7 +35,7 @@ jobs:
           python-version: '3.12'
       - name: Validate month and prepare isolated history branch
         env:
-          MONTH: ${{ inputs.month || '1991-08' }}
+          MONTH: ${{ inputs.month || '2026-10' }}
         run: |
           python - <<'PY'
           import datetime, os, re
@@ -57,6 +57,13 @@ jobs:
             git checkout -q --orphan arxiv-history-data
             git rm -rfq . || true
           fi
+      - name: Show execution context
+        run: |
+          echo "Event: ${{ github.event_name }}"
+          echo "Working directory: $(pwd)"
+          echo "Code checkout: $(test -f code/scripts/arxiv_oai_windows.py && echo present || echo missing)"
+          echo "History checkout: $(test -d history/.git && echo present || echo missing)"
+          git -C history status --short --branch
       - name: Harvest bounded historical window
         env:
           MONTH: ${{ inputs.month }}
@@ -69,7 +76,14 @@ jobs:
           year, month = map(int, os.environ["MONTH"].split("-"))
           start = datetime.date(year, month, 1)
           end = datetime.date(year, month, calendar.monthrange(year, month)[1])
-          print(harvest_window("history/windows", start, end, int(os.environ["MAX_PAGES"])))
+          try:
+              print(harvest_window("history/windows", start, end, int(os.environ["MAX_PAGES"])))
+          except Exception as exc:
+              import traceback
+              traceback.print_exc()
+              with open(os.environ["GITHUB_STEP_SUMMARY"], "a") as summary:
+                  summary.write(f"### Harvest failed\\n\\nMonth: {os.environ['MONTH']}\\n\\nError: \\`{type(exc).__name__}: {exc}\\`\\n")
+              raise
           PY
       - name: Enforce repository data budget and commit
         working-directory: history
