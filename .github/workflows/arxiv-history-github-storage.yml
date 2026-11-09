@@ -1,11 +1,5 @@
-name: arXiv historical archive (GitHub-only, manual pilot)
+name: arXiv historical archive (manual OAI pilot; upstream degraded)
 on:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/arxiv-history-github-storage.yml'
-      - 'scripts/arxiv_oai_windows.py'
-      - 'scripts/arxiv_oai_history.py'
   workflow_dispatch:
     inputs:
       month:
