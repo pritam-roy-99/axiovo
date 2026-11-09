@@ -32,7 +32,7 @@ BLOCK = re.compile(r"(?is)<(?:div|p)\b[^>]*class\s*=\s*['\"][^'\"]*\b%s\b[^'\"]*
 TAGS = re.compile(r"(?s)<[^>]*>")
 SPACE = re.compile(r"\s+")
 ANNOUNCE_TYPES = {"new", "cross", "replace", "replace-cross"}
-CATEGORY = re.compile(r"\b(?:astro-ph|cond-mat|cs|econ|eess|math|nlin|q-bio|q-fin|stat)\.[A-Za-z]{2,7}\b|\bphysics\.[a-z-]+\b|\b(?:quant-ph|gr-qc|hep-ex|hep-lat|hep-ph|hep-th|math-ph|nucl-ex|nucl-th)\b")
+CATEGORY = re.compile(r"\b(?:astro-ph|cond-mat|cs|econ|eess|math|nlin|q-bio|q-fin|stat|physics)\.[A-Za-z][A-Za-z-]{1,16}\b|\b(?:quant-ph|gr-qc|hep-ex|hep-lat|hep-ph|hep-th|math-ph|nucl-ex|nucl-th)\b")
 PRIMARY = re.compile(r"(?is)<span\b[^>]*class\s*=\s*['\"][^'\"]*primary-subject[^'\"]*['\"][^>]*>(.*?)</span>")
 
 
