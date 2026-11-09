@@ -4,6 +4,7 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/sync-all-sources.yml'
+      - 'scripts/arxiv_catchup.py'
       - 'scripts/validate_sync_snapshots.py'
   workflow_dispatch:
   schedule:
@@ -50,19 +51,21 @@ jobs:
         id: arxiv_announcements
         continue-on-error: true
         run: |
-          # US Eastern Sun-Thu 20:00 announcements appear on UTC Mon-Fri.
-          # During UTC weekends an empty RSS response is expected, not an outage.
+          # arXiv catch-up pages become public after 20:00 US Eastern,
+          # before the RSS/Atom refresh at midnight Eastern (05:00 UTC in EST).
+          # The Atom submission timestamp cannot certify announcement dates.
           if [ "$(date -u +%u)" -ge 6 ] && [ "$GITHUB_EVENT_NAME" != "workflow_dispatch" ]; then
-            echo "arXiv announcements: no routine weekend release; preserving cached batch."
+            echo "arXiv announcements: weekend pause, preserving last release."
             exit 0
           fi
-          # arXiv announces at 20:00 Eastern; RSS follows at midnight Eastern.
-          # Use official Atom before RSS publication, and RSS thereafter.
           hour=$(date -u +%H)
-          if [ "$hour" -lt 4 ]; then
-            python -m scripts.scirate_latest || python -m scripts.arxiv_announcements
+          if [ "$hour" -lt 5 ]; then
+            python -m scripts.arxiv_catchup || python -m scripts.arxiv_announcements
           else
-            python -m scripts.arxiv_announcements || python -m scripts.scirate_latest
+            # RSS is the official completeness check. If it is stale or not
+            # available, the direct catch-up pages can still advance the day.
+            python -m scripts.arxiv_announcements || true
+            python -m scripts.arxiv_catchup || python -m scripts.arxiv_announcements
           fi
       - name: Rebuild arXiv rolling feed
         id: arxiv_feed
