@@ -76,8 +76,20 @@ def harvest(directory, max_pages=5, fetch=request_page):
     state = json.loads(state_file.read_text()) if state_file.exists() else {"next_token": "", "pages": 0, "complete": False}
     if state["complete"]:
         return state
+    if state.get("recovery_required"):
+        raise RuntimeError("Expired OAI token: recovery required; checkpoint preserved")
     for _ in range(max_pages):
-        records, next_token = parse(fetch(state["next_token"]))
+        try:
+            records, next_token = parse(fetch(state["next_token"]))
+        except RuntimeError as error:
+            # Tokens may expire between scheduled jobs. Preserve checkpoint.
+            if "badResumptionToken" in str(error):
+                state["recovery_required"] = True
+                state["recovery_reason"] = "expired_oai_token"
+                temporary_state = state_file.with_suffix(".tmp")
+                temporary_state.write_text(json.dumps(state) + "\n", encoding="utf8")
+                os.replace(temporary_state, state_file)
+            raise
         # One immutable page per token transition; checkpoint advances only after
         # the complete page is durably written. Replays overwrite the same page.
         page_no = state["pages"]
