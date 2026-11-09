@@ -40,7 +40,7 @@ async function checkAnnouncement(){
   const response=await fetch("./data/announcements.json",{cache:"no-store",signal:AbortSignal.timeout(10000)});
   if(!response.ok)throw Error("HTTP "+response.status);
   const snapshot=await response.json();
-  if(!/^\\d{4}-\\d{2}-\\d{2}$/.test(String(snapshot.announcement_date||""))||
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(String(snapshot.announcement_date||""))||
      !Array.isArray(snapshot.papers))throw Error("Invalid official announcement snapshot");
   const batch={date:snapshot.announcement_date,count:snapshot.papers.length,
    complete:snapshot.complete===true,checked_at:snapshot.checked_at,
