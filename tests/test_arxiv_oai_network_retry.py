@@ -12,7 +12,7 @@ class NetworkRetryTests(unittest.TestCase):
             def read(self): return b"<OAI-PMH/>"
         calls = iter([TimeoutError("slow upstream"), Response()])
         with patch("scripts.arxiv_oai_windows.time.sleep") as sleep:
-            result = fetch_window_page(dt.date(2026,10,1), dt.date(2026,10,31), "", opener=lambda *a, **kw: next(calls))
+            result = fetch_window_page(dt.date(2026,10,1), dt.date(2026,10,31), "", opener=lambda *a, **kw: (lambda value: (_ for _ in ()).throw(value) if isinstance(value, Exception) else value)(next(calls)))
         self.assertEqual(result, b"<OAI-PMH/>")
         sleep.assert_called_once_with(5)
 
