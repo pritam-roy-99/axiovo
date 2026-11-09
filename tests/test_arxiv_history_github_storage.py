@@ -5,9 +5,7 @@ class GithubStorageWorkflowTests(unittest.TestCase):
     def test_manual_only_and_isolated_branch(self):
         text = Path(".github/workflows/arxiv-history-github-storage.yml").read_text()
         self.assertIn("workflow_dispatch:", text)
-        self.assertIn("'scripts/arxiv_oai_windows.py'", text)
-        self.assertIn("'scripts/arxiv_oai_history.py'", text)
-        self.assertIn('os.environ.get("GITHUB_EVENT_NAME") == "push"', text)
+        self.assertNotIn("  push:", text)
         self.assertIn('Harvest OAI datestamp window:', text)
         self.assertNotIn("  schedule:", text)
         self.assertIn("arxiv-history-data", text)
