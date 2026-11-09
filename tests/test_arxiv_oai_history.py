@@ -42,7 +42,11 @@ class HistoryTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             with self.assertRaises(RuntimeError):
                 history.harvest(directory, 1, lambda token: b'<OAI-PMH xmlns="' + OAI.encode() + b'"><error code="badResumptionToken">Expired</error></OAI-PMH>')
-            self.assertFalse((Path(directory) / "checkpoint.json").exists())
+            import json
+            state = json.loads((Path(directory) / "checkpoint.json").read_text())
+            self.assertEqual(state["pages"], 0)
+            self.assertEqual(state["next_token"], "")
+            self.assertTrue(state["recovery_required"])
 
     def test_expired_token_preserves_checkpoint_and_blocks_retries(self):
         import json
