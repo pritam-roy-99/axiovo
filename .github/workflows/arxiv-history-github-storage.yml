@@ -1,0 +1,87 @@
+name: arXiv historical archive (GitHub-only, manual pilot)
+on:
+  workflow_dispatch:
+    inputs:
+      month:
+        description: 'UTC month to harvest, YYYY-MM (pilot one month at a time)'
+        required: true
+        type: string
+      max_pages:
+        description: 'Maximum OAI pages per run (1-5)'
+        required: true
+        default: '1'
+        type: choice
+        options: ['1', '2', '3', '4', '5']
+permissions:
+  contents: write
+concurrency:
+  group: axiovo-arxiv-history-storage
+  cancel-in-progress: false
+jobs:
+  pilot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: code
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate month and prepare isolated history branch
+        env:
+          MONTH: ${{ inputs.month }}
+        run: |
+          python - <<'PY'
+          import datetime, os, re
+          month = os.environ["MONTH"]
+          if not re.fullmatch(r"\d{4}-(0[1-9]|1[0-2])", month):
+              raise SystemExit("month must be YYYY-MM")
+          start = datetime.date.fromisoformat(month + "-01")
+          if not (datetime.date(1991, 1, 1) <= start <= datetime.date.today()):
+              raise SystemExit("month is outside supported historical range")
+          PY
+          git clone --quiet --no-checkout "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" history
+          cd history
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git ls-remote --exit-code --heads origin arxiv-history-data >/dev/null; then
+            git fetch --quiet origin arxiv-history-data
+            git checkout -q -b arxiv-history-data origin/arxiv-history-data
+          else
+            git checkout -q --orphan arxiv-history-data
+            git rm -rfq . || true
+          fi
+      - name: Harvest bounded historical window
+        env:
+          MONTH: ${{ inputs.month }}
+          MAX_PAGES: ${{ inputs.max_pages }}
+          PYTHONPATH: ${{ github.workspace }}/code
+        run: |
+          python - <<'PY'
+          import calendar, datetime, os
+          from scripts.arxiv_oai_windows import harvest_window
+          year, month = map(int, os.environ["MONTH"].split("-"))
+          start = datetime.date(year, month, 1)
+          end = datetime.date(year, month, calendar.monthrange(year, month)[1])
+          print(harvest_window("history/windows", start, end, int(os.environ["MAX_PAGES"])))
+          PY
+      - name: Enforce repository data budget and commit
+        working-directory: history
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          root = Path("windows")
+          size = sum(p.stat().st_size for p in root.rglob("*") if p.is_file())
+          print(f"Historical data size: {size:,} bytes")
+          if size > 200 * 1024 * 1024:
+              raise SystemExit("Safety stop: data branch exceeds 200 MiB working-tree budget")
+          PY
+          git add windows
+          if git diff --cached --quiet; then
+            echo "No new historical data"
+          else
+            git commit -m "data: advance bounded arXiv historical harvest"
+            git push origin HEAD:arxiv-history-data
+          fi
