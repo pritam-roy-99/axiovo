@@ -18,6 +18,68 @@ concurrency:
   group: axiovo-all-sources
   cancel-in-progress: false
 jobs:
+  announcements:
+    # Publish early listings without waiting for OAI or any other archive.
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify announcement ingestion
+        run: python -m unittest discover -s tests -p 'test_arxiv*.py' -v
+      - name: Synchronize arXiv announcements
+        id: arxiv_announcements
+        continue-on-error: true
+        run: |
+          # arXiv catch-up pages become public after 20:00 US Eastern,
+          # before the RSS/Atom refresh at midnight Eastern (05:00 UTC in EST).
+          # The Atom submission timestamp cannot certify announcement dates.
+          if [ "$(date -u +%u)" -ge 6 ] && [ "$GITHUB_EVENT_NAME" != "workflow_dispatch" ]; then
+            echo "arXiv announcements: weekend pause, preserving last release."
+            exit 0
+          fi
+          hour=$(date -u +%H)
+          if [ "$hour" -lt 5 ]; then
+            timeout --signal=TERM --kill-after=10s 360s python -m scripts.arxiv_catchup || timeout --signal=TERM --kill-after=10s 360s python -m scripts.arxiv_announcements
+          else
+            # RSS is the official completeness check. If it is stale or not
+            # available, the direct catch-up pages can still advance the day.
+            timeout --signal=TERM --kill-after=10s 360s python -m scripts.arxiv_announcements || true
+            timeout --signal=TERM --kill-after=10s 360s python -m scripts.arxiv_catchup || timeout --signal=TERM --kill-after=10s 360s python -m scripts.arxiv_announcements
+          fi
+      - name: Validate announcement snapshot
+        run: |
+          git fetch origin main
+          python scripts/validate_sync_snapshots.py announcements.json
+      - name: Publish changed announcement only
+        id: publication
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add docs/data/announcements.json
+          if git diff --cached --quiet; then
+            echo 'changed=false' >> "$GITHUB_OUTPUT"
+          else
+            git commit -m 'data: publish verified arXiv announcement [skip ci]'
+            # Other archive jobs own disjoint snapshots. Never resolve a
+            # conflicting announcement by silently choosing the stale side.
+            git fetch origin main
+            git rebase origin/main
+            git push origin HEAD:main
+            echo 'changed=true' >> "$GITHUB_OUTPUT"
+          fi
+      - name: Trigger checked publication of the announcement
+        if: steps.publication.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run pages.yml --repo "${{ github.repository }}" --ref main
+      - name: Report announcement synchronization
+        if: always()
+        run: echo 'Announcement fetch outcome ${{ steps.arxiv_announcements.outcome }}. A successful fetch is not proof of a complete release; consult the snapshot date and coverage.' >> "$GITHUB_STEP_SUMMARY"
   synchronize:
     runs-on: ubuntu-latest
     timeout-minutes: 28
@@ -35,26 +97,6 @@ jobs:
           python -m unittest discover -s tests -p 'test_arxiv_announcement_order.py' -v
           python -m unittest discover -s tests -p 'test_eprint_harvest.py' -v
           python -m unittest discover -s tests -p 'test_sync_snapshots.py' -v
-      - name: Synchronize arXiv announcements
-        id: arxiv_announcements
-        continue-on-error: true
-        run: |
-          # arXiv catch-up pages become public after 20:00 US Eastern,
-          # before the RSS/Atom refresh at midnight Eastern (05:00 UTC in EST).
-          # The Atom submission timestamp cannot certify announcement dates.
-          if [ "$(date -u +%u)" -ge 6 ] && [ "$GITHUB_EVENT_NAME" != "workflow_dispatch" ]; then
-            echo "arXiv announcements: weekend pause, preserving last release."
-            exit 0
-          fi
-          hour=$(date -u +%H)
-          if [ "$hour" -lt 5 ]; then
-            timeout --signal=TERM --kill-after=10s 150s python -m scripts.arxiv_catchup || timeout --signal=TERM --kill-after=10s 150s python -m scripts.arxiv_announcements
-          else
-            # RSS is the official completeness check. If it is stale or not
-            # available, the direct catch-up pages can still advance the day.
-            timeout --signal=TERM --kill-after=10s 150s python -m scripts.arxiv_announcements || true
-            timeout --signal=TERM --kill-after=10s 150s python -m scripts.arxiv_catchup || timeout --signal=TERM --kill-after=10s 150s python -m scripts.arxiv_announcements
-          fi
       - name: Synchronize arXiv all-category OAI metadata
         id: arxiv_oai
         continue-on-error: true
@@ -92,19 +134,18 @@ jobs:
         id: integrity
         run: |
           git fetch origin main
-          python scripts/validate_sync_snapshots.py
+          python scripts/validate_sync_snapshots.py feed.json oai-recent.json biorxiv.json chemrxiv.json eprint.json
       - name: Summarize synchronization outcomes
         if: always()
         env:
           ARXIV_OAI: ${{ steps.arxiv_oai.outcome }}
-          ARXIV_ANNOUNCEMENTS: ${{ steps.arxiv_announcements.outcome }}
           ARXIV_FEED: ${{ steps.arxiv_feed.outcome }}
           BIORXIV: ${{ steps.biorxiv.outcome }}
           CHEMRXIV: ${{ steps.chemrxiv.outcome }}
           EPRINT: ${{ steps.eprint.outcome }}
         run: |
           echo '## Archive source synchronization' >> "$GITHUB_STEP_SUMMARY"
-          for name in ARXIV_OAI ARXIV_ANNOUNCEMENTS ARXIV_FEED BIORXIV CHEMRXIV EPRINT; do
+          for name in ARXIV_OAI ARXIV_FEED BIORXIV CHEMRXIV EPRINT; do
             echo "- ${name}: ${!name}" >> "$GITHUB_STEP_SUMMARY"
           done
           echo 'An unsuccessful source retains its previously verified snapshot. Source availability is not proof of complete historical coverage.' >> "$GITHUB_STEP_SUMMARY"
@@ -113,13 +154,13 @@ jobs:
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add docs/data/announcements.json docs/data/feed.json docs/data/oai-recent.json docs/data/biorxiv.json docs/data/chemrxiv.json docs/data/eprint.json
+          git add docs/data/feed.json docs/data/oai-recent.json docs/data/biorxiv.json docs/data/chemrxiv.json docs/data/eprint.json
           if git diff --cached --quiet; then
             echo 'changed=false' >> "$GITHUB_OUTPUT"
           else
             git commit -m 'data: synchronize verified scholarly sources [skip ci]'
             git fetch origin main
-            git rebase -X theirs origin/main
+            git rebase origin/main
             git push origin HEAD:main
             echo 'changed=true' >> "$GITHUB_OUTPUT"
           fi
@@ -132,14 +173,13 @@ jobs:
         if: always()
         env:
           ARXIV_OAI: ${{ steps.arxiv_oai.outcome }}
-          ARXIV_ANNOUNCEMENTS: ${{ steps.arxiv_announcements.outcome }}
           ARXIV_FEED: ${{ steps.arxiv_feed.outcome }}
           BIORXIV: ${{ steps.biorxiv.outcome }}
           CHEMRXIV: ${{ steps.chemrxiv.outcome }}
           EPRINT: ${{ steps.eprint.outcome }}
         run: |
           failed=0
-          for name in ARXIV_OAI ARXIV_ANNOUNCEMENTS ARXIV_FEED BIORXIV CHEMRXIV EPRINT; do
+          for name in ARXIV_OAI ARXIV_FEED BIORXIV CHEMRXIV EPRINT; do
             if [ "${!name}" = 'failure' ]; then
               echo "::warning::${name} failed. Previously verified metadata was retained."
               failed=1

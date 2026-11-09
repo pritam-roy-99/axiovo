@@ -16,6 +16,14 @@ class DeploymentPolicyTests(unittest.TestCase):
         self.assertIn("cron: '18 * * * *'",sync)
         self.assertIn("workflow_dispatch:",sync)
         self.assertIn("gh workflow run pages.yml",sync)
+    def test_announcements_publish_independently_of_historical_and_other_archives(self):
+        sync=(Path(__file__).resolve().parents[1]/".github/workflows/sync-all-sources.yml").read_text()
+        announcements=sync.split("  announcements:",1)[1].split("  synchronize:",1)[0]
+        self.assertIn("git add docs/data/announcements.json",announcements)
+        self.assertIn("gh workflow run pages.yml",announcements)
+        self.assertNotIn("scripts.oai_harvest",announcements)
+        self.assertNotIn("scripts.sync_biorxiv",announcements)
+        self.assertNotIn("rebase -X theirs",sync)
     def test_metadata_commits_cannot_cancel_running_video_publication(self):
         self.assertIn("group: axiovo-pages",WORKFLOW)
         self.assertIn("cancel-in-progress: false",WORKFLOW)

@@ -78,9 +78,11 @@ def acceptable(name, older, newer):
             return False, "ePrint metadata unexpectedly lost previously indexed records"
     return True, "verified"
 
-def validate():
+def validate(names=FILES):
     changed = []
-    for name in FILES:
+    if not set(names).issubset(FILES):
+        raise ValueError("Unknown source snapshot")
+    for name in names:
         path = DATA / name
         old, raw = read_old(name)
         if not path.is_file():
@@ -108,4 +110,5 @@ def validate():
     return changed
 
 if __name__ == "__main__":
-    validate()
+    import sys
+    validate(sys.argv[1:] or FILES)
