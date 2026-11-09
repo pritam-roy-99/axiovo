@@ -127,22 +127,28 @@ def parse_listing(raw, archive, date):
 
 
 def fetch_category(archive, date):
-    uri = f"https://arxiv.org/catchup/{archive}/{date}?abs=True&show=2000"
-    request = urllib.request.Request(uri, headers={
+    root = f"https://arxiv.org/catchup/{archive}/{date}"
+    headers = {
         "User-Agent": os.getenv("ARXIV_USER_AGENT",
             "Axiovo/0.9 (https://github.com/pritam-roy-99/axiovo; pre-RSS catch-up)"),
         "Accept": "text/html"
-    })
-    for attempt in range(2):
+    }
+    # The plain abs=False catch-up link is published by arXiv itself.
+    # Prefer full abstracts, but keep the verified original listing fallback.
+    failures = []
+    for suffix in ("?abs=True&show=2000", "?abs=True", "?abs=False"):
+        uri = root + suffix
         try:
+            request = urllib.request.Request(uri, headers=headers)
             with urllib.request.urlopen(request, timeout=35) as response:
                 page = response.read()
             return parse_listing(page, archive, date)
-        except (OSError, ValueError, urllib.error.HTTPError):
-            if attempt:
-                raise
-            time.sleep(4)
-    raise RuntimeError("Catch-up page unavailable")
+        except (OSError, ValueError, urllib.error.HTTPError) as exc:
+            failures.append(str(exc)[:100])
+            # Do not hammer an unavailable source or bypass its rate limits.
+            if isinstance(exc, urllib.error.HTTPError) and exc.code in (403, 429):
+                break
+    raise RuntimeError("Catch-up page unavailable: " + "; ".join(failures)[:160])
 
 
 def harvest(now=None, fetch=fetch_category, archives=ARCHIVES):
