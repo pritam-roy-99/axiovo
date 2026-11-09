@@ -5,7 +5,7 @@ Uses local content for reliable baseline coverage. Remote scholarly APIs are
 tested separately; a network-dependent fixture must not define UI correctness.
 """
 from __future__ import annotations
-import functools
+import functools,json
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from threading import Thread
@@ -36,8 +36,29 @@ PICKER_CASES={
  ),
 }
 
+# Synthetic announcement fixture, served only by this local test server.
+# A narrow subtopic can legitimately have zero papers on a real release day.
+ANNOUNCEMENT_FIXTURE={"source":"https://rss.arxiv.org/rss/",
+ "announcement_date":"2026-11-09","complete":True,"count":2,"papers":[
+ {"id":"2611.00001","title":"Lieb-Robinson bounds for quantum many-body theory",
+  "abstract":"Lieb-Robinson bounds on information propagation in quantum many-body systems.",
+  "authors":["Test Author"],"categories":["math-ph"],"version":1,
+  "announcement_date":"2026-11-09","announce_type":"new"},
+ {"id":"2611.00002","title":"Unrelated galaxy survey",
+  "abstract":"Galaxy observations.","authors":["Test Author"],
+  "categories":["astro-ph.GA"],"version":1,
+  "announcement_date":"2026-11-09","announce_type":"new"}]}
 class Quiet(SimpleHTTPRequestHandler):
  def log_message(self,*args):pass
+ def do_GET(self):
+  if urlsplit(self.path).path!="/data/announcements.json":
+   return super().do_GET()
+  payload=json.dumps(ANNOUNCEMENT_FIXTURE).encode()
+  self.send_response(200)
+  self.send_header("Content-Type","application/json")
+  self.send_header("Content-Length",str(len(payload)))
+  self.end_headers()
+  self.wfile.write(payload)
 
 def check_searchable_path(page,base,source,touch):
  # Isolate this baseline test from the path saved by the previous deep-link test.
@@ -130,6 +151,9 @@ def main():
       page.locator(".ex-paper").first.wait_for(timeout=18000)
       paper=page.locator(".ex-paper").first
       title=paper.locator("h3").inner_text().strip()
+      assert "Lieb-Robinson bounds" in title
+      assert page.locator(".ex-paper").count()==1,"Unrelated announcement leaked into subtopic"
+      assert page.locator("#archive-subfield").input_value()==subtopic
       assert title,(source,"Missing paper title")
       paper.get_by_role("button",name="Save to Library",exact=True).click()
       page.goto(base+"workspace.html",wait_until="domcontentloaded")
