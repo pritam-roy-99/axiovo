@@ -1,0 +1,43 @@
+name: Archive synchronization watchdog
+on:
+  workflow_dispatch:
+  schedule:
+    # Independent fallback, seven minutes after the primary 15-minute cadence.
+    # GitHub-hosted cron is best-effort and can be delayed or skipped.
+    - cron: '14,29,44,59 * * * *'
+permissions:
+  actions: write
+  contents: read
+concurrency:
+  group: axiovo-archive-watchdog
+  cancel-in-progress: false
+jobs:
+  ensure-recent-sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Dispatch archive synchronization if no recent attempt exists
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "## Archive sync watchdog" >> "$GITHUB_STEP_SUMMARY"
+          now=$(date -u +%s)
+          # Query the primary workflow directly, rather than unrelated repo actions.
+          runs=$(gh api "repos/$GH_REPO/actions/workflows/sync-all-sources.yml/runs?per_page=20")
+          recent=$(jq -r --argjson now "$now" '
+            [.workflow_runs[] |
+              select(.event == "schedule" or .event == "workflow_dispatch" or .event == "push") |
+              select(($now - (.created_at | sub("Z$"; "Z") | fromdateiso8601)) >= 0) |
+              select(($now - (.created_at | sub("Z$"; "Z") | fromdateiso8601)) < 1200)
+            ] | length' <<< "$runs")
+          echo "- Recent primary attempts (past 20 min): $recent" >> "$GITHUB_STEP_SUMMARY"
+          if [ "$recent" -eq 0 ]; then
+            gh workflow run sync-all-sources.yml --repo "$GH_REPO" --ref main
+            echo "- Recovery: dispatched primary synchronization." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "- Recovery: not needed; a recent primary run exists." >> "$GITHUB_STEP_SUMMARY"
+          fi
+          echo "- Note: GitHub scheduled workflows are best-effort. This watchdog is a fallback, not a guarantee of exact 15-minute execution." >> "$GITHUB_STEP_SUMMARY"
