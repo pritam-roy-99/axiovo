@@ -18,7 +18,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "docs"
 
 
-def stage(destination: Path, keep_days: int = 21) -> dict:
+def stage(destination: Path, keep_days: int = 7) -> dict:
     if keep_days < 7:
         raise ValueError("keep_days must retain at least a week")
     manifest_path = SOURCE / "data/arxiv-days/manifest.json"
@@ -95,6 +95,7 @@ def stage(destination: Path, keep_days: int = 21) -> dict:
         raise ValueError("No staging size reduction: refusing ineffective release")
     result = {
         "source_bytes": source_size, "staged_bytes": stage_size,
+        "published_file_count": sum(1 for p in destination.rglob("*") if p.is_file()),
         "saved_bytes": source_size - stage_size,
         "source_daily_shards": len(before),
         "published_daily_shards": len(before) - len(removed),
