@@ -31,3 +31,45 @@
 .prooflab-footer{margin-top:16px}
 @media(max-width:800px){.prooflab-layout,.prooflab-workspace-grid{grid-template-columns:minmax(0,1fr)}}
 @media(max-width:480px){.prooflab-page{padding:12px}.prooflab-hero{border-radius:17px;padding:22px}.prooflab-panel{padding:16px;border-radius:16px}.prooflab-actions{flex-direction:column;align-items:stretch}.prooflab-actions>*{flex:auto;width:100%}.prooflab-panel textarea{font-size:16px}.prooflab-panel select{font-size:16px}}
+
+
+/* ProofLab conversation workspace */
+.axiovo-research .prooflab-chat-layout{display:grid;grid-template-columns:minmax(255px,.75fr) minmax(0,1.5fr);gap:18px;align-items:start}
+.axiovo-research .prooflab-chat-layout>.prooflab-conversation{grid-column:2;grid-row:1 / span 2;display:flex;flex-direction:column;min-height:570px;padding:20px}
+.axiovo-research .prooflab-chat-layout>.prooflab-setup{grid-column:1;grid-row:1}
+.axiovo-research .prooflab-chat-layout>.prooflab-workspace{grid-column:1;grid-row:2}
+.axiovo-research .prooflab-chat-layout>.prooflab-workspace .prooflab-workspace-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:16px}
+.axiovo-research .prooflab-chat-layout .prooflab-panel{background:var(--rd-surface);color:var(--rd-ink);border-color:var(--rd-border)}
+.axiovo-research .prooflab-chat-layout .prooflab-panel :is(input,textarea,select){background:var(--rd-surface);color:var(--rd-ink);border-color:var(--rd-border)}
+.axiovo-research .prooflab-chat-layout .prooflab-panel .rd-button{width:auto;flex-shrink:0}
+.prooflab-conversation-heading{display:flex;align-items:start;justify-content:space-between;gap:12px;border-bottom:1px solid var(--rd-border);padding-bottom:14px}
+.prooflab-conversation-heading h2{margin:4px 0 0}
+.prooflab-unverified{border:1px solid var(--rd-border);background:var(--rd-soft);color:var(--rd-muted);padding:6px 10px;font-size:.75rem;font-weight:700;white-space:nowrap;border-radius:99px}
+.prooflab-thread{flex:1;min-height:220px;max-height:570px;overflow:auto;scrollbar-width:thin;padding:18px 4px}
+.prooflab-welcome{color:var(--rd-muted);text-align:center;max-width:38ch;margin:52px auto 30px;line-height:1.65;font-size:.96rem}
+.prooflab-message{width:fit-content;max-width:93%;margin:12px 0;padding:14px 16px;border-radius:17px;font-size:.92rem;line-height:1.65;overflow-wrap:anywhere}
+.prooflab-message strong{display:block;font-size:.76rem;margin-bottom:6px;color:var(--rd-link)}
+.prooflab-message>div{white-space:pre-wrap}
+.prooflab-message.user{margin-left:auto;background:var(--rd-soft);border-bottom-right-radius:5px}
+.prooflab-message.assistant{border-left:3px solid var(--rd-link);border-radius:0;max-width:100%}
+.prooflab-composer{border-top:1px solid var(--rd-border);padding-top:14px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:end}
+.prooflab-composer label{grid-column:1/-1;margin:0!important}
+.prooflab-composer textarea{min-height:80px;resize:vertical}
+.prooflab-composer button{min-height:46px;align-self:end}
+.prooflab-output-legacy{display:none!important}
+.prooflab-conversation>.rd-small:last-child{margin-top:10px}
+.prooflab-chat-layout .prooflab-status{background:var(--rd-soft);color:var(--rd-ink)}
+.prooflab-chat-layout .prooflab-note{color:var(--rd-muted)}
+@media(max-width:800px){
+ .axiovo-research .prooflab-chat-layout{grid-template-columns:minmax(0,1fr)}
+ .axiovo-research .prooflab-chat-layout>.prooflab-conversation{grid-column:1;grid-row:1;min-height:400px}
+ .axiovo-research .prooflab-chat-layout>.prooflab-setup{grid-column:1;grid-row:2}
+ .axiovo-research .prooflab-chat-layout>.prooflab-workspace{grid-column:1;grid-row:3}
+ .prooflab-thread{max-height:440px}
+}
+@media(max-width:480px){
+ .axiovo-research .prooflab-chat-layout>.prooflab-conversation{padding:16px;min-height:390px}
+ .prooflab-composer{grid-template-columns:minmax(0,1fr)}
+ .prooflab-composer button{width:100%!important}
+ .prooflab-message{max-width:98%}
+}
