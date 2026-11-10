@@ -5,6 +5,7 @@ on:
       - 'docs/prooflab*'
       - 'docs/copilot.html'
       - 'tests/prooflab.test.js'
+      - 'tests/prooflab-ollama.test.js'
       - 'scripts/smoke_prooflab.py'
       - 'scripts/prooflab_verify.py'
       - 'tests/test_prooflab_verify.py'
@@ -29,8 +30,9 @@ jobs:
         run: |
           node --check docs/prooflab-core.js
           node --check docs/prooflab.js
+          node --check docs/prooflab-ollama.js
       - name: Run ProofLab unit tests
-        run: node --test tests/prooflab.test.js
+        run: node --test tests/prooflab.test.js tests/prooflab-ollama.test.js
       - uses: actions/setup-python@v6
         with:
           python-version: '3.12'
