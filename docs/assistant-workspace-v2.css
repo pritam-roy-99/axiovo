@@ -275,3 +275,27 @@
 @media(prefers-reduced-motion:reduce){
  .axiovo-assistant .assistant-prooflab-cta{transition:none!important;transform:none!important;}
 }
+
+/* Simplified question-first assistant. Advanced controls are opt-in. */
+.axiovo-assistant .assistant-page>.assistant-results{display:contents!important}
+.axiovo-assistant .assistant-results>.rd-panel:first-child{min-height:280px!important}
+.axiovo-assistant .assistant-results #conversation{min-height:170px!important}
+.axiovo-assistant .assistant-results #conversation>.rd-small:first-child{
+ margin:12px auto!important;padding:20px!important;
+}
+.axiovo-assistant .assistant-compose .assistant-privacy-details{
+ border:1px solid var(--assistant-border);border-radius:12px;
+ padding:10px 13px;background:var(--assistant-quiet);
+}
+.axiovo-assistant .assistant-compose .assistant-privacy-details>summary{
+ font-weight:720;color:var(--rd-muted);font-size:.8rem;
+}
+.axiovo-assistant .assistant-compose .assistant-privacy-details .assistant-privacy{
+ margin-top:9px!important;padding:0!important;
+ border:0!important;background:transparent!important;
+}
+.axiovo-assistant .assistant-prooflab-cta{min-height:46px;box-sizing:border-box}
+@media(max-width:550px){
+ .axiovo-assistant .assistant-results>.rd-panel:first-child{min-height:230px!important}
+ .axiovo-assistant .assistant-results #conversation{min-height:130px!important}
+}
