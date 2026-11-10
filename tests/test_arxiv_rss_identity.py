@@ -20,6 +20,21 @@ class RssIdentityTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             rss.parse_feed(xml.replace(b'org:2611.01234', b'org:2611.09999'), 'quant-ph')
 
+    def test_rss_fetch_has_bounded_timeout(self):
+        """One unavailable category must not consume the whole update window."""
+        from unittest.mock import MagicMock
+        response = MagicMock()
+        response.__enter__.return_value.read.return_value = (
+            b'<rss><channel><pubDate>Tue, 10 Nov 2026 05:00:00 +0000</pubDate>'
+            b'<item><title>Example</title><link>https://arxiv.org/abs/2611.01234</link>'
+            b'</item></channel></rss>'
+        )
+        with patch.object(rss.urllib.request, "urlopen", return_value=response) as fetch:
+            day, rows = rss.get("quant-ph")
+        self.assertEqual(day, "2026-11-10")
+        self.assertEqual(len(rows), 1)
+        self.assertLessEqual(fetch.call_args.kwargs["timeout"], 10)
+
     def test_empty_category_is_not_a_failed_feed(self):
         with tempfile.TemporaryDirectory() as directory:
             target=Path(directory)/'announcements.json'
