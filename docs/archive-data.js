@@ -98,8 +98,9 @@ function normalize(source,p){
  * Unknown revisions remain visible rather than being falsely called v1.
  */
 function versionStatus(p){
- const n=Number(p?.version);
- if(Number.isSafeInteger(n)&&n>=1)return n===1?"original":"revised";
+ const n=p?.version;
+ // A missing version must never be coerced to zero or labelled original.
+ if((typeof n==="number"||typeof n==="string"&&/^\\d+$/.test(n))&&Number.isSafeInteger(Number(n))&&Number(n)>=1)return Number(n)===1?"original":"revised";
  return "unknown";
 }
 function firstSubmissionsFirst(papers){
