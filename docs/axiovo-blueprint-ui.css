@@ -137,3 +137,77 @@ body.axiovo-reference-ui.axiovo-home .axiovo-archive-card{background:#f5fafc;bor
  background:#fff;text-align:left;color:#133d57;font:700 13px Inter,system-ui,sans-serif;cursor:pointer
 }
 .ax-menu-panel .ax-menu-theme:hover{background:#e9f8f8}
+
+/* Visual audit corrections for the supplied desktop and mobile reference. */
+@media(min-width:761px){
+ html body.axiovo-reference-ui header.rl-global-header{
+  background:#fff!important;color:#16394e!important;
+ }
+ html body.axiovo-reference-ui header.rl-global-header .ax-header-home{
+  color:#103f59!important;font-weight:800!important
+ }
+ html body.axiovo-reference-ui header.rl-global-header .ax-header-search{
+  color:#0c5067!important;border-color:#cadfe7!important;background:#f7fcfd!important;
+ }
+ body.axiovo-reference-ui.axiovo-home .axiovo-welcome-header:before{
+  content:"";position:absolute;right:16px;bottom:18px;z-index:0;
+  width:clamp(135px,18vw,240px);height:270px;pointer-events:none;
+  background:url("./assets/axiovo-microscope.svg") center bottom/contain no-repeat;
+  opacity:.82;filter:drop-shadow(0 9px 13px #063f4b29)
+ }
+ body.axiovo-reference-ui.axiovo-home .axiovo-welcome-copy{
+  max-width:calc(100% - 140px)!important
+ }
+}
+@media(max-width:760px){
+ html:root body.axiovo-reference-ui header.rl-global-header>nav.rl-nav[aria-label]{
+  position:fixed!important;top:auto!important;bottom:0!important;
+  left:0!important;right:0!important;z-index:210!important;
+  display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;
+  grid-template-rows:1fr!important;
+  width:100%!important;min-width:0!important;max-width:none!important;
+  height:calc(68px + env(safe-area-inset-bottom,0px))!important;
+  margin:0!important;padding:4px 5px max(6px,env(safe-area-inset-bottom,0px))!important;
+  gap:2px!important;background:#fff!important;
+  border:1px solid #d1e2ea!important;border-radius:16px 16px 0 0!important;
+  box-shadow:0 -6px 18px #032c4b2b!important;
+  align-items:center!important;justify-content:space-between!important;overflow:visible!important;
+ }
+ html:root body.axiovo-reference-ui header.rl-global-header>nav.rl-nav[aria-label]>a{
+  grid-column:auto!important;display:flex!important;flex-direction:column!important;
+  width:100%!important;min-width:0!important;height:55px!important;min-height:55px!important;
+  justify-content:center!important;align-items:center!important;padding:4px 2px!important;
+  background:transparent!important;color:#46657d!important;
+  font-size:0!important;line-height:1.2!important;
+  border:0!important;border-radius:9px!important;
+ }
+ html:root body.axiovo-reference-ui header.rl-global-header>nav.rl-nav[aria-label]>a:before{
+  display:block!important;flex:0 0 21px!important;margin:0 0 2px!important;
+  font-size:19px!important;color:inherit!important;
+ }
+ html:root body.axiovo-reference-ui header.rl-global-header>nav.rl-nav[aria-label]>a:after{
+  content:"Explore";display:block;font:700 clamp(9px,2.35vw,11px)/1.2 Inter,system-ui,sans-serif;
+  color:inherit!important;white-space:normal;text-align:center;word-break:normal;
+ }
+ html:root body.axiovo-reference-ui header.rl-global-header>nav.rl-nav[aria-label]>a:nth-child(2):after{content:"Desk"}
+ html:root body.axiovo-reference-ui header.rl-global-header>nav.rl-nav[aria-label]>a:nth-child(3):after{content:"My Feed"}
+ html:root body.axiovo-reference-ui header.rl-global-header>nav.rl-nav[aria-label]>a:nth-child(4):after{content:"Library"}
+ html:root body.axiovo-reference-ui header.rl-global-header>nav.rl-nav[aria-label]>a:nth-child(5):after{content:"Assistant"}
+ html:root body.axiovo-reference-ui header.rl-global-header>nav.rl-nav[aria-label]>a[aria-current="page"]{
+  background:#e7f9f8!important;color:#007987!important;box-shadow:none!important;
+ }
+ html body.axiovo-reference-ui .rl-global-header .ax-header-search{
+  font-size:0!important;display:grid!important;place-items:center!important;
+  border:0!important;background:transparent!important;color:#fff!important;
+  min-width:44px!important;max-width:44px!important;
+ }
+ html body.axiovo-reference-ui .rl-global-header .ax-header-search:before{
+  content:"⌕";display:block;font:700 28px/1 Inter,system-ui,sans-serif;color:#fff!important;
+ }
+ body.axiovo-reference-ui.axiovo-home .axiovo-welcome-header .axiovo-welcome-actions>.axiovo-cta{
+  grid-column:auto!important;min-width:0!important;max-width:none!important;
+ }
+ body.axiovo-reference-ui.axiovo-home .axiovo-welcome-header .axiovo-welcome-actions>.axiovo-install-limits{
+  grid-column:1/-1!important;
+ }
+}
