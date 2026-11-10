@@ -1,0 +1,51 @@
+/* Phase 3: remaining active supporting screens, visual-only. */
+body:has(.panel.paper) main,body:has(.axiovo-palette-preview) main,
+body:has(.cards .card) main{max-width:1180px;margin-inline:auto}
+body:has(.panel.paper) main .panel,
+body:has(.axiovo-palette-preview) main .panel,
+body:has(.cards .card) main .card{border-radius:17px;box-shadow:0 8px 27px rgba(7,39,65,.06)}
+body:has(.panel.paper) main .grid{gap:20px}
+body:has(.panel.paper) main .paper h1{line-height:1.2;overflow-wrap:anywhere}
+body:has(.panel.paper) main .discussion{border-radius:12px}
+body:has(.panel.paper) main :is(button,a,input,textarea):focus-visible{outline:3px solid #27cbbf;outline-offset:2px}
+body:has(.axiovo-palette-preview) .axiovo-palette-preview{border-radius:14px}
+body:has(.axiovo-palette-preview) main .row{display:flex;flex-wrap:wrap;gap:8px}
+body:has(.axiovo-palette-preview) main :is(input,textarea,select,button,a):focus-visible{outline:3px solid #27cbbf;outline-offset:2px}
+body:has(.cards .card) main .cards{gap:14px}
+body:has(.cards .card) main .card{min-width:0}
+body:has(.cards .card) main :is(a,button):focus-visible{outline:3px solid #27cbbf;outline-offset:2px}
+.axiovo-compare-page{max-width:1180px}
+.axiovo-compare-page .axiovo-compare-form{border-radius:15px}
+.axiovo-compare-page .axiovo-compare-grid{min-width:0;gap:14px}
+.axiovo-compare-page .axiovo-compare-method{border-radius:16px}
+.axiovo-compare-page :is(input,button,a):focus-visible{outline:3px solid #27cbbf;outline-offset:2px}
+body.axiovo-research .install-page{max-width:1060px}
+body.axiovo-research .install-platforms{display:flex;flex-wrap:wrap;gap:8px}
+body.axiovo-research .install-platforms a{min-height:42px;border-radius:11px}
+body.axiovo-research .install-panel{border-radius:17px}
+body.axiovo-research .install-panel:target{outline:2px solid #12a99d;outline-offset:5px;scroll-margin-top:18px}
+body.axiovo-research .install-note{border-radius:12px}
+body.axiovo-research .watch-wrap{max-width:1080px}
+body.axiovo-research .watch-player{border-radius:16px;overflow:hidden}
+body.axiovo-research .watch-player video{display:block;width:100%;height:auto}
+body.axiovo-research .watch-panel{border-radius:16px}
+body.axiovo-research .watch-sections{gap:14px}
+body.axiovo-research .why-card{border-radius:15px}
+body.axiovo-research .why-cards{gap:12px}
+/* Long-form methodology and privacy should be comfortable to read without changing claims. */
+body:has(#axiovo-iacr-methodology) main,
+body:has(>header+main>section>h2:first-child) main{line-height:1.7}
+body:has(#axiovo-iacr-methodology) main section{border-radius:15px;overflow-wrap:anywhere}
+body:has(#axiovo-iacr-methodology) main :is(table,pre,code){max-width:100%;overflow-x:auto}
+body:has(#axiovo-iacr-methodology) main :is(a,button):focus-visible,
+body:has(.why-wrap) main :is(a,button):focus-visible{outline:3px solid #27cbbf;outline-offset:2px}
+@media(max-width:760px){
+ body:has(.panel.paper) main .grid{grid-template-columns:minmax(0,1fr);gap:12px}
+ body:has(.axiovo-palette-preview) main .grid{grid-template-columns:minmax(0,1fr)}
+ body:has(.cards .card) main .cards{grid-template-columns:minmax(0,1fr)}
+ .axiovo-compare-page .axiovo-compare-grid{grid-template-columns:minmax(0,1fr)}
+ body.axiovo-research .install-page,body.axiovo-research .watch-wrap{padding-inline:12px}
+ body.axiovo-research .install-platforms a{min-height:44px}
+ body:has(#axiovo-iacr-methodology) main{padding-inline:13px}
+}
+@media(prefers-reduced-motion:reduce){body.axiovo-research .install-platforms a{scroll-behavior:auto}}
