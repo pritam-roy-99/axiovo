@@ -11,7 +11,7 @@
   "lang": "en",
   "icons": [
     {
-      "src": "./icons/axiovo.svg",
+      "src": "./icons/axiovo.svg?v=20261111-brand",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any maskable"
