@@ -8,6 +8,7 @@ style.textContent+="\n#axiovo-robot .robot-launcher{display:flex;align-items:cen
 style.textContent+="\n#axiovo-robot .robot-launcher{display:flex!important;align-items:center!important;gap:8px!important;overflow:visible!important;max-width:calc(100vw - 12px)!important}\n#axiovo-robot .robot-help-label{display:inline-flex!important;visibility:visible!important;opacity:1!important;position:relative!important;align-items:center!important;justify-content:center!important;flex:none!important;min-height:38px!important;white-space:nowrap!important;z-index:2147483646!important;background:#123e5d!important;color:#fff!important;font-weight:800!important}\n#axiovo-robot .robot-speak-reply{display:block!important;margin-top:7px!important;padding:7px 10px!important;border-radius:8px!important;background:#fff!important;border:1px solid #8db4c9!important;color:#114a70!important;cursor:pointer!important;font-weight:650!important}\n#axiovo-robot .robot-voice-status{width:100%;font-size:11px;line-height:1.4;color:#385975}\n@media(max-width:760px){#axiovo-robot .robot-help-label{font-size:13px!important;padding:8px 12px!important;max-width:none!important}#axiovo-robot .robot-launcher{display:flex!important;flex-direction:row!important}#axiovo-robot .robot-fab{display:grid!important;visibility:visible!important;opacity:1!important;flex:none!important}}\n";
 style.textContent+="\n/* Fixed viewport launcher: independent of page layout, including mobile keyboard and open chat. */\n#axiovo-robot{--robot-panel:#f8fbfe;--robot-ink:#17324a;--robot-head:#123e5d;--robot-bubble:#e5f0f8;--robot-user:#d3eafb;--robot-border:#a2c8de;--robot-control:#ffffff;--robot-control-ink:#17425c;--robot-muted:#47647a;position:fixed!important;left:auto!important;right:16px!important;top:auto!important;bottom:calc(16px + env(safe-area-inset-bottom,0px))!important;z-index:2147483000!important;overflow:visible!important;display:block!important;visibility:visible!important;opacity:1!important}\n#axiovo-robot .robot-launcher{position:relative!important;display:flex!important;flex-flow:row nowrap!important;align-items:center!important;justify-content:flex-end!important;gap:8px!important;width:max-content!important;max-width:calc(100vw - 16px)!important;min-height:56px!important;visibility:visible!important;opacity:1!important;transform:none!important}\n#axiovo-robot .robot-help-label{display:inline-flex!important;align-items:center!important;visibility:visible!important;opacity:1!important;max-width:none!important;background:var(--robot-head)!important;color:#fff!important;box-shadow:0 5px 16px #081e3833!important;border:1px solid #88b8d2!important;border-radius:13px!important;padding:9px 12px!important;font-size:14px!important;font-weight:800!important;white-space:nowrap!important}\n#axiovo-robot .robot-fab{position:relative!important;flex:none!important;visibility:visible!important;opacity:1!important;background:var(--robot-head)!important;color:#fff!important;z-index:2!important}\n#axiovo-robot .robot-panel{position:fixed!important;left:auto!important;right:16px!important;top:auto!important;bottom:calc(84px + env(safe-area-inset-bottom,0px))!important;width:min(375px,calc(100vw - 20px))!important;max-width:calc(100vw - 20px)!important;height:min(510px,calc(100dvh - 125px))!important;max-height:calc(100dvh - 125px)!important;background:var(--robot-panel)!important;color:var(--robot-ink)!important;border-color:var(--robot-border)!important;z-index:2147483001!important}\n#axiovo-robot .robot-panel[hidden]{display:none!important}\n#axiovo-robot .robot-head{background:var(--robot-head)!important;color:#fff!important}\n#axiovo-robot .robot-msg{background:var(--robot-bubble)!important;color:var(--robot-ink)!important}\n#axiovo-robot .robot-msg.user{background:var(--robot-user)!important}\n#axiovo-robot .robot-voice-settings,#axiovo-robot .robot-note,#axiovo-robot .robot-voice-status{color:var(--robot-muted)!important}\n#axiovo-robot .robot-actions button,#axiovo-robot .robot-speak-reply,#axiovo-robot .robot-form button,#axiovo-robot .robot-voice-settings button,#axiovo-robot .robot-voice-settings select{background:var(--robot-control)!important;color:var(--robot-control-ink)!important;border-color:var(--robot-border)!important}\n#axiovo-robot .robot-form input{background:var(--robot-control)!important;color:var(--robot-ink)!important;border-color:var(--robot-border)!important}\nhtml[data-theme=\"dark\"] #axiovo-robot{--robot-panel:#122638;--robot-ink:#eaf5fd;--robot-head:#061b2d;--robot-bubble:#223c51;--robot-user:#174c68;--robot-border:#4a6d83;--robot-control:#1c364b;--robot-control-ink:#e9f5fd;--robot-muted:#c1d8e6}\n@media(max-width:760px){#axiovo-robot{left:auto!important;right:10px!important;top:auto!important;bottom:calc(12px + env(safe-area-inset-bottom,0px))!important}#axiovo-robot .robot-panel{left:10px!important;right:10px!important;top:auto!important;bottom:calc(83px + env(safe-area-inset-bottom,0px))!important;width:auto!important;height:min(480px,calc(100dvh - 116px))!important;max-height:calc(100dvh - 116px)!important}#axiovo-robot .robot-launcher{min-height:54px!important}#axiovo-robot .robot-help-label{font-size:13px!important}}\n";
 style.textContent+="\n/* Guided tour places the launcher beside the highlighted feature, never over it. */\n#axiovo-robot.axiovo-guiding{transition:left .35s ease,top .35s ease}\n#axiovo-robot.axiovo-guiding .robot-launcher{pointer-events:auto!important}\n.axiovo-robot-target{outline:3px solid #22b5dd!important;outline-offset:5px!important;box-shadow:0 0 0 8px rgba(34,181,221,.15)!important;scroll-margin-top:112px!important;position:relative;z-index:1}\n@media(prefers-reduced-motion:reduce){#axiovo-robot.axiovo-guiding{transition:none!important}}\n";
+style.textContent+="\n#axiovo-robot .robot-paper-card{padding:9px 0;border-bottom:1px solid var(--robot-border);display:grid;gap:4px}\n#axiovo-robot .robot-paper-title{display:block;color:var(--robot-control-ink);font-weight:750;text-decoration:underline;overflow-wrap:anywhere}\n#axiovo-robot .robot-paper-meta{color:var(--robot-muted);font-size:11px}\n#axiovo-robot .robot-paper-snippet{margin:4px 0;font-size:12px;line-height:1.5}\n#axiovo-robot .robot-paper-save{justify-self:start;border:1px solid var(--robot-border);background:var(--robot-control);color:var(--robot-control-ink);border-radius:7px;padding:6px 9px;cursor:pointer}\n";
 const make=(tag,cl,txt)=>{const n=document.createElement(tag);if(cl)n.className=cl;if(txt!==undefined)n.textContent=txt;return n};
 function setup(){
 if(document.getElementById("axiovo-robot"))return;
@@ -157,11 +158,114 @@ function findGuideTarget(query){
  return scored[0]||null;
 }
 
+
+/* One assistant entry point. Reuse Axiovo's existing archive connectors,
+   source IDs, and Library storage. No fabricated answers or paper records. */
+let archiveBridge=null,searchSerial=0;
+function loadScriptOnce(name){
+ return new Promise((resolve,reject)=>{
+  if(name==="archive-data.js"&&window.AxiovoArchiveData){resolve();return}
+  if(name==="arxiv-versions.js"&&window.AxiovoArxiv){resolve();return}
+  if(name==="eprint-source.js"&&window.AxiovoEprintSource){resolve();return}
+  let node=document.querySelector('script[data-robot-source="'+name+'"]');
+  if(node){node.addEventListener("load",resolve,{once:true});node.addEventListener("error",reject,{once:true});return}
+  node=document.createElement("script");node.src=new URL(name,base).href;
+  node.dataset.robotSource=name;node.onload=resolve;node.onerror=()=>reject(new Error("Unable to load "+name));
+  document.head.append(node);
+ });
+}
+async function archiveAPI(){
+ if(window.AxiovoArchiveData)return window.AxiovoArchiveData;
+ if(!archiveBridge)archiveBridge=(async()=>{
+  await loadScriptOnce("arxiv-versions.js");
+  // Data scripts must follow the archive identity helper.
+  await loadScriptOnce("archive-data.js");
+  return window.AxiovoArchiveData;
+ })().catch(e=>{archiveBridge=null;throw e});
+ return archiveBridge;
+}
+function researchLink(question){return new URL("copilot.html?q="+encodeURIComponent(question.slice(0,500)),base).href}
+function paperIntent(q){
+ return /\b(find|search|look for|show|list|discover|locate|fetch|get|papers?|preprints?|articles?|publications?|literature|arxiv|biorxiv|chemrxiv|eprint|doi)\b/i.test(q);
+}
+function paperQuery(question){
+ return question
+  .replace(/^(?:please\s+)?(?:could you\s+|can you\s+)?(?:find|search for|search|look for|show me|list|discover|locate|fetch|get)\s+/i,"")
+  .replace(/^(?:recent|latest|new|published|research|scientific)\s+(?:papers?|preprints?|articles?|literature)\s+(?:on|about|related to|in|by)\s+/i,"")
+  .replace(/^(?:papers?|preprints?|articles?|literature)\s+(?:on|about|related to|in|by)\s+/i,"")
+  .replace(/\s+(?:papers?|preprints?|articles?)\s*$/i,"")
+  .replace(/[?.!]+\s*$/,"").trim();
+}
+function resultCard(p,api){
+ const wrap=make("div","robot-paper-card");
+ const a=make("a","robot-paper-title",p.title);a.href=p.url;
+ a.target="_blank";a.rel="noopener noreferrer";
+ wrap.append(a);
+ const about=make("div","robot-paper-meta",(api.names[p.source]||p.source)+" · "+(p.date||"date not provided")+" · "+(p.authors||[]).slice(0,3).join(", "));
+ wrap.append(about);
+ if(p.abstract){const snippet=make("p","robot-paper-snippet",p.abstract.slice(0,235)+(p.abstract.length>235?"…":""));wrap.append(snippet)}
+ const save=make("button","robot-paper-save","Save to Library");
+ save.type="button";save.addEventListener("click",()=>{
+  try{if(api.save(p)){save.textContent="Saved ✓";save.disabled=true}else save.textContent="Unable to save"}
+  catch{save.textContent="Unable to save"}
+ });
+ wrap.append(save);return wrap;
+}
+async function searchPapers(question){
+ const query=paperQuery(question);
+ if(query.length<2){message("Tell me the research topic, author, title or paper identifier to search.");return}
+ const serial=++searchSerial;
+ const status=make("div","robot-msg","Searching Axiovo's four research archives for “"+query+"”…");
+ log.append(status);log.scrollTop=log.scrollHeight;
+ const go=make("a","robot-paper-title","Open the full cross-archive search");
+ go.href=new URL("desk.html?q="+encodeURIComponent(query),base).href;
+ try{
+  const api=await archiveAPI();
+  if(serial!==searchSerial)return;
+  const sources=["arxiv","biorxiv","chemrxiv","eprint"];
+  const criteria={q:query,sort:/\b(latest|newest|recent)\b/i.test(question)?"recent":"relevance"};
+  // Existing source clients perform actual fetches and retain original identifiers.
+  // Limit the mini-view to initial results; Research Desk offers full pagination.
+  const fetched=await Promise.allSettled(sources.map(async source=>{
+   try{
+    const live=await api.live(source,criteria,undefined,null);
+    return {source,papers:(live.papers||[]).slice(0,12),provider:live.provider||"live source"};
+   }catch(error){
+    const snap=await api.snapshot(source);
+    return {source,papers:api.filter(snap.papers,criteria).slice(0,12),provider:"indexed snapshot",partial:true};
+   }
+  }));
+  if(serial!==searchSerial)return;
+  const records=fetched.filter(x=>x.status==="fulfilled").flatMap(x=>x.value.papers);
+  const found=new Set(),unique=records.filter(p=>{const k=p.source+":"+(p.recordId||p.url);if(found.has(k))return false;found.add(k);return true});
+  status.replaceChildren();
+  status.append(make("div",null,unique.length?"Found "+unique.length+" matching indexed/source records (showing up to five).":"No matching records returned by the available source searches. This does not prove no such paper exists."));
+  if(unique.length){
+   const sort=window.AxiovoPaperSort;
+   const result=criteria.sort==="recent"?unique.sort((a,b)=>String(b.date||"").localeCompare(String(a.date||""))):unique;
+   result.slice(0,5).forEach(p=>status.append(resultCard(p,api)));
+  }
+  status.append(go);
+  if(fetched.some(x=>x.status==="rejected"||x.value.partial))status.append(make("small",null,"Some sources used partial indexes or were unavailable. Open Research Desk for coverage details."));
+  log.scrollTop=log.scrollHeight;
+ }catch(error){
+  if(serial!==searchSerial)return;
+  status.replaceChildren(make("div",null,"Axiovo's research search could not load here. Open the full Research Desk to run your search."),go);
+ }
+}
+function routeToCopilot(question){
+ const link=make("a","robot-paper-title","Open full Research Assistant with this question");
+ link.href=researchLink(question);
+ const msgText="For a research explanation, derivation, review or general question, I'll pass your exact question to Axiovo's full Research Assistant. Its answer depends on available sources and configured AI; I won't invent an answer.";
+ message(msgText,false,[["Open Research Assistant", "copilot.html?q="+encodeURIComponent(question.slice(0,500))]]);
+}
+
 const aliases=[["ProofLab",/\bproof\s*lab\b/],["Research Assistant",/\b(copilot|research assistant)\b/],["Research Desk",/\b(research desk|desk)\b/],["Library",/\b(library|workspace)\b/],["Settings",/\bsettings\b/],["My Feed",/\b(my feed|feed)\b/],["Research Tools",/\b(research tools|pdf reader)\b/],["Home",/\b(home|homepage)\b/],["ChemRxiv",/\bchemrxiv\b/],["bioRxiv",/\bbiorxiv\b/],["Cryptology ePrint",/\b(cryptology|crypto|eprint|iacr)\b/],["arXiv",/\barxiv\b/]];
 function ask(raw){
 const question=clean(raw);if(!question)return;message(question,true);
 const q=question.toLowerCase(),state=snapshot();
 if(/\b(stop guiding|stop pointing|cancel guide|stop tour)\b/.test(q)){stopGuide();message("I stopped pointing. Ask me to show another control.");return}
+if(paperIntent(question)&&!/\b(open|go to|navigate|take me|visit|switch to)\b/.test(q)){void searchPapers(question);return}
 if(/\b(show me|where is|where are|point to|highlight|guide me|how do i use)\b/.test(q)){const hit=findGuideTarget(question);if(hit&&showTarget(hit.node,hit.name.slice(0,75)))return}
 if(/\b(open|go to|navigate|take me|visit|switch to)\b/.test(q)){const target=aliases.find(([k,re])=>re.test(q));if(target){message("Opening "+target[0]+".");location.assign(new URL(pages[target[0]],base).href);return}}
 if(/\b(sort|order)\b/.test(q)&&/\b(newest|oldest|recent|relevance|title)\b/.test(q)){
@@ -185,7 +289,7 @@ const terms=tokens(question),candidates=[...state.headings.map(x=>({text:x,type:
 for(const c of candidates)c.score=terms.filter(t=>tokens(c.text).some(w=>w===t||w.startsWith(t)||t.startsWith(w))).length;
 const hits=candidates.filter(x=>x.score>0).sort((a,b)=>b.score-a.score).slice(0,4);
 if(hits.length){const best=findGuideTarget(question);if(best)showTarget(best.node,best.name.slice(0,75));message("Related items I found: "+hits.map(x=>x.text+" ("+x.type+")").join("; ")+".\n\nThese are verified page labels, not an AI-generated explanation.",false,hits.filter(x=>x.type==="page").map(x=>[x.text,pages[x.text]]));return}
-message("I can't verify that answer from this page. Try a specific visible feature, or open Research Assistant for deeper questions.",false,[["Research Assistant","copilot.html"]]);
+routeToCopilot(question);
 }
 message("Hello! I'm Axiovo Robot Help. I can inspect current page headings, guide navigation, and use supported search and sort controls. Deeper AI questions require a configured AI model.");
 for(const name of ["What does this page do?","Open Research Desk","Open ProofLab"]){const b=make("button",null,name);b.type="button";b.addEventListener("click",()=>ask(name));suggestions.append(b)}
