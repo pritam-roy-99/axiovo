@@ -37,6 +37,11 @@ html body.prooflab-body .pl-chat-settings .pl-install-guide-link{
   color:var(--rd-link);
 }
 @media(max-width:760px){
+  html body.prooflab-body .prooflab-conversation{
+    height:max(720px,88vh)!important;
+    min-height:720px!important;
+    max-height:none!important;
+  }
   html body.prooflab-body .pl-chat-settings{
     grid-template-columns:minmax(0,1fr);
     padding:10px 12px 8px;
