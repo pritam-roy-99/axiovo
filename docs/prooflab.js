@@ -3,7 +3,7 @@
 const $=id=>document.getElementById(id),P=window.AxiovoProofLab;let project=null;
 function feedback(s){$("feedback").textContent=s}
 function download(name,body,type){const url=URL.createObjectURL(new Blob([body],{type}));const a=document.createElement("a");a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000)}
-function render(){if(!project)return;$("workspace").hidden=false;$("project-title").textContent=project.title;$("project-status").textContent="Status: Unverified draft · "+P.report(project).open+" open obligations";const ol=$("obligations");ol.replaceChildren();for(const item of project.obligations){const li=document.createElement("li");li.textContent=item.statement+" (open)";ol.append(li)}}
+function render(){if(!project)return;const open=P.report(project).open;$("workspace").hidden=false;$("project-title").textContent=project.title;$("project-status").textContent="Status: Unverified draft · "+open+" open obligations";$("obligation-count").textContent=open+" open";$("prooflab-toolbar-status").textContent=project.title+" · Draft · "+open+" open";$("prooflab-empty-obligations").hidden=open>0;const ol=$("obligations");ol.replaceChildren();for(const item of project.obligations){const li=document.createElement("li");li.textContent=item.statement+" (open)";ol.append(li)}}
 // Optional user-initiated handoff from the Research Assistant; never fetch paper content automatically.
 const params=new URLSearchParams(location.search);
 const prefill=params.get("statement");
@@ -14,6 +14,7 @@ $("lean").addEventListener("input",()=>{if(project){project=P.setLean(project,$(
 const O=window.AxiovoProofLabOllama;let chatHistory=[];
 function chatMessage(role,content){const thread=$("prooflab-thread");const welcome=thread.querySelector(".prooflab-welcome");if(welcome)welcome.remove();const article=document.createElement("article");article.className="prooflab-message "+role;const name=document.createElement("strong");name.textContent=role==="user"?"You":"Local AI · unverified";const body=document.createElement("div");body.textContent=content;article.append(name,body);thread.append(article);thread.scrollTop=thread.scrollHeight;return article;}
 $("prooflab-prompt").addEventListener("keydown",e=>{if(e.key==="Enter"&&(e.ctrlKey||e.metaKey)){e.preventDefault();$("ollama-suggest").click();}});
+$("prooflab-strategy").addEventListener("click",()=>{$("prooflab-prompt").value="Propose a rigorous proof strategy, identify essential lemmas, and explain any gaps in the argument.";$("ollama-suggest").click();});
 $("ollama-detect").addEventListener("click",async()=>{const b=$("ollama-detect");b.disabled=true;$("ollama-status").textContent="Checking local Ollama…";try{const models=await O.models();const select=$("ollama-model");select.replaceChildren();for(const model of models){const option=document.createElement("option");option.value=model;option.textContent=model;select.append(option)}$("ollama-status").textContent=models.length?"Connected. Select a model and request a proof strategy.":"Ollama is running but has no installed models. Run: ollama pull qwen2.5:3b";}catch(e){$("ollama-status").textContent="Local Ollama unavailable. Start Ollama and allow this site's origin. "+String(e.message||e).slice(0,160)}finally{b.disabled=false}});
 $("ollama-suggest").addEventListener("click",async()=>{
  if(!project){feedback("Create a proof project first.");return}
@@ -30,4 +31,6 @@ $("ollama-suggest").addEventListener("click",async()=>{
 });
 $("download-lean").addEventListener("click",()=>{if(!project)return;download("axiovo-prooflab.lean",project.lean||"-- Unverified Lean 4 draft\n","text/plain")});
 $("download-json").addEventListener("click",()=>{if(!project)return;download("axiovo-prooflab.json",P.exportJSON(project),"application/json")});
+// Start with an editable local draft to make the whole studio useful on first load.
+$("create").click();
 })();
