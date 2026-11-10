@@ -1,29 +1,41 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>ProofLab | Axiovo</title><link rel="stylesheet" href="./theme.css"><link rel="stylesheet" href="./research-entry.css"><link rel="stylesheet" href="./axiovo-shell.css"><link rel="stylesheet" href="./research-desk.css">
-<link rel="stylesheet" href="./prooflab.css"><script defer src="./theme.js"></script><script defer src="./navigation.js"></script><script defer src="./prooflab-core.js"></script><script defer src="./prooflab-ollama.js"></script><script defer src="./prooflab.js"></script></head>
-<body class="axiovo-research"><header></header><main class="rd-page prooflab-page">
-<div class="rd-desk-heading prooflab-hero"><p class="rd-kicker">RESEARCH ASSISTANT · FORMAL REASONING</p><h1>Axiovo ProofLab</h1><p>Discuss proof strategies with your local model, organize lemmas and edit Lean 4 drafts. Suggestions remain unverified until checked by Lean.</p></div>
-<div class="prooflab-layout prooflab-chat-layout"><section class="rd-panel prooflab-panel prooflab-conversation" aria-labelledby="prooflab-chat-title">
-<div class="prooflab-conversation-heading"><div><p class="rd-kicker">LOCAL REASONING ASSISTANT</p><h2 id="prooflab-chat-title">Proof conversation</h2></div><span class="prooflab-unverified">Unverified AI</span></div>
-<div id="prooflab-thread" class="prooflab-thread" role="log" aria-live="polite" aria-label="Proof discussion"><p class="prooflab-welcome">Create a proof plan, connect a local Ollama model and ask for a proof strategy or a specific lemma.</p></div>
-<pre class="prooflab-output prooflab-output-legacy" id="ollama-output" aria-label="Latest unverified local model suggestion"></pre>
-<div class="prooflab-composer"><label class="rd-label" for="prooflab-prompt">Ask about this proof</label><textarea id="prooflab-prompt" rows="3" maxlength="2000" placeholder="Suggest a proof strategy, identify gaps, or help with a Lean lemma…"></textarea><button class="rd-button rd-primary" id="ollama-suggest" type="button">Send to local AI</button></div>
-<p class="rd-small">Uses only your locally running Ollama model. AI output is not a Lean-verified proof.</p>
-</section>
-<section class="rd-panel prooflab-panel prooflab-setup"><h2>Proof project</h2><label class="rd-label" for="title">Title</label><input id="title" value="CHSH Tsirelson bound" maxlength="200">
-<label class="rd-label" for="statement">Theorem statement (plain language)</label><textarea id="statement" rows="3">For Hermitian observables A0,A1,B0,B1 with eigenvalues ±1 on bipartite quantum systems, the CHSH expectation is at most 2 sqrt(2) in absolute value.</textarea>
-<label class="rd-label" for="assumptions">Assumptions, one per line</label><textarea id="assumptions" rows="4">Observables are Hermitian
+<title>ProofLab | Axiovo</title><meta name="description" content="Plan formal proofs, discuss strategies with local AI and export Lean 4 drafts in Axiovo ProofLab.">
+<link rel="stylesheet" href="./theme.css"><link rel="stylesheet" href="./research-entry.css"><link rel="stylesheet" href="./axiovo-shell.css"><link rel="stylesheet" href="./research-desk.css"><link rel="stylesheet" href="./prooflab.css?v=20261110-studio">
+<script defer src="./theme.js"></script><script defer src="./navigation.js"></script><script defer src="./prooflab-core.js"></script><script defer src="./prooflab-ollama.js"></script><script defer src="./prooflab.js?v=20261110-studio"></script></head>
+<body class="axiovo-research prooflab-body"><header></header>
+<main class="rd-page prooflab-page">
+<section class="prooflab-hero" aria-labelledby="prooflab-title"><div class="prooflab-hero-copy"><p class="rd-kicker">AXIOVO / FORMAL REASONING STUDIO</p><h1 id="prooflab-title">Axiovo ProofLab</h1><p>Think clearly. Build the argument. Refine it with local AI, then export your Lean 4 draft.</p></div><div class="prooflab-wave" aria-hidden="true"><svg viewBox="0 0 500 150" preserveAspectRatio="none"><defs><linearGradient id="prooflab-glow"><stop stop-color="#2de1c5"/><stop offset=".6" stop-color="#58a5ff"/><stop offset="1" stop-color="#9286ff"/></linearGradient></defs><path d="M0 95 C 90 125, 115 -15, 220 58 S 355 160, 500 34" stroke="url(#prooflab-glow)" stroke-width="2" fill="none"/><path d="M0 110 C 90 140, 115 0, 220 73 S 355 175, 500 49" stroke="#59c6e1" stroke-opacity=".4" fill="none"/><path d="M0 80 C 90 110, 115 -30, 220 43 S 355 145, 500 19" stroke="#8ba7fb" stroke-opacity=".45" fill="none"/></svg><span>‖S‖ ≤ 2√2</span></div></section>
+<nav class="prooflab-toolbar" aria-label="ProofLab workspace navigation"><a class="prooflab-tab active" href="#prooflab-chat-title" aria-current="page">◈ <span>Workspace</span></a><a class="prooflab-tab" href="#prooflab-setup-title">▤ <span>Project</span></a><a class="prooflab-tab" href="#prooflab-model-title">◇ <span>Models</span></a><a class="prooflab-tab" href="#prooflab-lean-title">⌘ <span>Lean editor</span></a><a class="prooflab-tab" href="./copilot.html">↗ <span>Research Assistant</span></a><span class="prooflab-toolbar-status" id="prooflab-toolbar-status">Draft · Local workspace</span></nav>
+<div class="prooflab-studio">
+<aside class="prooflab-sidebar" aria-label="Proof settings">
+<section class="rd-panel prooflab-card prooflab-setup" aria-labelledby="prooflab-setup-title"><div class="prooflab-card-title"><span class="prooflab-glyph" aria-hidden="true">▤</span><h2 id="prooflab-setup-title">Proof project</h2></div><p class="prooflab-card-caption">Set up your theorem and working assumptions.</p>
+<label class="rd-label" for="title">Project title</label><input id="title" value="CHSH Tsirelson bound" maxlength="200" autocomplete="off">
+<label class="rd-label" for="statement">Theorem statement</label><textarea id="statement" rows="5">For Hermitian observables A0,A1,B0,B1 with eigenvalues ±1 on bipartite quantum systems, the CHSH expectation is at most 2 sqrt(2) in absolute value.</textarea>
+<label class="rd-label" for="assumptions">Assumptions · one per line</label><textarea id="assumptions" rows="5">Observables are Hermitian
 Each observable squares to the identity
 Alice's operators commute with Bob's operators</textarea>
-<div class="rd-actions prooflab-actions"><button class="rd-button rd-primary" id="create" type="button">Create proof plan</button><a class="rd-button rd-secondary" href="./copilot.html">Back to Research Assistant</a></div></section>
-<section class="rd-panel prooflab-panel prooflab-workspace" id="workspace" hidden><h2 id="project-title"></h2><p class="prooflab-status" id="project-status" role="status"></p><div class="prooflab-workspace-grid"><div class="prooflab-section">
-<label class="rd-label" for="obligation">New lemma or proof obligation</label><textarea id="obligation" rows="2"></textarea><button class="rd-button rd-secondary" id="add" type="button">Add obligation</button><ol id="obligations"></ol>
-<h3>Local AI models</h3>
-<p class="rd-small">Free local Ollama runs on your own computer. Nothing is sent to an Axiovo AI server. Suggestions are not verified proofs.</p>
-<div class="rd-actions"><button class="rd-button rd-secondary" id="ollama-detect" type="button">Find installed Ollama models</button><select id="ollama-model" aria-label="Local Ollama model"><option value="">Detect models first</option></select></div>
-<p class="rd-small prooflab-note" id="ollama-status" role="status">Start Ollama locally, then detect models. Your browser may require localhost permission and an allowed origin.</p>
-
-</div><div class="prooflab-section"><h3>Lean 4 draft</h3><p class="rd-small">Paste or edit Lean code. The browser does not execute Lean; proof status remains unverified until an external trusted Lean checker succeeds.</p><textarea class="prooflab-lean" id="lean" rows="10" spellcheck="false" placeholder="import Mathlib&#10;&#10;-- Write a theorem statement and proof here"></textarea>
-<div class="rd-actions"><button class="rd-button rd-secondary" id="download-lean" type="button">Export .lean</button><button class="rd-button rd-secondary" id="download-json" type="button">Export project JSON</button></div></div></section></div>
-<p class="rd-small prooflab-footer" id="feedback" role="status"></p></main></body></html>
+<div class="prooflab-actions"><button class="rd-button rd-primary" id="create" type="button">Update proof plan</button></div>
+<p class="rd-small" id="feedback" role="status"></p>
+</section>
+<section class="rd-panel prooflab-card prooflab-model-card" aria-labelledby="prooflab-model-title"><div class="prooflab-card-title"><span class="prooflab-glyph prooflab-sparkle" aria-hidden="true">✦</span><h2 id="prooflab-model-title">AI proof assistance</h2></div><p class="prooflab-card-caption">Use a model installed on this computer. No Axiovo AI server is involved.</p>
+<label class="rd-label" for="ollama-model">Local model · Ollama</label><select id="ollama-model" aria-label="Local Ollama model"><option value="">Find installed models first</option></select>
+<button class="rd-button rd-secondary prooflab-wide-button" id="ollama-detect" type="button">Find installed Ollama models</button>
+<p class="rd-small prooflab-connection" id="ollama-status" role="status">Start Ollama locally, then find installed models.</p>
+<button class="rd-button rd-primary prooflab-wide-button" id="prooflab-strategy" type="button">✦ Suggest proof strategy</button>
+</section>
+</aside>
+<section class="rd-panel prooflab-card prooflab-conversation" aria-labelledby="prooflab-chat-title">
+<div class="prooflab-chat-heading"><div class="prooflab-card-title"><span class="prooflab-glyph" aria-hidden="true">◉</span><h2 id="prooflab-chat-title">Proof conversation</h2></div><p class="prooflab-card-caption">Discuss strategies, lemmas, and gaps with your local research model.</p><span class="prooflab-unverified">AI suggestions · not verified</span></div>
+<div id="prooflab-thread" class="prooflab-thread" role="log" aria-live="polite" aria-label="Proof discussion"><div class="prooflab-welcome"><span class="prooflab-welcome-icon" aria-hidden="true">✦</span><h3>Your proof starts here</h3><p>Ask for a structured proof strategy or investigate a specific lemma. Your local model can suggest arguments, but only Lean can verify them.</p></div></div>
+<pre class="prooflab-output-legacy" id="ollama-output" aria-label="Latest unverified local model suggestion"></pre>
+<div class="prooflab-composer"><label class="rd-sr-only" for="prooflab-prompt">Message Axiovo ProofLab</label><textarea id="prooflab-prompt" rows="3" maxlength="2000" placeholder="Message Axiovo ProofLab…"></textarea><div class="prooflab-composer-footer"><span>Local model · Ctrl+Enter to send</span><button class="rd-button rd-primary" id="ollama-suggest" type="button" aria-label="Send message to local AI">Send ↗</button></div></div>
+</section>
+<aside class="prooflab-tools" aria-label="Lean editor and proof obligations">
+<section class="rd-panel prooflab-card prooflab-lean-panel" aria-labelledby="prooflab-lean-title"><div class="prooflab-card-title"><span class="prooflab-glyph" aria-hidden="true">⌘</span><h2 id="prooflab-lean-title">Lean 4 draft</h2></div><p class="prooflab-card-caption">Your editable formalization. Syntax is not checked in the browser.</p>
+<div class="prooflab-editor"><div class="prooflab-editor-chrome"><span class="prooflab-editor-dots" aria-hidden="true">● ● ●</span><span>axiovo-prooflab.lean</span><span class="prooflab-editor-indicator">Draft</span></div><textarea class="prooflab-lean" id="lean" rows="14" spellcheck="false" aria-label="Lean 4 draft editor" placeholder="import Mathlib&#10;&#10;-- Begin your Lean 4 theorem and proof here"></textarea></div>
+<div class="prooflab-export-actions"><button class="rd-button rd-secondary" id="download-lean" type="button">↓ Export .lean</button><button class="rd-button rd-secondary" id="download-json" type="button">↓ Project JSON</button></div>
+</section>
+<section class="rd-panel prooflab-card prooflab-obligation-panel" id="workspace" hidden><div class="prooflab-card-title"><span class="prooflab-glyph" aria-hidden="true">◎</span><h2>Proof obligations</h2><span class="prooflab-count" id="obligation-count">0 open</span></div><h3 id="project-title" class="rd-sr-only"></h3><p class="rd-small" id="project-status" role="status">Status: Unverified draft</p><ol id="obligations" class="prooflab-obligations"></ol><div id="prooflab-empty-obligations" class="prooflab-empty"><span aria-hidden="true">✓</span><strong>No open obligations</strong><p>Add a lemma to keep track of the next step.</p></div><label class="rd-label" for="obligation">New lemma or proof obligation</label><textarea id="obligation" rows="2" placeholder="State the lemma or step to prove…"></textarea><button class="rd-button rd-secondary prooflab-wide-button" id="add" type="button">+ Add obligation</button></section>
+</aside>
+</div></main></body></html>
