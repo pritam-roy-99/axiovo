@@ -11,7 +11,8 @@ assert.match(explorer,/let viewMode=params\.get\("mode"\)==="indexed"\?"indexed"
 assert.match(explorer,/recentOnly=\(source==="biorxiv"\|\|source==="chemrxiv"\)/);
 assert.match(explorer,/Object\.assign\(c,recentWindow\(\),\{sort:c\.sort==="relevance"\?"recent":c\.sort,recentOnly:true\}\)/);
 assert.match(explorer,/state\.recentOnly\?"No matching papers in the latest 7 days/);
-assert.match(explorer,/viewMode=source==="arxiv"\?"indexed":"recent"/);
+assert.match(explorer,/function shouldBrowseAnnouncements\(\)/, "arXiv announcements must retain their dedicated routing");
+assert.match(explorer,/if\(viewMode==="indexed"\)return false/, "Explicit indexed mode must bypass announcement-only browsing");
 assert.match(explorer,/showLatestAnnouncement\(\)/);
 assert.match(archive,/criteria\.recentOnly\|\|parseDOI\(criteria\.q\)/,
  "Recent bioRxiv search must favor the native posting-date API");
