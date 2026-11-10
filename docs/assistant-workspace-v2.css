@@ -56,7 +56,14 @@
  gap:9px!important;margin:0!important;
 }
 .axiovo-assistant .assistant-task-row .mode{
- min-height:42px!important;
+ min-height:48px!important;
+ box-sizing:border-box!important;
+ display:inline-flex!important;
+ align-items:center!important;
+ justify-content:center!important;
+ line-height:1.45!important;
+ white-space:normal!important;
+ text-align:center!important;
  padding:10px 16px!important;
  border-radius:11px!important;
  font-weight:750!important;
@@ -72,7 +79,8 @@
 .axiovo-assistant .assistant-task-row>a{
  margin-left:auto!important;
  display:inline-flex!important;align-items:center;
- min-height:42px;padding:8px 12px!important;
+ min-height:48px;padding:10px 12px!important;
+ box-sizing:border-box!important;
  text-decoration:none!important;border-radius:10px;
  border:1px solid var(--assistant-border);
  background:var(--assistant-quiet);
@@ -241,7 +249,7 @@
  .axiovo-assistant .assistant-task-row{
   display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
  }
- .axiovo-assistant .assistant-task-row .mode{width:100%;padding:10px 8px!important;}
+ .axiovo-assistant .assistant-task-row .mode{width:100%;min-height:48px!important;padding:11px 8px!important;}
  .axiovo-assistant .assistant-task-row>a{
   grid-column:1/-1;justify-content:center;margin-left:0!important;
  }
