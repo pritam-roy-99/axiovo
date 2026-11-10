@@ -91,7 +91,7 @@ def main():
             first.locator(".feed-summary summary").click()
             assert first.locator(".feed-summary").get_attribute("open") is not None
             page.locator("#feed-topic-input").fill("quantum contextuality")
-            page.locator("#feed-topic-form button").click()
+            page.locator('#feed-topic-form button[type="submit"]').click()
             assert "quantum contextuality" in page.locator("#feed-followed-topics").inner_text()
             # Worker-backed feed operations commit asynchronously. Verify
             # their final rendered states rather than inspecting the old DOM

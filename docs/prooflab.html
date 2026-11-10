@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ProofLab | Axiovo</title><link rel="stylesheet" href="./theme.css"><link rel="stylesheet" href="./research-entry.css"><link rel="stylesheet" href="./axiovo-shell.css"><link rel="stylesheet" href="./research-desk.css">
+<script defer src="./theme.js"></script><script defer src="./navigation.js"></script><script defer src="./prooflab-core.js"></script><script defer src="./prooflab-ollama.js"></script><script defer src="./prooflab.js"></script></head>
+<body class="axiovo-research"><header></header><main class="rd-page">
+<div class="rd-desk-heading"><p class="rd-kicker">RESEARCH ASSISTANT · FORMAL REASONING</p><h1>Axiovo ProofLab</h1><p>Plan mathematical proofs and export Lean 4 drafts. No AI-generated statement is automatically a verified theorem.</p></div>
+<section class="rd-panel"><h2>Proof project</h2><label class="rd-label" for="title">Title</label><input id="title" value="CHSH Tsirelson bound" maxlength="200">
+<label class="rd-label" for="statement">Theorem statement (plain language)</label><textarea id="statement" rows="3">For Hermitian observables A0,A1,B0,B1 with eigenvalues ±1 on bipartite quantum systems, the CHSH expectation is at most 2 sqrt(2) in absolute value.</textarea>
+<label class="rd-label" for="assumptions">Assumptions, one per line</label><textarea id="assumptions" rows="4">Observables are Hermitian
+Each observable squares to the identity
+Alice's operators commute with Bob's operators</textarea>
+<div class="rd-actions"><button class="rd-button rd-primary" id="create" type="button">Create proof plan</button><a class="rd-button rd-secondary" href="./copilot.html">Back to Research Assistant</a></div></section>
+<section class="rd-panel" id="workspace" hidden><h2 id="project-title"></h2><p id="project-status" role="status"></p>
+<label class="rd-label" for="obligation">New lemma or proof obligation</label><textarea id="obligation" rows="2"></textarea><button class="rd-button rd-secondary" id="add" type="button">Add obligation</button><ol id="obligations"></ol>
+<h3>Optional local AI proof suggestions</h3>
+<p class="rd-small">Free local Ollama runs on your own computer. Nothing is sent to an Axiovo AI server. Suggestions are not verified proofs.</p>
+<div class="rd-actions"><button class="rd-button rd-secondary" id="ollama-detect" type="button">Find installed Ollama models</button><select id="ollama-model" aria-label="Local Ollama model"><option value="">Detect models first</option></select><button class="rd-button rd-secondary" id="ollama-suggest" type="button">Suggest proof strategy</button></div>
+<p class="rd-small" id="ollama-status" role="status">Start Ollama locally, then detect models. Your browser may require localhost permission and an allowed origin.</p>
+<pre id="ollama-output" style="white-space:pre-wrap;overflow-wrap:anywhere;max-height:26rem;overflow:auto" aria-label="Unverified local model suggestion"></pre>
+<h3>Lean 4 draft</h3><p class="rd-small">Paste or edit Lean code. The browser does not execute Lean; proof status remains unverified until an external trusted Lean checker succeeds.</p><textarea id="lean" rows="10" spellcheck="false" placeholder="import Mathlib&#10;&#10;-- Write a theorem statement and proof here"></textarea>
+<div class="rd-actions"><button class="rd-button rd-secondary" id="download-lean" type="button">Export .lean</button><button class="rd-button rd-secondary" id="download-json" type="button">Export project JSON</button></div></section>
+<p class="rd-small" id="feedback" role="status"></p></main></body></html>

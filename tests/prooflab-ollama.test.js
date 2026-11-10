@@ -1,0 +1,5 @@
+const test=require("node:test"),assert=require("node:assert/strict"),O=require("../docs/prooflab-ollama.js");
+test("reject invalid model names",()=>assert.equal(O.validModel("https://remote.example"),false));
+test("discover only local installed models",async()=>{const models=await O.models(async url=>{assert.equal(url,"http://127.0.0.1:11434/api/tags");return {ok:true,json:async()=>({models:[{name:"qwen2.5:3b"},{name:"qwen2.5:3b"},{name:"bad model"}]})}});assert.deepEqual(models,["qwen2.5:3b"])});
+test("request local proof suggestion without asserting verification",async()=>{const result=await O.suggest({model:"qwen2.5:3b",statement:"P implies P",fetcher:async(url,options)=>{assert.equal(url,"http://127.0.0.1:11434/api/chat");assert.equal(JSON.parse(options.body).stream,false);return {ok:true,json:async()=>({message:{content:"Proposed strategy only"}})}}});assert.equal(result,"Proposed strategy only")});
+test("reject empty theorem",async()=>await assert.rejects(()=>O.suggest({model:"qwen2.5:3b",statement:""})));

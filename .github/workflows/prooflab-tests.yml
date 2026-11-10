@@ -1,0 +1,46 @@
+name: ProofLab tests
+on:
+  pull_request:
+    paths:
+      - 'docs/prooflab*'
+      - 'docs/copilot.html'
+      - 'tests/prooflab.test.js'
+      - 'tests/prooflab-ollama.test.js'
+      - 'scripts/smoke_prooflab.py'
+      - 'scripts/prooflab_verify.py'
+      - 'tests/test_prooflab_verify.py'
+      - '.github/workflows/prooflab-tests.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'docs/prooflab*'
+      - 'tests/prooflab.test.js'
+jobs:
+  prooflab:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check JavaScript syntax
+        run: |
+          node --check docs/prooflab-core.js
+          node --check docs/prooflab.js
+          node --check docs/prooflab-ollama.js
+      - name: Run ProofLab unit tests
+        run: node --test tests/prooflab.test.js tests/prooflab-ollama.test.js
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Test local Lean checker logic
+        run: python -m unittest discover -s tests -p 'test_prooflab_verify.py' -v
+      - name: Install Chromium test dependencies
+        run: |
+          python -m pip install playwright
+          python -m playwright install --with-deps chromium
+      - name: Run ProofLab browser acceptance tests
+        run: python scripts/smoke_prooflab.py
