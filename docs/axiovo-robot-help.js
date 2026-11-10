@@ -91,7 +91,7 @@ return {name:document.title.split("|")[0].trim(),desc:clean(document.querySelect
 
 let guideTarget=null,guideTimer=null,guideOpen=false,guidePrevious=null;
 function targetNodes(){
- return [...document.querySelectorAll('main h1,main h2,main h3,main a,main button,main input,main select,main summary,[role="main"] h1,[role="main"] h2,[role="main"] button')]
+ return [...document.querySelectorAll('main h1,main h2,main h3,main a,main button,main input,main select,main summary,header a,header button,[role="main"] h1,[role="main"] h2,[role="main"] button')]
   .filter(n=>n.isConnected&&!n.closest("#axiovo-robot,[hidden],[aria-hidden='true']")&&n.getClientRects().length);
 }
 function positionGuide(){
@@ -190,7 +190,7 @@ message("I can't verify that answer from this page. Try a specific visible featu
 message("Hello! I'm Axiovo Robot Help. I can inspect current page headings, guide navigation, and use supported search and sort controls. Deeper AI questions require a configured AI model.");
 for(const name of ["What does this page do?","Open Research Desk","Open ProofLab"]){const b=make("button",null,name);b.type="button";b.addEventListener("click",()=>ask(name));suggestions.append(b)}
 let drag=null,wasDragged=false,lastPos=null;
-function move(x,y){if(innerWidth<=760)return;const w=launcher.offsetWidth,h=launcher.offsetHeight;x=Math.max(5,Math.min(innerWidth-w-5,x));y=Math.max(5,Math.min(innerHeight-h-5,y));lastPos={x,y};root.style.setProperty("right","auto","important");root.style.setProperty("bottom","auto","important");root.style.setProperty("left",x+"px","important");root.style.setProperty("top",y+"px","important");panel.style.setProperty("right","auto","important");panel.style.setProperty("bottom","auto","important");panel.style.setProperty("left",Math.max(8,Math.min(innerWidth-panel.offsetWidth-8,x<innerWidth/2?x:x+w-panel.offsetWidth))+"px","important");panel.style.setProperty("top",Math.max(8,Math.min(innerHeight-panel.offsetHeight-8,y-panel.offsetHeight-12))+"px","important")}
+function move(x,y){const w=launcher.offsetWidth,h=launcher.offsetHeight;x=Math.max(5,Math.min(innerWidth-w-5,x));y=Math.max(5,Math.min(innerHeight-h-5,y));lastPos={x,y};root.style.setProperty("right","auto","important");root.style.setProperty("bottom","auto","important");root.style.setProperty("left",x+"px","important");root.style.setProperty("top",y+"px","important");if(innerWidth>760){panel.style.setProperty("right","auto","important");panel.style.setProperty("bottom","auto","important");panel.style.setProperty("left",Math.max(8,Math.min(innerWidth-panel.offsetWidth-8,x<innerWidth/2?x:x+w-panel.offsetWidth))+"px","important");panel.style.setProperty("top",Math.max(8,Math.min(innerHeight-panel.offsetHeight-8,y-panel.offsetHeight-12))+"px","important")}}
 if(innerWidth>760){try{const pos=JSON.parse(localStorage.getItem("axiovo-robot-position-v1"));if(Number.isFinite(pos.x)&&Number.isFinite(pos.y))move(pos.x*innerWidth,pos.y*innerHeight)}catch{}}
 fab.addEventListener("pointerdown",e=>{if(e.button!==0)return;if(guideTarget)stopGuide();drag={id:e.pointerId,x:e.clientX,y:e.clientY,left:root.getBoundingClientRect().left,top:root.getBoundingClientRect().top};wasDragged=false;fab.setPointerCapture(e.pointerId)});
 fab.addEventListener("pointermove",e=>{if(!drag||e.pointerId!==drag.id)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;if(Math.hypot(dx,dy)>6)wasDragged=true;if(wasDragged)move(drag.left+dx,drag.top+dy)});
