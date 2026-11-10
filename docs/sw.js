@@ -6,7 +6,7 @@ const SHELL = [
   "./manifest.webmanifest", "./icons/axiovo-192.png", "./icons/axiovo-512.png", "./theme.css", "./research-entry.css", "./axiovo-shell.css?v=20261108-mobile-research-v3",
   "./research-desk.css", "./home-landing.css?v=20261107-mobile-ui-v1", "./theme.js", "./research-entry.js",
   "./research-hub.html", "./research-hub.css", "./research-hub.js",
-  "./navigation.js?v=20261111-no-flash-v1", "./axiovo-blueprint-ui.js?v=20261111-no-flash-v1", "./axiovo-blueprint-ui.css?v=20261111-reference", "./axiovo-page-design-v4.css?v=20261111-complete-v1", "./axiovo-page-design-v4.js?v=20261111-complete-v1", "./icons/axiovo-approved.svg", "./axiovo-robot-help.js?v=20261111-p0p1-v1", "./archive-taxonomy.js", "./arxiv-versions.js", "./archive-data.js",
+  "./navigation.js?v=20261111-appearance-v2", "./axiovo-blueprint-ui.js?v=20261111-appearance-v2", "./axiovo-blueprint-ui.css?v=20261111-appearance-v2", "./axiovo-page-design-v4.css?v=20261111-complete-v1", "./axiovo-page-design-v4.js?v=20261111-complete-v1", "./icons/axiovo-approved.svg", "./axiovo-robot-help.js?v=20261111-p0p1-v1", "./archive-taxonomy.js", "./arxiv-versions.js", "./archive-data.js",
   "./author-follow.js", "./feed-preferences.js", "./feed-core.js", "./feed-preview.js",
   "./source-pulse.js", "./pwa.js", "./voice-search.js?v=20261109-visible-v2", "./assets/axiovo-tour-poster.svg?v=four-sources-2", "./home-tour.js?v=20261108-video-recovery-v2",
   "./workspace.css", "./paper-actions.css", "./paper-card-polish.css?v=20261106-save2", "./research-workflow.css",
