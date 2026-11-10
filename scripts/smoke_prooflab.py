@@ -29,7 +29,9 @@ def main():
                 assert page.get_by_role("link", name="Open ProofLab").count() == 1
                 page.get_by_role("link", name="Open ProofLab").click()
                 page.wait_for_url("**/prooflab.html")
-                assert page.get_by_role("heading", name="Axiovo ProofLab").is_visible()
+                assert page.get_by_role("heading", name="ProofLab", exact=True).is_visible()
+                assert page.locator("header.rl-global-header").is_visible(), "Use shared Axiovo header"
+                assert not page.locator(".pl-rail").count(), "Standalone ProofLab sidebar must be removed"
                 assert page.locator(".pl-app-shell").count() == 1
                 assert page.locator(".pl-topbar").is_visible()
                 assert page.locator(".prooflab-studio").is_visible()
