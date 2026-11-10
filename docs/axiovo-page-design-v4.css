@@ -1,0 +1,604 @@
+/*
+ Axiovo Page Design v4
+ Blueprint-based, page-specific redesign of all 20 active routes.
+ Keep the original archive/search/feed/AI/ProofLab controls and their IDs.
+ Uses system fonts (no third-party font requests). Desktop >= 761, Android <= 760.
+*/
+:root {
+ --ax4-deep:#0C2741; --ax4-ocean:#126D94; --ax4-teal:#11A6AE;
+ --ax4-aqua:#70E6D9; --ax4-slate:#567A91; --ax4-surface:#fff;
+ --ax4-soft:#f2f7f9; --ax4-ink:#102e46; --ax4-muted:#5a7183;
+ --ax4-line:#d8e5ec; --ax4-tint:#e8f7f6;
+ --ax4-shadow:0 9px 28px rgba(11,50,70,.07);
+ --ax4-head:"Arial Narrow","Liberation Sans Narrow","Roboto Condensed","Segoe UI",Arial,sans-serif;
+ --ax4-body:Inter,"Segoe UI",system-ui,-apple-system,BlinkMacSystemFont,Arial,sans-serif;
+}
+:root[data-theme="dark"] {
+ --ax4-surface:#142f42;--ax4-soft:#10283a;--ax4-ink:#e7f6fc;
+ --ax4-muted:#b6cdd8;--ax4-line:#355468;--ax4-tint:#134854;
+ --ax4-shadow:0 7px 23px #0005;
+}
+body.ax4{font-family:var(--ax4-body)!important;font-size:14px;line-height:1.52;letter-spacing:-.006em}
+body.ax4 :is(h1,h2,h3,h4){font-family:var(--ax4-head)!important;font-stretch:condensed;letter-spacing:-.045em;font-weight:800;line-height:1.18}
+body.ax4 main :is(h1){font-size:clamp(30px,3.3vw,43px);margin:.12em 0 .26em}
+body.ax4 main :is(h2){font-size:clamp(19px,2vw,24px)}
+body.ax4 main :is(h3){font-size:18px}
+body.ax4 main p{line-height:1.6}
+body.ax4 main :is(.rd-kicker,.rl-eyebrow,.ax4-eyebrow,.ex-step-number){letter-spacing:.13em;font-size:10px;font-weight:850;color:var(--ax4-teal)}
+body.ax4 main :is(.rd-small,.rl-subtext,.muted,.feed-author-warning){color:var(--ax4-muted)}
+body.ax4 main :is(.rd-panel,.rl-section,.panel,.card,.feed-side-card,.feed-stream,.ex-search,.ex-guide,.install-panel,.watch-panel,.rh-section,.lab-block){
+ border:1px solid var(--ax4-line);background:var(--ax4-surface);border-radius:15px!important;box-shadow:var(--ax4-shadow);
+}
+body.ax4 main :is(.rd-button,.rl-button,.btn,button[type="submit"],button[data-view],.ex-archives a,.library-tabs a,.lab-tabs a,.rh-tabs a){
+ font-family:var(--ax4-body);font-weight:750;letter-spacing:-.01em;transition:background-color .16s ease,border-color .16s ease,box-shadow .16s ease,transform .16s ease;
+}
+body.ax4 main :is(.rd-button,.rl-button,.btn,button[type="submit"]){border-radius:9px;min-height:42px}
+body.ax4 main :is(.rd-button.rd-primary,.rl-button.primary,.btn.primary,button[type="submit"]:not(.rd-secondary)){background:var(--ax4-ocean);border-color:var(--ax4-ocean);color:#fff}
+body.ax4 main :is(.rd-button.rd-primary,.rl-button.primary,.btn.primary,button[type="submit"]:not(.rd-secondary)):hover{background:#0d5876;transform:translateY(-1px)}
+body.ax4 main :is(button,a,input,textarea,select,summary):focus-visible{
+ outline:3px solid var(--ax4-aqua)!important;outline-offset:2px!important
+}
+body.ax4 main :is(input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),select,textarea){
+ border:1px solid #c5dbe6;border-radius:10px;min-height:43px;
+ box-sizing:border-box;max-width:100%;font-family:var(--ax4-body);font-size:14px;
+}
+body.ax4 main :is(input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),select,textarea):focus{border-color:var(--ax4-teal);box-shadow:0 0 0 3px #11a6ae17}
+body.ax4 :is(.paper-sort-toolbar,.rd-actions,.rl-paper-actions,.prooflab-actions,.feed-hero-actions,.why-actions){gap:9px}
+body.ax4 main :is(.rd-panel,.rl-section,.feed-side-card,.panel,.card) :is(h2,h3){margin-top:0}
+body.ax4 .ax4-eyebrow{display:block;margin:0 0 5px;line-height:1.2}
+body.ax4 .ax4-intro{max-width:76ch;font-size:13px;color:var(--ax4-muted);line-height:1.6;margin-bottom:19px}
+body.ax4 main .ax4-badge{display:inline-flex;align-items:center;gap:5px;border:1px solid #bde9e3;background:var(--ax4-tint);color:var(--ax4-teal);padding:4px 9px;border-radius:30px;font-size:11px;font-weight:800}
+body.ax4 main .ax4-badge::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--ax4-teal)}
+body.ax4 main .ax4-section-heading{display:flex;align-items:center;justify-content:space-between;gap:12px}
+body.ax4 main .ax4-section-heading>a{white-space:nowrap}
+/* The page header, cards, form and navigation should feel connected to the same product. */
+body.ax4 header.rl-global-header .axiovo-nav-return{gap:7px}
+body.ax4 header.rl-global-header .axiovo-nav-return :is(button,a){font-size:12px;font-weight:800;min-height:42px}
+body.ax4 .ax-sidebar{background:linear-gradient(165deg,#092a44 0%,#07314b 70%,#064d60 100%)}
+body.ax4 header.rl-global-header nav.rl-nav>a[aria-current="page"]{border-radius:10px}
+body.ax4 .ax-sidebar-logo{border-radius:12px}
+body.ax4 main .ax4-callout{border-left:3px solid var(--ax4-teal);padding:12px 15px;background:var(--ax4-tint);border-radius:9px;color:var(--ax4-ink)}
+
+/* 05: Home. Preserve real narrated media, archive cards, source checks, feed previews. */
+body.ax4.axiovo-home .axiovo-welcome-header{padding-block:32px!important}
+body.ax4.axiovo-home #welcome-title{font-size:clamp(34px,3.65vw,53px)!important}
+body.ax4.axiovo-home .axiovo-welcome-media{gap:15px!important}
+body.ax4.axiovo-home .axiovo-home-video{border:6px solid #083e52!important;min-height:195px;object-fit:contain}
+body.ax4.axiovo-home .ax-home-guide{padding:23px!important}
+body.ax4.axiovo-home .ax-home-guide h3{font-size:23px}
+body.ax4.axiovo-home .ax-home-guide li{padding:10px 0;border-bottom:1px solid var(--ax4-line)}
+body.ax4.axiovo-home .rd-home-section{padding:22px!important}
+body.ax4.axiovo-home .axiovo-archive-card{transition:transform .16s,box-shadow .16s}
+body.ax4.axiovo-home .axiovo-archive-card:hover{transform:translateY(-2px);box-shadow:var(--ax4-shadow)}
+
+/* 06-09: Four source explorer pages */
+body.ax4.axiovo-explore .ex-page{max-width:1550px}
+body.ax4.axiovo-explore .ex-hero{
+ display:flex;flex-direction:column;gap:15px;margin-bottom:17px;border:0!important;
+ background:transparent;box-shadow:none;padding:0;
+}
+body.ax4.axiovo-explore .ex-hero .ex-hero-copy{order:0;display:flex;align-items:flex-end;justify-content:space-between;gap:20px}
+body.ax4.axiovo-explore .ex-hero .ex-archives{order:1;display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+body.ax4.axiovo-explore .ex-hero-copy h1{margin:0 0 7px}
+body.ax4.axiovo-explore .ex-hero-copy p:not(.rd-kicker){font-size:13px;color:var(--ax4-muted);max-width:70ch}
+body.ax4.axiovo-explore .ex-count{display:inline-flex;align-items:center;padding:8px 13px;border-radius:11px;background:var(--ax4-tint);font-size:11px;max-width:260px;text-align:right}
+body.ax4.axiovo-explore .ex-archives>a{
+ display:inline-flex;align-items:center;justify-content:center;min-width:83px;
+ padding:10px 13px!important;border:1px solid var(--ax4-line);
+ background:var(--ax4-surface);font-weight:800;font-size:12px;color:var(--ax4-ink);border-radius:22px!important
+}
+body.ax4.axiovo-explore .ex-archives>a[aria-current="page"]{
+ background:var(--ax4-deep)!important;color:#fff!important;border-color:var(--ax4-deep)!important;
+ box-shadow:0 3px 8px #123c5d1b
+}
+body.ax4.axiovo-explore .ex-help{margin-bottom:14px;background:var(--ax4-tint);box-shadow:none}
+body.ax4.axiovo-explore .ex-layout{
+ display:grid!important;grid-template-columns:minmax(282px,.82fr) minmax(0,1.45fr)!important;
+ gap:18px;align-items:start
+}
+body.ax4.axiovo-explore .ex-sidebar{min-width:0}
+body.ax4.axiovo-explore .ex-guide{padding:22px!important}
+body.ax4.axiovo-explore .ex-guide h2{font-size:23px}
+body.ax4.axiovo-explore .ex-steps{display:grid;gap:8px}
+body.ax4.axiovo-explore .ex-steps label{display:flex;gap:8px;align-items:center;margin-top:9px;font-weight:800;font-size:12px;color:var(--ax4-ink)}
+body.ax4.axiovo-explore .ex-step-number{display:grid;place-items:center;min-width:23px;height:23px;background:var(--ax4-tint);border-radius:50%;font-size:12px}
+body.ax4.axiovo-explore .ex-steps select,body.ax4.axiovo-explore #archive-topic-find{width:100%;min-height:47px}
+body.ax4.axiovo-explore .ex-guide-actions{display:grid;grid-template-columns:1fr auto;gap:8px;margin-top:17px}
+body.ax4.axiovo-explore .ex-guide-actions #archive-show-results{min-height:46px!important;font-size:12px!important}
+body.ax4.axiovo-explore .ex-personal{border-top:1px solid var(--ax4-line);margin-top:16px;padding-top:11px}
+body.ax4.axiovo-explore .ex-personal summary{color:var(--ax4-teal);font-weight:800}
+body.ax4.axiovo-explore .ex-search{padding:21px!important;margin-bottom:16px}
+body.ax4.axiovo-explore .ex-search h2{font-size:22px}
+body.ax4.axiovo-explore .ex-search .rd-searchbar{display:flex;gap:8px;align-items:center}
+body.ax4.axiovo-explore .ex-search .rd-searchbar input{flex:1;min-width:0}
+body.ax4.axiovo-explore .ex-date-presets{display:flex;flex-wrap:wrap;gap:7px;margin-top:11px}
+body.ax4.axiovo-explore .ex-date-presets button{border-radius:9px!important;font-size:11px;min-height:40px}
+body.ax4.axiovo-explore .ex-results .rd-section-heading{margin:16px 0 7px}
+body.ax4.axiovo-explore .ex-results .rd-section-heading h2{font-size:23px}
+body.ax4.axiovo-explore .ex-result-summary{padding:12px 16px!important;background:var(--ax4-surface)}
+body.ax4.axiovo-explore .ex-results :is(.rd-paper-card,.paper-card,.rd-results-stack>article){background:var(--ax4-surface);border:1px solid var(--ax4-line);border-radius:13px;padding:15px 17px;margin:10px 0;box-shadow:var(--ax4-shadow)}
+
+/* 10: Research Desk */
+body.ax4.axiovo-desk .rd-page{max-width:1570px}
+body.ax4.axiovo-desk .rd-desk-heading{margin:0 0 18px;max-width:95ch}
+body.ax4.axiovo-desk .rd-desk-heading h1{font-size:clamp(31px,3.4vw,44px)}
+body.ax4.axiovo-desk .rd-desk-heading>p:not(.rd-kicker){font-size:13px;color:var(--ax4-muted)}
+body.ax4.axiovo-desk .rd-filters{padding:20px 23px!important;margin-bottom:20px}
+body.ax4.axiovo-desk .rd-filters .rd-searchbar{display:flex;gap:9px}
+body.ax4.axiovo-desk .rd-filters .rd-searchbar input{flex:1;min-width:0;min-height:48px}
+body.ax4.axiovo-desk .rd-sources{display:flex;gap:8px;flex-wrap:wrap;margin:15px 0 11px}
+body.ax4.axiovo-desk .rd-sources label{
+ display:inline-flex;align-items:center;gap:7px;
+ padding:9px 12px;background:var(--ax4-soft);border:1px solid var(--ax4-line);
+ border-radius:30px;font-size:12px;font-weight:780;cursor:pointer;
+}
+body.ax4.axiovo-desk .rd-sources label:has(input:checked){background:var(--ax4-deep);border-color:var(--ax4-deep);color:#fff}
+body.ax4.axiovo-desk .rd-layout{
+ display:grid!important;grid-template-columns:minmax(0,1fr) minmax(225px,275px)!important;
+ gap:17px;align-items:start
+}
+body.ax4.axiovo-desk .rd-results{min-width:0}
+body.ax4.axiovo-desk .rd-sidebar{display:grid;gap:12px}
+body.ax4.axiovo-desk .rd-side-panel{margin:0;padding:17px!important}
+body.ax4.axiovo-desk .rd-side-panel h2{font-size:19px}
+body.ax4.axiovo-desk .rd-results-stack>*{margin-block:10px}
+body.ax4.axiovo-desk .rd-source-jumps{gap:6px}
+
+/* 11: My Feed */
+body.ax4.axiovo-feed-page .feed-hero{
+ background:var(--ax4-surface)!important;color:var(--ax4-ink)!important;
+ border:1px solid var(--ax4-line);box-shadow:var(--ax4-shadow);border-radius:15px!important;
+ padding:22px 24px!important;margin-bottom:14px
+}
+body.ax4.axiovo-feed-page .feed-hero .rd-kicker{color:var(--ax4-teal)!important}
+body.ax4.axiovo-feed-page .feed-hero h1{font-size:40px!important;color:var(--ax4-ink)!important}
+body.ax4.axiovo-feed-page .feed-hero p{color:var(--ax4-muted)!important}
+body.ax4.axiovo-feed-page .feed-insight{background:var(--ax4-tint);color:var(--ax4-ink);border-radius:12px}
+body.ax4.axiovo-feed-page .feed-toolbar{display:grid;gap:12px;margin-bottom:17px}
+body.ax4.axiovo-feed-page .feed-tabs{
+ display:flex;gap:5px;flex-wrap:wrap;background:transparent!important;border:0;
+}
+body.ax4.axiovo-feed-page .feed-tabs button{
+ min-height:44px;border:1px solid var(--ax4-line)!important;border-radius:30px!important;
+ background:var(--ax4-surface)!important;color:var(--ax4-ink)!important;padding:9px 15px;font-size:12px
+}
+body.ax4.axiovo-feed-page .feed-tabs button[aria-pressed="true"]{
+ background:var(--ax4-deep)!important;color:#fff!important;border-color:var(--ax4-deep)!important
+}
+body.ax4.axiovo-feed-page .feed-filters{background:var(--ax4-surface);border:1px solid var(--ax4-line);border-radius:12px;padding:12px 13px}
+body.ax4.axiovo-feed-page .feed-filters :is(select,button){min-height:44px}
+body.ax4.axiovo-feed-page .feed-layout{
+ display:grid!important;grid-template-columns:minmax(0,1.55fr) minmax(260px,.78fr)!important;gap:17px;align-items:start
+}
+body.ax4.axiovo-feed-page .feed-stream{padding:17px 19px!important;min-width:0}
+body.ax4.axiovo-feed-page .feed-sidebar{display:grid;gap:13px}
+body.ax4.axiovo-feed-page .feed-side-card{padding:18px!important}
+body.ax4.axiovo-feed-page .feed-card{border:1px solid var(--ax4-line);box-shadow:0 3px 12px #073a5310;border-radius:13px}
+body.ax4.axiovo-feed-page .feed-follow-form :is(input,button){min-height:43px}
+
+/* 12: Library workspace */
+body.ax4.axiovo-workspace-page main.library-page{max-width:1540px}
+body.ax4.axiovo-workspace-page .rd-desk-heading{margin-bottom:20px}
+body.ax4.axiovo-workspace-page .library-tabs{
+ display:flex;gap:7px;flex-wrap:wrap;border:0;background:transparent;margin-bottom:15px
+}
+body.ax4.axiovo-workspace-page .library-tabs>a{
+ display:inline-flex;padding:10px 15px;min-height:43px;align-items:center;
+ border:1px solid var(--ax4-line);background:var(--ax4-surface);color:var(--ax4-ink);
+ border-radius:25px!important;text-decoration:none;font-size:12px;font-weight:800
+}
+body.ax4.axiovo-workspace-page .library-tabs>a[aria-current="true"]{
+ background:var(--ax4-deep)!important;color:#fff!important;border-color:var(--ax4-deep)
+}
+body.ax4.axiovo-workspace-page .rl-section{padding:21px!important;margin-bottom:14px}
+body.ax4.axiovo-workspace-page .rl-section-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+body.ax4.axiovo-workspace-page .rl-library-controls{
+ display:grid;grid-template-columns:minmax(180px,2fr) repeat(2,minmax(120px,1fr));gap:9px
+}
+body.ax4.axiovo-workspace-page .rl-stack>*{padding:12px;border-radius:12px;border:1px solid var(--ax4-line);background:var(--ax4-surface);margin:10px 0}
+body.ax4.axiovo-workspace-page .rl-library-footer{display:flex;gap:9px;flex-wrap:wrap;margin-top:13px}
+body.ax4.axiovo-workspace-page .library-more{padding:14px 20px;margin-top:17px}
+body.ax4.axiovo-workspace-page .library-more>summary{font-weight:800;color:var(--ax4-ocean)}
+body.ax4.axiovo-workspace-page .library-following-controls{padding:18px!important}
+body.ax4.axiovo-workspace-page .rl-project-form{display:grid;gap:11px}
+body.ax4.axiovo-workspace-page .rl-project-form-grid{gap:12px}
+
+/* 13: Research Assistant */
+body.ax4.axiovo-assistant main.assistant-page{max-width:1510px}
+body.ax4.axiovo-assistant .rd-desk-heading{margin-bottom:20px}
+body.ax4.axiovo-assistant .assistant-compose{padding:20px 23px!important}
+body.ax4.axiovo-assistant .assistant-task-row{gap:7px;flex-wrap:wrap;margin-bottom:13px}
+body.ax4.axiovo-assistant .assistant-task-row .mode{
+ min-height:43px;border:1px solid var(--ax4-line)!important;border-radius:22px!important;background:var(--ax4-surface);color:var(--ax4-ink);font-size:12px
+}
+body.ax4.axiovo-assistant .assistant-task-row .mode[aria-pressed="true"]{
+ background:var(--ax4-deep)!important;color:#fff!important;border-color:var(--ax4-deep)!important
+}
+body.ax4.axiovo-assistant #question{min-height:95px;font-size:14px;padding:15px}
+body.ax4.axiovo-assistant .assistant-prooflab-row{margin:9px 0}
+body.ax4.axiovo-assistant .assistant-prooflab-cta{padding:10px 13px;border-radius:9px;background:var(--ax4-tint);font-size:12px}
+body.ax4.axiovo-assistant .assistant-results{
+ display:grid!important;grid-template-columns:minmax(0,1.55fr) minmax(240px,.75fr);gap:15px;align-items:start;margin-top:18px
+}
+body.ax4.axiovo-assistant .assistant-results>.rd-panel{padding:19px!important;min-width:0}
+body.ax4.axiovo-assistant .assistant-results h2{font-size:20px}
+body.ax4.axiovo-assistant .assistant-results :is(pre,code){max-width:100%;overflow-x:auto}
+
+/* 14: ProofLab, 2 columns conversation + project/editor */
+body.ax4.prooflab-body .pl-topbar{background:transparent;border:0}
+body.ax4.prooflab-body .pl-topbrand .rd-kicker{font-size:10px;color:var(--ax4-teal)}
+body.ax4.prooflab-body .pl-section-nav{
+ display:flex;flex-wrap:wrap;gap:7px;padding:0!important;margin:0 0 16px;border:0!important;background:transparent!important
+}
+body.ax4.prooflab-body .pl-section-nav>a{
+ border:1px solid var(--ax4-line);background:var(--ax4-surface);
+ border-radius:20px!important;min-height:43px;display:inline-flex;align-items:center;padding:10px 15px;
+ color:var(--ax4-ink);font-size:12px;font-weight:800
+}
+body.ax4.prooflab-body .pl-section-nav>a.pl-section-current{
+ background:var(--ax4-deep)!important;color:#fff;border-color:var(--ax4-deep)
+}
+body.ax4.prooflab-body .prooflab-studio{
+ display:grid!important;grid-template-columns:minmax(0,1.35fr) minmax(270px,.85fr)!important;
+ grid-template-areas:"conversation project" "conversation tools";gap:15px;align-items:start
+}
+body.ax4.prooflab-body .prooflab-conversation{grid-area:conversation;min-width:0;padding:20px!important}
+body.ax4.prooflab-body .prooflab-sidebar{grid-area:project;display:grid;gap:14px;min-width:0}
+body.ax4.prooflab-body .prooflab-tools{grid-area:tools;display:grid;gap:14px;min-width:0}
+body.ax4.prooflab-body .prooflab-card{padding:19px!important;min-width:0}
+body.ax4.prooflab-body .prooflab-card-title{gap:9px}
+body.ax4.prooflab-body .prooflab-card-title h2{font-size:20px}
+body.ax4.prooflab-body .prooflab-glyph{border-radius:8px;background:var(--ax4-tint);color:var(--ax4-teal)}
+body.ax4.prooflab-body .prooflab-chat-heading{margin-bottom:14px}
+body.ax4.prooflab-body .prooflab-thread{border:1px solid var(--ax4-line);background:var(--ax4-soft);border-radius:13px;min-height:260px}
+body.ax4.prooflab-body .prooflab-composer{background:var(--ax4-surface);border:1px solid var(--ax4-line);border-radius:13px;padding:9px}
+body.ax4.prooflab-body #prooflab-prompt{font-size:14px;min-height:85px}
+body.ax4.prooflab-body .prooflab-lean{background:#0b2b44!important;color:#d9ffff!important;border-radius:11px;font:13px/1.55 ui-monospace,SFMono-Regular,Consolas,monospace;min-width:0}
+body.ax4.prooflab-body .prooflab-obligation-panel{border-top:3px solid var(--ax4-teal)}
+body.ax4.prooflab-body .prooflab-setup :is(input,textarea),body.ax4.prooflab-body .prooflab-model-card select{width:100%}
+
+/* 15: Research Tools */
+body.ax4.ax4-lab .rl-welcome{
+ display:flex;align-items:center;justify-content:space-between;gap:19px;
+ background:var(--ax4-surface);padding:22px 23px;border:1px solid var(--ax4-line);border-radius:15px;
+ box-shadow:var(--ax4-shadow);margin-bottom:15px
+}
+body.ax4.ax4-lab .rl-welcome h1{font-size:36px}
+body.ax4.ax4-lab .lab-tabs{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:17px}
+body.ax4.ax4-lab .lab-tabs a{
+ border:1px solid var(--ax4-line);background:var(--ax4-surface);border-radius:12px;
+ min-height:44px;padding:10px 14px;font-size:12px;font-weight:800;color:var(--ax4-ink)
+}
+body.ax4.ax4-lab .lab-tabs a:focus,body.ax4.ax4-lab .lab-tabs a:hover{background:var(--ax4-tint);color:var(--ax4-ocean)}
+body.ax4.ax4-lab .lab-block{padding:21px!important;margin-bottom:16px}
+body.ax4.ax4-lab .lab-block h2{font-size:22px}
+body.ax4.ax4-lab .lab-form-inline{gap:11px;align-items:end}
+body.ax4.ax4-lab .lab-reader-grid{gap:15px}
+body.ax4.ax4-lab .lab-notes{padding:17px;border-radius:12px;background:var(--ax4-soft);border:1px solid var(--ax4-line)}
+body.ax4.ax4-lab .lab-canvas-shell{border-radius:12px;background:#e4ebf0}
+
+/* 16-18: Paper detail, comparison, Community */
+body.ax4.ax4-paper main{max-width:1450px;padding:20px clamp(15px,2.3vw,28px) 40px}
+body.ax4.ax4-paper main .grid{
+ display:grid!important;grid-template-columns:minmax(0,1.65fr) minmax(250px,.75fr);gap:16px;align-items:start
+}
+body.ax4.ax4-paper main .grid>div{min-width:0}
+body.ax4.ax4-paper main .grid>aside{display:grid;gap:14px;min-width:0}
+body.ax4.ax4-paper .paper{padding:22px!important}
+body.ax4.ax4-paper .paper #title{font-size:clamp(26px,3vw,37px)}
+body.ax4.ax4-paper .paper .abstract{line-height:1.75;font-size:14px}
+body.ax4.ax4-paper .panel{padding:20px;margin-bottom:15px}
+body.ax4.ax4-paper .discussion{background:var(--ax4-soft);padding:15px;border-radius:12px}
+body.ax4.ax4-compare main{max-width:1410px;padding:21px clamp(15px,2vw,27px) 40px}
+body.ax4.ax4-compare .axiovo-compare-form{
+ display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr)) auto;gap:12px;
+ align-items:end;border:1px solid var(--ax4-line);padding:19px;background:var(--ax4-surface);border-radius:15px
+}
+body.ax4.ax4-compare .axiovo-compare-form label{display:grid;gap:7px;font-weight:800;color:var(--ax4-ink);font-size:12px}
+body.ax4.ax4-compare #compare-results{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:19px 0}
+body.ax4.ax4-compare .axiovo-compare-method{padding:20px}
+body.ax4.ax4-community main{max-width:1300px;padding:20px clamp(14px,2vw,28px) 50px}
+body.ax4.ax4-community main .cards{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+body.ax4.ax4-community main .card{padding:22px!important;min-width:0}
+body.ax4.ax4-community main .intro{font-size:14px;color:var(--ax4-muted);margin-bottom:20px}
+
+/* 19: Settings */
+body.ax4.ax4-settings main{max-width:1340px;padding:20px clamp(15px,2vw,27px) 46px}
+body.ax4.ax4-settings main>.warning{background:var(--ax4-tint);border-left:3px solid var(--ax4-teal);border-radius:10px;padding:15px;margin-bottom:18px}
+body.ax4.ax4-settings main>.panel{margin:13px 0;padding:21px!important}
+body.ax4.ax4-settings main .grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px!important}
+body.ax4.ax4-settings main .grid .panel{min-width:0;padding:21px}
+body.ax4.ax4-settings #axiovo-palette-options{display:flex;flex-wrap:wrap;gap:10px}
+body.ax4.ax4-settings main label{display:block;margin-top:10px;font-size:12px;font-weight:800}
+body.ax4.ax4-settings main label :is(input,textarea){display:block;width:100%;margin-top:7px}
+
+/* 20-24: Installation, tutorial, methods, privacy, why & Research Hub. */
+body.ax4.ax4-install main,body.ax4.ax4-tutorial main,body.ax4.ax4-methodology main,body.ax4.ax4-privacy main,body.ax4.ax4-why main,body.ax4.ax4-hub main{
+ max-width:1240px;padding:20px clamp(14px,2.2vw,28px) 44px;
+}
+body.ax4.ax4-install .install-page h1,body.ax4.ax4-tutorial .watch-wrap h1{font-size:40px}
+body.ax4.ax4-install .install-platforms{display:flex;flex-wrap:wrap;gap:8px;margin:13px 0 21px}
+body.ax4.ax4-install .install-platforms a{
+ display:inline-flex;min-height:44px;align-items:center;border:1px solid var(--ax4-line);
+ border-radius:22px;padding:10px 15px;color:var(--ax4-ink);font-weight:800;font-size:12px;
+ background:var(--ax4-surface)
+}
+body.ax4.ax4-install .install-platforms a:hover{background:var(--ax4-tint)}
+body.ax4.ax4-install .install-panel{padding:22px!important;margin-bottom:16px;scroll-margin-top:20px}
+body.ax4.ax4-install .install-panel:target{outline:2px solid var(--ax4-teal);outline-offset:3px}
+body.ax4.ax4-install .install-note{border-left:3px solid var(--ax4-teal);padding:11px 15px;background:var(--ax4-tint);border-radius:9px}
+body.ax4.ax4-tutorial .watch-player{overflow:hidden;border-radius:15px;background:#0b2c45;box-shadow:var(--ax4-shadow)}
+body.ax4.ax4-tutorial .watch-player video{display:block;width:100%;height:auto}
+body.ax4.ax4-tutorial .watch-sections{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:17px}
+body.ax4.ax4-tutorial .watch-panel{padding:22px!important}
+body.ax4.ax4-methodology main>section,body.ax4.ax4-privacy main>section{padding:21px;margin:15px 0;background:var(--ax4-surface);border:1px solid var(--ax4-line);border-radius:14px;box-shadow:var(--ax4-shadow)}
+body.ax4.ax4-methodology :is(pre,table),body.ax4.ax4-privacy :is(pre,table){max-width:100%;overflow:auto}
+body.ax4.ax4-why .why-cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+body.ax4.ax4-why .why-card{border:1px solid var(--ax4-line);padding:19px!important;background:var(--ax4-surface);border-radius:14px}
+body.ax4.ax4-hub .rh-hero{padding:23px;background:var(--ax4-surface);border:1px solid var(--ax4-line);border-radius:15px;box-shadow:var(--ax4-shadow)}
+body.ax4.ax4-hub .rh-tabs{display:flex;flex-wrap:wrap;gap:8px}
+body.ax4.ax4-hub .rh-tabs a{border-radius:10px;min-height:43px;padding:10px 13px}
+body.ax4.ax4-hub .rh-section{padding:22px!important;margin:15px 0}
+
+/* Tablet must not inherit desktop grid widths that crowd content. */
+@media (min-width:761px) and (max-width:1170px) {
+ body.ax4.axiovo-explore .ex-layout{grid-template-columns:minmax(240px,.9fr) minmax(0,1.25fr)!important;gap:12px}
+ body.ax4.axiovo-desk .rd-layout{grid-template-columns:minmax(0,1fr) 210px!important;gap:12px}
+ body.ax4.axiovo-feed-page .feed-layout{grid-template-columns:minmax(0,1fr) 228px!important;gap:12px}
+ body.ax4.prooflab-body .prooflab-studio{grid-template-columns:minmax(0,1fr) minmax(225px,.8fr)!important}
+ body.ax4.axiovo-assistant .assistant-results{grid-template-columns:minmax(0,1fr) minmax(210px,.8fr)}
+}
+
+/* Android. True single-column tasks; input, buttons and cards remain touchable. */
+@media(max-width:760px) {
+ body.ax4 main :is(h1){font-size:clamp(27px,8vw,34px)}
+ body.ax4 main :is(h2){font-size:20px}
+ body.ax4 main :is(.rd-button,.rl-button,.btn,button[type="submit"],.feed-tabs button,.library-tabs a){min-height:44px}
+ body.ax4 main :is(input[type="search"],input[type="text"],input[type="date"],input[type="url"],select,textarea){font-size:16px!important;min-height:44px}
+ body.ax4 main :is(.rd-panel,.rl-section,.panel,.card,.feed-stream,.feed-side-card){box-shadow:0 4px 15px #082e4510}
+ body.ax4.axiovo-home .axiovo-welcome-header{padding:21px 15px!important}
+ body.ax4.axiovo-home #welcome-title{font-size:clamp(29px,7.8vw,39px)!important}
+ body.ax4.axiovo-home .ax-home-guide{padding:17px!important}
+ body.ax4.axiovo-explore .ex-hero{gap:12px}
+ body.ax4.axiovo-explore .ex-hero-copy{flex-direction:column;align-items:start!important}
+ body.ax4.axiovo-explore .ex-count{max-width:100%;text-align:left}
+ body.ax4.axiovo-explore .ex-archives{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:5px!important}
+ body.ax4.axiovo-explore .ex-archives>a{min-width:0;padding:9px 3px!important;font-size:10px;min-height:44px}
+ body.ax4.axiovo-explore .ex-layout{display:flex!important;flex-direction:column;gap:14px}
+ body.ax4.axiovo-explore .ex-sidebar,body.ax4.axiovo-explore .ex-main{width:100%;min-width:0}
+ body.ax4.axiovo-explore .ex-guide,body.ax4.axiovo-explore .ex-search{padding:16px!important}
+ body.ax4.axiovo-explore .ex-guide-actions{grid-template-columns:minmax(0,1fr) auto}
+ body.ax4.axiovo-explore .ex-guide-actions #archive-show-results{font-size:12px!important;white-space:normal!important}
+ body.ax4.axiovo-explore .ex-search .rd-searchbar{display:flex;flex-wrap:wrap}
+ body.ax4.axiovo-explore .ex-search .rd-searchbar input{flex:1 0 180px}
+ body.ax4.axiovo-desk .rd-filters{padding:16px!important}
+ body.ax4.axiovo-desk .rd-layout{display:flex!important;flex-direction:column;gap:13px}
+ body.ax4.axiovo-desk .rd-results,body.ax4.axiovo-desk .rd-sidebar{width:100%}
+ body.ax4.axiovo-desk .rd-sidebar{display:flex;flex-direction:column}
+ body.ax4.axiovo-desk .rd-sources{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}
+ body.ax4.axiovo-desk .rd-sources label{min-width:0;justify-content:center;padding:8px 2px;font-size:10px}
+ body.ax4.axiovo-desk .rd-filters .rd-searchbar{flex-wrap:wrap}
+ body.ax4.axiovo-desk .rd-filters .rd-searchbar input{flex:1 0 100%;min-height:47px}
+ body.ax4.axiovo-desk .rd-filters .rd-searchbar button{width:100%}
+ body.ax4.axiovo-feed-page .feed-hero{padding:16px!important}
+ body.ax4.axiovo-feed-page .feed-hero h1{font-size:32px!important}
+ body.ax4.axiovo-feed-page .feed-toolbar{gap:8px}
+ body.ax4.axiovo-feed-page .feed-tabs{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))}
+ body.ax4.axiovo-feed-page .feed-tabs button{font-size:11px;min-width:0;padding:8px 2px}
+ body.ax4.axiovo-feed-page .feed-filters{padding:10px}
+ body.ax4.axiovo-feed-page .feed-layout{display:flex!important;flex-direction:column;gap:11px}
+ body.ax4.axiovo-feed-page .feed-stream,body.ax4.axiovo-feed-page .feed-sidebar{width:100%}
+ body.ax4.axiovo-feed-page .feed-stream,body.ax4.axiovo-feed-page .feed-side-card{padding:15px!important}
+ body.ax4.axiovo-workspace-page .library-tabs{display:flex;flex-wrap:nowrap;overflow-x:auto;padding-bottom:5px}
+ body.ax4.axiovo-workspace-page .library-tabs>a{white-space:nowrap;flex:none;font-size:11px}
+ body.ax4.axiovo-workspace-page .rl-section{padding:15px!important}
+ body.ax4.axiovo-workspace-page .rl-library-controls{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+ body.ax4.axiovo-workspace-page .rl-library-controls>#library-search{grid-column:1/-1}
+ body.ax4.axiovo-assistant .assistant-compose{padding:16px!important}
+ body.ax4.axiovo-assistant .assistant-task-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+ body.ax4.axiovo-assistant .assistant-results{display:flex!important;flex-direction:column;gap:12px}
+ body.ax4.axiovo-assistant .assistant-results>.rd-panel{width:100%;padding:16px!important}
+ body.ax4.prooflab-body .prooflab-studio{
+  display:flex!important;flex-direction:column!important;gap:11px
+ }
+ body.ax4.prooflab-body .prooflab-studio>.prooflab-conversation{order:0;width:100%}
+ body.ax4.prooflab-body .prooflab-studio>.prooflab-sidebar{order:1;width:100%}
+ body.ax4.prooflab-body .prooflab-studio>.prooflab-tools{order:2;width:100%}
+ body.ax4.prooflab-body .prooflab-card{padding:14px!important}
+ body.ax4.prooflab-body .pl-section-nav{display:flex;flex-wrap:nowrap;overflow:auto;gap:5px}
+ body.ax4.prooflab-body .pl-section-nav a{white-space:nowrap;flex:none;min-height:44px}
+ body.ax4.prooflab-body .prooflab-thread{min-height:210px}
+ body.ax4.ax4-lab .rl-welcome{display:block;padding:15px}
+ body.ax4.ax4-lab .rl-welcome h1{font-size:31px}
+ body.ax4.ax4-lab .lab-tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+ body.ax4.ax4-lab .lab-tabs a{min-width:0;min-height:44px;font-size:11px}
+ body.ax4.ax4-lab .lab-block{padding:15px!important}
+ body.ax4.ax4-lab .lab-reader-grid{display:flex;flex-direction:column}
+ body.ax4.ax4-paper main .grid{display:flex!important;flex-direction:column}
+ body.ax4.ax4-paper main .grid>div,body.ax4.ax4-paper main .grid>aside{width:100%}
+ body.ax4.ax4-paper .paper,body.ax4.ax4-paper .panel{padding:15px!important}
+ body.ax4.ax4-compare .axiovo-compare-form{display:flex!important;flex-direction:column;gap:11px}
+ body.ax4.ax4-compare .axiovo-compare-form label,body.ax4.ax4-compare .axiovo-compare-form button{width:100%}
+ body.ax4.ax4-compare #compare-results{display:flex;flex-direction:column}
+ body.ax4.ax4-community main .cards{display:flex!important;flex-direction:column;gap:11px}
+ body.ax4.ax4-community main .card{padding:17px!important}
+ body.ax4.ax4-settings main .grid{display:flex!important;flex-direction:column}
+ body.ax4.ax4-settings main .grid>.panel{width:100%;padding:16px!important}
+ body.ax4.ax4-settings main>.panel{padding:16px!important}
+ body.ax4.ax4-install .install-panel{padding:16px!important}
+ body.ax4.ax4-tutorial .watch-sections{display:flex;flex-direction:column}
+ body.ax4.ax4-methodology main>section,body.ax4.ax4-privacy main>section{padding:15px}
+ body.ax4.ax4-why .why-cards{display:flex;flex-direction:column}
+ body.ax4.ax4-hub .rh-section{padding:16px!important}
+}
+@media(max-width:360px){
+ body.ax4.axiovo-explore .ex-archives>a{font-size:9px}
+ body.ax4.axiovo-feed-page .feed-tabs button{font-size:10px}
+}
+@media(prefers-reduced-motion:reduce){body.ax4 main :is(button,a){transition:none!important;transform:none!important}}
+
+body.ax4 .ax4-skip{position:fixed;z-index:99999;top:-75px;left:242px;background:#0C2741;color:white;padding:12px 16px;border-radius:10px;font-weight:800;box-shadow:var(--ax4-shadow)}
+body.ax4 .ax4-skip:focus{top:12px}
+@media(max-width:760px){body.ax4 .ax4-skip{left:12px}}
+
+/* 320px accessibility fixes: all four archive tabs are equal-height cells. */
+@media(max-width:760px){
+ html:root body.ax4.axiovo-explore .ex-archives>a{
+  box-sizing:border-box!important;height:44px!important;min-height:44px!important;max-height:44px!important;
+  min-width:0!important;overflow:hidden!important;white-space:nowrap!important;
+  text-overflow:ellipsis!important;line-height:1.2!important;padding:7px 2px!important;
+  align-self:center!important;justify-self:stretch!important;vertical-align:middle!important;
+ }
+ html:root body.ax4.axiovo-explore .ex-archives>a:last-child{
+  font-size:0!important;
+ }
+ html:root body.ax4.axiovo-explore .ex-archives>a:last-child::after{
+  content:"ePrint";font-size:10px;line-height:1.2;font-weight:800;
+ }
+ html:root body.ax4.prooflab-body.axiovo-reference-ui .prooflab-studio{
+  display:grid!important;grid-template-columns:minmax(0,1fr)!important;
+  grid-template-areas:"conversation" "project" "tools"!important;
+  align-items:start!important;gap:12px!important;min-width:0!important;
+ }
+ html:root body.ax4.prooflab-body.axiovo-reference-ui .prooflab-conversation{grid-area:conversation!important;width:100%!important}
+ html:root body.ax4.prooflab-body.axiovo-reference-ui .prooflab-sidebar{grid-area:project!important;width:100%!important}
+ html:root body.ax4.prooflab-body.axiovo-reference-ui .prooflab-tools{grid-area:tools!important;width:100%!important}
+}
+
+/* Keep Library's three primary destinations visible at 320px, without sideways scrolling. */
+@media(max-width:760px){
+ html:root body.ax4.axiovo-workspace-page .library-tabs{
+  display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:5px!important;overflow:visible!important;width:100%!important;
+ }
+ html:root body.ax4.axiovo-workspace-page .library-tabs>a{
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  min-width:0!important;width:100%!important;min-height:48px!important;height:auto!important;
+  padding:8px 3px!important;white-space:normal!important;
+  text-align:center!important;font-size:10px!important;line-height:1.2!important;
+  box-sizing:border-box!important;
+ }
+}
+
+/* 320px explorer: the primary search action spans the panel; Clear is below. */
+@media(max-width:760px){
+ html:root body.ax4.axiovo-explore .ex-guide-actions{
+  display:grid!important;grid-template-columns:minmax(0,1fr)!important;
+  grid-template-rows:auto auto!important;gap:7px!important;width:100%!important;
+ }
+ html:root body.ax4.axiovo-explore .ex-guide-actions>#archive-show-results{
+  width:100%!important;max-width:100%!important;min-width:0!important;
+  height:48px!important;min-height:48px!important;max-height:48px!important;
+  padding:8px 7px!important;display:flex!important;align-items:center!important;
+  justify-content:center!important;white-space:nowrap!important;
+  font-size:12px!important;line-height:1.15!important;box-sizing:border-box!important;
+ }
+ html:root body.ax4.axiovo-explore .ex-guide-actions>#archive-clear-path{
+  width:100%!important;min-height:44px!important;box-sizing:border-box!important
+ }
+}
+
+/* Research Assistant must preserve its existing named grid areas. A generic
+   results grid would push verified sources outside the viewport. */
+@media(min-width:761px){
+ html:root body.ax4.axiovo-assistant.axiovo-reference-ui>main.assistant-page{
+  display:grid!important;
+  width:calc(100% - 224px)!important;max-width:calc(100% - 224px)!important;
+  margin-left:224px!important;box-sizing:border-box!important;
+  grid-template-columns:minmax(0,1fr) minmax(250px,325px)!important;
+  grid-template-areas:"intro intro" "composer sources" "chat sources" "tools tools"!important;
+  gap:16px!important;min-width:0!important;
+ }
+}
+@media(min-width:761px) and (max-width:1050px){
+ html:root body.ax4.axiovo-assistant.axiovo-reference-ui>main.assistant-page{
+  width:calc(100% - 194px)!important;max-width:calc(100% - 194px)!important;margin-left:194px!important;
+  grid-template-columns:minmax(0,1fr) minmax(210px,265px)!important
+ }
+}
+html:root body.ax4.axiovo-assistant .assistant-page>.assistant-results{display:contents!important}
+html:root body.ax4.axiovo-assistant .assistant-page>.rd-desk-heading{grid-area:intro!important}
+html:root body.ax4.axiovo-assistant .assistant-page>.assistant-compose{grid-area:composer!important;min-width:0!important}
+html:root body.ax4.axiovo-assistant .assistant-results>.rd-panel:first-child{grid-area:chat!important;min-width:0!important}
+html:root body.ax4.axiovo-assistant .assistant-results>.rd-panel:nth-child(2){grid-area:sources!important;min-width:0!important}
+html:root body.ax4.axiovo-assistant .assistant-page>.assistant-indexed-tools{grid-area:tools!important;min-width:0!important}
+@media(max-width:760px){
+ html:root body.ax4.axiovo-assistant.axiovo-reference-ui>main.assistant-page{
+  display:grid!important;grid-template-columns:minmax(0,1fr)!important;
+  grid-template-areas:"intro" "composer" "chat" "sources" "tools"!important;
+  width:100%!important;max-width:100%!important;margin:0!important;
+  gap:12px!important;box-sizing:border-box!important
+ }
+ html:root body.ax4.axiovo-assistant .assistant-results>.rd-panel:nth-child(2){
+  position:static!important;max-height:none!important
+ }
+}
+
+/* On tablet and desktop the topic panel is narrower than the browser viewport.
+   Keep primary and secondary actions vertically stacked at every breakpoint. */
+html:root body.ax4.axiovo-explore .ex-guide-actions{
+ display:grid!important;grid-template-columns:minmax(0,1fr)!important;
+ grid-template-rows:auto auto!important;width:100%!important;gap:7px!important;
+}
+html:root body.ax4.axiovo-explore .ex-guide-actions>#archive-show-results{
+ box-sizing:border-box!important;width:100%!important;max-width:100%!important;
+ min-width:0!important;height:48px!important;min-height:48px!important;max-height:48px!important;
+ white-space:nowrap!important;line-height:1.15!important;
+ display:flex!important;align-items:center!important;justify-content:center!important;
+ gap:5px!important;font-size:12px!important;padding:8px 5px!important;
+}
+html:root body.ax4.axiovo-explore .ex-guide-actions>#archive-clear-path{
+ display:block!important;width:100%!important;min-height:44px!important;box-sizing:border-box!important;
+}
+
+/* Research Tools home: six functional, descriptive launch cards. These are the
+   original six anchors, not duplicates or fake tools. Detailed controls remain below. */
+body.ax4.ax4-lab .lab-tabs{
+ display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;
+ gap:13px!important;margin:12px 0 22px!important;
+}
+body.ax4.ax4-lab .lab-tabs>a{
+ display:flex!important;flex-direction:column;align-items:flex-start!important;
+ justify-content:space-between!important;gap:11px;
+ min-height:142px!important;height:auto!important;min-width:0!important;
+ padding:20px!important;border:1px solid var(--ax4-line)!important;
+ border-radius:15px!important;box-shadow:var(--ax4-shadow);
+ background:var(--ax4-surface)!important;color:var(--ax4-ink)!important;
+ font-family:var(--ax4-head)!important;font-size:19px!important;
+ font-weight:800!important;letter-spacing:-.02em!important;text-decoration:none!important;
+}
+body.ax4.ax4-lab .lab-tabs>a::before{
+ content:"▤";display:grid;place-items:center;width:29px;height:29px;
+ border-radius:9px;background:var(--ax4-tint);color:var(--ax4-ocean);font-size:19px;
+}
+body.ax4.ax4-lab .lab-tabs>a:nth-child(2)::before{content:"▧"}
+body.ax4.ax4-lab .lab-tabs>a:nth-child(3)::before{content:"⇄"}
+body.ax4.ax4-lab .lab-tabs>a:nth-child(4)::before{content:"⤴"}
+body.ax4.ax4-lab .lab-tabs>a:nth-child(5)::before{content:"◷"}
+body.ax4.ax4-lab .lab-tabs>a:nth-child(6)::before{content:"⇩"}
+body.ax4.ax4-lab .lab-tabs>a::after{
+ content:"Find source-linked research literature";display:block;
+ font:500 12px/1.4 var(--ax4-body);letter-spacing:normal;
+ color:var(--ax4-muted);
+}
+body.ax4.ax4-lab .lab-tabs>a:nth-child(2)::after{content:"Read, annotate and export PDF notes"}
+body.ax4.ax4-lab .lab-tabs>a:nth-child(3)::after{content:"Compare original records side by side"}
+body.ax4.ax4-lab .lab-tabs>a:nth-child(4)::after{content:"Examine cited and related scholarship"}
+body.ax4.ax4-lab .lab-tabs>a:nth-child(5)::after{content:"Monitor new papers in followed topics"}
+body.ax4.ax4-lab .lab-tabs>a:nth-child(6)::after{content:"Manage data backup and restore"}
+body.ax4.ax4-lab .lab-tabs>a:hover{transform:translateY(-2px);border-color:var(--ax4-teal)!important}
+@media(min-width:761px) and (max-width:1050px){
+ body.ax4.ax4-lab .lab-tabs{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}
+@media(max-width:760px){
+ body.ax4.ax4-lab .lab-tabs{grid-template-columns:minmax(0,1fr)!important;gap:9px!important}
+ body.ax4.ax4-lab .lab-tabs>a{
+  min-height:68px!important;padding:13px 15px!important;
+  display:grid!important;grid-template-columns:33px minmax(0,1fr)!important;
+  grid-template-rows:1fr 1fr!important;column-gap:9px!important;
+  align-content:center!important;align-items:center!important;
+  font-size:16px!important;
+ }
+ body.ax4.ax4-lab .lab-tabs>a::before{grid-column:1!important;grid-row:1/3!important}
+ body.ax4.ax4-lab .lab-tabs>a::after{grid-column:2!important;grid-row:2!important;font-size:11px!important}
+}
