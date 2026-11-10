@@ -95,3 +95,18 @@
 .prooflab-approve{margin:14px 0!important;padding:12px;border:1px solid var(--pl-border);border-radius:12px;background:var(--pl-soft);font-weight:720}
 .prooflab-personal-card .rd-small{line-height:1.6}
 .prooflab-personal-card>p:last-child{margin-top:12px}
+
+
+/* Research-grade mathematical typesetting in AI messages. */
+.prooflab-thread .prooflab-message.assistant{width:min(100%,100%);min-width:0;overflow-wrap:break-word;white-space:normal;box-sizing:border-box}
+.prooflab-thread .prooflab-message.assistant>div{white-space:normal;min-width:0;overflow-wrap:anywhere}
+.prooflab-message-paragraph{margin:0 0 .85em;line-height:1.72;white-space:pre-line;overflow-wrap:break-word}
+.prooflab-message-paragraph:last-child{margin-bottom:0}
+.prooflab-message-heading{font-size:1.04em;font-weight:780;margin:1.15em 0 .5em;line-height:1.35}
+.prooflab-message-heading:first-child{margin-top:0}
+.prooflab-message-list-item{padding-left:9px;margin:.35em 0;line-height:1.65}
+.prooflab-equation{margin:15px 0;padding:14px 12px;background:var(--pl-surface);border:1px solid var(--pl-border);border-radius:12px;max-width:100%;min-width:0;overflow-x:auto;overflow-y:hidden;text-align:center;white-space:normal;scrollbar-width:thin}
+.prooflab-equation mjx-container[display="true"]{max-width:100%;min-width:max-content;margin:4px 0!important}
+.prooflab-message-paragraph mjx-container{max-width:100%;vertical-align:middle}
+.prooflab-message-code{margin:12px 0;padding:12px 14px;white-space:pre;overflow-x:auto;max-width:100%;border-radius:10px;border:1px solid #334961;background:#111f33;color:#e1f0f4;font:500 .85rem/1.6 ui-monospace,Consolas,monospace}
+@media(max-width:760px){.prooflab-equation{padding:10px 8px}.prooflab-thread .prooflab-message.assistant{max-width:100%}}
