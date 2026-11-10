@@ -179,6 +179,7 @@ async function archiveAPI(){
  if(!archiveBridge)archiveBridge=(async()=>{
   await loadScriptOnce("arxiv-versions.js");
   // Data scripts must follow the archive identity helper.
+  await loadScriptOnce("eprint-source.js");
   await loadScriptOnce("archive-data.js");
   return window.AxiovoArchiveData;
  })().catch(e=>{archiveBridge=null;throw e});
@@ -254,8 +255,6 @@ async function searchPapers(question){
  }
 }
 function routeToCopilot(question){
- const link=make("a","robot-paper-title","Open full Research Assistant with this question");
- link.href=researchLink(question);
  const msgText="For a research explanation, derivation, review or general question, I'll pass your exact question to Axiovo's full Research Assistant. Its answer depends on available sources and configured AI; I won't invent an answer.";
  message(msgText,false,[["Open Research Assistant", "copilot.html?q="+encodeURIComponent(question.slice(0,500))]]);
 }
@@ -291,7 +290,7 @@ const hits=candidates.filter(x=>x.score>0).sort((a,b)=>b.score-a.score).slice(0,
 if(hits.length){const best=findGuideTarget(question);if(best)showTarget(best.node,best.name.slice(0,75));message("Related items I found: "+hits.map(x=>x.text+" ("+x.type+")").join("; ")+".\n\nThese are verified page labels, not an AI-generated explanation.",false,hits.filter(x=>x.type==="page").map(x=>[x.text,pages[x.text]]));return}
 routeToCopilot(question);
 }
-message("Hello! I'm Axiovo Robot Help. I can inspect current page headings, guide navigation, and use supported search and sort controls. Deeper AI questions require a configured AI model.");
+message("Hi! Ask me to find research papers across Axiovo’s four archives, save a paper, explain a page, or guide you to a feature. I can also pass deeper questions to Research Assistant.");
 for(const name of ["What does this page do?","Open Research Desk","Open ProofLab"]){const b=make("button",null,name);b.type="button";b.addEventListener("click",()=>ask(name));suggestions.append(b)}
 let drag=null,wasDragged=false,lastPos=null;
 function move(x,y){const w=launcher.offsetWidth,h=launcher.offsetHeight;x=Math.max(5,Math.min(innerWidth-w-5,x));y=Math.max(5,Math.min(innerHeight-h-5,y));lastPos={x,y};root.style.setProperty("right","auto","important");root.style.setProperty("bottom","auto","important");root.style.setProperty("left",x+"px","important");root.style.setProperty("top",y+"px","important");if(innerWidth>760){panel.style.setProperty("right","auto","important");panel.style.setProperty("bottom","auto","important");panel.style.setProperty("left",Math.max(8,Math.min(innerWidth-panel.offsetWidth-8,x<innerWidth/2?x:x+w-panel.offsetWidth))+"px","important");panel.style.setProperty("top",Math.max(8,Math.min(innerHeight-panel.offsetHeight-8,y-panel.offsetHeight-12))+"px","important")}}
