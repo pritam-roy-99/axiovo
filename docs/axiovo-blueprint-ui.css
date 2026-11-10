@@ -373,7 +373,7 @@ body.axiovo-reference-ui.axiovo-home .axiovo-archive-card{background:#f5fafc;bor
  --ax4-line:#425d6f;--ax4-tint:rgba(var(--ax-brand-rgb),.21);
  --rl-panel:#162b3b;--rl-surface:#162b3b;--rl-text:#edf7fe;--rl-muted:#b7cbd9;--rl-border:#425d6f;
  --rd-surface:#162b3b;--rd-ink:#edf7fe;--rd-muted:#b7cbd9;--rd-border:#425d6f;--rd-link:var(--ax-brand-bright);
- --ax4-ocean:var(--ax-brand-bright);--ax4-teal:var(--ax-brand-bright);
+ --ax4-ocean:var(--ax-brand-dark);--ax4-teal:var(--ax-brand-bright);
  color-scheme:dark;
 }
 html:root[data-accent] body.axiovo-reference-ui{
