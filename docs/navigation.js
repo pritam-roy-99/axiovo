@@ -11,7 +11,7 @@
   const brandImg=document.createElement("img");brandImg.src=new URL("./icons/axiovo-brand.svg",location.href).href;
   brandImg.width=38;brandImg.height=38;brandImg.alt="";brandImg.setAttribute("aria-hidden","true");
   mark.append(brandImg);
-  logo.append(mark,document.createTextNode("Axiovo"));
+  logo.append(mark,document.createTextNode(" Axiovo"));
   const nav=document.createElement("nav");nav.className="rl-nav";nav.setAttribute("aria-label","Main navigation");
   const file=location.pathname.split("/").pop()||"index.html";
   const archivePage=["arxiv.html","biorxiv.html","chemrxiv.html","crypto.html"].includes(file);
