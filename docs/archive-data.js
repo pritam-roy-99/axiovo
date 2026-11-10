@@ -94,6 +94,21 @@ function normalize(source,p){
  const url=source==="biorxiv"?"https://www.biorxiv.org/content/"+doi+(versioned?"v"+version:""):"https://doi.org/"+doi;
  return {...record,id:doi,recordId:doi,version:versioned?version:null,url,pdf:source==="biorxiv"?url+".full.pdf":null};
 }
+/* Version-aware display only. Never rewrite ingestion, timestamps or search indexes.
+ * Unknown revisions remain visible rather than being falsely called v1.
+ */
+function versionStatus(p){
+ const n=p?.version;
+ // A missing version must never be coerced to zero or labelled original.
+ if((typeof n==="number"||typeof n==="string"&&/^\\d+$/.test(n))&&Number.isSafeInteger(Number(n))&&Number(n)>=1)return Number(n)===1?"original":"revised";
+ return "unknown";
+}
+function firstSubmissionsFirst(papers){
+ return [...papers].sort((a,b)=>{
+  const rank=p=>versionStatus(p)==="original"?0:versionStatus(p)==="unknown"?1:2;
+  return rank(a)-rank(b);
+ });
+}
 function workKey(p){
  return p.source+":"+(p.source==="chemrxiv"?p.id.replace(/(?:\/|-)v\d+$/i,""):p.id);
 }
@@ -505,6 +520,6 @@ function removeComparison(p){
  root.dispatchEvent(new Event("axiovo:comparison-change"));
  return true;
 }
-root.AxiovoArchiveData={names,historicalStart,historyRange,sourceDateWindow,clean,simple,read,write,normalize,workKey,recordKey,merge,filter,topicHit,categoryMatch,identifier,snapshot,latestArxivAnnouncement,datedArxiv,live,sourceLink,
+root.AxiovoArchiveData={versionStatus,firstSubmissionsFirst,names,historicalStart,historyRange,sourceDateWindow,clean,simple,read,write,normalize,workKey,recordKey,merge,filter,topicHit,categoryMatch,identifier,snapshot,latestArxivAnnouncement,datedArxiv,live,sourceLink,
  saved,save,unsave,savedRecords,parseDOI,parseEprint,eprintIdentifier,comparison,addComparison,removeComparison};
 })(window);

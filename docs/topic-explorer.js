@@ -246,7 +246,8 @@ function paperCard(p,c){
  const tokens=[hit?.term,...c.q.replaceAll('"',"").split(/\s+/)].filter(Boolean);
  const recordLabel=p.source==="biorxiv"&&p.version?p.recordId+" · v"+p.version:p.recordId;
  const releaseView=Boolean(search?.announcementOnly&&source==="arxiv");
- const meta=[recordLabel,
+ const versionTag=data.versionStatus(p)==="original"?"Original submission · v1":data.versionStatus(p)==="revised"?"Revised submission · v"+p.version:"Version not verified";
+ const meta=[recordLabel,versionTag,
   ...(releaseView?["Announced "+(p.announcementDate||"date unavailable")+" (US Eastern)",
     p.date?"First submitted "+p.date+" (UTC)":"First-submission date unavailable"]:
    [p.date?(p.source==="arxiv"?"First submitted "+p.date+" (UTC)":"Posted "+p.date):
@@ -326,6 +327,16 @@ function filtered(state){
  // Merge source records first, then score and sort once. Filtering each source
  // separately creates redundant full-text passes and blocks mobile scrolling.
  const groups=state.complete?[state.batch]:[state.local,state.batch,state.remote];
+ // Recent views must not collapse v1 into v2 before ordering. Historical
+ // search retains its existing work-level deduplication and ranking.
+ if(state.announcementOnly||state.recentOnly){
+  const byVersion=new Map();
+  for(const paper of groups.flat()){
+   const key=paper.source+":"+(paper.recordId||paper.id)+":"+(paper.version??"unknown");
+   if(!byVersion.has(key))byVersion.set(key,paper);
+  }
+  return data.filter([...byVersion.values()],state.criteria);
+ }
  return data.filter(data.merge(...groups),state.criteria);
 }
 function drawResults(state){
@@ -337,7 +348,7 @@ function drawResults(state){
   $("scope-label").textContent="Scope: all available indexed years · "+(pathText()||"all "+name+" subjects")+" (coverage may be partial).";
  }
  if(sorter&&sorter.value!==c.sort)sorter.value=c.sort||"relevance";
- const rows=filtered(state),results=$("results"),actions=$("result-actions");
+ const matchedRows=filtered(state),rows=(state.announcementOnly||state.recentOnly)?data.firstSubmissionsFirst(matchedRows):matchedRows,results=$("results"),actions=$("result-actions");
  if($("sort-note"))$("sort-note").textContent=window.AxiovoPaperSort?.note(rows,c.sort)||"";
  $("result-count").textContent=rows.length.toLocaleString()+" matching "+name+" record"+(rows.length===1?"":"s")+
   (state.announcementOnly?" · latest official announcement":state.recentOnly?" · latest 7 days":!c.from&&!c.to?" · indexed search across available years":"")+
