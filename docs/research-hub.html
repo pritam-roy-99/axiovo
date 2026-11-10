@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Research Hub | Axiovo</title>
+<meta name="description" content="Connect saved papers, explore source-linked relationships, open version histories, read PDFs, manage alerts and research projects locally.">
+<link rel="icon" href="./icons/axiovo.svg" type="image/svg+xml"><link rel="manifest" href="./manifest.webmanifest">
+<link rel="stylesheet" href="./theme.css"><link rel="stylesheet" href="./research-entry.css"><link rel="stylesheet" href="./axiovo-shell.css?v=20261108-mobile-research-v3">
+<link rel="stylesheet" href="./research-hub.css">
+<script defer src="./theme.js"></script><script defer src="./navigation.js?v=20261108-home-history-v5"></script>
+<script defer src="./arxiv-versions.js"></script><script defer src="./eprint-source.js?v=20261108-mobile-feed-v2"></script>
+<script defer src="./archive-data.js"></script><script defer src="./research-hub.js"></script><script defer src="./pwa.js"></script>
+</head><body class="axiovo-research"><header></header>
+<main class="rd-page rh-page">
+<section class="rh-hero"><div><p class="rd-kicker">CONNECTED RESEARCH WORKSPACE</p><h1>Research Hub</h1><p>From finding a paper to understanding how it relates to your projects. Your saved records and notes stay in this browser.</p></div><a class="rh-button primary" href="./desk.html">Search all four archives</a></section>
+<nav class="rh-tabs" aria-label="Research Hub sections"><a href="#relationships">Connections</a><a href="#versions">Paper evolution</a><a href="#workflows">Research workflows</a></nav>
+<section id="relationships" class="rh-section" aria-labelledby="rh-graph-title"><div class="rh-section-head"><div><p class="rd-kicker">PAPER CONNECTIONS</p><h2 id="rh-graph-title">Your research map</h2></div><button id="rh-refresh" class="rh-button" type="button">Refresh map</button></div>
+<p>Explore subject similarity between papers in your Library. Connections are based only on shared title and abstract terms, <strong>not verified citations or scientific agreement</strong>.</p>
+<div class="rh-graph-wrap"><svg id="rh-graph" role="img" aria-label="Interactive map of saved paper similarity" viewBox="0 0 760 390"></svg><div id="rh-graph-status" role="status" class="rh-status"></div></div>
+<div id="rh-graph-list" class="rh-cards"></div>
+<p class="rh-footnote">Up to 24 saved papers are shown for performance. Missing or unrelated records are not connected. Use original sources to verify any scientific relationship.</p>
+</section>
+<section id="versions" class="rh-section" aria-labelledby="rh-version-title"><p class="rd-kicker">SOURCE-VERIFIED REVISIONS</p><h2 id="rh-version-title">Follow a paper's evolution</h2>
+<p>Enter an arXiv identifier. Axiovo links to the original record and lets you inspect a specific revision. A version number is not treated as available until the official source confirms it.</p>
+<form id="rh-version-form" class="rh-form"><label>arXiv ID <input id="rh-version-id" maxlength="70" required placeholder="e.g. 2611.01234v2"></label><button class="rh-button primary" type="submit">Open version information</button></form>
+<div id="rh-version-result" role="status"></div>
+</section>
+<section id="workflows" class="rh-section" aria-labelledby="rh-tools-title"><p class="rd-kicker">ONE RESEARCH FLOW</p><h2 id="rh-tools-title">Continue your research</h2><div class="rh-workflows">
+<a href="./lab.html#reader"><strong>Read and annotate a PDF</strong><span>Open the existing private PDF reader and page notes. File bytes stay in your browser.</span><b>Open reader ↗</b></a>
+<a href="./lab.html#alerts"><strong>Check research alerts</strong><span>Review matches when you visit. Automatic notifications require additional infrastructure.</span><b>Open alerts ↗</b></a>
+<a href="./workspace.html#research-questions"><strong>Research project notebook</strong><span>Organize questions, keywords, reading status, and attached papers locally.</span><b>Open projects ↗</b></a>
+<a href="./copilot.html"><strong>Research Assistant</strong><span>Source-aware comparisons and optional on-device model explanations.</span><b>Ask a question ↗</b></a>
+<a href="./lab.html#citations"><strong>Citation explorer</strong><span>Use linked scholarly records to inspect documented citation metadata.</span><b>Explore citations ↗</b></a>
+<a href="./workspace.html"><strong>My Library</strong><span>Save, annotate and export research records without requiring an account.</span><b>View saved papers ↗</b></a>
+</div></section></main></body></html>
