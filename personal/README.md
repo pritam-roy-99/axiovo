@@ -13,13 +13,13 @@ Open **PowerShell** (normal user, not administrator).
 If the Axiovo repository is not on this laptop yet:
 
 ```powershell
-cd "$HOME\Documents"
+cd $HOME
 git clone --depth 1 --filter=blob:none --sparse https://github.com/pritam-roy-99/axiovo.git
 cd axiovo
 git sparse-checkout set docs personal
 ```
 
-If the repository is already cloned, open it in PowerShell and run `git pull` after these changes are merged. The sample clone commands use your Windows user folder, so they work even if Documents is redirected to OneDrive.
+If you already cloned Axiovo, use that existing Git checkout. The example uses your Windows home folder, even if Documents is redirected to OneDrive.
 
 Start the private companion:
 
@@ -30,6 +30,22 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\personal\start.ps1
 The startup script clones OpenAI's official DevKit into a **sibling folder** `sign-in-with-chatgpt-devkit`, installs its packages, and builds `@siwc/local`. It then runs `personal/server.mjs` and opens the local ProofLab page. First-time setup requires network access. Subsequent launches use the installed kit. Do not publish or sync the local credential directory.
 
 If you prefer not to change PowerShell execution policy even for one process, review `personal/start.ps1` and run its commands manually. No administrator privileges are needed by Axiovo.
+
+## Automatic updates for your laptop
+
+Every normal launch checks the GitHub **main** branch using `git pull --ff-only origin main`. On success, the newly started local server uses those files.
+
+The updater does **not** force-reset changes. If the checkout is missing, the branch is not `main`, tracked files are modified, or the Git remote is not the official Axiovo repository, it skips the update. If GitHub is unavailable or the update cannot fast-forward, the installed version still launches.
+
+To skip the update for a specific launch, run:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\personal\start.ps1 -NoUpdate
+```
+
+Updates are checked **only at startup**, not continuously. Stop the running local server with Ctrl+C and relaunch to load newer files.
+
+Your ChatGPT authorization is encrypted outside the Git checkout under `%LOCALAPPDATA%\AxiovoPersonal\chatgpt`; Ollama model files are independent. Do not save private projects in tracked Git source files. The local startup script does not update the upstream OpenAI DevKit automatically.
 
 ## Using ChatGPT in ProofLab
 
