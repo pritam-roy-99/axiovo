@@ -26,3 +26,14 @@ test("explicit per-request consent and user context opt-in are mandatory",()=>{
  assert.match(client,/personal-disconnect/);
  assert.match(client,/personal-clear/);
 });
+
+
+test("Windows startup updater never forces reset and supports opt-out",()=>{
+ const startup=fs.readFileSync(path.join(root,"personal/start.ps1"),"utf8");
+ assert.match(startup,/\[switch\]\$NoUpdate/);
+ assert.match(startup,/if \(\$NoUpdate\)/);
+ assert.match(startup,/git -c credential\.interactive=never pull --ff-only origin main/);
+ assert.match(startup,/git status --porcelain --untracked-files=no/);
+ assert.match(startup,/git remote get-url origin/);
+ assert.doesNotMatch(startup,/git\s+(?:reset\s+--hard|clean\s+-fd|pull\s+--force)/);
+});
