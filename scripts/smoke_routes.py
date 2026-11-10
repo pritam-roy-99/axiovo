@@ -88,8 +88,9 @@ def main():
                 page.set_default_timeout(12000)
                 for path in ROUTES:
                     page.goto(base + path, wait_until="domcontentloaded", timeout=25000)
-                    page.locator("header.rl-global-header .axiovo-header-appearance").wait_for()
-                    page.locator(".axiovo-header-appearance .theme-toggle").wait_for()
+                    page.locator("header.rl-global-header .axiovo-header-appearance").wait_for(state="attached")
+                    page.locator("body.axiovo-reference-ui").wait_for()
+                    page.locator(".axiovo-header-appearance .theme-toggle").wait_for(state="attached")
                     result = page.evaluate("""() => {
                       const qs = s => document.querySelector(s);
                       const rect = el => {const r=el?.getBoundingClientRect();return r&&{
@@ -113,45 +114,30 @@ def main():
                       };
                     }""")
                     links=result["links"]
-                    assert tuple(link["label"] for link in links)==FEATURES,(width,path,"Incorrect global navigation",result)
-                    assert result["settings"] and result["theme"],(width,path,"Appearance actions absent")
-                    a,b=result["settings"],result["theme"]
-                    assert abs(a["y"]-b["y"])<=2, (width,path,"Settings and theme not in same row",result)
-                    assert 0<=a["x"] and b["right"]<=width+2,(width,path,"Appearance outside viewport",result)
-                    assert result["overflow"]<=7,(width,path,"Page has horizontal overflow",result)
+                    assert tuple(link["label"] for link in links)==FEATURES,(width,path,"Incorrect navigation labels",result)
+                    assert result["overflow"]<=7,(width,path,"Horizontal overflow",result)
                     if phone:
-                        assert abs(result["logo"]["y"]-a["y"])<=7,(width,path,"Mobile header shifted",result)
+                        # Five native navigation links now form the bottom app bar.
                         nav=result["navigation"]
-                        assert nav and nav["y"]>=a["bottom"]+4,(width,path,"Research links must be below the utility row",result)
-                        assert nav["x"]<=16 and nav["right"]>=width-16,(width,path,"Research panel does not span the header",result)
-                        assert result["navOverflow"]<=1,(width,path,"Research links require horizontal scrolling",result)
-                        assert result["header"]["height"]<=140,(width,path,"Mobile header too tall",result)
-                        controls=[a,b]
-                        if path:
-                            assert result["back"] and result["home"],(width,path,"Back/Home missing")
-                            controls=[result["back"],result["home"],*controls]
-                        assert all(abs(c["y"]-a["y"])<=2 for c in controls),(width,path,"Utility buttons split across rows",result)
-                        assert all(left["right"]<=right["x"] for left,right in zip(controls,controls[1:])),(
-                            width,path,"Utility controls overlap or are out of order",result)
-                        assert all(c["width"]>=44 and c["height"]>=44 for c in [*controls,*links]),(
-                            width,path,"Tap target smaller than 44px",result)
-                        assert all(nav["x"]<=link["x"] and link["right"]<=nav["right"] and
-                                   abs(link["y"]-links[0]["y"])<=2 and link["overflow"]<=1 for link in links),(
-                            width,path,"A research link is off-screen, clipped, or on the wrong row",result)
-                        if width==390 and path=="desk.html" and page.evaluate("CSS.supports('reading-flow','grid-rows')"):
-                            page.locator(".rl-logo").focus()
-                            for selector in (".axiovo-back-button",".axiovo-home-link",".rl-settings-link",
-                                             ".theme-toggle",".rl-nav a:first-child"):
-                                page.keyboard.press("Tab")
-                                assert page.evaluate("selector => document.activeElement.matches(selector)",selector),(
-                                    width,path,"Keyboard focus does not follow the mobile rows",selector)
-                    elif width==1360:
-                        midpoint=(a["y"]+a["bottom"])/2
-                        assert all(abs((link["y"]+link["bottom"])/2-midpoint)<=4 for link in links),(
-                            width,path,"Desktop navigation left its original row",result)
-                        if path:
-                            assert result["home"]["right"]<=links[0]["x"] and links[-1]["right"]<=a["x"],(
-                                width,path,"Desktop navigation changed its position",result)
+                        assert nav and nav["x"]<=2 and nav["right"]>=width-2,(width,path,"Bottom bar not full width",result)
+                        assert nav["y"]>=height-100 and nav["bottom"]<=height+3,(width,path,"Bottom bar not anchored",result)
+                        assert result["header"]["height"]<=90,(width,path,"Mobile topbar too tall",result)
+                        assert all(x["width"]>=44 and x["height"]>=44 for x in links),(width,path,"Bottom navigation touch target",result)
+                        assert all(abs(x["y"]-links[0]["y"])<=2 for x in links),(width,path,"Bottom links not aligned",result)
+                        assert page.locator(".ax-mobile-menu summary").is_visible(),(width,path,"More menu missing")
+                        if width==390 and path=="desk.html":
+                            page.locator(".ax-mobile-menu summary").click()
+                            assert page.locator(".ax-menu-panel a[href='./profiles.html']").is_visible()
+                            page.locator(".ax-mobile-menu summary").click()
+                    else:
+                        # A real desktop workspace sidebar replaces the old horizontal nav.
+                        assert page.locator(".ax-sidebar").is_visible(),(width,path,"Desktop sidebar missing")
+                        nav=result["navigation"]
+                        assert nav and nav["x"]<=16 and nav["right"]<width/2,(width,path,"Sidebar nav moved out",result)
+                        assert all(x["height"]>=44 for x in links),(width,path,"Desktop nav touch targets",result)
+                        assert all(links[i+1]["y"]>links[i]["y"] for i in range(4)),(width,path,"Sidebar links out of order",result)
+                        assert page.locator(".axiovo-header-appearance .theme-toggle").is_visible()
+                        assert page.locator(".ax-header-search").is_visible()
                     if width<=428:
                         check_phone_content(page,path,width)
                     if not path:
@@ -264,7 +250,7 @@ def main():
                         assert action["clearBelow"] and action["clearHeight"]>=44,(action_width,source,action)
                     show.click()
                     assert page.evaluate("document.activeElement?.id")=="archive-results-heading",(source,"Results not focused")
-                    page.locator(".axiovo-home-link").click()
+                    (page.locator(".rl-logo") if phone else page.locator(".axiovo-home-link")).click()
                     page.wait_for_url(lambda url: urlsplit(url).path.endswith("/index.html"))
                 # Regression: returning from My Feed must show the top of Home,
                 # not a restored anchor at the archive cards below the video.
@@ -272,7 +258,7 @@ def main():
                 page.locator("a[href='./feed.html']").first.click()
                 page.wait_for_url(lambda url: urlsplit(url).path.endswith("/feed.html"))
                 history_length = page.evaluate("history.length")
-                page.locator(".axiovo-back-button").click()
+                (page.go_back(wait_until="domcontentloaded") if phone else page.locator(".axiovo-back-button").click())
                 page.wait_for_url(lambda url: urlsplit(url).path.endswith("/index.html"))
                 page.locator("#axiovo-home-video").wait_for()
                 assert page.locator("#axiovo-tour-show-video").is_visible()
@@ -492,7 +478,8 @@ def main():
                     page.unroute("https://api.openalex.org/works?**")
                 page.goto(base+"profiles.html",wait_until="domcontentloaded")
                 before = page.evaluate("document.documentElement.dataset.theme")
-                page.locator(".axiovo-header-appearance .theme-toggle").click()
+                (page.locator(".ax-mobile-menu summary").click() if phone else None)
+                (page.locator(".ax-menu-theme").click() if phone else page.locator(".axiovo-header-appearance .theme-toggle").click())
                 assert page.evaluate("document.documentElement.dataset.theme") != before
                 page.reload(wait_until="domcontentloaded")
                 assert page.evaluate("document.documentElement.dataset.theme") != before
