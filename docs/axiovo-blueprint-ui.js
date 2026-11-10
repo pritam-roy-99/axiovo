@@ -37,6 +37,7 @@
  '<a href="./profiles.html">Settings and appearance</a><button type="button" class="ax-menu-theme">☾ Toggle day / night</button><a href="./install.html">Install Axiovo</a>',
  '<a href="./tutorial.html">Tutorial</a><a href="./methodology.html">Source methodology</a></div>'].join("");
  header.append(menu);
+ if(window.AxiovoAppearance)window.AxiovoAppearance.setTheme(window.AxiovoAppearance.getTheme());
  menu.querySelector(".ax-menu-theme").addEventListener("click",()=>{const appearance=window.AxiovoAppearance;if(appearance)appearance.setTheme(appearance.getTheme()==="dark"?"light":"dark");menu.open=false;});
  document.addEventListener("click",event=>{if(!menu.contains(event.target))menu.open=false;});
  document.addEventListener("keydown",event=>{if(event.key==="Escape")menu.open=false;});
