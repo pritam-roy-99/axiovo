@@ -126,6 +126,19 @@ S^2 = 4I - [A_0,A_1] \\otimes [B_0,B_1]
                 assert page.locator("#obligations li").count() == 1
                 page.locator("#lean").fill("import Mathlib\\n\\n-- draft only")
                 assert "Unverified draft" in page.locator("#project-status").inner_text()
+                if width <= 390:
+                    geometry = page.evaluate("""() => {
+                        const el=document.querySelector('#download-json');
+                        const info=n=>{const r=n.getBoundingClientRect(),c=getComputedStyle(n);return {
+                            selector:n.id||n.className||n.tagName,
+                            rect:{x:r.x,y:r.y,width:r.width,height:r.height,right:r.right,bottom:r.bottom},
+                            overflow:c.overflow,overflowY:c.overflowY,display:c.display,
+                            clientHeight:n.clientHeight,scrollHeight:n.scrollHeight,scrollTop:n.scrollTop
+                        }};
+                        const rows=[];for(let n=el;n&&rows.length<10;n=n.parentElement)rows.push(info(n));
+                        return {rows,scrollY:scrollY,viewport:innerHeight,documentHeight:document.documentElement.scrollHeight};
+                    }""")
+                    print("PROOFLAB_EXPORT_GEOMETRY", width, geometry, flush=True)
                 with page.expect_download() as info:
                     page.locator("#download-json").click()
                 assert info.value.suggested_filename.endswith(".json")
