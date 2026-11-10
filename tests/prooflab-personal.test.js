@@ -36,4 +36,6 @@ test("Windows startup updater never forces reset and supports opt-out",()=>{
  assert.match(startup,/git status --porcelain --untracked-files=no/);
  assert.match(startup,/git remote get-url origin/);
  assert.doesNotMatch(startup,/git\s+(?:reset\s+--hard|clean\s+-fd|pull\s+--force)/);
+ assert.equal((startup.match(/^\$project = \(Resolve-Path/gm)||[]).length,1,"startup project setup must not be duplicated");
+ assert.equal((startup.match(/^function Update-Axiovo/gm)||[]).length,1,"updater must not be duplicated");
 });
