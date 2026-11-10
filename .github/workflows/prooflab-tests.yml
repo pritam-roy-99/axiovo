@@ -5,6 +5,7 @@ on:
       - 'docs/prooflab*'
       - 'docs/copilot.html'
       - 'tests/prooflab.test.js'
+      - 'scripts/smoke_prooflab.py'
       - '.github/workflows/prooflab-tests.yml'
   push:
     branches: [main]
@@ -28,3 +29,12 @@ jobs:
           node --check docs/prooflab.js
       - name: Run ProofLab unit tests
         run: node --test tests/prooflab.test.js
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Install Chromium test dependencies
+        run: |
+          python -m pip install playwright
+          python -m playwright install --with-deps chromium
+      - name: Run ProofLab browser acceptance tests
+        run: python scripts/smoke_prooflab.py
