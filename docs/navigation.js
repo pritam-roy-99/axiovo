@@ -117,7 +117,7 @@
    sheet.dataset.axiovoBlueprint="true";document.head.append(sheet);
   }
   const script=document.createElement("script");script.defer=true;
-  script.src=new URL("./axiovo-blueprint-ui.js?v=20261111-single-home-v2",location.href).href;
+  script.src=new URL("./axiovo-blueprint-ui.js?v=20261111-no-flash-v1",location.href).href;
   script.dataset.axiovoBlueprint="true";document.head.append(script);
   // Per-page design is presentational; all original handlers stay intact.
   if(!document.querySelector('link[data-axiovo-page-design]')){
