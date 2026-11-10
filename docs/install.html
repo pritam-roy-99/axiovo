@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Install Axiovo locally | Windows, Ubuntu, macOS</title>
-<meta name="description" content="Public, step-by-step installation guide for Axiovo local research workspace on Windows 11, Ubuntu Linux and macOS. Understand the difference between Ollama offline AI and ChatGPT cloud authorization.">
+<title>Install Axiovo | Android, Windows, Ubuntu, macOS</title>
+<meta name="description" content="Public, step-by-step installation guide for Android home-screen access and local research workspace on Windows 11, Ubuntu Linux and macOS. Understand the difference between Ollama offline AI and ChatGPT cloud authorization.">
 <link rel="icon" type="image/svg+xml" href="./icons/axiovo.svg"><link rel="stylesheet" href="./theme.css"><link rel="stylesheet" href="./axiovo-shell.css"><link rel="stylesheet" href="./research-desk.css">
 <script defer src="./theme.js"></script><script defer src="./navigation.js"></script>
 <style>
@@ -26,9 +26,9 @@
 </style></head><body class="axiovo-research"><header></header>
 <main class="install-page">
 <p class="rd-kicker">AXIOVO · PUBLIC SETUP GUIDE</p>
-<h1>Install Axiovo on your computer</h1>
+<h1>Use Axiovo on Android or install it on your computer</h1>
 <p class="intro">Run the free Axiovo research website on your own device, and optionally connect locally downloaded Ollama models. Axiovo Personal also offers a separate ChatGPT account connection on Windows. Read the platform-specific instructions below.</p>
-<div class="install-platforms" role="navigation" aria-label="Choose operating system"><a href="#windows">Windows 11</a><a href="#ubuntu">Ubuntu / Linux</a><a href="#macos">macOS</a><a href="#privacy">Privacy and limitations</a></div>
+<div class="install-platforms" role="navigation" aria-label="Choose operating system"><a href="#android">Android</a><a href="#windows">Windows 11</a><a href="#ubuntu">Ubuntu / Linux</a><a href="#macos">macOS</a><a href="#privacy">Privacy and limitations</a></div>
 <section class="install-panel" id="modes" aria-labelledby="modes-title">
 <h2 id="modes-title">Choose how AI runs</h2>
 <table><thead><tr><th>Mode</th><th>Processing</th><th>Works without internet after setup?</th></tr></thead><tbody>
@@ -36,6 +36,18 @@
 <tr><td><strong>ChatGPT account</strong></td><td>OpenAI's cloud, with your authorization</td><td>No</td></tr>
 </tbody></table>
 <p class="install-note"><strong>Support status:</strong> Axiovo Personal's official ChatGPT connection currently uses a Windows-specific credential-encryption implementation. Ubuntu and macOS users can run the local Axiovo website with Ollama, but the Windows ChatGPT companion is <strong>not supported</strong> on those operating systems. Public Axiovo remains accessible on all three platforms.</p>
+</section>
+<section class="install-panel" id="android" aria-labelledby="android-title">
+<h2 id="android-title">Android: add Axiovo to your home screen</h2>
+<p>No APK download, Git or command-line setup is required. This installs the public Axiovo web app shortcut or progressive web app, depending on browser support.</p>
+<ol>
+<li>On your Android phone, open <a href="https://pritam-roy-99.github.io/axiovo/">Axiovo's homepage</a> in Google Chrome.</li>
+<li>Tap Chrome's three-dot menu and choose <strong>Install app</strong> or <strong>Add to Home screen</strong>. Wording depends on Chrome version and installability.</li>
+<li>Confirm and open the new Axiovo icon from your home screen or app launcher.</li>
+</ol>
+<p class="install-note"><strong>Android limitations:</strong> This is a web app, not a native Android APK. The public research discovery, reading and browser-based workspace features are accessible, but certain pages require internet access. Offline shell caching does not include the complete paper archive, videos or PDFs. Browser-local data may be lost if Chrome site data is cleared and is not automatically synchronized between devices.</p>
+<p><strong>ProofLab AI:</strong> The ProofLab interface can open on Android, but the Windows ChatGPT Personal account companion does not run on Android, and Axiovo does not currently provide a supported on-device Android Ollama installation. Local AI actions require a separately configured reachable backend; opening ProofLab alone does not provide offline AI or a ChatGPT connection.</p>
+<p><strong>Updates:</strong> The web app loads new website versions when they are published and the device reconnects, although Chrome may temporarily display cached resources. It is not an independently distributed Play Store app.</p>
 </section>
 <section class="install-panel" id="windows" aria-labelledby="windows-title">
 <h2 id="windows-title">Windows 11: Axiovo Personal, Ollama and optional ChatGPT</h2>
