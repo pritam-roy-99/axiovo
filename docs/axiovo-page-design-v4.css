@@ -497,3 +497,39 @@ body.ax4 .ax4-skip:focus{top:12px}
   width:100%!important;min-height:44px!important;box-sizing:border-box!important
  }
 }
+
+/* Research Assistant must preserve its existing named grid areas. A generic
+   results grid would push verified sources outside the viewport. */
+@media(min-width:761px){
+ html:root body.ax4.axiovo-assistant.axiovo-reference-ui>main.assistant-page{
+  display:grid!important;
+  width:calc(100% - 224px)!important;max-width:calc(100% - 224px)!important;
+  margin-left:224px!important;box-sizing:border-box!important;
+  grid-template-columns:minmax(0,1fr) minmax(250px,325px)!important;
+  grid-template-areas:"intro intro" "composer sources" "chat sources" "tools tools"!important;
+  gap:16px!important;min-width:0!important;
+ }
+}
+@media(min-width:761px) and (max-width:1050px){
+ html:root body.ax4.axiovo-assistant.axiovo-reference-ui>main.assistant-page{
+  width:calc(100% - 194px)!important;max-width:calc(100% - 194px)!important;margin-left:194px!important;
+  grid-template-columns:minmax(0,1fr) minmax(210px,265px)!important
+ }
+}
+html:root body.ax4.axiovo-assistant .assistant-page>.assistant-results{display:contents!important}
+html:root body.ax4.axiovo-assistant .assistant-page>.rd-desk-heading{grid-area:intro!important}
+html:root body.ax4.axiovo-assistant .assistant-page>.assistant-compose{grid-area:composer!important;min-width:0!important}
+html:root body.ax4.axiovo-assistant .assistant-results>.rd-panel:first-child{grid-area:chat!important;min-width:0!important}
+html:root body.ax4.axiovo-assistant .assistant-results>.rd-panel:nth-child(2){grid-area:sources!important;min-width:0!important}
+html:root body.ax4.axiovo-assistant .assistant-page>.assistant-indexed-tools{grid-area:tools!important;min-width:0!important}
+@media(max-width:760px){
+ html:root body.ax4.axiovo-assistant.axiovo-reference-ui>main.assistant-page{
+  display:grid!important;grid-template-columns:minmax(0,1fr)!important;
+  grid-template-areas:"intro" "composer" "chat" "sources" "tools"!important;
+  width:100%!important;max-width:100%!important;margin:0!important;
+  gap:12px!important;box-sizing:border-box!important
+ }
+ html:root body.ax4.axiovo-assistant .assistant-results>.rd-panel:nth-child(2){
+  position:static!important;max-height:none!important
+ }
+}
