@@ -3,7 +3,7 @@
 <title>Install Axiovo | Android, Windows, Ubuntu, macOS</title>
 <meta name="description" content="Public, step-by-step installation guide for Android home-screen access and local research workspace on Windows 11, Ubuntu Linux and macOS. Understand the difference between Ollama offline AI and ChatGPT cloud authorization.">
 <link rel="icon" type="image/svg+xml" href="./icons/axiovo.svg"><link rel="stylesheet" href="./theme.css"><link rel="stylesheet" href="./axiovo-shell.css"><link rel="stylesheet" href="./research-desk.css">
-<script defer src="./theme.js"></script><script defer src="./navigation.js?v=20261111-allpages-v4"></script>
+<script defer src="./theme.js"></script><script defer src="./navigation.js?v=20261111-no-flash-v1"></script>
 <style>
 .install-page{max-width:1050px;margin:0 auto;padding:26px 18px 76px;color:var(--rd-ink,#17334d)}
 .install-page h1{font-size:clamp(1.9rem,4vw,2.7rem);line-height:1.15;margin:.3em 0}
@@ -23,7 +23,15 @@
 .install-page table{width:100%;border-collapse:collapse}
 .install-page td,.install-page th{padding:11px;border-bottom:1px solid var(--rd-border,#d0dce8);text-align:left;vertical-align:top}
 @media(max-width:520px){.install-page{padding:16px 12px 52px}.install-page pre{font-size:.75rem}}
-</style></head><body class="axiovo-research"><header></header>
+</style><!-- Load the final design before first paint; navigation still supplies interactive controls. -->
+<link data-axiovo-ui-phase1="true" rel="stylesheet" href="./axiovo-ui-phase1.css?v=1">
+<link data-axiovo-ui-phase2="true" rel="stylesheet" href="./axiovo-ui-phase2.css?v=1">
+<link data-axiovo-ui-phase3="true" rel="stylesheet" href="./axiovo-ui-phase3.css?v=1">
+<link data-axiovo-blueprint="true" rel="stylesheet" href="./axiovo-blueprint-ui.css?v=20261111-reference">
+<link data-axiovo-page-design="v4" rel="stylesheet" href="./axiovo-page-design-v4.css?v=20261111-complete-v1">
+<style>html.ax-preboot body{visibility:hidden}</style>
+<script>document.documentElement.classList.add("ax-preboot");setTimeout(function(){document.documentElement.classList.remove("ax-preboot")},2500);</script>
+</head><body class="axiovo-research ax4 axiovo-reference-ui"><header></header>
 <main class="install-page">
 <p class="rd-kicker">AXIOVO · PUBLIC SETUP GUIDE</p>
 <h1>Use Axiovo on Android or install it on your computer</h1>

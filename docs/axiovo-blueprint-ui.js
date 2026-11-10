@@ -67,4 +67,7 @@
  const mobileRobot=document.createElement("style");
  mobileRobot.textContent="@media(max-width:760px){body #axiovo-robot{bottom:calc(83px + env(safe-area-inset-bottom,0px))!important}body #axiovo-robot .robot-panel{bottom:calc(154px + env(safe-area-inset-bottom,0px))!important;height:min(500px,calc(100dvh - 169px))!important}}";
  document.head.append(mobileRobot);
+ // The final stylesheet is already parsed; expose the completed navigation
+ // and responsive workspace only after its DOM additions are ready.
+ document.documentElement.classList.remove("ax-preboot");
 })();
