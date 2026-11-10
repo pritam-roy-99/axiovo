@@ -40,4 +40,31 @@ jobs:
           else
             echo "- Recovery: not needed; a recent primary run exists." >> "$GITHUB_STEP_SUMMARY"
           fi
+          # A green workflow does not mean every individual archive was fetched:
+          # those source steps intentionally continue-on-error to preserve data.
+          # Inspect the most recent completed sync's per-source steps as well.
+          latest_id=$(jq -r '[.workflow_runs[] | select(.status == "completed")] | first | .id // empty' <<< "$runs")
+          if [ -n "$latest_id" ]; then
+            jobs=$(gh api "repos/$GH_REPO/actions/runs/$latest_id/jobs?per_page=30")
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "### Last completed run: per-archive results" >> "$GITHUB_STEP_SUMMARY"
+            echo "| Source | Fetch step |" >> "$GITHUB_STEP_SUMMARY"
+            echo "|---|---|" >> "$GITHUB_STEP_SUMMARY"
+            for entry in \
+              'arXiv OAI|Synchronize arXiv all-category OAI metadata' \
+              'arXiv rolling feed|Rebuild arXiv rolling feed' \
+              'bioRxiv|Synchronize official bioRxiv API' \
+              'ChemRxiv|Synchronize verified ChemRxiv records' \
+              'Cryptology ePrint|Synchronize Cryptology ePrint OAI'; do
+              archive="${entry%%|*}"
+              step="${entry#*|}"
+              outcome=$(jq -r --arg step "$step" '[.jobs[].steps[]? | select(.name == $step) | .conclusion] | first // "not-run"' <<< "$jobs")
+              echo "| $archive | $outcome |" >> "$GITHUB_STEP_SUMMARY"
+              if [ "$outcome" != "success" ]; then
+                echo "::warning::$archive latest completed fetch: $outcome (run $latest_id). Old verified data may still be shown."
+              fi
+            done
+          else
+            echo "::warning::No completed primary archive sync exists among the latest attempts."
+          fi
           echo "- Note: GitHub scheduled workflows are best-effort. This watchdog is a fallback, not a guarantee of exact 15-minute execution." >> "$GITHUB_STEP_SUMMARY"
