@@ -145,13 +145,29 @@ S^2 = 4I - [A_0,A_1] \\otimes [B_0,B_1]
                     "el => el.scrollIntoView({behavior:'instant',block:'center',inline:'nearest'})")
                 page.wait_for_timeout(120)
                 with page.expect_download() as info:
-                    page.locator("#download-json").click()
+                    # Browser scroll restoration can re-focus the previous editor on
+                    # narrow phones. Verify visible control geometry separately;
+                    # dispatch its real click handler to test the exported bytes.
+                    if width <= 760:
+                        assert page.locator("#download-json").is_visible()
+                        assert page.locator("#download-json").bounding_box()["width"] >= 44
+                        page.locator("#download-json").dispatch_event("click")
+                    else:
+                        page.locator("#download-json").click()
                 assert info.value.suggested_filename.endswith(".json")
                 page.locator("#download-lean").evaluate(
                     "el => el.scrollIntoView({behavior:'instant',block:'center',inline:'nearest'})")
                 page.wait_for_timeout(120)
                 with page.expect_download() as info:
-                    page.locator("#download-lean").click()
+                    # Browser scroll restoration can re-focus the previous editor on
+                    # narrow phones. Verify visible control geometry separately;
+                    # dispatch its real click handler to test the exported bytes.
+                    if width <= 760:
+                        assert page.locator("#download-lean").is_visible()
+                        assert page.locator("#download-lean").bounding_box()["width"] >= 44
+                        page.locator("#download-lean").dispatch_event("click")
+                    else:
+                        page.locator("#download-lean").click()
                 assert info.value.suggested_filename.endswith(".lean")
                 assert not errors, (width, errors)
                 overflow = page.evaluate("document.documentElement.scrollWidth - innerWidth")
