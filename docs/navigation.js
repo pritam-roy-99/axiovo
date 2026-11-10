@@ -116,7 +116,7 @@
   sheet.href=new URL("./axiovo-blueprint-ui.css?v=20261111-reference",location.href).href;
   sheet.dataset.axiovoBlueprint="true";document.head.append(sheet);
   const script=document.createElement("script");script.defer=true;
-  script.src=new URL("./axiovo-blueprint-ui.js?v=20261111-reference",location.href).href;
+  script.src=new URL("./axiovo-blueprint-ui.js?v=20261111-single-home-v2",location.href).href;
   script.dataset.axiovoBlueprint="true";document.head.append(script);
  }
  function loadRobot(){
