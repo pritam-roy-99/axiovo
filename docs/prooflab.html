@@ -2,17 +2,18 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>ProofLab | Axiovo</title><meta name="description" content="Plan formal proofs, discuss strategies with local AI and export Lean 4 drafts in Axiovo ProofLab.">
 <link rel="stylesheet" href="./theme.css"><link rel="stylesheet" href="./research-entry.css"><link rel="stylesheet" href="./axiovo-shell.css"><link rel="stylesheet" href="./research-desk.css"><link rel="stylesheet" href="./prooflab.css?v=20261110-math1"><link rel="stylesheet" href="./prooflab-axiovo-theme.css?v=20261110-native-v2">
-<script defer src="./theme.js"></script><script defer src="./navigation.js"></script><script defer src="./assistant-math.js"></script><script defer src="./prooflab-math.js?v=20261110-math1"></script><script defer src="./prooflab-core.js"></script><script defer src="./prooflab-ollama.js"></script><script defer src="./prooflab.js?v=20261110-handoff-v2"></script><script defer src="./prooflab-personal.js?v=20261110-math1"></script><script defer src="./prooflab-studio-v2.js?v=20261110-a"></script></head>
+<link rel="stylesheet" href="./prooflab-focused.css?v=20261110-focus2">
+<script defer src="./theme.js"></script><script defer src="./navigation.js"></script><script defer src="./assistant-math.js"></script><script defer src="./prooflab-math.js?v=20261110-math1"></script><script defer src="./prooflab-core.js"></script><script defer src="./prooflab-ollama.js"></script><script defer src="./prooflab.js?v=20261110-handoff-v2"></script><script defer src="./prooflab-personal.js?v=20261110-math1"></script><script defer src="./prooflab-studio-v2.js?v=20261110-a"></script><script defer src="./prooflab-attachments.js?v=20261110-v1"></script></head>
 <body class="axiovo-research prooflab-body"><header></header>
 <div class="pl-app-shell">
 
 <div class="pl-stage">
 <div class="pl-topbar rd-desk-heading"><div class="pl-topbrand"><p class="rd-kicker">AXIOVO · RESEARCH WORKSPACE</p><h1 id="prooflab-title" class="pl-topbrand-name">ProofLab</h1><p class="pl-topbrand-sub">Plan theorem proofs, investigate open lemmas, and export unverified Lean 4 drafts.</p></div><button class="rd-button rd-secondary pl-topbar-center" type="button" id="pl-focus-prompt" aria-label="Focus the proof conversation input">Ask a proof question <span aria-hidden="true">↗</span></button></div>
 <main class="rd-page prooflab-page">
-<nav class="pl-section-nav" aria-label="ProofLab sections"><a class="pl-section-current" href="#prooflab-chat-title">Conversation</a><a href="#prooflab-setup-title">Proof project</a><a href="#prooflab-lean-title">Lean editor</a><a href="./copilot.html">Research Assistant</a><span id="prooflab-toolbar-status" class="pl-local-status">Draft · Local workspace</span></nav>
+<nav class="pl-section-nav" aria-label="ProofLab sections"><a class="pl-section-current" href="#prooflab-chat-title">Conversation</a><a href="#prooflab-setup-title">Project</a><a href="#prooflab-lean-title">Lean 4</a><a href="./copilot.html">Research Assistant</a><span id="prooflab-toolbar-status" class="pl-local-status">Draft · Local workspace</span></nav>
 <div class="prooflab-studio">
 <aside class="prooflab-sidebar" aria-label="Proof settings">
-<section class="rd-panel prooflab-card prooflab-setup" aria-labelledby="prooflab-setup-title"><div class="prooflab-card-title"><span class="prooflab-glyph" aria-hidden="true">▤</span><h2 id="prooflab-setup-title">Proof project</h2></div><p class="prooflab-card-caption">Set up your theorem and working assumptions.</p>
+<section class="rd-panel prooflab-card prooflab-setup" aria-labelledby="prooflab-setup-title"><div class="prooflab-card-title"><span class="prooflab-glyph" aria-hidden="true">▤</span><h2 id="prooflab-setup-title">Proof project</h2></div><p class="prooflab-card-caption">Optional project context for proof planning.</p>
 <label class="rd-label" for="title">Project title</label><input id="title" value="CHSH Tsirelson bound" maxlength="200" autocomplete="off">
 <label class="rd-label" for="statement">Theorem statement</label><textarea id="statement" rows="5">For Hermitian observables A0,A1,B0,B1 with eigenvalues ±1 on bipartite quantum systems, the CHSH expectation is at most 2 sqrt(2) in absolute value.</textarea>
 <label class="rd-label" for="assumptions">Assumptions · one per line</label><textarea id="assumptions" rows="5">Observables are Hermitian
@@ -21,7 +22,7 @@ Alice's operators commute with Bob's operators</textarea>
 <div class="prooflab-actions"><button class="rd-button rd-primary" id="create" type="button">Update proof plan</button></div>
 <p class="rd-small" id="feedback" role="status"></p>
 </section>
-<section class="rd-panel prooflab-card prooflab-model-card" aria-labelledby="prooflab-model-title"><div class="prooflab-card-title"><span class="prooflab-glyph prooflab-sparkle" aria-hidden="true">✦</span><h2 id="prooflab-model-title">AI proof assistance</h2></div><p class="prooflab-card-caption">Use a model installed on this computer. No Axiovo AI server is involved.</p>
+<section class="rd-panel prooflab-card prooflab-model-card" aria-labelledby="prooflab-model-title"><div class="prooflab-card-title"><span class="prooflab-glyph prooflab-sparkle" aria-hidden="true">✦</span><h2 id="prooflab-model-title">AI proof assistance</h2></div><p class="prooflab-card-caption">Ollama setup and local model discovery. Select your model beside the chat box.</p>
 <label class="rd-label" for="ollama-model">Local model · Ollama</label><select id="ollama-model" aria-label="Local Ollama model"><option value="">Find installed models first</option></select>
 <button class="rd-button rd-secondary prooflab-wide-button" id="ollama-detect" type="button">Find installed Ollama models</button>
 <p class="rd-small prooflab-connection" id="ollama-status" role="status">Start Ollama locally, then find installed models.</p>
@@ -29,10 +30,28 @@ Alice's operators commute with Bob's operators</textarea>
 </section>
 </aside>
 <section class="rd-panel prooflab-card prooflab-conversation" aria-labelledby="prooflab-chat-title">
-<div class="prooflab-chat-heading"><div class="prooflab-card-title"><span class="prooflab-glyph" aria-hidden="true">◉</span><h2 id="prooflab-chat-title">Proof conversation</h2></div><p class="prooflab-card-caption">Discuss strategies, lemmas, and gaps with your local research model.</p><span class="prooflab-unverified">● Draft · not verified</span><span id="pl-active-model" class="pl-active-model" aria-live="polite">Choose a local AI model</span></div>
+<div class="prooflab-chat-heading"><div class="prooflab-card-title"><span class="prooflab-glyph" aria-hidden="true">◉</span><h2 id="prooflab-chat-title">Proof conversation</h2></div><p class="prooflab-card-caption">Ask questions, examine uploaded research notes, and refine a formal proof draft.</p><span class="prooflab-unverified">● Draft · not verified</span><span id="pl-active-model" class="pl-active-model" aria-live="polite">Choose a local AI model</span></div>
 <div id="prooflab-thread" class="prooflab-thread" role="log" aria-live="polite" aria-label="Proof discussion"><div class="prooflab-welcome"><span class="prooflab-welcome-icon" aria-hidden="true">✦</span><h3>Your proof starts here</h3><p>Ask for a structured proof strategy or investigate a specific lemma. Your local model can suggest arguments, but only Lean can verify them.</p></div></div>
 <pre class="prooflab-output-legacy" id="ollama-output" aria-label="Latest unverified local model suggestion"></pre>
-<div class="prooflab-composer"><label class="rd-sr-only" for="prooflab-prompt">Message Axiovo ProofLab</label><textarea id="prooflab-prompt" rows="3" maxlength="2000" placeholder="Message Axiovo ProofLab…"></textarea><div class="prooflab-composer-footer"><span>Choose an available local model in Proof settings · Ctrl+Enter to send</span><button class="rd-button rd-primary" id="ollama-suggest" type="button" aria-label="Send message to local AI">Send ↗</button></div></div>
+<div class="prooflab-composer"><label class="rd-sr-only" for="prooflab-prompt">Message Axiovo ProofLab</label>
+<div class="pl-chat-attachment-preview" id="pl-attachment-list" aria-live="polite" hidden></div>
+<textarea id="prooflab-prompt" rows="3" maxlength="2000" placeholder="Ask about a theorem, proof or attached document…"></textarea>
+<div class="pl-composer-actions">
+  <div class="pl-composer-left">
+    <button class="pl-attach-button" id="pl-attach-trigger" type="button" title="Attach text, LaTeX, Lean, code or PDF files" aria-label="Attach research files"><span aria-hidden="true">＋</span> Attach</button>
+    <input id="pl-chat-files" type="file" accept=".pdf,.txt,.md,.tex,.lean,.json,.csv,.py,.js,.html,.log,text/plain,application/pdf" multiple aria-label="Choose research files to attach" hidden>
+    <label class="pl-attach-opt" for="pl-include-files"><input id="pl-include-files" type="checkbox"> Include files in next AI request</label>
+  </div>
+  <div class="pl-composer-right">
+    <label for="pl-chat-provider" class="rd-sr-only">AI provider</label>
+    <select id="pl-chat-provider" aria-label="Choose AI provider"><option value="ollama">Ollama · local</option></select>
+    <label for="pl-chat-model" class="rd-sr-only">AI model</label>
+    <select id="pl-chat-model" aria-label="Select model beside chat"><option value="">Detect models first</option></select>
+    <button type="button" id="pl-detect-ollama" class="rd-button rd-secondary pl-mini-detect" title="Find local Ollama models" aria-label="Find installed Ollama models">↻</button>
+    <button class="rd-button rd-primary" id="ollama-suggest" type="button" aria-label="Send to selected AI model">Send ↗</button>
+  </div>
+</div>
+<div id="pl-cloud-consent" class="pl-cloud-consent" hidden></div><p id="pl-chat-feedback" class="pl-chat-feedback" role="status">Files remain on this device until you explicitly include them in an AI request. ChatGPT requests also require separate approval.</p></div>
 </section>
 <aside class="prooflab-tools" aria-label="Lean editor and proof obligations">
 <section class="rd-panel prooflab-card prooflab-lean-panel" aria-labelledby="prooflab-lean-title"><div class="prooflab-card-title"><span class="prooflab-glyph" aria-hidden="true">⌘</span><h2 id="prooflab-lean-title">Lean 4 draft</h2></div><p class="prooflab-card-caption">Your editable formalization. Syntax is not checked in the browser.</p>

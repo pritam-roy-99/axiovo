@@ -39,7 +39,25 @@ def main():
                     page.locator("#pl-focus-prompt").click()
                     assert page.locator("#prooflab-prompt").evaluate("(el) => document.activeElement === el")
                 cols = page.locator(".prooflab-studio").evaluate("(el) => getComputedStyle(el).gridTemplateColumns.split(' ').length")
-                assert cols == (3 if width == 1280 else 1), (width, cols)
+                assert cols == (2 if width == 1280 else 1), (width, cols)
+                # Native header and theme controls remain in place.
+                assert page.locator("header.rl-global-header .theme-toggle").is_visible()
+                assert page.locator("#pl-chat-provider").is_visible()
+                assert page.locator("#pl-chat-model").is_visible()
+                # Text attachments are extracted on-device; not transmitted by selecting.
+                page.locator("#pl-chat-files").set_input_files({
+                    "name": "lemma.tex",
+                    "mimeType": "text/plain",
+                    "buffer": b"\\\\[S^2 = 4I - [A_0,A_1]\\\\otimes[B_0,B_1]\\\\]"
+                })
+                page.wait_for_function("window.AxiovoProofLabAttachments?.metadata.length === 1")
+                assert "lemma.tex" in page.locator("#pl-attachment-list").inner_text()
+                assert "Attached research file" in page.evaluate("window.AxiovoProofLabAttachments.getApprovedText()")
+                page.locator("#pl-include-files").uncheck()
+                assert not page.evaluate("window.AxiovoProofLabAttachments.getApprovedText()")
+                page.locator("#pl-include-files").check()
+                page.get_by_role("button", name="Remove lemma.tex").click()
+                assert not page.evaluate("window.AxiovoProofLabAttachments.getApprovedText()")
                 page.locator("#create").click()
                 assert page.locator("#workspace").is_visible()
                 assert "Unverified draft" in page.locator("#project-status").inner_text()

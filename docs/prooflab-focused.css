@@ -1,0 +1,134 @@
+
+/* ProofLab-focused redesign: original Axiovo header, navigation and appearance remain unchanged. */
+html body.prooflab-body .rd-page.prooflab-page{max-width:1480px!important;padding-top:10px!important}
+html body.prooflab-body .pl-section-nav{margin-bottom:12px!important}
+html body.prooflab-body .prooflab-studio{
+  display:grid!important;
+  grid-template-columns:minmax(0,1.84fr) minmax(285px,.82fr)!important;
+  grid-template-areas:"chat project" "chat tools"!important;
+  gap:14px!important;align-items:start!important;
+}
+html body.prooflab-body .prooflab-conversation{
+  grid-area:chat!important;grid-column:1!important;grid-row:1/span 2!important;
+  min-width:0!important;height:clamp(620px,calc(100vh - 255px),1060px)!important;
+  max-height:none!important;min-height:620px!important;display:flex!important;
+  flex-direction:column!important;overflow:hidden!important;padding:0!important;
+}
+html body.prooflab-body .prooflab-sidebar{
+  grid-area:project!important;grid-column:2!important;grid-row:1!important;
+  display:flex!important;flex-direction:column!important;gap:12px!important;
+}
+html body.prooflab-body .prooflab-tools{
+  grid-area:tools!important;grid-column:2!important;grid-row:2!important;
+  display:flex!important;flex-direction:column!important;gap:12px!important;
+}
+html body.prooflab-body .prooflab-setup,
+html body.prooflab-body .prooflab-lean-panel,
+html body.prooflab-body .prooflab-obligation-panel{min-width:0!important}
+html body.prooflab-body .prooflab-card{box-shadow:none!important;border-radius:13px!important}
+html body.prooflab-body .prooflab-chat-heading{display:block!important;padding:17px 21px!important}
+html body.prooflab-body .prooflab-chat-heading .prooflab-card-caption{margin:5px 0 5px 40px!important}
+html body.prooflab-body .prooflab-unverified,
+html body.prooflab-body .pl-active-model{margin-top:5px!important}
+html body.prooflab-body .prooflab-thread{
+  flex:1!important;min-height:160px!important;max-height:none!important;
+  padding:14px 20px!important;overflow-y:auto!important;overscroll-behavior:contain;
+}
+html body.prooflab-body .prooflab-message.assistant{
+  max-width:100%!important;padding:15px 18px!important;
+  font-size:.91rem!important;line-height:1.72!important;
+}
+html body.prooflab-body .prooflab-message.user{max-width:89%!important}
+html body.prooflab-body .prooflab-composer{
+  flex:none!important;margin:0 13px 13px!important;padding:11px 12px!important;
+  border:1px solid var(--rd-border)!important;border-radius:15px!important;
+  background:var(--rd-surface)!important;box-shadow:0 5px 18px rgba(15,51,85,.055)!important;
+}
+html body.prooflab-body .prooflab-composer>textarea{
+  display:block!important;width:100%!important;min-height:67px!important;
+  resize:vertical!important;border:0!important;padding:7px 8px!important;
+  background:transparent!important;box-shadow:none!important;outline:0!important;
+  font-size:.95rem!important;
+}
+html body.prooflab-body .pl-composer-actions{display:flex;align-items:end;justify-content:space-between;flex-wrap:wrap;gap:10px;padding:5px 1px 0}
+html body.prooflab-body .pl-composer-left,
+html body.prooflab-body .pl-composer-right{display:flex;align-items:center;gap:8px;min-width:0;flex-wrap:wrap}
+html body.prooflab-body .pl-composer-right{margin-left:auto;justify-content:flex-end}
+html body.prooflab-body .pl-attach-button{
+  min-height:42px;display:inline-flex;align-items:center;gap:6px;
+  cursor:pointer;border:1px solid var(--rd-border);background:var(--rd-soft);
+  color:var(--rd-ink);border-radius:10px;padding:8px 10px;
+  font-size:.8rem;font-weight:780;white-space:nowrap;
+}
+html body.prooflab-body .pl-attach-button>span{font-size:1.22rem;line-height:1}
+html body.prooflab-body .pl-attach-button:hover{border-color:var(--rd-link)}
+html body.prooflab-body .pl-attach-opt{display:flex;align-items:center;gap:6px;font-size:.74rem;color:var(--rd-muted);cursor:pointer;line-height:1.25}
+html body.prooflab-body .pl-attach-opt input[type=checkbox]{width:17px;height:17px;flex:none;margin:0;accent-color:var(--rd-link)}
+html body.prooflab-body .pl-composer-right select{
+  display:inline-flex!important;min-height:42px!important;max-width:170px!important;
+  font-size:.8rem!important;width:auto!important;
+  padding:7px 26px 7px 10px!important;border:1px solid var(--rd-border)!important;
+  background:var(--rd-surface)!important;color:var(--rd-ink)!important;border-radius:10px!important;
+}
+html body.prooflab-body .pl-composer-right #pl-chat-provider{max-width:146px!important}
+html body.prooflab-body .pl-composer-right #pl-chat-model{max-width:190px!important;min-width:120px!important}
+html body.prooflab-body .pl-composer-right button{height:42px!important;min-height:42px!important;margin:0!important;white-space:nowrap}
+html body.prooflab-body .pl-composer-right .pl-mini-detect{width:42px!important;padding:6px!important;font-size:1.17rem!important}
+html body.prooflab-body #ollama-suggest{padding-inline:15px!important}
+html body.prooflab-body .pl-chat-feedback{font-size:.7rem;line-height:1.55;color:var(--rd-muted);margin:10px 2px 0;overflow-wrap:anywhere}
+html body.prooflab-body .pl-chat-attachment-preview{
+  display:flex;gap:7px;flex-wrap:wrap;max-height:100px;overflow-y:auto;margin:0 0 8px;
+}
+html body.prooflab-body .pl-chat-attachment-preview[hidden]{display:none!important}
+html body.prooflab-body .pl-file-chip{
+  display:inline-flex;align-items:center;gap:7px;padding:5px 7px 5px 11px;border:1px solid var(--rd-border);
+  background:var(--rd-soft);color:var(--rd-ink);border-radius:99px;max-width:100%;
+  font-size:.74rem;overflow-wrap:anywhere
+}
+html body.prooflab-body .pl-file-chip span{overflow-wrap:anywhere}
+html body.prooflab-body .pl-file-chip button{
+  width:27px;height:27px;min-width:27px;min-height:27px;display:grid;place-items:center;
+  border:0;border-radius:50%;background:var(--rd-surface);color:var(--rd-ink);
+  cursor:pointer;font-size:1.1rem;line-height:1;
+}
+html body.prooflab-body .pl-cloud-consent:not([hidden]){
+  display:block;padding:9px 11px;border-top:1px solid var(--rd-border);margin-top:8px;
+}
+html body.prooflab-body .pl-cloud-consent[hidden]{display:none!important}
+html body.prooflab-body .pl-cloud-consent .prooflab-approve{margin:0!important;font-size:.76rem!important}
+html body.prooflab-body .prooflab-composer-footer{display:none!important}
+html body.prooflab-body .pl-aux-settings{border:1px solid var(--rd-border);border-radius:13px;background:var(--rd-surface);overflow:hidden}
+html body.prooflab-body .pl-aux-settings summary{
+  min-height:44px;display:flex;align-items:center;gap:8px;cursor:pointer;
+  padding:12px 15px;font-size:.82rem;font-weight:800;color:var(--rd-ink);
+}
+html body.prooflab-body .pl-aux-settings summary::marker{color:var(--rd-link)}
+html body.prooflab-body .pl-aux-settings>.prooflab-card{border:0!important;border-top:1px solid var(--rd-border)!important;border-radius:0!important}
+html body.prooflab-body .prooflab-sidebar .prooflab-model-card{margin:0!important}
+html body.prooflab-body .prooflab-personal-card .prooflab-card-caption{margin-left:0!important}
+html body.prooflab-body .prooflab-editor .prooflab-lean{min-height:235px!important}
+html body.prooflab-body .prooflab-lean-panel .prooflab-card-caption{margin-left:0!important}
+@media(max-width:1050px){
+ html body.prooflab-body .prooflab-studio{
+  grid-template-columns:minmax(0,1.6fr) minmax(250px,.83fr)!important;
+  grid-template-areas:"chat project" "chat tools"!important;
+ }
+ html body.prooflab-body .prooflab-sidebar,html body.prooflab-body .prooflab-tools{grid-template-columns:minmax(0,1fr)!important;grid-column:2!important}
+ html body.prooflab-body .prooflab-conversation{grid-column:1!important;grid-row:1/span 2!important}
+}
+@media(max-width:760px){
+ html body.prooflab-body .prooflab-studio{grid-template-columns:minmax(0,1fr)!important;grid-template-areas:"chat" "project" "tools"!important}
+ html body.prooflab-body .prooflab-conversation{grid-column:1!important;grid-row:1!important;height:clamp(490px,74vh,780px)!important;min-height:490px!important;max-height:780px!important}
+ html body.prooflab-body .prooflab-sidebar{grid-area:project!important;grid-column:1!important;grid-row:2!important}
+ html body.prooflab-body .prooflab-tools{grid-area:tools!important;grid-column:1!important;grid-row:3!important}
+ html body.prooflab-body .pl-composer-left,.pl-composer-right{width:100%}
+ html body.prooflab-body .pl-composer-right{justify-content:stretch!important}
+ html body.prooflab-body .pl-composer-right select{min-width:0!important;flex:1 1 100px!important}
+ html body.prooflab-body .pl-composer-right #pl-chat-model{min-width:95px!important}
+ html body.prooflab-body .prooflab-thread{padding:12px!important}
+}
+@media(max-width:390px){
+ html body.prooflab-body .pl-composer-right #pl-chat-provider{max-width:120px!important}
+ html body.prooflab-body .pl-composer-right #pl-chat-model{max-width:130px!important}
+ html body.prooflab-body #ollama-suggest{flex:1 1 auto!important}
+}

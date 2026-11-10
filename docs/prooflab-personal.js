@@ -56,6 +56,8 @@ function build(){
  <button class="rd-button rd-secondary prooflab-wide-button" id="personal-clear" type="button">Clear ChatGPT context</button>
  <p class="rd-small"><a href="https://chatgpt.com/settings/usage" target="_blank" rel="noopener noreferrer">Manage ChatGPT usage & access</a>. Your ChatGPT account does not expose existing conversations or memories to this app.</p>`;
  document.querySelector(".prooflab-sidebar")?.append(wrap);
+ window.AxiovoProofLabAttachments?.placeConsent();
+ document.dispatchEvent(new Event("axiovo-chatgpt-ready"));
  $("personal-connect").addEventListener("click",async()=>{
   const b=$("personal-connect");b.disabled=true;status("Opening ChatGPT authorization in your browser. Review the permissions there.");
   try{await post("signin");await refresh()}catch(e){status(e.message)}
@@ -81,7 +83,9 @@ async function send(){
  statement:$("personal-include-statement").checked?$("statement").value:"",
  assumptions:$("personal-include-assumptions").checked?$("assumptions").value:"",
  lean:$("personal-include-lean").checked?$("lean").value:"",
- history:$("personal-history").checked?history:[]};
+ history:$("personal-history").checked?history:[],
+ includeAttachments:!!window.AxiovoProofLabAttachments?.getApprovedText(),
+ attachmentText:window.AxiovoProofLabAttachments?.getApprovedText()||""};
  $("personal-approve").checked=false;active=true;pending=new AbortController();
  $("personal-ask").disabled=true;$("personal-cancel").hidden=false;
  append("user",question);
@@ -106,6 +110,7 @@ async function send(){
   }
   if(!finished)throw Error("The stream ended without a completion confirmation.");
   if(answer.trim()&&window.AxiovoProofLabMath)window.AxiovoProofLabMath.render(output,answer);
+  if(payload.includeAttachments)window.AxiovoProofLabAttachments?.clearAttachments();
   if(!answer.trim())output.textContent="ChatGPT returned no text.";
   history.push({role:"user",content:question},{role:"assistant",content:answer});history=history.slice(-8);
   $("prooflab-prompt").value="";

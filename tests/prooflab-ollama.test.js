@@ -15,3 +15,14 @@ test("local follow-up includes bounded chat history and current question",async(
  assert.match(payload.messages.at(-1).content,/Explain step two/);
  assert.equal(payload.stream,false);
 });
+
+
+test("local Ollama receives only explicitly supplied attachment context",async()=>{
+ let request;
+ await O.suggest({model:"qwen2.5:3b",statement:"P implies P",question:"Review this lemma",attachmentText:"Attached research file: lemma.tex\\nA\\\\to A",fetcher:async(url,opts)=>{
+  request=JSON.parse(opts.body);return {ok:true,json:async()=>({message:{content:"Unverified suggestion"}})};
+ }});
+ assert.match(request.messages.at(-1).content,/Attached research files/);
+ assert.match(request.messages.at(-1).content,/lemma\.tex/);
+ assert.match(request.messages.at(-1).content,/Review this lemma/);
+});

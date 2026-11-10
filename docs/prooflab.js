@@ -47,18 +47,25 @@ $("ollama-detect").addEventListener("click",async()=>{
  finally{b.disabled=false}
 });
 $("ollama-suggest").addEventListener("click",async()=>{
+ if(window.AxiovoProofLabAttachments?.cloudSelected()){
+  const ask=$("personal-ask");
+  if(!ask){$("pl-chat-feedback").textContent="ChatGPT connection unavailable on this page. Open your local Axiovo Personal server to use ChatGPT.";return}
+  ask.click();return;
+ }
  if(!project){displayError("Create a proof project first.");return;}
  const model=$("ollama-model").value;
  if(!model){displayError("No model selected. Click Find installed Ollama models, then select your installed Qwen or DeepSeek model.");return;}
  const question=$("prooflab-prompt").value.trim()||"Suggest a proof strategy with intermediate lemmas and identify any gaps.";
+ const attachmentText=window.AxiovoProofLabAttachments?.getApprovedText()||"";
  const b=$("ollama-suggest"),strategy=$("prooflab-strategy");b.disabled=true;strategy.disabled=true;
  chatMessage("user",question);$("prooflab-prompt").value="";const pending=waitingMessage();
  $("ollama-status").textContent="Generating with "+model+"…";
  try{
-  const answer=await O.suggest({model,statement:project.statement,assumptions:project.assumptions,obligations:project.obligations,question,history:chatHistory});
+  const answer=await O.suggest({model,statement:project.statement,assumptions:project.assumptions,obligations:project.obligations,question,attachmentText,history:chatHistory});
   pending.remove();chatMessage("assistant",answer);
   chatHistory.push({role:"user",content:question},{role:"assistant",content:answer});chatHistory=chatHistory.slice(-8);
   $("ollama-output").textContent=answer;
+  if(attachmentText)window.AxiovoProofLabAttachments?.clearAttachments();
   $("ollama-status").textContent="Answer received from "+model+". This is a draft argument, not a verified Lean proof.";
  }catch(e){
   pending.remove();const issue=String(e.message||e).slice(0,200);
