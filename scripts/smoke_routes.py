@@ -202,7 +202,7 @@ def main():
                           });
                         }""")
                         assert len(cta_contrast)==3,(width,"Homepage start actions missing",cta_contrast)
-                         assert [x["label"] for x in cta_contrast]==["Search papers","Explore archives","Install Axiovo"],(width,"Homepage actions changed order",cta_contrast)
+                        assert [x["label"] for x in cta_contrast]==["Search papers","Explore archives","Install Axiovo"],(width,"Homepage actions changed order",cta_contrast)
                         assert all(x["ratio"]>=4.5 and x["help"]>=4.5 and x["icons"]==1 and x["visible"]
                                    for x in cta_contrast),(width,"CTA contrast or icon regression",cta_contrast)
                         if width<=390:
