@@ -31,6 +31,20 @@ def main():
                 page.wait_for_url("**/prooflab.html")
                 assert page.get_by_role("heading", name="ProofLab", exact=True).is_visible()
                 assert page.locator("header.rl-global-header").is_visible(), "Use shared Axiovo header"
+                if width <= 760:
+                    header = page.evaluate("""() => {
+                        const box = selector => {const r=document.querySelector(selector)?.getBoundingClientRect();return r&&{x:r.x,y:r.y,bottom:r.bottom,right:r.right};};
+                        return {display:getComputedStyle(document.querySelector("header.rl-global-header")).display,
+                            logo:box("header .rl-logo"),back:box("header .axiovo-back-button"),
+                            home:box("header .axiovo-home-link"),
+                            settings:box("header .axiovo-header-appearance .rl-settings-link"),
+                            night:box("header .axiovo-header-appearance .theme-toggle"),
+                            nav:box("header nav.rl-nav")};
+                    }""")
+                    assert header["display"] == "grid", (width, "ProofLab must use shared mobile header grid", header)
+                    actions = [header[k] for k in ("logo", "back", "home", "settings", "night")]
+                    assert all(actions) and max(b["y"] for b in actions)-min(b["y"] for b in actions) <= 3, (width, "Utility buttons split into multiple rows", header)
+                    assert header["nav"]["y"] >= max(b["bottom"] for b in actions)+3, (width, "Navigation must be below utilities", header)
                 assert not page.locator(".pl-rail").count(), "Standalone ProofLab sidebar must be removed"
                 assert page.locator(".pl-app-shell").count() == 1
                 assert page.locator(".pl-topbar").is_visible()
