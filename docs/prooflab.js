@@ -6,8 +6,25 @@ function download(name,body,type){const url=URL.createObjectURL(new Blob([body],
 function render(){if(!project)return;const open=P.report(project).open;$("workspace").hidden=false;$("project-title").textContent=project.title;$("project-status").textContent="Status: Unverified draft · "+open+" open obligations";$("obligation-count").textContent=open+" open";$("prooflab-toolbar-status").textContent=project.title+" · Draft · "+open+" open";$("prooflab-empty-obligations").hidden=open>0;const ol=$("obligations");ol.replaceChildren();for(const item of project.obligations){const li=document.createElement("li");li.textContent=item.statement+" (open)";ol.append(li)}}
 // Optional user-initiated handoff from the Research Assistant; never fetch paper content automatically.
 const params=new URLSearchParams(location.search);
-const prefill=params.get("statement");
-if(prefill){$("statement").value=prefill.slice(0,12000);feedback("Statement imported from the Research Assistant. Review its assumptions before proceeding.");}
+let prefill=params.get("statement");
+if(!prefill){
+ try{
+  const stored=sessionStorage.getItem("axiovo-prooflab-handoff-v1");
+  if(stored){
+   sessionStorage.removeItem("axiovo-prooflab-handoff-v1");
+   const handoff=JSON.parse(stored);
+   if(typeof handoff.statement==="string"&&
+      Number.isFinite(handoff.createdAt)&&
+      Date.now()-handoff.createdAt<30*60*1000){
+    prefill=handoff.statement;
+   }
+  }
+ }catch{/* The independent ProofLab workspace remains available. */}
+}
+if(prefill){
+ $("statement").value=prefill.slice(0,12000);
+ feedback("Imported draft from Research Assistant. Check that it is a theorem, then review all assumptions and regenerate the proof plan. AI suggestions are not verified proofs.");
+}
 $("create").addEventListener("click",()=>{project=P.create($("title").value,$("statement").value,$("assumptions").value);if(!project.title||!project.statement){feedback("A title and theorem statement are required.");project=null;return}render();chatHistory=[];const thread=$("prooflab-thread");if(thread){thread.replaceChildren();const welcome=document.createElement("p");welcome.className="prooflab-welcome";welcome.textContent="Your proof plan is ready. Ask your local AI model for a strategy or a lemma.";thread.append(welcome)}feedback("Proof plan created locally. No data uploaded.")});
 $("add").addEventListener("click",()=>{if(!project)return;try{project=P.addObligation(project,$("obligation").value);$("obligation").value="";render()}catch(e){feedback(e.message)}});
 $("lean").addEventListener("input",()=>{if(project){project=P.setLean(project,$("lean").value);render()}});
