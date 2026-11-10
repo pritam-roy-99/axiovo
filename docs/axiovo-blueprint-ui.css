@@ -250,3 +250,29 @@ body.axiovo-reference-ui.axiovo-home .axiovo-archive-card{background:#f5fafc;bor
  }
  body.axiovo-reference-ui.axiovo-explore .ex-guide-actions .ex-show-papers > [aria-hidden="true"]{display:none!important}
 }
+
+/* Native mobile layout must not retain the old Back/Home/Settings/Night toolbar. */
+@media(max-width:760px){
+ html:root body.axiovo-reference-ui header.rl-global-header > .axiovo-nav-return,
+ html:root body.axiovo-reference-ui header.rl-global-header > .axiovo-header-appearance,
+ html:root body.axiovo-reference-ui header.rl-global-header > a.ax-header-home,
+ html:root body.axiovo-reference-ui header.rl-global-header > a.ax-header-status{
+  display:none!important;visibility:hidden!important;
+  width:0!important;min-width:0!important;max-width:0!important;
+  margin:0!important;padding:0!important;
+ }
+ html:root body.axiovo-reference-ui header.rl-global-header > a.rl-logo{
+  display:inline-flex!important;visibility:visible!important;
+  flex:1 1 auto!important;width:auto!important;min-width:0!important;max-width:calc(100% - 100px)!important;
+  align-items:center!important;overflow:hidden!important;margin:0 auto 0 0!important;
+  font-size:0!important;color:transparent!important;
+ }
+ html:root body.axiovo-reference-ui header.rl-global-header > a.rl-logo .rl-logo-mark{
+  width:130px!important;min-width:130px!important;max-width:130px!important;height:44px!important;
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  border-radius:9px!important;background:#fff!important;overflow:hidden!important;
+ }
+ html:root body.axiovo-reference-ui header.rl-global-header > a.rl-logo .rl-logo-mark img{
+  width:125px!important;min-width:125px!important;height:42px!important;object-fit:contain!important;
+ }
+}
