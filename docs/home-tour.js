@@ -18,6 +18,18 @@
    const guide=document.getElementById("axiovo-tour-show-guide");
    const retry=document.getElementById("axiovo-tour-retry-video");
    const status=document.getElementById("axiovo-tour-media-status");
+   // Keep the video and interactive guide in one stable presentation slot.
+   // The mode buttons stay above the slot, so changing modes never moves
+   // the tutorial or scrolls the visitor to a different part of the page.
+   const switcher=document.querySelector(".axiovo-tour-mode-switch");
+   if(switcher&&video.parentElement===root.parentElement){
+    const stage=document.createElement("div");
+    stage.className="axiovo-unified-tour-stage";
+    stage.setAttribute("aria-label","Axiovo tutorial presentation");
+    video.before(stage);
+    stage.append(video,root);
+    stage.before(switcher);
+   }
    let mode="video";
    let unavailable=false;
    let failures=0;
