@@ -543,3 +543,10 @@ body.axiovo-home .axiovo-tour-mode-switch button[aria-pressed="true"]{
  }
  body.axiovo-home .axiovo-unified-tour-stage .axiovo-demo-illustration span{min-height:44px}
 }
+
+/* On phones the video keeps its natural 16:9 height; the guide can be taller. */
+@media(max-width:760px){
+ body.axiovo-home .axiovo-unified-tour-stage:has(> .axiovo-home-video:not([hidden])){
+  min-height:0;aspect-ratio:16/9;
+ }
+}
