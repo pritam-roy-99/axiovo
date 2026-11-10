@@ -54,6 +54,19 @@ let catalog=new Map(), catalogReady=false, index=[], topics=[], topic, leaf, sub
 let search=null, datePreset=0;
 // All-year indexed search is the default for every archive.
 let viewMode=params.get("mode")==="recent"?"recent":"indexed";
+const shortcutIds=["announced","latest","latest-verified","week","date-open","history"];
+let activeShortcut=null;
+function selectShortcut(id){
+ activeShortcut=shortcutIds.includes(id)?id:null;
+ for(const key of shortcutIds){
+  const b=$(key);if(!b)continue;
+  const selected=key===activeShortcut;
+  b.classList.toggle("is-active",selected);
+  b.classList.toggle("rd-primary",selected);
+  b.classList.toggle("rd-secondary",!selected);
+  b.setAttribute("aria-pressed",String(selected));
+ }
+}
 const recentWindow=()=>({from:shiftDate(allDates(),-6),to:allDates()});
 const initialSort=params.get("sort");
 $("sort").value=["recent","oldest","cited"].includes(initialSort)?initialSort:"relevance";
@@ -418,7 +431,7 @@ function expectedCatchupDay(now=new Date()){
 async function showLatestAnnouncement(){
  if(source!=="arxiv")return;
  const stamp=++datePreset;
- viewMode="recent";
+ viewMode="recent";selectShortcut("announced");
  search?.controller.abort();
  // Announcement filtering must never apply first-submission-day inputs.
  $("from").value="";$("to").value="";
@@ -530,7 +543,7 @@ $("clear-path").onclick=()=>selectPath({});
 $("show-results").onclick=()=>{
  // The primary search action always searches indexed history with relevance.
  // The distinct "Latest announced papers" button retains the release-only mode.
- viewMode="indexed";datePreset++;runSearch();
+ viewMode="indexed";selectShortcut(null);datePreset++;runSearch();
  const heading=$("results-heading");
  if(!heading)return;
  heading.setAttribute("tabindex","-1");
@@ -549,7 +562,7 @@ $("topic-find").onkeydown=e=>{
 };
 $("search-form").onsubmit=e=>{
  e.preventDefault();
- viewMode="indexed";datePreset++;runSearch();
+ viewMode="indexed";selectShortcut($("from").value||$("to").value?"date-open":null);datePreset++;runSearch();
 };
 function changeSort(mode){
  $("sort").value=mode;
@@ -563,12 +576,13 @@ function changeSort(mode){
  }else{datePreset++;runSearch()}
 }
 $("sort").onchange=()=>changeSort($("sort").value);
-$("date-open").onclick=()=>{$("advanced").open=true;$("from").focus()};
+$("date-open").onclick=()=>{selectShortcut("date-open");$("advanced").open=true;$("from").focus()};
+for(const field of ["from","to"])$(field).addEventListener("change",()=>selectShortcut("date-open"));
 $("history")?.addEventListener("click",()=>{
  // Earliest available archive dates are lower bounds, not claims of completeness.
  datePreset++;
  const years=data.historyRange(source,allDates());
- viewMode="indexed";
+ viewMode="indexed";selectShortcut("history");
  $("from").value=years.from;
  $("to").value=years.to;
  $("sort").value=$("query").value.trim()?"relevance":"oldest";
@@ -578,10 +592,10 @@ $("history")?.addEventListener("click",()=>{
 
 $("announced")?.addEventListener("click",()=>{
  if(source==="arxiv"){showLatestAnnouncement();return;}
- datePreset++;viewMode="recent";$("from").value=$("to").value="";$("sort").value="recent";runSearch();
+ selectShortcut("announced");datePreset++;viewMode="recent";$("from").value=$("to").value="";$("sort").value="recent";runSearch();
 });
 $("latest").onclick=()=>{
- datePreset++;$("from").value=$("to").value="";$("sort").value="recent";
+ selectShortcut("latest");datePreset++;$("from").value=$("to").value="";$("sort").value="recent";
  viewMode="indexed";runSearch();
 };
 $("latest-verified")?.addEventListener("click",async()=>{
@@ -594,7 +608,7 @@ $("latest-verified")?.addEventListener("click",async()=>{
    if(stamp!==datePreset)return;
    const latest=(snapshot.papers||[]).map(p=>p.date).filter(d=>/^\d{4}-\d{2}-\d{2}$/.test(d)).sort().at(-1);
    if(!latest)throw Error("No verified source dates");
-   viewMode="indexed";$("from").value=$("to").value=latest;$("sort").value="recent";$("advanced").open=true;runSearch();
+   selectShortcut("latest-verified");viewMode="indexed";$("from").value=$("to").value=latest;$("sort").value="recent";$("advanced").open=true;runSearch();
   }catch{if(stamp===datePreset)$("sync-status").textContent="No verified source day is available in the current index."}
   finally{control.disabled=false}
   return;
@@ -608,13 +622,13 @@ $("latest-verified")?.addEventListener("click",async()=>{
   const latest=Object.entries(manifest.days||{}).filter(([,row])=>row?.complete&&row.count>0)
    .map(([day])=>day).sort().at(-1);
   if(!latest)throw Error("No verified dates");
-  viewMode="indexed";$("from").value=$("to").value=latest;$("advanced").open=true;runSearch();
+  selectShortcut("latest-verified");viewMode="indexed";$("from").value=$("to").value=latest;$("advanced").open=true;runSearch();
  }catch{
   if(stamp==datePreset)$("sync-status").textContent="No verified day is available right now. Use Latest papers to browse indexed records.";
  }finally{control.disabled=false}
 });
 $("week").onclick=()=>{
- viewMode="recent";
+ selectShortcut("week");viewMode="recent";
  datePreset++;
  const end=source==="arxiv"?shiftDate(allDates(),-1):allDates();
  $("from").value=shiftDate(end,-6);$("to").value=end;$("advanced").open=true;runSearch();
@@ -654,6 +668,7 @@ if(window.AxiovoSearchableSelect){
   researchPickers.push(window.AxiovoSearchableSelect.mount($(id),hint));
  }
 }
+selectShortcut(params.get("announced")==="latest"?"announced":params.get("mode")==="recent"?"announced":null);
 drawPath();rebuildIndex();
 fetch("./data/topics/"+source+".tsv",{signal:AbortSignal.timeout(6500)})
  .then(response=>{if(!response.ok)throw Error("Topic directory unavailable");return response.text()})
