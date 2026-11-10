@@ -1,8 +1,49 @@
 # Axiovo Personal: run only on the user's Windows 11 laptop.
 # Downloads OpenAI's official open-source Sign in with ChatGPT DevKit.
+param([switch]$NoUpdate)
 $ErrorActionPreference = 'Stop'
+# Safe startup synchronization. Private data is stored outside the repo.
+function Update-Axiovo {
+ param([string]$ProjectRoot)
+ if ($NoUpdate) {
+  Write-Host 'Automatic Axiovo update skipped (-NoUpdate).' -ForegroundColor Yellow
+  return
+ }
+ if (-not (Test-Path (Join-Path $ProjectRoot '.git'))) {
+  Write-Host 'No Git checkout; using installed files.' -ForegroundColor Yellow
+  return
+ }
+ Push-Location $ProjectRoot
+ try {
+  $branchName = (& git branch --show-current | Out-String).Trim()
+  if ($LASTEXITCODE -ne 0 -or $branchName -ne 'main') {
+   Write-Host 'Auto-update skipped: not on main.' -ForegroundColor Yellow
+   return
+  }
+  $changes = (& git status --porcelain --untracked-files=no | Out-String).Trim()
+  if ($LASTEXITCODE -ne 0 -or $changes) {
+   Write-Host 'Auto-update skipped: tracked local changes found.' -ForegroundColor Yellow
+   return
+  }
+  $remote = (& git remote get-url origin | Out-String).Trim()
+  if ($LASTEXITCODE -ne 0 -or $remote -notmatch '^https://github\.com/pritam-roy-99/axiovo(?:\.git)?$') {
+   Write-Host 'Auto-update skipped: remote is not the official Axiovo repository.' -ForegroundColor Yellow
+   return
+  }
+  Write-Host 'Checking GitHub for Axiovo updates...' -ForegroundColor Cyan
+  & git -c credential.interactive=never pull --ff-only origin main
+  if ($LASTEXITCODE -ne 0) {
+   Write-Host 'Update unavailable or fast-forward refused. Using installed files.' -ForegroundColor Yellow
+   return
+  }
+  Write-Host 'Axiovo is synchronized with the latest main branch.' -ForegroundColor Green
+ } catch {
+  Write-Host ('Update unavailable; using installed files: ' + $_.Exception.Message) -ForegroundColor Yellow
+ } finally { Pop-Location }
+}
 $project = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 Set-Location $project
+Update-Axiovo -ProjectRoot $project
 if (-not (Get-Command node -ErrorAction SilentlyContinue)) { throw 'Node.js 22.12+ is required: https://nodejs.org/en/download' }
 if (-not (Get-Command npm -ErrorAction SilentlyContinue)) { throw 'npm is required. Install Node.js 22.12+ from nodejs.org.' }
 if (-not (Get-Command git -ErrorAction SilentlyContinue)) { throw 'Git is required: https://git-scm.com/downloads/win' }
