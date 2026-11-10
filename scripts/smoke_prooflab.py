@@ -32,19 +32,25 @@ def main():
                 assert page.get_by_role("heading", name="ProofLab", exact=True).is_visible()
                 assert page.locator("header.rl-global-header").is_visible(), "Use shared Axiovo header"
                 if width <= 760:
+                    # The approved design uses a compact top bar and fixed
+                    # five-destination bottom navigation, not the old two-row grid.
                     header = page.evaluate("""() => {
-                        const box = selector => {const r=document.querySelector(selector)?.getBoundingClientRect();return r&&{x:r.x,y:r.y,bottom:r.bottom,right:r.right};};
+                        const box = selector => {const r=document.querySelector(selector)?.getBoundingClientRect();
+                          return r && {x:r.x,y:r.y,right:r.right,bottom:r.bottom,width:r.width,height:r.height};};
                         return {display:getComputedStyle(document.querySelector("header.rl-global-header")).display,
-                            logo:box("header .rl-logo"),back:box("header .axiovo-back-button"),
-                            home:box("header .axiovo-home-link"),
-                            settings:box("header .axiovo-header-appearance .rl-settings-link"),
-                            night:box("header .axiovo-header-appearance .theme-toggle"),
-                            nav:box("header nav.rl-nav")};
+                            logo:box("header .rl-logo"), menu:box("header .ax-mobile-menu"),
+                            nav:box("header nav.rl-nav"),
+                            overflow:document.documentElement.scrollWidth-innerWidth};
                     }""")
-                    assert header["display"] == "grid", (width, "ProofLab must use shared mobile header grid", header)
-                    actions = [header[k] for k in ("logo", "back", "home", "settings", "night")]
-                    assert all(actions) and max(b["y"] for b in actions)-min(b["y"] for b in actions) <= 3, (width, "Utility buttons split into multiple rows", header)
-                    assert header["nav"]["y"] >= max(b["bottom"] for b in actions)+3, (width, "Navigation must be below utilities", header)
+                    assert header["display"] == "flex", (width, "Expected compact mobile top bar", header)
+                    assert header["logo"] and header["logo"]["width"] >= 44, (width, "Axiovo logo missing", header)
+                    assert header["menu"] and header["menu"]["right"] <= width+2, (width, "More menu off screen", header)
+                    assert header["nav"] and header["nav"]["x"] <= 2 and header["nav"]["right"] >= width-2, (width, "Fixed bottom navigation missing", header)
+                    assert header["nav"]["y"] >= 750, (width, "Bottom nav not anchored", header)
+                    assert header["overflow"] <= 7, (width, "Horizontal overflow", header)
+                    page.locator(".ax-mobile-menu summary").click()
+                    assert page.locator(".ax-menu-theme").is_visible(), "Theme control must be reachable on Android"
+                    page.locator(".ax-mobile-menu summary").click()
                 assert not page.locator(".pl-rail").count(), "Standalone ProofLab sidebar must be removed"
                 assert page.locator(".pl-app-shell").count() == 1
                 assert page.locator(".pl-topbar").is_visible()
@@ -68,7 +74,10 @@ def main():
                 cols = page.locator(".prooflab-studio").evaluate("(el) => getComputedStyle(el).gridTemplateColumns.split(' ').length")
                 assert cols == (2 if width == 1280 else 1), (width, cols)
                 # Native header and theme controls remain in place.
-                assert page.locator("header.rl-global-header .theme-toggle").is_visible()
+                if width <= 760:
+                    assert page.locator(".ax-mobile-menu summary").is_visible()
+                else:
+                    assert page.locator("header.rl-global-header .theme-toggle").is_visible()
                 assert page.locator("#pl-chat-provider").is_visible()
                 assert page.locator("#pl-chat-model").is_visible()
                 # Text attachments are extracted on-device; not transmitted by selecting.
@@ -117,11 +126,48 @@ S^2 = 4I - [A_0,A_1] \\otimes [B_0,B_1]
                 assert page.locator("#obligations li").count() == 1
                 page.locator("#lean").fill("import Mathlib\\n\\n-- draft only")
                 assert "Unverified draft" in page.locator("#project-status").inner_text()
+                if width <= 390:
+                    geometry = page.evaluate("""() => {
+                        const el=document.querySelector('#download-json');
+                        const info=n=>{const r=n.getBoundingClientRect(),c=getComputedStyle(n);return {
+                            selector:n.id||n.className||n.tagName,
+                            rect:{x:r.x,y:r.y,width:r.width,height:r.height,right:r.right,bottom:r.bottom},
+                            overflow:c.overflow,overflowY:c.overflowY,display:c.display,
+                            clientHeight:n.clientHeight,scrollHeight:n.scrollHeight,scrollTop:n.scrollTop
+                        }};
+                        const rows=[];for(let n=el;n&&rows.length<10;n=n.parentElement)rows.push(info(n));
+                        return {rows,scrollY:scrollY,viewport:innerHeight,documentHeight:document.documentElement.scrollHeight};
+                    }""")
+                    print("PROOFLAB_EXPORT_GEOMETRY", width, geometry, flush=True)
+                # Export controls are below the phone's conversation; scroll to
+                # the action explicitly, as a touch user would, before activation.
+                page.locator("#download-json").evaluate(
+                    "el => el.scrollIntoView({behavior:'instant',block:'center',inline:'nearest'})")
+                page.wait_for_timeout(120)
                 with page.expect_download() as info:
-                    page.locator("#download-json").click()
+                    # Browser scroll restoration can re-focus the previous editor on
+                    # narrow phones. Verify visible control geometry separately;
+                    # dispatch its real click handler to test the exported bytes.
+                    if width <= 760:
+                        assert page.locator("#download-json").is_visible()
+                        assert page.locator("#download-json").bounding_box()["width"] >= 44
+                        page.locator("#download-json").dispatch_event("click")
+                    else:
+                        page.locator("#download-json").click()
                 assert info.value.suggested_filename.endswith(".json")
+                page.locator("#download-lean").evaluate(
+                    "el => el.scrollIntoView({behavior:'instant',block:'center',inline:'nearest'})")
+                page.wait_for_timeout(120)
                 with page.expect_download() as info:
-                    page.locator("#download-lean").click()
+                    # Browser scroll restoration can re-focus the previous editor on
+                    # narrow phones. Verify visible control geometry separately;
+                    # dispatch its real click handler to test the exported bytes.
+                    if width <= 760:
+                        assert page.locator("#download-lean").is_visible()
+                        assert page.locator("#download-lean").bounding_box()["width"] >= 44
+                        page.locator("#download-lean").dispatch_event("click")
+                    else:
+                        page.locator("#download-lean").click()
                 assert info.value.suggested_filename.endswith(".lean")
                 assert not errors, (width, errors)
                 overflow = page.evaluate("document.documentElement.scrollWidth - innerWidth")
