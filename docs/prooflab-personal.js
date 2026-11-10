@@ -81,8 +81,10 @@ async function send(){
  statement:$("personal-include-statement").checked?$("statement").value:"",
  assumptions:$("personal-include-assumptions").checked?$("assumptions").value:"",
  lean:$("personal-include-lean").checked?$("lean").value:"",
- history:$("personal-history").checked?history:[]};
- $("personal-approve").checked=false;active=true;pending=new AbortController();
+ history:$("personal-history").checked?history:[],
+ includeAttachment:!!window.AxiovoProofLabAttachments?.approvedText?.(),
+ attachmentText:window.AxiovoProofLabAttachments?.approvedText?.()||""};
+ $("personal-approve").checked=false;if(payload.includeAttachment)$("prooflab-send-files").checked=false;active=true;pending=new AbortController();
  $("personal-ask").disabled=true;$("personal-cancel").hidden=false;
  append("user",question);
  const output=append("assistant","Generating with ChatGPT…");let answer="",finished=false;

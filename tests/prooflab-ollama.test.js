@@ -15,3 +15,10 @@ test("local follow-up includes bounded chat history and current question",async(
  assert.match(payload.messages.at(-1).content,/Explain step two/);
  assert.equal(payload.stream,false);
 });
+
+test("local AI includes attached research text only when explicitly supplied",async()=>{
+ let payload;
+ await O.suggest({model:"qwen2.5:3b",statement:"A implies A",question:"Check this argument",attachmentText:"[Attached file: notes.tex]\\nS^2=4I",fetcher:async(url,options)=>{payload=JSON.parse(options.body);return {ok:true,json:async()=>({message:{content:"Draft only"}})};}});
+ assert.match(payload.messages.at(-1).content,/Attached file: notes.tex/);
+ assert.match(payload.messages.at(-1).content,/S\^2=4I/);
+});

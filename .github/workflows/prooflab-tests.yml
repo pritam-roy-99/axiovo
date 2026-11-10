@@ -35,6 +35,8 @@ jobs:
           node --check docs/prooflab.js
           node --check docs/prooflab-ollama.js
           node --check docs/prooflab-personal.js
+          node --check docs/prooflab-attachments.js
+          node --check docs/prooflab-native.js
           node --check personal/server.mjs
       - name: Validate Windows Axiovo launcher PowerShell syntax
         shell: pwsh

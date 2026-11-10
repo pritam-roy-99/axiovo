@@ -30,15 +30,32 @@ def main():
                 page.get_by_role("link", name="Open ProofLab").click()
                 page.wait_for_url("**/prooflab.html")
                 assert page.get_by_role("heading", name="Axiovo ProofLab").is_visible()
-                assert page.locator(".pl-app-shell").count() == 1
-                assert page.locator(".pl-topbar").is_visible()
-                assert page.locator(".prooflab-studio").is_visible()
-                if width >= 700:
-                    page.locator("#pl-focus-prompt").click()
-                    assert page.locator("#prooflab-prompt").evaluate("(el) => document.activeElement === el")
+                assert page.locator(".rl-global-header").is_visible()
+                assert page.locator(".theme-toggle").is_visible()
+                assert page.locator(".pl-app-shell").count() == 0
+                assert page.locator("#prooflab-settings").is_visible()
+                assert page.locator("#prooflab-provider").is_visible()
+                assert page.locator("#prooflab-composer-model").is_visible()
                 cols = page.locator(".prooflab-studio").evaluate("(el) => getComputedStyle(el).gridTemplateColumns.split(' ').length")
-                assert cols == (3 if width == 1280 else 1), (width, cols)
+                assert cols == (2 if width == 1280 else 1), (width, cols)
+                assert page.locator("#prooflab-settings").get_attribute("open") is None
+                page.locator("#prooflab-settings summary").click()
+                assert page.locator("#ollama-detect").is_visible()
+                page.locator("#prooflab-settings summary").click()
+                page.locator("#prooflab-file-input").set_input_files({
+                    "name": "notes.tex",
+                    "mimeType": "text/plain",
+                    "buffer": b"\\\\[S^2 = 4I - [A_0,A_1] \\\\otimes [B_0,B_1]\\\\]"
+                })
+                page.wait_for_function("document.querySelector(\'#prooflab-attachment-list\').textContent.includes(\'notes.tex\')")
+                assert page.evaluate("window.AxiovoProofLabAttachments.approvedText()") == ""
+                page.locator("#prooflab-send-files").check()
+                assert "S^2" in page.evaluate("window.AxiovoProofLabAttachments.approvedText()")
+                page.get_by_role("button", name="Remove notes.tex").click()
+                assert page.evaluate("window.AxiovoProofLabAttachments.approvedText()") == ""
+                page.locator("#prooflab-settings summary").click()
                 page.locator("#create").click()
+                page.locator("#prooflab-settings summary").click()
                 assert page.locator("#workspace").is_visible()
                 assert "Unverified draft" in page.locator("#project-status").inner_text()
                 page.locator("#prooflab-prompt").fill("Derive a CHSH bound.")

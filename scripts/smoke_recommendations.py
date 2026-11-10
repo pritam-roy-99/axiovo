@@ -45,7 +45,11 @@ def main():
                 assert card.locator(".axiovo-rec-actions > button.paper-save-btn").count()==1
                 assert card.locator(".axiovo-rec-reason").count()>=1
                 assert card.locator(".axiovo-rec-abstract").count()==1
-                assert card.locator(".axiovo-rec-actions").evaluate("e=>getComputedStyle(e).display")=="grid"
+                actions=card.locator(".axiovo-rec-actions")
+                assert actions.evaluate("e=>['grid','flex'].includes(getComputedStyle(e).display)")
+                assert actions.locator("a.axiovo-rec-read").is_visible()
+                assert actions.locator("a.axiovo-rec-assistant").is_visible()
+                assert actions.locator("button.paper-save-btn").is_visible()
                 save=card.locator(".paper-save-btn")
                 save.click()
                 assert save.get_attribute("aria-pressed")=="true"
