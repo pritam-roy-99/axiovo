@@ -78,7 +78,7 @@ def main():
             browser = pw.chromium.launch(headless=True, args=["--no-sandbox", "--disable-dev-shm-usage"])
             for width, height in ((320, 740), (360, 850), (390, 850), (428, 926), (740, 390), (844, 390),
                                   (768, 850), (1360, 850)):
-                phone = width <= 760 or (width, height) == (844, 390)
+                phone = width <= 760
                 mobile = pw.devices["Pixel 7"] if phone else {}
                 ctx = browser.new_context(**{**mobile, "viewport": {"width": width, "height": height}},
                                           service_workers="block", reduced_motion="reduce")
