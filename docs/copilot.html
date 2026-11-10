@@ -13,6 +13,7 @@
 <link rel="stylesheet" href="./axiovo-shell.css?v=20261108-mobile-research-v3">
 <link rel="stylesheet" href="./research-desk.css">
 <link rel="stylesheet" href="./research-workspace.css?v=20261108-mobile-research-v1">
+<link rel="stylesheet" href="./assistant-chat.css">
 <script defer src="./theme.js"></script>
 <script defer src="./navigation.js?v=20261108-home-history-v5"></script>
 <script defer src="./arxiv-versions.js"></script>
@@ -30,9 +31,9 @@
 <header></header>
 <main class="rd-page assistant-page">
  <div class="rd-desk-heading">
-  <p class="rd-kicker">WORK WITH THE SOURCE</p>
+  <p class="rd-kicker">AXIOVO · RESEARCH CONVERSATION</p>
   <h1>Research Assistant</h1>
-  <p>Find source-linked research papers, including arXiv historical records, and inspect what an abstract actually establishes. Open the original before drawing conclusions.</p>
+  <p>Ask research questions, explore source-linked evidence and use an optional local AI model. Check original papers before relying on conclusions.</p>
  </div>
  <section class="rd-panel assistant-compose" aria-labelledby="assistant-task-title">
   <h2 class="rd-sr-only" id="assistant-task-title">Choose a task</h2>
@@ -91,7 +92,7 @@
  <div class="assistant-results">
   <section class="rd-panel" aria-labelledby="assistant-result-title">
    <div class="assistant-panel-head"><h2 id="assistant-result-title">Result</h2><span id="mode-indicator" class="rd-count">Literature discovery</span></div>
-   <div id="conversation" aria-live="polite"><p class="rd-small">Enter a question to find related papers, or choose Inspect a paper and paste its arXiv ID.</p></div>
+   <div id="conversation" role="log" aria-label="Research conversation" aria-live="polite"><p class="rd-small">What would you like to research? Ask a question below, or inspect a paper by arXiv ID.</p></div>
    <details class="rd-advanced"><summary>Save or clear this session</summary><div class="rd-actions"><button class="rd-button rd-secondary" id="download-evidence" type="button">Export source report</button><button class="rd-button rd-secondary" id="export-chat" type="button">Export session</button><button class="rd-button rd-secondary" id="new-chat" type="button">Clear session</button></div></details>
   </section>
   <section class="rd-panel" aria-labelledby="assistant-source-title">
