@@ -8,7 +8,7 @@
   const toggle=header.querySelector(".theme-toggle");
   const logo=document.createElement("a");logo.className="rl-logo";logo.href=HOME;logo.setAttribute("aria-label","Axiovo home");
   const mark=document.createElement("span");mark.className="rl-logo-mark";
-  const brandImg=document.createElement("img");brandImg.src=new URL("./icons/axiovo-brand.svg",location.href).href;
+  const brandImg=document.createElement("img");brandImg.src=new URL("./icons/axiovo-approved.svg",location.href).href;
   brandImg.width=38;brandImg.height=38;brandImg.alt="";brandImg.setAttribute("aria-hidden","true");
   mark.append(brandImg);
   logo.append(mark,document.createTextNode(" Axiovo"));
