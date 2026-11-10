@@ -235,3 +235,18 @@ body.axiovo-reference-ui.axiovo-home .axiovo-archive-card{background:#f5fafc;bor
   font-size:clamp(11px,.94vw,13px)!important;line-height:1.2!important;
  }
 }
+
+/* Keep the archive's primary action in one line after the sidebar narrows its panel. */
+@media(min-width:761px){
+ body.axiovo-reference-ui.axiovo-explore .ex-guide-actions .ex-show-papers{
+  font-size:13px!important;
+  line-height:1.2!important;
+  white-space:nowrap!important;
+  overflow-wrap:normal!important;
+  min-height:46px!important;
+  height:48px!important;
+  padding:8px 4px!important;
+  justify-content:center!important;
+ }
+ body.axiovo-reference-ui.axiovo-explore .ex-guide-actions .ex-show-papers > [aria-hidden="true"]{display:none!important}
+}
