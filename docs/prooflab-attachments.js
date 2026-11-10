@@ -104,18 +104,31 @@ model?.addEventListener("change",()=>{const actual=source();if(actual){actual.va
 document.addEventListener("change",e=>{if(["personal-model","ollama-model"].includes(e.target?.id))syncModels();});
 const sidebar=document.querySelector(".prooflab-sidebar");
 if(sidebar){
- const observer=new MutationObserver(()=>{const connected=$("personal-disconnect")&&!$("personal-disconnect").hidden;if(connected!==cloudReady){cloudReady=!!connected;syncModels();}});
+ const observer=new MutationObserver(()=>{const connected=$("personal-disconnect")&&!$("personal-disconnect").hidden;if(connected!==cloudReady)cloudReady=!!connected;syncModels();});
  observer.observe(sidebar,{childList:true,subtree:true,attributes:true,attributeFilter:["hidden"]});
 }
 const detect=$("ollama-detect");
+$("pl-detect-ollama")?.addEventListener("click",()=>{
+ if(provider?.value==="chatgpt"){status("ChatGPT models are loaded after you connect your account.");return;}
+ detect?.click();
+});
 detect?.addEventListener("click",()=>setTimeout(syncModels,500));
+function makeCollapsible(section,summaryText){
+ if(!section||section.parentElement?.tagName==="DETAILS")return;
+ const details=document.createElement("details");details.className="pl-aux-settings";
+ const summary=document.createElement("summary");summary.textContent=summaryText;
+ const parent=section.parentNode;parent.insertBefore(details,section);details.append(summary,section);
+ return details;
+}
+makeCollapsible(document.querySelector(".prooflab-model-card"),"Ollama settings and model discovery");
+
 const consentSlot=$("pl-cloud-consent");
 function placeConsent(){
  const checkbox=$("personal-approve");if(!checkbox||!consentSlot)return;
  const label=checkbox.closest("label");
  if(label&&!consentSlot.contains(label))consentSlot.append(label);
 }
-document.addEventListener("axiovo-chatgpt-ready",()=>{placeConsent();syncModels();});
+document.addEventListener("axiovo-chatgpt-ready",()=>{placeConsent();makeCollapsible(document.querySelector(".prooflab-personal-card"),"ChatGPT account and privacy settings");syncModels();});
 function cloudSelected(){return provider?.value==="chatgpt";}
 window.AxiovoProofLabAttachments={
  getApprovedText,clearAttachments,cloudSelected,refresh:syncModels,placeConsent,
