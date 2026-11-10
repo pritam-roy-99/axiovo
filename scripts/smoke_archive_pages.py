@@ -151,8 +151,12 @@ def main():
       # Latest release is an explicit shortcut now. The archive's default
       # search covers indexed history, so it must not be treated as one release.
       page.locator("#archive-announced").click()
-      page.locator(".ex-paper").first.wait_for(timeout=18000)
-      paper=page.locator(".ex-paper").first
+      # The indexed history may already have cards; wait for the asynchronous
+      # announcement response rather than reading a stale first card.
+      paper=page.locator(".ex-paper").filter(has_text="Lieb-Robinson bounds").first
+      paper.wait_for(timeout=18000)
+      expect(page.locator("#archive-sync-status")).to_contain_text(
+       "Official arXiv",timeout=18000)
       title=paper.locator("h3").inner_text().strip()
       assert "Lieb-Robinson bounds" in title
       assert page.locator(".ex-paper").count()==1,"Unrelated announcement leaked into subtopic"
