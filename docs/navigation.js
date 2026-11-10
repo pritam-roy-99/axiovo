@@ -90,6 +90,11 @@
   css.href=new URL("./axiovo-ui-phase1.css?v=1",document.currentScript?.src||location.href).href;
   css.dataset.axiovoUiPhase1="true";
   document.head.append(css);
+  if(!document.querySelector('link[data-axiovo-ui-phase2]')){
+   const detail=document.createElement("link");detail.rel="stylesheet";
+   detail.href=new URL("./axiovo-ui-phase2.css?v=1",location.href).href;
+   detail.dataset.axiovoUiPhase2="true";document.head.append(detail);
+  }
  }
  function addAssistantMark(){
   if(!document.body.classList.contains("axiovo-assistant"))return;

@@ -1,0 +1,64 @@
+/* Phase 2: page-specific presentation. No IDs, storage, event handlers or source logic change. */
+:root{--axiovo-panel-shadow:0 10px 30px rgba(7,39,65,.07);--axiovo-focus:#23c7b8}
+/* Every archive keeps its independent provenance, taxonomy, and date model. */
+body.axiovo-archive-page .ex-hero{max-width:1350px;margin-inline:auto}
+body.axiovo-archive-page .ex-archives{display:flex;flex-wrap:wrap;gap:7px}
+body.axiovo-archive-page .ex-archives a{border-radius:11px;transition:background .15s ease,box-shadow .15s ease}
+body.axiovo-archive-page .ex-archives a[aria-current="page"]{border-color:#087f91!important;background:#e8f9f7!important;box-shadow:inset 0 -2px #0da6a2}
+body.axiovo-archive-page .ex-guide,
+body.axiovo-archive-page .ex-search,
+body.axiovo-archive-page .ex-result-summary{border-radius:17px;box-shadow:var(--axiovo-panel-shadow)}
+body.axiovo-archive-page .ex-steps{scroll-margin-top:14px}
+body.axiovo-archive-page .ex-show-papers{font-weight:750}
+body.axiovo-archive-page :is(.ex-date-presets button,.rd-searchbar button){border-radius:10px}
+body.axiovo-archive-page :is(button,input,select,a):focus-visible{outline:3px solid var(--axiovo-focus);outline-offset:2px}
+/* Research Desk: readable search/results hierarchy without hiding advanced filters. */
+body.axiovo-desk .rd-desk-heading{margin-bottom:18px}
+body.axiovo-desk .rd-filters{border-radius:18px;box-shadow:var(--axiovo-panel-shadow)}
+body.axiovo-desk .rd-results .rd-section-heading{align-items:center;gap:10px}
+body.axiovo-desk .rd-side-panel{border-radius:16px}
+body.axiovo-desk .rd-sources label{cursor:pointer;border-radius:10px}
+body.axiovo-desk .rd-source-jumps{display:flex;flex-wrap:wrap;gap:5px}
+body.axiovo-desk .rd-results-stack>*{border-radius:13px}
+body.axiovo-desk :is(input,select,button,a):focus-visible{outline:3px solid var(--axiovo-focus);outline-offset:2px}
+/* Library: surface saved papers, followed researchers, backups and citation export. */
+body.axiovo-workspace-page .library-page{max-width:1340px}
+body.axiovo-workspace-page .library-tabs{gap:8px}
+body.axiovo-workspace-page .library-tabs a{border-radius:12px;transition:background .15s ease}
+body.axiovo-workspace-page :is(.rl-section,.library-following-controls,.library-more){border-radius:17px;box-shadow:var(--axiovo-panel-shadow)}
+body.axiovo-workspace-page .rl-section-head{gap:12px}
+body.axiovo-workspace-page .rl-library-controls{gap:8px}
+body.axiovo-workspace-page .rl-library-footer{display:flex;gap:8px;flex-wrap:wrap}
+body.axiovo-workspace-page :is(input,textarea,select,button,a):focus-visible{outline:3px solid var(--axiovo-focus);outline-offset:2px}
+/* ProofLab: preserve chat composer, local AI accounts, obligations and Lean editor. */
+body.prooflab-body .pl-app-shell{min-width:0}
+body.prooflab-body .pl-topbar{border-bottom:1px solid var(--axiovo-v2-border,#c8dce8)}
+body.prooflab-body .pl-section-nav a{border-radius:10px}
+body.prooflab-body .pl-section-nav .pl-section-current{background:#087d86!important;color:white!important}
+body.prooflab-body .prooflab-card{border-radius:16px;box-shadow:var(--axiovo-panel-shadow)}
+body.prooflab-body .prooflab-conversation{min-width:0}
+body.prooflab-body .prooflab-thread{scrollbar-color:#9dbbc9 transparent}
+body.prooflab-body .prooflab-composer{border-radius:13px}
+body.prooflab-body .prooflab-editor{border-radius:12px}
+body.prooflab-body .prooflab-lean{font-variant-ligatures:none}
+body.prooflab-body :is(button,input,select,textarea,a):focus-visible{outline:3px solid var(--axiovo-focus);outline-offset:2px}
+/* Research tools retain source lookup, PDF annotations, comparisons, citation graph, alerts, and sync. */
+body.rl-lab .rl-welcome,body.rl-lab .lab-block{border-radius:18px;box-shadow:var(--axiovo-panel-shadow)}
+body.rl-lab .lab-tabs{display:flex;flex-wrap:wrap;gap:8px}
+body.rl-lab .lab-tabs a{border-radius:11px}
+body.rl-lab .lab-reader-grid{min-width:0}
+body.rl-lab .lab-notes{border-radius:13px}
+body.rl-lab :is(button,input,select,textarea,a):focus-visible{outline:3px solid var(--axiovo-focus);outline-offset:2px}
+/* Other supporting pages benefit from a consistent surface hierarchy without changing their structure. */
+body.axiovo-research .rd-panel{border-color:var(--axiovo-v2-border,#c8dce8)}
+body.axiovo-research :is(.rd-button,.rl-button){transition:filter .15s ease}
+body.axiovo-research :is(.rd-button,.rl-button):hover{filter:brightness(1.035)}
+@media(max-width:760px){
+ body.axiovo-archive-page .ex-archives{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px!important}
+ body.axiovo-archive-page .ex-archives a{min-width:0;text-align:center;justify-content:center}
+ body.axiovo-desk .rd-side-panel{box-shadow:none}
+ body.axiovo-workspace-page .rl-library-footer{align-items:stretch}
+ body.prooflab-body .prooflab-card{box-shadow:none}
+ body.rl-lab .lab-block{box-shadow:none}
+}
+@media(prefers-reduced-motion:reduce){body.axiovo-research :is(.rd-button,.rl-button),body.axiovo-archive-page .ex-archives a{transition:none}}
