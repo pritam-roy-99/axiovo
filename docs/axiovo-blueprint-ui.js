@@ -21,13 +21,9 @@
   '<a class="ax-sidebar-logo" href="./index.html" aria-label="Axiovo home"><img src="./icons/axiovo-approved.svg" width="178" height="62" alt="Axiovo"></a>',
   '<div class="ax-sidebar-eyebrow">RESEARCH WORKSPACE</div>',
   '<div class="ax-sidebar-extra"><a href="./lab.html">⚗ <span>Research Tools</span></a><a href="./prooflab.html">◈ <span>ProofLab</span></a><a href="./community.html">♧ <span>Community</span></a><a href="./install.html">↓ <span>Install Axiovo</span></a></div>',
-  '<div class="ax-sidebar-bottom"><a href="./profiles.html">⚙ <span>Settings</span></a><button type="button" class="ax-sidebar-night">☾ <span>Night</span></button><small>Source-first, free and open</small><small class="ax-sidebar-credit">✦ Built with ChatGPT</small></div>'
+  '<div class="ax-sidebar-bottom"><a href="./profiles.html">⚙ <span>Settings</span></a><small>Source-first, free and open</small><small class="ax-sidebar-credit">✦ Built with ChatGPT</small></div>'
  ].join("");
  header.before(sidebar);
- sidebar.querySelector(".ax-sidebar-night").addEventListener("click",()=>{
-   const toggle=header.querySelector(".theme-toggle");
-   if(toggle)toggle.click();else if(window.AxiovoAppearance)window.AxiovoAppearance.setTheme(window.AxiovoAppearance.getTheme()==="dark"?"light":"dark");
- });
  // The shared navigation already provides one Back and one Home link on inner pages.
  // Do not inject another Home link into the header.
  const status=document.createElement("a");status.className="ax-header-status";status.href="./methodology.html#axiovo-source-health";status.textContent="● Source status";
@@ -41,7 +37,7 @@
  '<a href="./profiles.html">Settings and appearance</a><button type="button" class="ax-menu-theme">☾ Toggle day / night</button><a href="./install.html">Install Axiovo</a>',
  '<a href="./tutorial.html">Tutorial</a><a href="./methodology.html">Source methodology</a></div>'].join("");
  header.append(menu);
- menu.querySelector(".ax-menu-theme").addEventListener("click",()=>{const toggle=header.querySelector(".theme-toggle");if(toggle)toggle.click();menu.open=false;});
+ menu.querySelector(".ax-menu-theme").addEventListener("click",()=>{const appearance=window.AxiovoAppearance;if(appearance)appearance.setTheme(appearance.getTheme()==="dark"?"light":"dark");menu.open=false;});
  document.addEventListener("click",event=>{if(!menu.contains(event.target))menu.open=false;});
  document.addEventListener("keydown",event=>{if(event.key==="Escape")menu.open=false;});
  if(document.body.classList.contains("axiovo-home")){
