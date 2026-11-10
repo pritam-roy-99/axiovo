@@ -86,7 +86,14 @@
    // Bounded concurrency, rather than loading a month of XML or a massive list at once.
    for(let start=0;start<available.length;start+=4){
     const batch=await Promise.all(available.slice(start,start+4).map(async day=>{
-     const res=await fetcher(base+day+".json",{signal,cache:"no-store"});
+     let res=await fetcher(base+day+".json",{signal,cache:"no-store"});
+     // Historic verified day shards live in the same public GitHub repository.
+     // Pages publishes only recent shards to avoid the 10-minute backend timeout.
+     // Never silently fall back for custom test bases or for invalid metadata.
+     if(!res.ok&&res.status===404&&base==="./data/arxiv-days/"){
+      const fallback="https://raw.githubusercontent.com/pritam-roy-99/axiovo/main/docs/data/arxiv-days/"+day+".json";
+      res=await fetcher(fallback,{signal,cache:"no-store"});
+     }
      if(!res.ok)throw Error("Daily file missing: "+day);
      const value=await res.json();
      if(!value.complete||value.date!==day||value.paper_count<=0||value.paper_count!==value.source_total
