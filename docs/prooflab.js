@@ -12,22 +12,41 @@ $("create").addEventListener("click",()=>{project=P.create($("title").value,$("s
 $("add").addEventListener("click",()=>{if(!project)return;try{project=P.addObligation(project,$("obligation").value);$("obligation").value="";render()}catch(e){feedback(e.message)}});
 $("lean").addEventListener("input",()=>{if(project){project=P.setLean(project,$("lean").value);render()}});
 const O=window.AxiovoProofLabOllama;let chatHistory=[];
+function displayError(message){const issue=String(message||"Connection unavailable.");const guide="Check that Ollama is running on this computer at http://127.0.0.1:11434, that OLLAMA_ORIGINS includes https://pritam-roy-99.github.io, and that your browser allows local-network requests.";chatMessage("assistant","Connection issue: "+issue+"\n\n"+guide);$("ollama-status").textContent="Connection issue: "+issue+" Check the conversation for troubleshooting steps.";}
+function waitingMessage(){return chatMessage("assistant","Generating with your local model… A 7B model can take some time on a 4 GB graphics card. Your request has been sent; no proof is verified yet.");}
 function chatMessage(role,content){const thread=$("prooflab-thread");const welcome=thread.querySelector(".prooflab-welcome");if(welcome)welcome.remove();const article=document.createElement("article");article.className="prooflab-message "+role;const name=document.createElement("strong");name.textContent=role==="user"?"You":"Local AI · unverified";const body=document.createElement("div");body.textContent=content;article.append(name,body);thread.append(article);thread.scrollTop=thread.scrollHeight;return article;}
 $("prooflab-prompt").addEventListener("keydown",e=>{if(e.key==="Enter"&&(e.ctrlKey||e.metaKey)){e.preventDefault();$("ollama-suggest").click();}});
 $("prooflab-strategy").addEventListener("click",()=>{$("prooflab-prompt").value="Propose a rigorous proof strategy, identify essential lemmas, and explain any gaps in the argument.";$("ollama-suggest").click();});
-$("ollama-detect").addEventListener("click",async()=>{const b=$("ollama-detect");b.disabled=true;$("ollama-status").textContent="Checking local Ollama…";try{const models=await O.models();const select=$("ollama-model");select.replaceChildren();for(const model of models){const option=document.createElement("option");option.value=model;option.textContent=model;select.append(option)}$("ollama-status").textContent=models.length?"Connected. Select a model and request a proof strategy.":"Ollama is running but has no installed models. Run: ollama pull qwen2.5:3b";}catch(e){$("ollama-status").textContent="Local Ollama unavailable. Start Ollama and allow this site's origin. "+String(e.message||e).slice(0,160)}finally{b.disabled=false}});
+$("ollama-detect").addEventListener("click",async()=>{
+ const b=$("ollama-detect");b.disabled=true;$("ollama-status").textContent="Checking Ollama at http://127.0.0.1:11434…";
+ try{
+  const models=await O.models(),select=$("ollama-model");select.replaceChildren();
+  if(!models.length){const option=document.createElement("option");option.value="";option.textContent="No installed models";select.append(option);displayError("Ollama is reachable but no models were found. Install one with: ollama pull qwen2.5:3b");return;}
+  for(const model of models){const option=document.createElement("option");option.value=model;option.textContent=model;select.append(option)}
+  const preferred=models.find(name=>name==="deepseek-r1:7b")||models.find(name=>name==="qwen2.5:3b")||models[0];select.value=preferred;
+  $("ollama-status").textContent="Connected to local Ollama · "+models.length+" installed model"+(models.length===1?"":"s")+". Selected "+preferred+".";
+  chatMessage("assistant","Connected to your local Ollama server. Using "+preferred+". Enter a question and press Send to local AI to generate an unverified proof strategy.");
+ }catch(e){displayError("Cannot detect local Ollama models: "+String(e.message||e).slice(0,160))}
+ finally{b.disabled=false}
+});
 $("ollama-suggest").addEventListener("click",async()=>{
- if(!project){feedback("Create a proof project first.");return}
- const model=$("ollama-model").value;if(!model){$("ollama-status").textContent="Detect and select an installed model first.";return}
+ if(!project){displayError("Create a proof project first.");return;}
+ const model=$("ollama-model").value;
+ if(!model){displayError("No model selected. Click Find installed Ollama models, then select your installed Qwen or DeepSeek model.");return;}
  const question=$("prooflab-prompt").value.trim()||"Suggest a proof strategy with intermediate lemmas and identify any gaps.";
- const b=$("ollama-suggest");b.disabled=true;$("ollama-status").textContent="Generating a local, unverified suggestion…";
+ const b=$("ollama-suggest"),strategy=$("prooflab-strategy");b.disabled=true;strategy.disabled=true;
+ chatMessage("user",question);$("prooflab-prompt").value="";const pending=waitingMessage();
+ $("ollama-status").textContent="Generating with "+model+"…";
  try{
   const answer=await O.suggest({model,statement:project.statement,assumptions:project.assumptions,obligations:project.obligations,question,history:chatHistory});
-  chatMessage("user",question);chatMessage("assistant",answer);chatHistory.push({role:"user",content:question},{role:"assistant",content:answer});chatHistory=chatHistory.slice(-8);
-  $("ollama-output").textContent=answer;$("prooflab-prompt").value="";
-  $("ollama-status").textContent="Local suggestion received from "+model+". Check the steps using Lean 4.";
- }catch(e){$("ollama-status").textContent="Local generation failed: "+String(e.message||e).slice(0,200)}
- finally{b.disabled=false}
+  pending.remove();chatMessage("assistant",answer);
+  chatHistory.push({role:"user",content:question},{role:"assistant",content:answer});chatHistory=chatHistory.slice(-8);
+  $("ollama-output").textContent=answer;
+  $("ollama-status").textContent="Answer received from "+model+". This is a draft argument, not a verified Lean proof.";
+ }catch(e){
+  pending.remove();const issue=String(e.message||e).slice(0,200);
+  $("prooflab-prompt").value=question;displayError("Generation failed: "+issue);
+ }finally{b.disabled=false;strategy.disabled=false}
 });
 $("download-lean").addEventListener("click",()=>{if(!project)return;download("axiovo-prooflab.lean",project.lean||"-- Unverified Lean 4 draft\n","text/plain")});
 $("download-json").addEventListener("click",()=>{if(!project)return;download("axiovo-prooflab.json",P.exportJSON(project),"application/json")});
