@@ -28,8 +28,8 @@
    const toggle=header.querySelector(".theme-toggle");
    if(toggle)toggle.click();else if(window.AxiovoAppearance)window.AxiovoAppearance.setTheme(window.AxiovoAppearance.getTheme()==="dark"?"light":"dark");
  });
- const homepage=document.createElement("a");homepage.className="ax-header-home";homepage.href="./index.html";homepage.textContent="⌂ Home";
- header.insertBefore(homepage,nav);
+ // The shared navigation already provides one Back and one Home link on inner pages.
+ // Do not inject another Home link into the header.
  const status=document.createElement("a");status.className="ax-header-status";status.href="./methodology.html#axiovo-source-health";status.textContent="● Source status";
  const search=document.createElement("a");search.className="ax-header-search";search.href="./desk.html";search.textContent="⌕ Search all papers";
  const appearance=header.querySelector(".axiovo-header-appearance");
