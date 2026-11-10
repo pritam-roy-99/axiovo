@@ -4,14 +4,14 @@
 <link rel="stylesheet" href="./prooflab.css"><script defer src="./theme.js"></script><script defer src="./navigation.js"></script><script defer src="./prooflab-core.js"></script><script defer src="./prooflab-ollama.js"></script><script defer src="./prooflab.js"></script></head>
 <body class="axiovo-research"><header></header><main class="rd-page prooflab-page">
 <div class="rd-desk-heading prooflab-hero"><p class="rd-kicker">RESEARCH ASSISTANT · FORMAL REASONING</p><h1>Axiovo ProofLab</h1><p>Discuss proof strategies with your local model, organize lemmas and edit Lean 4 drafts. Suggestions remain unverified until checked by Lean.</p></div>
-<section class="rd-panel prooflab-panel prooflab-conversation" aria-labelledby="prooflab-chat-title">
+<div class="prooflab-layout prooflab-chat-layout"><section class="rd-panel prooflab-panel prooflab-conversation" aria-labelledby="prooflab-chat-title">
 <div class="prooflab-conversation-heading"><div><p class="rd-kicker">LOCAL REASONING ASSISTANT</p><h2 id="prooflab-chat-title">Proof conversation</h2></div><span class="prooflab-unverified">Unverified AI</span></div>
 <div id="prooflab-thread" class="prooflab-thread" role="log" aria-live="polite" aria-label="Proof discussion"><p class="prooflab-welcome">Create a proof plan, connect a local Ollama model and ask for a proof strategy or a specific lemma.</p></div>
 <pre class="prooflab-output prooflab-output-legacy" id="ollama-output" aria-label="Latest unverified local model suggestion"></pre>
 <div class="prooflab-composer"><label class="rd-label" for="prooflab-prompt">Ask about this proof</label><textarea id="prooflab-prompt" rows="3" maxlength="2000" placeholder="Suggest a proof strategy, identify gaps, or help with a Lean lemma…"></textarea><button class="rd-button rd-primary" id="ollama-suggest" type="button">Send to local AI</button></div>
 <p class="rd-small">Uses only your locally running Ollama model. AI output is not a Lean-verified proof.</p>
 </section>
-<div class="prooflab-layout prooflab-chat-layout"><section class="rd-panel prooflab-panel prooflab-setup"><h2>Proof project</h2><label class="rd-label" for="title">Title</label><input id="title" value="CHSH Tsirelson bound" maxlength="200">
+<section class="rd-panel prooflab-panel prooflab-setup"><h2>Proof project</h2><label class="rd-label" for="title">Title</label><input id="title" value="CHSH Tsirelson bound" maxlength="200">
 <label class="rd-label" for="statement">Theorem statement (plain language)</label><textarea id="statement" rows="3">For Hermitian observables A0,A1,B0,B1 with eigenvalues ±1 on bipartite quantum systems, the CHSH expectation is at most 2 sqrt(2) in absolute value.</textarea>
 <label class="rd-label" for="assumptions">Assumptions, one per line</label><textarea id="assumptions" rows="4">Observables are Hermitian
 Each observable squares to the identity
