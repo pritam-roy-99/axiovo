@@ -588,6 +588,17 @@ $("copy-sources").onclick=async()=>{
 };
 $("clear-sources").onclick=()=>{sources=[];renderSources();rstatus("Source list cleared.")};
 $("clear-draft").onclick=()=>{$("draft").value=""};
+// ProofLab handoff is local to the current browser tab. Do not put private
+// questions in URL parameters, server logs or the public research index.
+$("assistant-prooflab-handoff")?.addEventListener("click",()=>{
+ const text=$("question").value.trim()||$("draft").value.trim();
+ if(!text)return;
+ try{
+  sessionStorage.setItem("axiovo-prooflab-handoff-v1",JSON.stringify({
+   statement:text.slice(0,3500),createdAt:Date.now()
+  }));
+ }catch{status("ProofLab will open, but the browser blocked transferring the question.");}
+});
 $("question").onkeydown=evt=>{if(evt.key==="Enter"&&!evt.shiftKey){evt.preventDefault();submit(false)}};
 const params=new URLSearchParams(location.search);
 const requestedId=window.AxiovoArxiv?.parse(params.get("id"))?.requested||Archive?.eprintIdentifier(params.get("id"));
