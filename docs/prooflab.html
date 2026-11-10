@@ -38,7 +38,7 @@ Alice's operators commute with Bob's operators</textarea>
 <textarea id="prooflab-prompt" rows="3" maxlength="2000" placeholder="Ask about a theorem, proof or attached document…"></textarea>
 <div class="pl-composer-actions">
   <div class="pl-composer-left">
-    <label class="pl-attach-button" for="pl-chat-files" title="Attach text, LaTeX, Lean, code or PDF files"><span aria-hidden="true">＋</span> Attach</label>
+    <button class="pl-attach-button" id="pl-attach-trigger" type="button" title="Attach text, LaTeX, Lean, code or PDF files" aria-label="Attach research files"><span aria-hidden="true">＋</span> Attach</button>
     <input id="pl-chat-files" type="file" accept=".pdf,.txt,.md,.tex,.lean,.json,.csv,.py,.js,.html,.log,text/plain,application/pdf" multiple aria-label="Choose research files to attach" hidden>
     <label class="pl-attach-opt" for="pl-include-files"><input id="pl-include-files" type="checkbox"> Include files in next AI request</label>
   </div>
