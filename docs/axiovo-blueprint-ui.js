@@ -21,7 +21,7 @@
   '<a class="ax-sidebar-logo" href="./index.html" aria-label="Axiovo home"><img src="./icons/axiovo-approved.svg" width="178" height="62" alt="Axiovo"></a>',
   '<div class="ax-sidebar-eyebrow">RESEARCH WORKSPACE</div>',
   '<div class="ax-sidebar-extra"><a href="./lab.html">⚗ <span>Research Tools</span></a><a href="./prooflab.html">◈ <span>ProofLab</span></a><a href="./community.html">♧ <span>Community</span></a><a href="./install.html">↓ <span>Install Axiovo</span></a></div>',
-  '<div class="ax-sidebar-bottom"><a href="./profiles.html">⚙ <span>Settings</span></a><button type="button" class="ax-sidebar-night">☾ <span>Night</span></button><small>Source-first, free and open</small></div>'
+  '<div class="ax-sidebar-bottom"><a href="./profiles.html">⚙ <span>Settings</span></a><button type="button" class="ax-sidebar-night">☾ <span>Night</span></button><small>Source-first, free and open</small><small class="ax-sidebar-credit">✦ Built with ChatGPT</small></div>'
  ].join("");
  header.before(sidebar);
  sidebar.querySelector(".ax-sidebar-night").addEventListener("click",()=>{
