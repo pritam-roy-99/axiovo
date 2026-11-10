@@ -118,7 +118,7 @@ def main():
                     # header Home button.
                     if not phone:
                         assert page.locator("header .ax-header-home").count() == 0, (width,path,"Duplicate injected Home")
-                        expected_home = 0 if path == "index.html" else 1
+                        expected_home = 0 if path in ("", "index.html") else 1
                         assert page.locator("header .axiovo-home-link").count() == expected_home, (width,path,"Incorrect Home link count")
                     links=result["links"]
                     assert tuple(link["label"] for link in links)==FEATURES,(width,path,"Incorrect navigation labels",result)
