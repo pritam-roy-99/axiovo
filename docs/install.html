@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Install Axiovo locally | Windows, Ubuntu, macOS</title>
+<meta name="description" content="Public, step-by-step installation guide for Axiovo local research workspace on Windows 11, Ubuntu Linux and macOS. Understand the difference between Ollama offline AI and ChatGPT cloud authorization.">
+<link rel="icon" type="image/svg+xml" href="./icons/axiovo.svg"><link rel="stylesheet" href="./theme.css"><link rel="stylesheet" href="./axiovo-shell.css"><link rel="stylesheet" href="./research-desk.css">
+<script defer src="./theme.js"></script><script defer src="./navigation.js"></script>
+<style>
+.install-page{max-width:1050px;margin:0 auto;padding:26px 18px 76px;color:var(--rd-ink,#17334d)}
+.install-page h1{font-size:clamp(1.9rem,4vw,2.7rem);line-height:1.15;margin:.3em 0}
+.install-page h2{font-size:1.35rem;margin:0 0 12px}
+.install-page h3{font-size:1.05rem;margin:18px 0 8px}
+.install-page .intro{font-size:1rem;line-height:1.7;color:var(--rd-muted,#566b80);max-width:76ch}
+.install-page .install-panel{border:1px solid var(--rd-border,#d0dce8);background:var(--rd-surface,#fff);border-radius:17px;padding:clamp(18px,3vw,28px);margin:16px 0}
+.install-page .install-platforms{display:flex;flex-wrap:wrap;gap:9px;margin:20px 0}
+.install-page .install-platforms a{border:1px solid var(--rd-border,#d0dce8);border-radius:11px;padding:12px 17px;min-height:44px;text-decoration:none;font-weight:750;color:var(--rd-link,#0c6c92);background:var(--rd-surface,#fff)}
+.install-page p,.install-page li{line-height:1.7}
+.install-page li{margin:7px 0}
+.install-page code{font-size:.88em;overflow-wrap:anywhere}
+.install-page pre{background:#102b43;color:#f4fbff;border-radius:11px;padding:16px;overflow:auto;white-space:pre;line-height:1.5;font-size:.83rem}
+.install-page pre code{color:inherit}
+.install-page a{color:var(--rd-link,#08759c)}
+.install-page .install-note{border-left:3px solid #1894a2;padding:12px 15px;background:var(--rd-soft,#edf6fa);border-radius:0 10px 10px 0}
+.install-page table{width:100%;border-collapse:collapse}
+.install-page td,.install-page th{padding:11px;border-bottom:1px solid var(--rd-border,#d0dce8);text-align:left;vertical-align:top}
+@media(max-width:520px){.install-page{padding:16px 12px 52px}.install-page pre{font-size:.75rem}}
+</style></head><body class="axiovo-research"><header></header>
+<main class="install-page">
+<p class="rd-kicker">AXIOVO · PUBLIC SETUP GUIDE</p>
+<h1>Install Axiovo on your computer</h1>
+<p class="intro">Run the free Axiovo research website on your own device, and optionally connect locally downloaded Ollama models. Axiovo Personal also offers a separate ChatGPT account connection on Windows. Read the platform-specific instructions below.</p>
+<div class="install-platforms" role="navigation" aria-label="Choose operating system"><a href="#windows">Windows 11</a><a href="#ubuntu">Ubuntu / Linux</a><a href="#macos">macOS</a><a href="#privacy">Privacy and limitations</a></div>
+<section class="install-panel" id="modes" aria-labelledby="modes-title">
+<h2 id="modes-title">Choose how AI runs</h2>
+<table><thead><tr><th>Mode</th><th>Processing</th><th>Works without internet after setup?</th></tr></thead><tbody>
+<tr><td><strong>Ollama local model</strong></td><td>On your device, when using downloaded models</td><td>Yes, for local inference</td></tr>
+<tr><td><strong>ChatGPT account</strong></td><td>OpenAI's cloud, with your authorization</td><td>No</td></tr>
+</tbody></table>
+<p class="install-note"><strong>Support status:</strong> Axiovo Personal's official ChatGPT connection currently uses a Windows-specific credential-encryption implementation. Ubuntu and macOS users can run the local Axiovo website with Ollama, but the Windows ChatGPT companion is <strong>not supported</strong> on those operating systems. Public Axiovo remains accessible on all three platforms.</p>
+</section>
+<section class="install-panel" id="windows" aria-labelledby="windows-title">
+<h2 id="windows-title">Windows 11: Axiovo Personal, Ollama and optional ChatGPT</h2>
+<ol><li>Install <a href="https://nodejs.org/en/download" target="_blank" rel="noopener noreferrer">Node.js 22.12+</a>, <a href="https://git-scm.com/downloads/win" target="_blank" rel="noopener noreferrer">Git for Windows</a> and, for offline AI, <a href="https://ollama.com/download/windows" target="_blank" rel="noopener noreferrer">Ollama</a>.</li><li>Open <strong>PowerShell</strong> (no administrator privileges required for Axiovo). Download the repository:</li></ol>
+<pre><code>cd $HOME
+git clone --depth 1 --filter=blob:none --sparse https://github.com/pritam-roy-99/axiovo.git
+cd axiovo
+git sparse-checkout set docs personal</code></pre>
+<p>If already installed, run <code>cd $HOME\axiovo</code> followed by <code>git pull --ff-only origin main</code> instead of cloning again.</p>
+<h3>Start the local app</h3>
+<pre><code>powershell -NoProfile -ExecutionPolicy Bypass -File .\personal\start.ps1</code></pre>
+<p>It opens the Axiovo homepage at <a href="http://127.0.0.1:4317/index.html">http://127.0.0.1:4317/index.html</a> on your own computer. First launch downloads and builds OpenAI's official local ChatGPT DevKit. ChatGPT access still requires an eligible account, browser authorization and an internet connection.</p>
+<h3>Add a desktop icon</h3>
+<pre><code>powershell -NoProfile -ExecutionPolicy Bypass -File .\personal\install-shortcut.ps1</code></pre>
+<p>Double-click <strong>Axiovo Personal</strong> to open the homepage. The installer also attempts Start Menu shortcuts, but restricted Windows accounts may block them; the desktop shortcut can still succeed. Existing local Axiovo instances are reused.</p>
+<h3>Use offline Ollama</h3>
+<pre><code>ollama pull qwen2.5:3b
+ollama list</code></pre>
+<p>For localhost Axiovo, configure Ollama's allowed web origin as <code>http://127.0.0.1:4317</code> and restart Ollama. To run a dedicated server, first quit its existing instance, then open PowerShell:</p>
+<pre><code>$env:OLLAMA_ORIGINS = "http://127.0.0.1:4317"
+ollama serve</code></pre>
+<p>If the port is already occupied, stop the existing Ollama service instead of launching a second instance. Use the ProofLab model discovery button after the server starts. For the publicly hosted site, allow <code>https://pritam-roy-99.github.io</code> as an additional origin if you want browser-to-local access.</p>
+<p>More detailed Windows instructions: <a href="https://github.com/pritam-roy-99/axiovo/blob/main/personal/README.md">Axiovo Personal README</a>.</p>
+</section>
+<section class="install-panel" id="ubuntu" aria-labelledby="ubuntu-title">
+<h2 id="ubuntu-title">Ubuntu / Linux: local Axiovo + offline Ollama</h2>
+<p>These steps support the local website and local Ollama inference, <strong>not</strong> the Windows-only ChatGPT companion.</p>
+<ol><li>Install <strong>Git</strong> and <strong>Python 3</strong> with your distribution's package manager:</li></ol>
+<pre><code>sudo apt update
+sudo apt install git python3</code></pre>
+<p>Download Axiovo:</p>
+<pre><code>cd ~
+git clone --depth 1 --filter=blob:none --sparse https://github.com/pritam-roy-99/axiovo.git
+cd axiovo
+git sparse-checkout set docs</code></pre>
+<p>Install Ollama following its <a href="https://docs.ollama.com/linux" target="_blank" rel="noopener noreferrer">official Linux instructions</a>:</p>
+<pre><code>curl -fsSL https://ollama.com/install.sh | sh
+ollama pull qwen2.5:3b</code></pre>
+<p>Serve Axiovo using Python:</p>
+<pre><code>python3 -m http.server 4317 --bind 127.0.0.1 --directory docs</code></pre>
+<p>Open <code>http://127.0.0.1:4317/index.html</code> and navigate to ProofLab. If your Ollama server blocks this web origin, configure <code>OLLAMA_ORIGINS=http://127.0.0.1:4317</code> for the Ollama process and restart it. For a systemd installation, set the environment variable using a service override and restart the service; do not start a second server on port 11434.</p>
+<p class="install-note">To run Ollama in a user shell instead of an existing service, stop the existing server first, then run <code>OLLAMA_ORIGINS=http://127.0.0.1:4317 ollama serve</code>.</p>
+</section>
+<section class="install-panel" id="macos" aria-labelledby="macos-title">
+<h2 id="macos-title">macOS: local Axiovo + offline Ollama</h2>
+<p>These instructions run Axiovo locally with downloaded Ollama models. The Windows-specific ChatGPT account companion is not yet available for macOS.</p>
+<ol><li>Install <a href="https://git-scm.com/downloads/mac" target="_blank" rel="noopener noreferrer">Git</a> and Python 3 if not already available.</li><li>Install <a href="https://ollama.com/download/mac" target="_blank" rel="noopener noreferrer">Ollama for macOS</a> (check its current macOS system requirements).</li><li>Open Terminal, then run:</li></ol>
+<pre><code>cd ~
+git clone --depth 1 --filter=blob:none --sparse https://github.com/pritam-roy-99/axiovo.git
+cd axiovo
+git sparse-checkout set docs
+ollama pull qwen2.5:3b
+python3 -m http.server 4317 --bind 127.0.0.1 --directory docs</code></pre>
+<p>Open <code>http://127.0.0.1:4317/index.html</code>. If browser requests are blocked, quit the existing Ollama app instance, then restart the Ollama server with this allowed origin:</p>
+<pre><code>OLLAMA_ORIGINS=http://127.0.0.1:4317 ollama serve</code></pre>
+<p>Use a separate Terminal window for the Axiovo Python server. Avoid starting duplicate Ollama servers on port 11434.</p>
+</section>
+<section class="install-panel" id="updates" aria-labelledby="updates-title">
+<h2 id="updates-title">Updates and troubleshooting</h2>
+<p><strong>Windows:</strong> the Axiovo Personal launcher checks GitHub for updates on a fresh online launch when the Git checkout is clean and can fast-forward. If already running, stop the app and launch it again. Its Windows login credentials and Ollama models are stored outside the Git checkout.</p>
+<p><strong>Ubuntu and macOS:</strong> stop the Python server, run <code>git pull --ff-only origin main</code> in your <code>axiovo</code> directory, and restart the Python server.</p>
+<p><strong>No Ollama models:</strong> check <code>ollama list</code> and verify that the server is running at <code>http://127.0.0.1:11434</code>. <strong>Cannot connect:</strong> check localhost origin permissions and whether another Ollama process is already running.</p>
+</section>
+<section class="install-panel" id="privacy" aria-labelledby="privacy-title">
+<h2 id="privacy-title">Privacy, security and proof verification</h2>
+<p>A local Axiovo website can store research interactions in your browser. A downloaded Ollama model performs local inference, while ChatGPT's authorized inference sends the approved question and selected material to OpenAI. Existing ChatGPT browser sessions, conversations, passwords and memories are not automatically imported.</p>
+<p>Run the local server on <code>127.0.0.1</code>, not <code>0.0.0.0</code>, unless you intentionally configure network access. Do not publicly expose the Ollama API or commit credentials to GitHub. Model output is a suggestion, not a mathematically verified proof. Exported Lean 4 drafts require a separate Lean checker.</p>
+<p>See the <a href="./methodology.html">Axiovo methods and limitations</a> page, the <a href="./prooflab.html">ProofLab workspace</a>, and <a href="https://github.com/pritam-roy-99/axiovo" target="_blank" rel="noopener noreferrer">open-source repository</a>.</p>
+</section></main></body></html>
