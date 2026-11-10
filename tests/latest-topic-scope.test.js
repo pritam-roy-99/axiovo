@@ -18,7 +18,7 @@ assert.ok(!release.includes('$("author").value=""'),"Release must not clear auth
 assert.match(explorer,/function shouldBrowseAnnouncements\(\)/,"Scoped announcement routing must exist");
 const primaryActions=explorer.slice(explorer.indexOf('$("show-results").onclick=()=>{'),
  explorer.indexOf("function changeSort(mode){"));
-assert.ok(primaryActions.includes('viewMode="indexed";datePreset++;runSearch()'),
+assert.ok(primaryActions.includes('viewMode="indexed";selectShortcut(null);datePreset++;runSearch()'),
  "Primary search actions must explicitly enter all-year indexed mode");
 assert.doesNotMatch(primaryActions,/showLatestAnnouncement\(\)/,
  "Search and Show matching papers buttons must not route to announcement-only results");
@@ -27,6 +27,11 @@ assert.match(explorer,/if\(source==="arxiv"\)\{\s*if\(params\.get\("announced"\)
 assert.match(explorer,/let viewMode=params\.get\("mode"\)==="recent"\?"recent":"indexed"/,
  "All four archives must default to the indexed relevance mode");
 assert.match(explorer,/indexed search across available years/,"Result count must disclose historical scope");
+assert.match(explorer,/function selectShortcut\(id\)/,"Shortcut state must be centrally managed");
+for(const id of ["announced","latest","latest-verified","week","date-open","history"]){
+ assert.ok(explorer.includes('selectShortcut("'+id+'")'),"Shortcut must update active styling: "+id);
+}
+
 
 
 const context={URL,URLSearchParams,AbortSignal,window:null,localStorage:{
