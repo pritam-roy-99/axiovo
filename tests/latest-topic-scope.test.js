@@ -16,11 +16,11 @@ assert.ok(!release.includes("selected=pathFrom({})"),"Release must not reset the
 assert.ok(!release.includes('$("query").value=""'),"Release must not clear the keyword");
 assert.ok(!release.includes('$("author").value=""'),"Release must not clear author filtering");
 assert.match(explorer,/function shouldBrowseAnnouncements\(\)/,"Scoped announcement routing must exist");
-assert.doesNotMatch(explorer,/else if\\(shouldBrowseAnnouncements\\(\\)\\)showLatestAnnouncement\\(\\)/,
+assert.doesNotMatch(explorer,/else if\(shouldBrowseAnnouncements\(\)\)showLatestAnnouncement\(\)/,
  "Ordinary topic searches must not switch silently to the announcement batch");
-assert.match(explorer,/if\\(source==="arxiv"\\)\\{\\s*if\\(params\\.get\\("announced"\\)==="latest"/,
+assert.match(explorer,/if\(source==="arxiv"\)\{\s*if\(params\.get\("announced"\)==="latest"/,
  "Announcement mode must require an explicit URL parameter");
-assert.match(explorer,/let viewMode=params\\.get\\("mode"\\)==="recent"\\?"recent":"indexed"/,
+assert.match(explorer,/let viewMode=params\.get\("mode"\)==="recent"\?"recent":"indexed"/,
  "All four archives must default to the indexed relevance mode");
 assert.match(explorer,/indexed search across available years/,"Result count must disclose historical scope");
 
