@@ -80,6 +80,11 @@
   footer.append(stamp,attribution,methods,privacy);
   if(!document.querySelector(".axiovo-credit"))document.body.append(footer);
  }
- if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",mount);
- else mount();
+ function loadRobot(){
+  if(document.querySelector('script[data-axiovo-robot]'))return;
+  const script=document.createElement("script");script.src=new URL("./axiovo-robot-help.js?v=20261110-robot1",document.currentScript?.src||location.href).href;
+  script.defer=true;script.dataset.axiovoRobot="1";document.head.append(script);
+ }
+ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",()=>{mount();loadRobot()});
+ else {mount();loadRobot()}
 })();
