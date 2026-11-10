@@ -33,7 +33,7 @@
  font-size:12px;font-weight:800;padding:6px 0}
 #research-recommendations .axiovo-rec-abstract-full p{margin:7px 0;color:var(--rl-text,#18364e);white-space:normal}
 /* Workspace-specific specificity wins over older flex-based paper-card styling. */
-body.axiovo-workspace-page #research-recommendations .axiovo-rec-actions{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
+#research-recommendations .axiovo-rec-actions{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
  gap:9px!important;margin-top:auto!important;padding:15px 0 9px!important;border-top:1px solid var(--rl-border,#ccdeea)!important}
 #research-recommendations .axiovo-rec-actions > :is(a,button){
  display:inline-flex!important;justify-content:center!important;align-items:center!important;gap:7px!important;
