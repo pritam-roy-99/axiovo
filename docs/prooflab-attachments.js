@@ -118,7 +118,10 @@ function makeCollapsible(section,summaryText){
  if(!section||section.parentElement?.tagName==="DETAILS")return;
  const details=document.createElement("details");details.className="pl-aux-settings";
  const summary=document.createElement("summary");summary.textContent=summaryText;
- const parent=section.parentNode;parent.insertBefore(details,section);details.append(summary,section);
+ const host=document.getElementById("pl-chat-settings");
+ const parent=section.parentNode;
+ if(host)host.append(details);else parent.insertBefore(details,section);
+ details.append(summary,section);
  return details;
 }
 makeCollapsible(document.querySelector(".prooflab-model-card"),"Ollama settings and model discovery");
