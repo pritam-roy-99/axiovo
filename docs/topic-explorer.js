@@ -350,7 +350,11 @@ function drawResults(state){
  if(sorter&&sorter.value!==c.sort)sorter.value=c.sort||"relevance";
  const matchedRows=filtered(state),rows=(state.announcementOnly||state.recentOnly)?data.firstSubmissionsFirst(matchedRows):matchedRows,results=$("results"),actions=$("result-actions");
  if($("sort-note"))$("sort-note").textContent=window.AxiovoPaperSort?.note(rows,c.sort)||"";
- $("result-count").textContent=rows.length.toLocaleString()+" matching "+name+" record"+(rows.length===1?"":"s")+
+ const verifiedOriginals=rows.filter(p=>data.versionStatus(p)==="original").length;
+ const verifiedRevisions=rows.filter(p=>data.versionStatus(p)==="revised").length;
+ const unverified=rows.length-verifiedOriginals-verifiedRevisions;
+ const versionSummary=" · "+verifiedOriginals.toLocaleString()+" verified v1"+(verifiedRevisions?" · "+verifiedRevisions.toLocaleString()+" revisions":"")+(unverified?" · "+unverified.toLocaleString()+" unverified versions":"");
+ $("result-count").textContent=rows.length.toLocaleString()+" matching "+name+" record"+(rows.length===1?"":"s")+versionSummary+
   (state.announcementOnly?" · latest official announcement":state.recentOnly?" · latest 7 days":!c.from&&!c.to?" · indexed search across available years":"")+
   (state.loading?" · checking source…":"");
  $("sync-status").textContent=state.message;
@@ -375,9 +379,12 @@ function drawResults(state){
    runSearch();
   }));
  }
- if(rows.length>state.visible)actions.append(button("Show more matches",()=>{
-  const previous=state.visible;state.visible+=12;drawResults(state);results.children[previous]?.querySelector("h3 a")?.focus();
+ if(rows.length>state.visible)actions.append(button("Show all "+rows.length.toLocaleString()+" loaded matches",()=>{
+  const previous=state.visible;state.visible=rows.length;drawResults(state);results.children[previous]?.querySelector("h3 a")?.focus();
  }));
+ // This action reveals every currently retrieved match. Source coverage is
+ // separate: when a provider exposes a continuation cursor, retain its button.
+
  if(state.next!=null&&!state.loading)actions.append(button("Load more from source",()=>loadLive(state,true)));
  if(state.failed&&!state.loading)actions.append(button("Retry live source",()=>loadLive(state,state.next!=null)));
  actions.append(link("Search official "+name+" ↗",data.sourceLink(source,c),"rd-button"));
