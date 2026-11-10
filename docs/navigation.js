@@ -110,11 +110,20 @@
   icon.alt="";icon.setAttribute("aria-hidden","true");icon.width=46;icon.height=46;
   heading.before(wrap);wrap.append(icon,heading);
  }
+ function activateBlueprint(){
+  if(document.querySelector('link[data-axiovo-blueprint]'))return;
+  const sheet=document.createElement("link");sheet.rel="stylesheet";
+  sheet.href=new URL("./axiovo-blueprint-ui.css?v=20261111-reference",location.href).href;
+  sheet.dataset.axiovoBlueprint="true";document.head.append(sheet);
+  const script=document.createElement("script");script.defer=true;
+  script.src=new URL("./axiovo-blueprint-ui.js?v=20261111-reference",location.href).href;
+  script.dataset.axiovoBlueprint="true";document.head.append(script);
+ }
  function loadRobot(){
   if(document.querySelector('script[data-axiovo-robot]'))return;
   const script=document.createElement("script");script.src=new URL("./axiovo-robot-help.js?v=20261111-p0p1-v1",document.currentScript?.src||location.href).href;
   script.defer=true;script.dataset.axiovoRobot="1";document.head.append(script);
  }
- if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",()=>{mount();enablePhaseOneStyles();addAssistantMark();loadRobot()});
- else {mount();enablePhaseOneStyles();addAssistantMark();loadRobot()}
+ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",()=>{mount();enablePhaseOneStyles();addAssistantMark();activateBlueprint();loadRobot()});
+ else {mount();enablePhaseOneStyles();addAssistantMark();activateBlueprint();loadRobot()}
 })();
