@@ -2,7 +2,7 @@
 (function(root,factory){const api=factory();if(typeof module==="object"&&module.exports)module.exports=api;if(root)root.AxiovoProofLabOllama=api;})(typeof globalThis!=="undefined"?globalThis:null,function(){
 "use strict";
 const endpoint="http://127.0.0.1:11434";
-const validModel=name=>/^[a-zA-Z0-9][a-zA-Z0-9._:/-]{0,100}$/.test(String(name||""));
+const validModel=name=>/^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,100}$/.test(String(name||""));
 async function models(fetcher=fetch){
  const response=await fetcher(endpoint+"/api/tags",{signal:AbortSignal.timeout(10000)});
  if(!response.ok)throw Error("Ollama model discovery returned HTTP "+response.status);
