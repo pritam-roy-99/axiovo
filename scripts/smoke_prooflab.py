@@ -139,9 +139,17 @@ S^2 = 4I - [A_0,A_1] \\otimes [B_0,B_1]
                         return {rows,scrollY:scrollY,viewport:innerHeight,documentHeight:document.documentElement.scrollHeight};
                     }""")
                     print("PROOFLAB_EXPORT_GEOMETRY", width, geometry, flush=True)
+                # Export controls are below the phone's conversation; scroll to
+                # the action explicitly, as a touch user would, before activation.
+                page.locator("#download-json").evaluate(
+                    "el => el.scrollIntoView({behavior:'instant',block:'center',inline:'nearest'})")
+                page.wait_for_timeout(120)
                 with page.expect_download() as info:
                     page.locator("#download-json").click()
                 assert info.value.suggested_filename.endswith(".json")
+                page.locator("#download-lean").evaluate(
+                    "el => el.scrollIntoView({behavior:'instant',block:'center',inline:'nearest'})")
+                page.wait_for_timeout(120)
                 with page.expect_download() as info:
                     page.locator("#download-lean").click()
                 assert info.value.suggested_filename.endswith(".lean")
