@@ -5,7 +5,9 @@
 import http from 'node:http';
 import { resolve, dirname, join, extname, sep } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { readFile, realpath } from 'node:fs/promises';
+import { readFile, realpath, stat } from 'node:fs/promises';
+import { createReadStream } from 'node:fs';
+import { parseMediaRange } from './media-range.mjs';
 import { existsSync } from 'node:fs';
 import { spawnSync, spawn } from 'node:child_process';
 import { randomBytes } from 'node:crypto';
@@ -52,7 +54,7 @@ const chatgpt=createChatGPT({
 });
 const csrf=randomBytes(32).toString('hex');
 let active=null, signingIn=false;
-const mime={'.html':'text/html; charset=utf-8','.js':'application/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.svg':'image/svg+xml','.png':'image/png','.jpg':'image/jpeg','.webp':'image/webp','.json':'application/json','.woff2':'font/woff2','.ico':'image/x-icon','.webmanifest':'application/manifest+json','.txt':'text/plain; charset=utf-8'};
+const mime={'.html':'text/html; charset=utf-8','.js':'application/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.svg':'image/svg+xml','.png':'image/png','.jpg':'image/jpeg','.webp':'image/webp','.json':'application/json','.woff2':'font/woff2','.ico':'image/x-icon','.webmanifest':'application/manifest+json','.txt':'text/plain; charset=utf-8','.mp4':'video/mp4','.webm':'video/webm','.vtt':'text/vtt; charset=utf-8','.m4v':'video/mp4'};
 function security(res){res.setHeader('Cache-Control','no-store');res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('Referrer-Policy','no-referrer');res.setHeader('X-Frame-Options','DENY');res.setHeader('Cross-Origin-Resource-Policy','same-origin');}
 function json(res,status,data){res.writeHead(status,{'Content-Type':'application/json; charset=utf-8'});res.end(JSON.stringify(data));}
 function fail(res,e){let msg=e instanceof ChatGPTError?e.message:'Local companion request failed.';json(res,e instanceof ChatGPTError?400:500,{error:msg});}
@@ -125,6 +127,21 @@ const server=http.createServer(async(req,res)=>{
   if(!real||!real.startsWith(docs+sep)){json(res,404,{error:'Not found.'});return;}
   const ext=extname(file).toLowerCase();
   if(!mime[ext]){json(res,404,{error:'Unsupported local asset.'});return;}
+  if(ext==='.mp4'||ext==='.webm'||ext==='.m4v'){
+   const size=(await stat(real)).size;
+   const requestRange=req.headers.range;
+   const range=parseMediaRange(requestRange,size);
+   if(range?.error){res.writeHead(416,{'Content-Range':'bytes */'+size,'Accept-Ranges':'bytes'});res.end();return;}
+   const start=range?range.start:0,end=range?range.end:size-1;
+   const headers={'Content-Type':mime[ext],'Content-Length':end-start+1,'Accept-Ranges':'bytes'};
+   if(range)headers['Content-Range']='bytes '+start+'-'+end+'/'+size;
+   res.writeHead(range?206:200,headers);
+   if(req.method==='HEAD'){res.end();return;}
+   const stream=createReadStream(real,{start,end});
+   stream.on('error',()=>res.destroy());
+   stream.pipe(res);
+   return;
+  }
   const content=await readFile(real);
   res.writeHead(200,{'Content-Type':mime[ext],...(ext==='.html'?{'Content-Security-Policy':"frame-ancestors 'none'; base-uri 'self'"}:{})});
   res.end(req.method==='HEAD'?undefined:content);

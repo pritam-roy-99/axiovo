@@ -4,6 +4,7 @@ on:
     paths:
       - 'docs/prooflab*'
       - 'personal/**'
+      - 'tests/personal-media.test.mjs'
       - 'tests/prooflab-personal.test.js'
       - 'docs/copilot.html'
       - 'tests/prooflab.test.js'
@@ -36,6 +37,7 @@ jobs:
           node --check docs/prooflab-ollama.js
           node --check docs/prooflab-personal.js
           node --check personal/server.mjs
+          node --check personal/media-range.mjs
       - name: Validate Windows Axiovo launcher PowerShell syntax
         shell: pwsh
         run: |
@@ -50,7 +52,7 @@ jobs:
             }
           }
       - name: Run ProofLab unit tests
-        run: node --test tests/prooflab.test.js tests/prooflab-ollama.test.js tests/prooflab-personal.test.js
+        run: node --test tests/prooflab.test.js tests/prooflab-ollama.test.js tests/prooflab-personal.test.js tests/personal-media.test.mjs
       - uses: actions/setup-python@v6
         with:
           python-version: '3.12'
