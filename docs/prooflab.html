@@ -2,15 +2,15 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>ProofLab | Axiovo</title><meta name="description" content="Plan formal proofs, discuss strategies with local AI and export Lean 4 drafts in Axiovo ProofLab.">
 <link rel="stylesheet" href="./theme.css"><link rel="stylesheet" href="./research-entry.css"><link rel="stylesheet" href="./axiovo-shell.css"><link rel="stylesheet" href="./research-desk.css"><link rel="stylesheet" href="./prooflab.css?v=20261110-math1"><link rel="stylesheet" href="./prooflab-axiovo-theme.css?v=20261110-mobile-nav-fix">
-<link rel="stylesheet" href="./prooflab-focused.css?v=20261110-focus2">
-<script defer src="./theme.js"></script><script defer src="./navigation.js"></script><script defer src="./assistant-math.js"></script><script defer src="./prooflab-math.js?v=20261110-math1"></script><script defer src="./prooflab-core.js"></script><script defer src="./prooflab-ollama.js"></script><script defer src="./prooflab.js?v=20261110-handoff-v2"></script><script defer src="./prooflab-personal.js?v=20261110-math1"></script><script defer src="./prooflab-studio-v2.js?v=20261110-a"></script><script defer src="./prooflab-attachments.js?v=20261110-v1"></script></head>
+<link rel="stylesheet" href="./prooflab-focused.css?v=20261110-focus2"><link rel="stylesheet" href="./prooflab-install-ui.css?v=20261110-settings-top">
+<script defer src="./theme.js"></script><script defer src="./navigation.js"></script><script defer src="./assistant-math.js"></script><script defer src="./prooflab-math.js?v=20261110-math1"></script><script defer src="./prooflab-core.js"></script><script defer src="./prooflab-ollama.js"></script><script defer src="./prooflab.js?v=20261110-handoff-v2"></script><script defer src="./prooflab-personal.js?v=20261110-math1"></script><script defer src="./prooflab-studio-v2.js?v=20261110-a"></script><script defer src="./prooflab-attachments.js?v=20261110-settings-top"></script></head>
 <body class="axiovo-research prooflab-body"><header></header>
 <div class="pl-app-shell">
 
 <div class="pl-stage">
 <div class="pl-topbar rd-desk-heading"><div class="pl-topbrand"><p class="rd-kicker">AXIOVO · RESEARCH WORKSPACE</p><h1 id="prooflab-title" class="pl-topbrand-name">ProofLab</h1><p class="pl-topbrand-sub">Plan theorem proofs, investigate open lemmas, and export unverified Lean 4 drafts.</p></div><button class="rd-button rd-secondary pl-topbar-center" type="button" id="pl-focus-prompt" aria-label="Focus the proof conversation input">Ask a proof question <span aria-hidden="true">↗</span></button></div>
 <main class="rd-page prooflab-page">
-<nav class="pl-section-nav" aria-label="ProofLab sections"><a class="pl-section-current" href="#prooflab-chat-title">Conversation</a><a href="#prooflab-setup-title">Project</a><a href="#prooflab-lean-title">Lean 4</a><a href="./copilot.html">Research Assistant</a><span id="prooflab-toolbar-status" class="pl-local-status">Draft · Local workspace</span></nav>
+<nav class="pl-section-nav" aria-label="ProofLab sections"><a class="pl-section-current" href="#prooflab-chat-title">Conversation</a><a href="#prooflab-setup-title">Project</a><a href="#prooflab-lean-title">Lean 4</a><a href="./copilot.html">Research Assistant</a><a href="./install.html">Install locally</a><span id="prooflab-toolbar-status" class="pl-local-status">Draft · Local workspace</span></nav>
 <div class="prooflab-studio">
 <aside class="prooflab-sidebar" aria-label="Proof settings">
 <section class="rd-panel prooflab-card prooflab-setup" aria-labelledby="prooflab-setup-title"><div class="prooflab-card-title"><span class="prooflab-glyph" aria-hidden="true">▤</span><h2 id="prooflab-setup-title">Proof project</h2></div><p class="prooflab-card-caption">Optional project context for proof planning.</p>
@@ -30,6 +30,7 @@ Alice's operators commute with Bob's operators</textarea>
 </section>
 </aside>
 <section class="rd-panel prooflab-card prooflab-conversation" aria-labelledby="prooflab-chat-title">
+<div id="pl-chat-settings" class="pl-chat-settings" aria-label="AI model and account settings"></div>
 <div class="prooflab-chat-heading"><div class="prooflab-card-title"><span class="prooflab-glyph" aria-hidden="true">◉</span><h2 id="prooflab-chat-title">Proof conversation</h2></div><p class="prooflab-card-caption">Ask questions, examine uploaded research notes, and refine a formal proof draft.</p><span class="prooflab-unverified">● Draft · not verified</span><span id="pl-active-model" class="pl-active-model" aria-live="polite">Choose a local AI model</span></div>
 <div id="prooflab-thread" class="prooflab-thread" role="log" aria-live="polite" aria-label="Proof discussion"><div class="prooflab-welcome"><span class="prooflab-welcome-icon" aria-hidden="true">✦</span><h3>Your proof starts here</h3><p>Ask for a structured proof strategy or investigate a specific lemma. Your local model can suggest arguments, but only Lean can verify them.</p></div></div>
 <pre class="prooflab-output-legacy" id="ollama-output" aria-label="Latest unverified local model suggestion"></pre>
