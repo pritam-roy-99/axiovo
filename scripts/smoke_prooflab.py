@@ -32,19 +32,25 @@ def main():
                 assert page.get_by_role("heading", name="ProofLab", exact=True).is_visible()
                 assert page.locator("header.rl-global-header").is_visible(), "Use shared Axiovo header"
                 if width <= 760:
+                    # The approved design uses a compact top bar and fixed
+                    # five-destination bottom navigation, not the old two-row grid.
                     header = page.evaluate("""() => {
-                        const box = selector => {const r=document.querySelector(selector)?.getBoundingClientRect();return r&&{x:r.x,y:r.y,bottom:r.bottom,right:r.right};};
+                        const box = selector => {const r=document.querySelector(selector)?.getBoundingClientRect();
+                          return r && {x:r.x,y:r.y,right:r.right,bottom:r.bottom,width:r.width,height:r.height};};
                         return {display:getComputedStyle(document.querySelector("header.rl-global-header")).display,
-                            logo:box("header .rl-logo"),back:box("header .axiovo-back-button"),
-                            home:box("header .axiovo-home-link"),
-                            settings:box("header .axiovo-header-appearance .rl-settings-link"),
-                            night:box("header .axiovo-header-appearance .theme-toggle"),
-                            nav:box("header nav.rl-nav")};
+                            logo:box("header .rl-logo"), menu:box("header .ax-mobile-menu"),
+                            nav:box("header nav.rl-nav"),
+                            overflow:document.documentElement.scrollWidth-innerWidth};
                     }""")
-                    assert header["display"] == "grid", (width, "ProofLab must use shared mobile header grid", header)
-                    actions = [header[k] for k in ("logo", "back", "home", "settings", "night")]
-                    assert all(actions) and max(b["y"] for b in actions)-min(b["y"] for b in actions) <= 3, (width, "Utility buttons split into multiple rows", header)
-                    assert header["nav"]["y"] >= max(b["bottom"] for b in actions)+3, (width, "Navigation must be below utilities", header)
+                    assert header["display"] == "flex", (width, "Expected compact mobile top bar", header)
+                    assert header["logo"] and header["logo"]["width"] >= 44, (width, "Axiovo logo missing", header)
+                    assert header["menu"] and header["menu"]["right"] <= width+2, (width, "More menu off screen", header)
+                    assert header["nav"] and header["nav"]["x"] <= 2 and header["nav"]["right"] >= width-2, (width, "Fixed bottom navigation missing", header)
+                    assert header["nav"]["y"] >= 750, (width, "Bottom nav not anchored", header)
+                    assert header["overflow"] <= 7, (width, "Horizontal overflow", header)
+                    page.locator(".ax-mobile-menu summary").click()
+                    assert page.locator(".ax-menu-theme").is_visible(), "Theme control must be reachable on Android"
+                    page.locator(".ax-mobile-menu summary").click()
                 assert not page.locator(".pl-rail").count(), "Standalone ProofLab sidebar must be removed"
                 assert page.locator(".pl-app-shell").count() == 1
                 assert page.locator(".pl-topbar").is_visible()
@@ -68,7 +74,10 @@ def main():
                 cols = page.locator(".prooflab-studio").evaluate("(el) => getComputedStyle(el).gridTemplateColumns.split(' ').length")
                 assert cols == (2 if width == 1280 else 1), (width, cols)
                 # Native header and theme controls remain in place.
-                assert page.locator("header.rl-global-header .theme-toggle").is_visible()
+                if width <= 760:
+                    assert page.locator(".ax-mobile-menu summary").is_visible()
+                else:
+                    assert page.locator("header.rl-global-header .theme-toggle").is_visible()
                 assert page.locator("#pl-chat-provider").is_visible()
                 assert page.locator("#pl-chat-model").is_visible()
                 # Text attachments are extracted on-device; not transmitted by selecting.
