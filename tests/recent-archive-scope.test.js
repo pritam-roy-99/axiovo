@@ -7,7 +7,8 @@ const vm=require("node:vm");
 const explorer=fs.readFileSync("docs/topic-explorer.js","utf8");
 const crypto=fs.readFileSync("docs/crypto.js","utf8");
 const archive=fs.readFileSync("docs/archive-data.js","utf8");
-assert.match(explorer,/let viewMode=params\.get\("mode"\)==="indexed"\?"indexed":"recent"/);
+assert.match(explorer,/let viewMode=params\.get\("mode"\)==="recent"\?"recent":"indexed"/,
+ "All-year indexed relevance is the default; seven-day browsing requires explicit recent mode");
 assert.match(explorer,/recentOnly=\(source==="biorxiv"\|\|source==="chemrxiv"\)/);
 assert.match(explorer,/Object\.assign\(c,recentWindow\(\),\{sort:c\.sort==="relevance"\?"recent":c\.sort,recentOnly:true\}\)/);
 assert.match(explorer,/state\.recentOnly\?"No matching papers in the latest 7 days/);
