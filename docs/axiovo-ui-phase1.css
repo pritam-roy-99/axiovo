@@ -64,7 +64,7 @@ body.axiovo-assistant :is(button,a,textarea,select):focus-visible{outline:3px so
  body.axiovo-home .axiovo-welcome-media{padding-top:18px!important}
  body.axiovo-feed-page .feed-toolbar{min-width:0}
  body.axiovo-feed-page .feed-tabs{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}
- body.axiovo-feed-page .feed-tabs button{min-width:0;min-height:42px;padding:8px 3px;font-size:12px}
+ body.axiovo-feed-page .feed-tabs button{min-width:0;min-height:46px!important;padding:9px 3px;font-size:12px}
  body.axiovo-feed-page .feed-filters{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:6px!important;min-width:0}
  body.axiovo-feed-page .feed-filters>*{max-width:100%;min-width:0}
  body.axiovo-feed-page .feed-filters label{align-self:end}
