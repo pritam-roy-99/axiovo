@@ -7,7 +7,7 @@ if(location.hostname!=="127.0.0.1"||location.protocol!=="http:")return;
 const $=id=>document.getElementById(id);
 let csrf="",connected=false,models=[],history=[],pending=null,active=false;
 const api=async(path,options={})=>{
- const res=await fetch("/api/"+path,{cache:"no-store",...options});
+ const res=await fetch("/api/"+path,{cache:"no-store",headers:csrf?{"X-Axiovo-Local":csrf}:undefined,...options});
  const data=await res.json();
  if(!res.ok)throw Error(data.error||"Local companion request failed");
  return data;
