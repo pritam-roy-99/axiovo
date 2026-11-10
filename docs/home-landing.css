@@ -439,3 +439,30 @@ body.axiovo-home .axiovo-welcome-header .axiovo-cta:focus-visible{
  body.axiovo-home .axiovo-archive-grid {grid-template-columns:minmax(0,1fr)!important}
  body.axiovo-home .axiovo-source-pulse-list {grid-template-columns:minmax(0,1fr)}
 }
+
+/* Homepage installation: keep the install action WITH the primary CTA group.
+   It must not become a stray flex child of the hero header. */
+body.axiovo-home .axiovo-welcome-header .axiovo-welcome-actions .axiovo-cta-install,
+body.axiovo-home .axiovo-welcome-header .axiovo-welcome-actions .axiovo-cta-install:visited{
+ background:#d6f6ef!important;border:2px solid #a1e5dd!important;color:#10334a!important;
+ text-decoration:none!important;min-height:58px;
+}
+body.axiovo-home .axiovo-welcome-header .axiovo-welcome-actions .axiovo-cta-install:hover{
+ background:#b8eee5!important;color:#0a293e!important;
+}
+body.axiovo-home .axiovo-welcome-header .axiovo-install-limits{
+ color:#deecf6;font-size:.78rem;line-height:1.55;margin:0;
+ text-align:center;max-width:38ch;align-self:center;
+}
+body.axiovo-home .axiovo-welcome-header .axiovo-install-limits a{
+ color:#baf6e9;text-decoration:underline;text-underline-offset:2px;
+}
+body.axiovo-home .axiovo-welcome-header .axiovo-cta-install:focus-visible,
+body.axiovo-home .axiovo-welcome-header .axiovo-install-limits a:focus-visible{
+ outline:3px solid #fff;outline-offset:3px;
+}
+@media(max-width:900px){
+ body.axiovo-home .axiovo-welcome-header .axiovo-welcome-actions .axiovo-cta-install,
+ body.axiovo-home .axiovo-welcome-header .axiovo-install-limits{grid-column:1/-1;width:100%;max-width:none}
+ body.axiovo-home .axiovo-welcome-header .axiovo-welcome-actions .axiovo-cta-install{min-height:66px}
+}
