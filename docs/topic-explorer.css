@@ -152,3 +152,22 @@
   contain-intrinsic-size: auto 400px;
  }
 }
+
+/* Mutually exclusive archive date shortcut selection. No default highlight. */
+.ex-date-presets > button.rd-button{
+ background:var(--rd-soft,#edf3f8)!important;
+ color:var(--rd-text,#274055)!important;
+ border:1px solid var(--rd-border,#c8d4df)!important;
+}
+.ex-date-presets > button.rd-button:hover:not(:disabled){
+ background:var(--rd-soft,#e3ebf2)!important;
+}
+.ex-date-presets > button.rd-button.is-active[aria-pressed="true"]{
+ background:var(--axiovo-accent,#126f9c)!important;
+ color:#fff!important;
+ border-color:var(--axiovo-accent,#126f9c)!important;
+}
+.ex-date-presets > button.rd-button:focus-visible{
+ outline:3px solid var(--axiovo-accent,#126f9c);
+ outline-offset:2px;
+}
