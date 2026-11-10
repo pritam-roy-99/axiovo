@@ -34,7 +34,7 @@ for(const file of ["arxiv-versions.js","archive-data.js"]){
 }
 (async()=>{
  const api=sandbox.AxiovoArchiveData;
- const result=await api.live("biorxiv",{q:"",to:"2026-11-01",sort:"recent"});
+ const result=await api.live("biorxiv",{q:"",to:"2026-11-01",sort:"recent",recentOnly:true});
  assert.equal(result.total,4);
  assert.equal(result.next,2);
  assert.ok(calls[0].includes("/2013-11-01/2026-11-01/0/json"),
