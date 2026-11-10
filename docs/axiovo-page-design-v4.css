@@ -479,3 +479,21 @@ body.ax4 .ax4-skip:focus{top:12px}
   box-sizing:border-box!important;
  }
 }
+
+/* 320px explorer: the primary search action spans the panel; Clear is below. */
+@media(max-width:760px){
+ html:root body.ax4.axiovo-explore .ex-guide-actions{
+  display:grid!important;grid-template-columns:minmax(0,1fr)!important;
+  grid-template-rows:auto auto!important;gap:7px!important;width:100%!important;
+ }
+ html:root body.ax4.axiovo-explore .ex-guide-actions>#archive-show-results{
+  width:100%!important;max-width:100%!important;min-width:0!important;
+  height:48px!important;min-height:48px!important;max-height:48px!important;
+  padding:8px 7px!important;display:flex!important;align-items:center!important;
+  justify-content:center!important;white-space:nowrap!important;
+  font-size:12px!important;line-height:1.15!important;box-sizing:border-box!important;
+ }
+ html:root body.ax4.axiovo-explore .ex-guide-actions>#archive-clear-path{
+  width:100%!important;min-height:44px!important;box-sizing:border-box!important
+ }
+}
