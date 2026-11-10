@@ -148,6 +148,9 @@ def main():
      assert page.evaluate("document.documentElement.scrollWidth<=innerWidth+7"),(width,path,"Horizontal overflow")
      checks+=1
      if source=="arxiv" and width==1360:
+      # Latest release is an explicit shortcut now. The archive's default
+      # search covers indexed history, so it must not be treated as one release.
+      page.locator("#archive-announced").click()
       page.locator(".ex-paper").first.wait_for(timeout=18000)
       paper=page.locator(".ex-paper").first
       title=paper.locator("h3").inner_text().strip()
