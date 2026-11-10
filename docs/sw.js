@@ -1,6 +1,6 @@
 /* Axiovo offline shell. Scholarly metadata, video and PDFs stay network-only. */
 "use strict";
-const CACHE = "axiovo-shell-v107";
+const CACHE = "axiovo-shell-v108";
 const SHELL = [
   "./", "./index.html", "./workspace.html", "./icons/axiovo.svg",
   "./manifest.webmanifest", "./theme.css", "./research-entry.css", "./axiovo-shell.css?v=20261108-mobile-research-v3",
