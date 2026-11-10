@@ -247,7 +247,14 @@
   padding:17px!important;border-radius:17px!important;
  }
  .axiovo-assistant .assistant-task-row{
-  display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  align-items:stretch!important;
+  justify-items:stretch!important;
+ }
+ .axiovo-assistant .assistant-task-row>.mode{
+  align-self:stretch!important;
+  height:100%!important;
  }
  .axiovo-assistant .assistant-task-row .mode{width:100%;min-height:48px!important;padding:11px 8px!important;}
  .axiovo-assistant .assistant-task-row>a{
