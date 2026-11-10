@@ -1,3 +1,5 @@
+/* Preserve the Library recommendation action layout used by its mobile controls and tests. */
+body.axiovo-workspace-page #research-recommendations .axiovo-rec-actions{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important}
 /* Phase 3: remaining active supporting screens, visual-only. */
 body:has(.panel.paper) main,body:has(.axiovo-palette-preview) main,
 body:has(.cards .card) main{max-width:1180px;margin-inline:auto}
