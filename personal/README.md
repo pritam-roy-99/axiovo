@@ -1,6 +1,6 @@
 # Axiovo Personal: ChatGPT on your own Windows laptop
 
-Axiovo Personal is an **optional, private, localhost-only** version of ProofLab. It runs at `http://127.0.0.1:4317/prooflab.html` on **your Windows computer**. It does **not** expose your ChatGPT connection on GitHub Pages.
+Axiovo Personal is an **optional, private, localhost-only** version of ProofLab. Its homepage runs at `http://127.0.0.1:4317/index.html` on **your Windows computer**. It does **not** expose your ChatGPT connection on GitHub Pages.
 
 It uses OpenAI's official [Sign in with ChatGPT DevKit](https://github.com/openai/sign-in-with-chatgpt-devkit), built locally. Eligible ChatGPT Plus or Pro account holders can authorize supported ChatGPT-plan AI requests without entering an API key. Inference is performed by OpenAI's cloud service; **this is not offline ChatGPT**. Ollama remains separately available for offline local inference.
 
@@ -27,7 +27,7 @@ Start the private companion:
 powershell -NoProfile -ExecutionPolicy Bypass -File .\personal\start.ps1
 ```
 
-The startup script clones OpenAI's official DevKit into a **sibling folder** `sign-in-with-chatgpt-devkit`, installs its packages, and builds `@siwc/local`. It then runs `personal/server.mjs` and opens the local ProofLab page. First-time setup requires network access. Subsequent launches use the installed kit. Do not publish or sync the local credential directory.
+The startup script clones OpenAI's official DevKit into a **sibling folder** `sign-in-with-chatgpt-devkit`, installs its packages, and builds `@siwc/local`. It then runs `personal/server.mjs` and opens the local Axiovo homepage. First-time setup requires network access. Subsequent launches use the installed kit. Do not publish or sync the local credential directory.
 
 If you prefer not to change PowerShell execution policy even for one process, review `personal/start.ps1` and run its commands manually. No administrator privileges are needed by Axiovo.
 
@@ -39,11 +39,11 @@ After the normal Axiovo Personal installation, open PowerShell in your `axiovo` 
 powershell -NoProfile -ExecutionPolicy Bypass -File .\personal\install-shortcut.ps1
 ```
 
-This creates a branded **Axiovo Personal** shortcut on your Windows desktop and in the Start menu. The icon is drawn locally and saved to `%LOCALAPPDATA%\AxiovoPersonal\axiovo-personal.ico`. It does not download a third-party icon or require administrator access.
+This creates a branded **Axiovo Personal** desktop shortcut; a Start Menu shortcut is also attempted when Windows permissions allow it. The icon is drawn locally and saved to `%LOCALAPPDATA%\AxiovoPersonal\axiovo-personal.ico`. It does not download a third-party icon or require administrator access.
 
-Double-click **Axiovo Personal** to launch `http://127.0.0.1:4317/prooflab.html`. The shortcut starts the local service when necessary, opening the page in your default browser. When the app is already running, it opens the existing local page instead of starting a second server. You can right-click the shortcut in Windows to pin it to the taskbar.
+Double-click **Axiovo Personal** to open the **Axiovo homepage** at `http://127.0.0.1:4317/index.html`. The shortcut starts the local service when necessary, opening the page in your default browser. When the app is already running, it opens the existing local page instead of starting a second server. You can right-click the shortcut in Windows to pin it to the taskbar.
 
-The **Stop Axiovo Personal** shortcut in the Start menu stops only this checkout's Node server. The app does not register a Windows service or start automatically on system boot. The launcher is hidden to avoid a terminal window; if a startup error occurs, it displays a local Windows error dialog. To troubleshoot from PowerShell, run `.\personal\start.ps1` directly.
+If Windows restricts Start Menu writes, only the Desktop shortcut is installed. The **Stop Axiovo Personal** shortcut in the Start menu (when available) stops only this checkout's Node server. The app does not register a Windows service or start automatically on system boot. The launcher is hidden to avoid a terminal window; if a startup error occurs, it displays a local Windows error dialog. To troubleshoot from PowerShell, run `.\personal\start.ps1` directly.
 
 The shortcut keeps pointing to the same installation location. If you move or rename your `axiovo` folder, run `install-shortcut.ps1` again from its new location.
 
@@ -65,7 +65,7 @@ Your ChatGPT authorization is encrypted outside the Git checkout under `%LOCALAP
 
 ## Using ChatGPT in ProofLab
 
-1. Open `http://127.0.0.1:4317/prooflab.html`. The page must use **127.0.0.1:4317**, not the public GitHub Pages URL.
+1. Open the local homepage at `http://127.0.0.1:4317/index.html`, then navigate to ProofLab at `http://127.0.0.1:4317/prooflab.html`. The page must use **127.0.0.1:4317**, not the public GitHub Pages URL.
 2. In the left panel, find **ChatGPT · personal** and click **Continue with ChatGPT**.
 3. Your default browser opens OpenAI authorization. Choose your ChatGPT account and **review and explicitly approve** the permitted scopes for ChatGPT-plan use.
 4. Select a model **returned by your account**. No specific ChatGPT model is assumed or hardcoded.

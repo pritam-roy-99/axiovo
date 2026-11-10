@@ -119,7 +119,7 @@ const server=http.createServer(async(req,res)=>{
   if(req.method!=='GET'&&req.method!=='HEAD'){json(res,405,{error:'Read-only static files.'});return;}
   const parts=decodeURIComponent(u.pathname).split('/');
   if(parts.some(x=>x.startsWith('.')||x==='..')){json(res,403,{error:'Invalid path.'});return;}
-  const file=resolve(docs,'.'+(u.pathname==='/'?'/prooflab.html':u.pathname));
+  const file=resolve(docs,'.'+(u.pathname==='/'?'/index.html':u.pathname));
   if(!file.startsWith(docs+sep)){json(res,403,{error:'Invalid path.'});return;}
   const real=await realpath(file).catch(()=>null);
   if(!real||!real.startsWith(docs+sep)){json(res,404,{error:'Not found.'});return;}
@@ -131,7 +131,7 @@ const server=http.createServer(async(req,res)=>{
  }catch(e){if(!res.headersSent)fail(res,e);else res.end();}
 });
 server.listen(port,'127.0.0.1',()=>{
- console.log('Axiovo Personal is available only on this computer: '+origin+'/prooflab.html');
+ console.log('Axiovo Personal is available only on this computer: '+origin+'/index.html');
  console.log('Sign in from ProofLab. No credentials are written to the GitHub repository.');
- const child=spawn('rundll32.exe',['url.dll,FileProtocolHandler',origin+'/prooflab.html'],{windowsHide:true,stdio:'ignore',shell:false});child.on('error',()=>{});
+ const child=spawn('rundll32.exe',['url.dll,FileProtocolHandler',origin+'/index.html'],{windowsHide:true,stdio:'ignore',shell:false});child.on('error',()=>{});
 });

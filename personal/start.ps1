@@ -70,5 +70,5 @@ Set-Location $project
 $env:AXIOVO_SIWC_DEVKIT = $devkit
 Write-Host ''
 Write-Host 'Axiovo Personal is restricted to this computer only.' -ForegroundColor Green
-Write-Host 'Opening http://127.0.0.1:4317/prooflab.html' -ForegroundColor Green
+Write-Host 'Opening http://127.0.0.1:4317/index.html' -ForegroundColor Green
 & node (Join-Path $PSScriptRoot 'server.mjs')

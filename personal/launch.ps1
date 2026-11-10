@@ -1,7 +1,7 @@
 # One-click Axiovo Personal launcher. Runs the existing local server without a terminal window.
 $ErrorActionPreference = 'Stop'
 $root = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
-$url = 'http://127.0.0.1:4317/prooflab.html'
+$url = 'http://127.0.0.1:4317/index.html'
 try {
   # Do not start a second server instance when Axiovo Personal is already available.
   $alreadyRunning = $false

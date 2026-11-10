@@ -25,27 +25,42 @@ $graphics.DrawString('A',$font,$white,[System.Drawing.RectangleF]::new(0,1,64,61
 $icon=[System.Drawing.Icon]::FromHandle($bitmap.GetHicon())
 $stream=[System.IO.File]::Create($ico)
 try { $icon.Save($stream) } finally { $stream.Dispose();$graphics.Dispose();$bitmap.Dispose();$ring.Dispose();$font.Dispose();$white.Dispose();$fmt.Dispose();$icon.Dispose() }
+# Windows account policies can block Start Menu writes even when Desktop is writable.
+# Install the Desktop shortcut independently; Start Menu entries are best-effort.
 $desktop=[Environment]::GetFolderPath('Desktop')
 $menu=Join-Path ([Environment]::GetFolderPath('StartMenu')) 'Programs'
 $powerShell=(Join-Path $PSHOME 'powershell.exe')
 $wsh=New-Object -ComObject WScript.Shell
-foreach($folder in @($desktop,$menu)) {
-  $shortcut=$wsh.CreateShortcut((Join-Path $folder 'Axiovo Personal.lnk'))
+function New-AxiovoShortcut {
+  param([string]$Folder,[string]$Name,[string]$Script,[string]$Description,[switch]$Hidden)
+  $shortcut=$wsh.CreateShortcut((Join-Path $Folder ($Name+'.lnk')))
   $shortcut.TargetPath=$powerShell
-  $shortcut.Arguments='-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File "'+(Join-Path $PSScriptRoot 'launch.ps1')+'"'
+  $visibility = if ($Hidden) { '-WindowStyle Hidden ' } else { '' }
+  $shortcut.Arguments='-NoProfile -ExecutionPolicy Bypass '+$visibility+'-File "'+(Join-Path $PSScriptRoot $Script)+'"'
   $shortcut.WorkingDirectory=$root
   $shortcut.IconLocation=$ico+',0'
-  $shortcut.Description='Axiovo Personal: private Windows research assistant, ChatGPT and local Ollama'
+  $shortcut.Description=$Description
   $shortcut.Save()
 }
-# Keep a visible, easy stop action in the Windows Start Menu.
-$stopShortcut=$wsh.CreateShortcut((Join-Path $menu 'Stop Axiovo Personal.lnk'))
-$stopShortcut.TargetPath=$powerShell
-$stopShortcut.Arguments='-NoProfile -ExecutionPolicy Bypass -File "'+(Join-Path $PSScriptRoot 'stop.ps1')+'"'
-$stopShortcut.WorkingDirectory=$root
-$stopShortcut.IconLocation=$ico+',0'
-$stopShortcut.Description='Stop the Axiovo Personal localhost server on this laptop'
-$stopShortcut.Save()
-Write-Host 'Axiovo Personal icon added to Desktop and Start Menu.' -ForegroundColor Green
-Write-Host 'Double-click Axiovo Personal to open the local research workspace.' -ForegroundColor Green
-Write-Host 'Right-click the icon and choose Pin to taskbar if desired.'
+$desktopOK=$false
+try {
+  New-AxiovoShortcut -Folder $desktop -Name 'Axiovo Personal' -Script 'launch.ps1' -Description 'Open your private Axiovo research homepage' -Hidden
+  $desktopOK=$true
+  Write-Host ('Axiovo Personal desktop shortcut created at: '+$desktop) -ForegroundColor Green
+} catch {
+  Write-Warning ('Cannot save shortcut on your Desktop: '+$_.Exception.Message)
+}
+$menuOK=$false
+try {
+  New-AxiovoShortcut -Folder $menu -Name 'Axiovo Personal' -Script 'launch.ps1' -Description 'Open your private Axiovo research homepage' -Hidden
+  New-AxiovoShortcut -Folder $menu -Name 'Stop Axiovo Personal' -Script 'stop.ps1' -Description 'Stop the private Axiovo local server'
+  $menuOK=$true
+  Write-Host 'Start Menu shortcuts created.' -ForegroundColor Green
+} catch {
+  Write-Warning 'Windows denied Start Menu shortcut access. The desktop shortcut can still be used.'
+  Write-Host 'To stop the app without the Start Menu entry, run: powershell -NoProfile -ExecutionPolicy Bypass -File .\personal\stop.ps1'
+}
+if (-not $desktopOK -and -not $menuOK) {
+  throw 'Neither the Desktop nor Start Menu is writable. Ask your Windows administrator to permit shortcuts, or use personal\launch.ps1 directly.'
+}
+Write-Host 'Double-click Axiovo Personal to open the local Axiovo homepage.' -ForegroundColor Green
