@@ -334,10 +334,20 @@ jobs:
           fi
       - name: Identify tested release artifact
         run: python scripts/verify_release.py build
+      # Keep the full verified archive committed in docs/. Only the published
+      # artifact omits older daily shards, fetched from the same public GitHub
+      # repository by arxiv-daily-archive.js with exact manifest validation.
+      # This reduces the Pages backend sync workload without deleting data.
+      - name: Stage size-bounded GitHub Pages artifact
+        id: stage_pages
+        run: |
+          python scripts/stage_pages.py "$RUNNER_TEMP/axiovo-pages"
+          test -f "$RUNNER_TEMP/axiovo-pages/data/arxiv-days/manifest.json"
+          test -f "$RUNNER_TEMP/axiovo-pages/assets/axiovo-tour.mp4"
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: docs
+          path: ${{ runner.temp }}/axiovo-pages
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
