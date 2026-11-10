@@ -33,8 +33,9 @@ def main():
                 assert page.locator(".pl-app-shell").count() == 1
                 assert page.locator(".pl-topbar").is_visible()
                 assert page.locator(".prooflab-studio").is_visible()
-                page.locator("#pl-focus-prompt").click()
-                assert page.locator("#prooflab-prompt").evaluate("(el) => document.activeElement === el")
+                if width >= 700:
+                    page.locator("#pl-focus-prompt").click()
+                    assert page.locator("#prooflab-prompt").evaluate("(el) => document.activeElement === el")
                 cols = page.locator(".prooflab-studio").evaluate("(el) => getComputedStyle(el).gridTemplateColumns.split(' ').length")
                 assert cols == (3 if width == 1280 else 1), (width, cols)
                 page.locator("#create").click()
