@@ -27,6 +27,7 @@ jobs:
           for test in tests/*.test.js; do
             node "$test"
           done
+          node tests/version-aware-display.test.cjs
 
   browser-smoke:
     name: Smoke test Axiovo in Chromium
