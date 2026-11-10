@@ -38,9 +38,10 @@
  menu.innerHTML=['<summary aria-label="More pages">☰</summary><div class="ax-menu-panel">',
  '<a href="./index.html">Home</a><a href="./lab.html">Research Tools</a><a href="./prooflab.html">ProofLab</a>',
  '<a href="./research-hub.html">Research Hub</a><a href="./community.html">Community</a>',
- '<a href="./profiles.html">Settings and appearance</a><a href="./install.html">Install Axiovo</a>',
+ '<a href="./profiles.html">Settings and appearance</a><button type="button" class="ax-menu-theme">☾ Toggle day / night</button><a href="./install.html">Install Axiovo</a>',
  '<a href="./tutorial.html">Tutorial</a><a href="./methodology.html">Source methodology</a></div>'].join("");
  header.append(menu);
+ menu.querySelector(".ax-menu-theme").addEventListener("click",()=>{const toggle=header.querySelector(".theme-toggle");if(toggle)toggle.click();menu.open=false;});
  document.addEventListener("click",event=>{if(!menu.contains(event.target))menu.open=false;});
  document.addEventListener("keydown",event=>{if(event.key==="Escape")menu.open=false;});
  if(document.body.classList.contains("axiovo-home")){
