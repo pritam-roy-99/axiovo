@@ -84,3 +84,14 @@
 @media(max-width:1150px){.prooflab-studio{grid-template-columns:minmax(230px,.8fr) minmax(0,1.3fr)}.prooflab-tools{grid-column:1/-1;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.prooflab-conversation{min-height:670px}}
 @media(max-width:760px){.prooflab-studio{grid-template-columns:minmax(0,1fr)}.prooflab-sidebar,.prooflab-tools{grid-column:1;grid-template-columns:minmax(0,1fr)}.prooflab-conversation{grid-row:1;min-height:520px}.prooflab-thread{max-height:55vh;min-height:210px}.prooflab-wave{opacity:.42;width:85%}.prooflab-toolbar-status{margin-left:0}.prooflab-page .prooflab-card{border-radius:16px;padding:18px}}
 @media(max-width:480px){.axiovo-research .rd-page.prooflab-page{padding:12px 11px 46px}.prooflab-hero{padding:24px 19px;min-height:158px;border-radius:16px}.prooflab-hero h1{font-size:2rem}.prooflab-toolbar{gap:4px;padding:10px 0}.prooflab-page .prooflab-tab{padding:9px 10px;font-size:.79rem}.prooflab-page .prooflab-tab span{display:inline}.prooflab-toolbar-status{width:100%}.prooflab-message{max-width:100%;font-size:.88rem}.prooflab-message.user{max-width:94%}.prooflab-composer-footer span{font-size:.65rem}.prooflab-card :is(textarea,input,select){font-size:16px}.prooflab-card-caption{margin-left:0}.prooflab-unverified{margin-left:0}}
+
+
+/* ChatGPT controls are inserted exclusively by the localhost companion. */
+.prooflab-personal-card{border-top:3px solid #10a3a1!important}
+.prooflab-personal-privacy{border:1px solid var(--pl-border);border-radius:12px;padding:11px 12px;margin:16px 0 10px;display:grid;gap:9px}
+.prooflab-personal-privacy legend{font-weight:750;font-size:.82rem;padding:0 6px;color:var(--pl-ink)}
+.prooflab-personal-privacy label,.prooflab-approve{display:flex!important;gap:9px;align-items:flex-start;color:var(--pl-ink);font-size:.85rem;line-height:1.45;cursor:pointer}
+.prooflab-personal-privacy input[type=checkbox],.prooflab-approve input[type=checkbox]{width:18px!important;height:18px!important;flex:none;accent-color:#078f9d;margin:0;padding:0!important}
+.prooflab-approve{margin:14px 0!important;padding:12px;border:1px solid var(--pl-border);border-radius:12px;background:var(--pl-soft);font-weight:720}
+.prooflab-personal-card .rd-small{line-height:1.6}
+.prooflab-personal-card>p:last-child{margin-top:12px}

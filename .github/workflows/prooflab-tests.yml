@@ -3,8 +3,11 @@ on:
   pull_request:
     paths:
       - 'docs/prooflab*'
+      - 'personal/**'
+      - 'tests/prooflab-personal.test.js'
       - 'docs/copilot.html'
       - 'tests/prooflab.test.js'
+      - 'tests/prooflab-personal.test.js'
       - 'tests/prooflab-ollama.test.js'
       - 'scripts/smoke_prooflab.py'
       - 'scripts/prooflab_verify.py'
@@ -31,8 +34,10 @@ jobs:
           node --check docs/prooflab-core.js
           node --check docs/prooflab.js
           node --check docs/prooflab-ollama.js
+          node --check docs/prooflab-personal.js
+          node --check personal/server.mjs
       - name: Run ProofLab unit tests
-        run: node --test tests/prooflab.test.js tests/prooflab-ollama.test.js
+        run: node --test tests/prooflab.test.js tests/prooflab-ollama.test.js tests/prooflab-personal.test.js
       - uses: actions/setup-python@v6
         with:
           python-version: '3.12'
