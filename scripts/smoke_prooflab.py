@@ -53,7 +53,9 @@ def main():
                 assert "S^2" in page.evaluate("window.AxiovoProofLabAttachments.approvedText()")
                 page.get_by_role("button", name="Remove notes.tex").click()
                 assert page.evaluate("window.AxiovoProofLabAttachments.approvedText()") == ""
+                page.locator("#prooflab-settings summary").click()
                 page.locator("#create").click()
+                page.locator("#prooflab-settings summary").click()
                 assert page.locator("#workspace").is_visible()
                 assert "Unverified draft" in page.locator("#project-status").inner_text()
                 page.locator("#prooflab-prompt").fill("Derive a CHSH bound.")
