@@ -77,7 +77,8 @@ data.live("biorxiv",criteria).then(async result=>{
  const empty=await data.live("biorxiv",{q:"10.1101/123450"});
  assert.equal(empty.total,0);
  await data.live("biorxiv",{to:"2018-03-15"});
- assert.match(requests.at(-1).pathname,/2013-11-01\/2018-03-15/);
+ assert.match(requests.at(-1).searchParams.get("query"),/FIRST_PDATE:\\[2013-11-01 TO 2018-03-15\\]/,
+  "Historical bioRxiv search must query the indexed date range instead of a recent API stream");
  await data.live("biorxiv",{q:"transcriptomics",sort:"oldest"});
  assert.equal(requests.at(-1).searchParams.get("sort"),"P_PDATE_D asc");
  await data.live("biorxiv",{q:"transcriptomics",sort:"cited"});
