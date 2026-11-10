@@ -55,8 +55,23 @@ jobs:
           else
             # RSS is the official completeness check. If it is stale or not
             # available, the direct catch-up pages can still advance the day.
-            timeout --signal=TERM --kill-after=10s 360s python -m scripts.arxiv_announcements || true
-            timeout --signal=TERM --kill-after=10s 360s python -m scripts.arxiv_catchup || timeout --signal=TERM --kill-after=10s 360s python -m scripts.arxiv_announcements
+            # RSS is authoritative once complete. Do not refetch all catch-up
+            # pages after a complete RSS census: that caused avoidable 429s.
+            timeout --signal=TERM --kill-after=10s 300s python -m scripts.arxiv_announcements || true
+            if python - <<'PY'
+          import json
+          from pathlib import Path
+          from scripts.arxiv_catchup import target_announcement_date
+          p = Path("docs/data/announcements.json")
+          batch = json.loads(p.read_text(encoding="utf-8")) if p.exists() else {}
+          raise SystemExit(0 if batch.get("complete") and batch.get("announcement_date") == target_announcement_date() else 1)
+          PY
+            then
+              echo "Complete current official RSS announcement: skip rate-limited catch-up requests."
+            else
+              # Incomplete RSS must retain its best available verified snapshot.
+              timeout --signal=TERM --kill-after=10s 300s python -m scripts.arxiv_catchup || true
+            fi
           fi
       - name: Validate announcement snapshot
         run: |
@@ -109,7 +124,7 @@ jobs:
         continue-on-error: true
         env:
           OAI_LOOKBACK_DAYS: '3'
-          OAI_MAX_PAGES: '20'
+          OAI_MAX_PAGES: '8'
         run: |
           # OAI datestamps reflect metadata changes, not announcement days.
           # Harvest every scheduled run, including weekends, to catch revisions.
