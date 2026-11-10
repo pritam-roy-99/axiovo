@@ -47,7 +47,7 @@ def main():
                     "mimeType": "text/plain",
                     "buffer": b"\\\\[S^2 = 4I - [A_0,A_1] \\\\otimes [B_0,B_1]\\\\]"
                 })
-                assert "notes.tex" in page.locator("#prooflab-attachment-list").inner_text()
+                page.wait_for_function("document.querySelector(\'#prooflab-attachment-list\').textContent.includes(\'notes.tex\')")
                 assert page.evaluate("window.AxiovoProofLabAttachments.approvedText()") == ""
                 page.locator("#prooflab-send-files").check()
                 assert "S^2" in page.evaluate("window.AxiovoProofLabAttachments.approvedText()")
