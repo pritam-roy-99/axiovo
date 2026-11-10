@@ -1,0 +1,84 @@
+/* Axiovo Phase 1: visual-only responsive upgrade. Keep existing feature IDs/JS untouched.
+   The approved navy/teal scheme, source-first disclosure, and robot are preserved. */
+:root{--axiovo-v2-ink:#0c2944;--axiovo-v2-teal:#27cbbf;--axiovo-v2-bg:#f2f7fb;--axiovo-v2-border:#c8dce8}
+body{overflow-x:clip}
+body .rl-global-header{position:relative;z-index:20;border-bottom:1px solid #327491!important;gap:10px!important}
+body .rl-global-header .rl-logo{gap:8px!important;letter-spacing:-.025em!important}
+body .rl-global-header .rl-logo .rl-logo-mark{background:transparent!important;padding:0!important;border-radius:0!important;overflow:visible}
+body .rl-global-header .rl-logo .rl-logo-mark img{width:38px;height:38px;display:block;object-fit:contain}
+body .rl-global-header .rl-nav a[aria-current="page"]{background:#087d86!important;box-shadow:inset 0 -2px 0 #7ff1df}
+body .rl-global-header .rl-nav a:hover{background:#1a516e!important}
+body .rl-global-header :is(a,button):focus-visible{outline:3px solid #80f7e5!important;outline-offset:3px!important}
+.axiovo-credit{display:flex!important;justify-content:center!important;align-items:center!important;flex-wrap:wrap!important;gap:10px 16px!important;line-height:1.5!important}
+.axiovo-credit .axiovo-chatgpt-credit{font-weight:800;color:inherit}
+.axiovo-chatgpt-credit img{display:none}
+.axiovo-v2-assistant-title{display:flex;align-items:center;gap:13px}
+.axiovo-v2-assistant-title img{width:46px;height:46px;flex:none}
+.axiovo-v2-assistant-title h1{margin:0}
+.axiovo-v2-research-caption{font-size:.83rem;color:var(--rd-muted,#537086)}
+/* Home: preserve the narrated video, guide, archive lists, and return-to-work blocks. */
+body.axiovo-home .axiovo-welcome{box-shadow:0 18px 50px #0a29431a}
+body.axiovo-home .axiovo-welcome-actions .axiovo-cta{border-radius:13px!important;transition:transform .16s ease,box-shadow .16s ease}
+body.axiovo-home .axiovo-welcome-actions .axiovo-cta:hover{box-shadow:0 6px 16px #001c2a33;transform:translateY(-2px)}
+body.axiovo-home .axiovo-welcome-media{scroll-margin-top:28px}
+body.axiovo-home .axiovo-home-video{display:block;max-width:100%;border-radius:13px}
+body.axiovo-home .axiovo-install-limits{max-width:34ch;color:#e6f7fb!important}
+body.axiovo-home .axiovo-demo-heading h2{line-height:1.2}
+/* Feed: current four feed modes, follow forms, researcher identity caveat and
+   source coverage are not removed or collapsed behind unsupported new APIs. */
+body.axiovo-feed-page .feed-hero{border-radius:20px}
+body.axiovo-feed-page .feed-tabs{display:flex;flex-wrap:wrap;gap:4px}
+body.axiovo-feed-page .feed-tabs button[aria-pressed="true"]{background:#087d86!important;color:#fff!important}
+body.axiovo-feed-page .feed-tabs button:focus-visible,
+body.axiovo-feed-page .feed-filters :is(select,button):focus-visible{outline:3px solid #22b7aa;outline-offset:2px}
+body.axiovo-feed-page .feed-filters{gap:9px}
+body.axiovo-feed-page .feed-results>*{border-radius:13px}
+body.axiovo-feed-page .feed-side-card{border-radius:16px}
+/* Assistant: custom evidence-network mark. Existing retrieval and model selectors
+   keep their original input IDs and script event bindings. */
+body.axiovo-assistant .assistant-page{max-width:1320px}
+body.axiovo-assistant .assistant-compose,body.axiovo-assistant .assistant-results>.rd-panel{border-radius:16px}
+body.axiovo-assistant .assistant-task-row{display:flex;flex-wrap:wrap;gap:9px}
+body.axiovo-assistant #question{min-height:85px}
+body.axiovo-assistant .assistant-task-row [aria-pressed="true"]{background:#087d86!important;border-color:#087d86!important;color:#fff!important}
+body.axiovo-assistant #conversation{min-height:220px}
+body.axiovo-assistant :is(button,a,textarea,select):focus-visible{outline:3px solid #20baaf;outline-offset:2px}
+/* Shared touch behaviour. No fixed sticky overlay in front of the movable robot. */
+@media(max-width:900px){
+ body .rl-global-header{padding:10px 12px!important;min-height:0!important}
+ body .rl-global-header .rl-logo{font-size:19px!important}
+ body .rl-global-header .rl-nav{justify-content:space-around!important;gap:2px!important}
+ body .rl-global-header .rl-nav a{font-size:12px!important;padding:10px 7px!important;min-height:42px}
+ body.axiovo-feed-page .feed-layout{min-width:0}
+ body.axiovo-feed-page .feed-filters{display:flex;flex-wrap:wrap;align-items:end}
+}
+@media(max-width:600px){
+ body .rl-global-header{row-gap:7px!important}
+ body .rl-global-header .rl-nav{order:4!important;width:100%!important;flex:1 0 100%!important;display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:2px!important}
+ body .rl-global-header .rl-nav a{display:flex!important;align-items:center!important;justify-content:center!important;text-align:center!important;font-size:clamp(9px,2.3vw,11px)!important;line-height:1.15!important;padding:5px 3px!important;height:52px!important;min-height:52px!important;max-height:52px!important;box-sizing:border-box!important;overflow-wrap:anywhere!important}
+ body .rl-global-header .axiovo-nav-return{gap:4px!important}
+ body .rl-global-header .axiovo-nav-return :is(a,button){min-width:0!important;padding:8px!important;min-height:39px!important;font-size:11px!important}
+ body .rl-global-header .axiovo-header-appearance{margin-left:auto!important;gap:4px!important}
+ body .rl-global-header .axiovo-header-appearance :is(a,button){padding:7px 9px!important;min-height:39px!important;font-size:11px!important}
+ body.axiovo-home .axiovo-welcome-actions .axiovo-cta{min-width:0!important}
+ body.axiovo-home .axiovo-welcome-media{padding-top:18px!important}
+ body.axiovo-feed-page .feed-toolbar{min-width:0}
+ body.axiovo-feed-page .feed-tabs{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}
+ body.axiovo-feed-page .feed-tabs button{min-width:0;min-height:46px!important;padding:9px 3px;font-size:12px}
+ body.axiovo-feed-page .feed-filters{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;grid-template-areas:"archive-label date-label" "archive date" "order-label refresh" "order refresh"!important;gap:6px 8px!important;width:100%;min-width:0}
+ body.axiovo-feed-page .feed-filters>*{max-width:100%;min-width:0}
+ body.axiovo-feed-page .feed-filters label{align-self:end}
+ body.axiovo-feed-page .feed-filters select{width:100%;min-height:46px!important;height:auto}
+ body.axiovo-feed-page #feed-refresh{min-height:46px!important}
+ body.axiovo-feed-page .feed-hero-actions{display:flex;flex-wrap:wrap;gap:7px}
+ body.axiovo-feed-page .feed-hero-actions a{min-height:42px}
+ body.axiovo-assistant .axiovo-v2-assistant-title img{width:37px;height:37px}
+ body.axiovo-assistant .assistant-task-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+ body.axiovo-assistant .assistant-task-row>*{min-width:0;white-space:normal}
+ body.axiovo-assistant .assistant-prooflab-row a{min-height:44px}
+ body.axiovo-assistant #question{font-size:16px}
+}
+@media(prefers-reduced-motion:reduce){
+ body.axiovo-home .axiovo-welcome-actions .axiovo-cta{transition:none}
+ body.axiovo-home .axiovo-welcome-actions .axiovo-cta:hover{transform:none}
+}
