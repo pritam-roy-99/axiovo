@@ -145,6 +145,7 @@ def main():
     page.reload(wait_until="domcontentloaded")
     paper=page.locator('.feed-card h3 a[href="https://eprint.iacr.org/2026/1234"]')
     paper.wait_for(timeout=20000)
+    page.wait_for_function("""() => Array.from(document.querySelectorAll('.feed-card h3 a')).some(el => el.href.endsWith('/2026/1234') && el.textContent.includes('Quantum Key Distribution'))""",timeout=20000)
     assert "Quantum Key Distribution" in paper.inner_text()
     page.locator("#feed-source").select_option("eprint")
     paper.wait_for(timeout=12000)
