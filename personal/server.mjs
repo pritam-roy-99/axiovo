@@ -70,6 +70,7 @@ const server=http.createServer(async(req,res)=>{
   if(u.pathname.startsWith('/api/')){
    if(req.method==='GET'){
     if(u.pathname==='/api/bootstrap'){json(res,200,{token:csrf,local:true});return;}
+    if(req.headers['x-axiovo-local']!==csrf){json(res,403,{error:'Local authorization header required.'});return;}
     if(u.pathname==='/api/status'){json(res,200,{session:await chatgpt.getSession(),signingIn});return;}
     if(u.pathname==='/api/models'){const session=await chatgpt.getSession();if(!session.sharing){json(res,403,{error:'Authorize ChatGPT plan usage first.'});return;}json(res,200,{models:await chatgpt.listModels()});return;}
     json(res,404,{error:'Unknown local API path.'});return;
