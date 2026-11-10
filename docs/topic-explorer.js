@@ -52,7 +52,8 @@ const hasPathOverride=["category","topic","subtopic","refine"].some(k=>params.ha
 let selected=pathFrom(hasPathOverride?Object.fromEntries(params):stored?.last);
 let catalog=new Map(), catalogReady=false, index=[], topics=[], topic, leaf, subject;
 let search=null, datePreset=0;
-let viewMode=params.get("mode")==="indexed"?"indexed":"recent";
+// All-year indexed search is the default for every archive.
+let viewMode=params.get("mode")==="recent"?"recent":"indexed";
 const recentWindow=()=>({from:shiftDate(allDates(),-6),to:allDates()});
 const initialSort=params.get("sort");
 $("sort").value=["recent","oldest","cited"].includes(initialSort)?initialSort:"relevance";
@@ -72,7 +73,7 @@ function syncURL(criteria){
  const url=new URL(location.href);
  const next={...selected,q:criteria.q,author:criteria.author,affiliation:criteria.affiliation,
   from:$("from").value,to:$("to").value,
-  mode:!$("from").value&&!$("to").value?(viewMode==="indexed"?"indexed":source==="arxiv"?"":"recent"):"",
+  mode:!$("from").value&&!$("to").value?(viewMode==="recent"?"recent":""):"",
   sort:criteria.sort==="relevance"?"":criteria.sort,
   match:criteria.match==="title"?"title":"",crosslisted:criteria.crosslisted?"1":""};
  if((topic?.personal||leaf?.personal)&&!next.refine)next.refine=leaf?.name||topic.name;
@@ -319,14 +320,14 @@ function drawResults(state){
  if(state.announcementOnly)$("scope-label").textContent="Scope: latest official announcement · "+(pathText()||"all arXiv categories")+".";
  const c=state.criteria,sorter=$("result-sort");
  if(state.recentOnly)$("scope-label").textContent="Scope: latest 7 source-posting days ("+c.from+" to "+c.to+") · "+(pathText()||"all "+name+" topics")+".";
- if(!state.announcementOnly&&source==="arxiv"&&!c.from&&!c.to){
-  $("scope-label").textContent="Scope: indexed metadata across available years · "+(pathText()||"all arXiv categories")+".";
+ if(!state.announcementOnly&&!state.recentOnly&&!c.from&&!c.to){
+  $("scope-label").textContent="Scope: all available indexed years · "+(pathText()||"all "+name+" subjects")+" (coverage may be partial).";
  }
  if(sorter&&sorter.value!==c.sort)sorter.value=c.sort||"relevance";
  const rows=filtered(state),results=$("results"),actions=$("result-actions");
  if($("sort-note"))$("sort-note").textContent=window.AxiovoPaperSort?.note(rows,c.sort)||"";
  $("result-count").textContent=rows.length.toLocaleString()+" matching "+name+" record"+(rows.length===1?"":"s")+
-  (state.announcementOnly?" · latest official announcement":state.recentOnly?" · latest 7 days":source==="arxiv"&&!c.from&&!c.to?" · indexed search across available years":"")+
+  (state.announcementOnly?" · latest official announcement":state.recentOnly?" · latest 7 days":!c.from&&!c.to?" · indexed search across available years":"")+
   (state.loading?" · checking source…":"");
  $("sync-status").textContent=state.message;
  $("match-details").hidden=!c.topicTerms.length;
@@ -530,8 +531,7 @@ $("show-results").onclick=()=>{
   if(search?.announcementOnly&&!$("from").value&&!$("to").value){
    search.criteria=criteriaFromForm();search.visible=12;
    savePrefs();syncAnnouncementURL(search.criteria);drawResults(search);
-  }else if(shouldBrowseAnnouncements())showLatestAnnouncement();
-  else{datePreset++;runSearch()}
+  }else{viewMode="indexed";datePreset++;runSearch()}
  const heading=$("results-heading");
  if(!heading)return;
  heading.setAttribute("tabindex","-1");
@@ -554,8 +554,7 @@ $("search-form").onsubmit=e=>{
     !data.identifier($("query").value).arxiv&&!data.identifier($("query").value).doi){
   search.criteria=criteriaFromForm();search.visible=12;
    savePrefs();syncAnnouncementURL(search.criteria);drawResults(search);
-  }else if(shouldBrowseAnnouncements())showLatestAnnouncement();
-  else{if(data.identifier($("query").value).arxiv||data.identifier($("query").value).doi)viewMode="indexed";datePreset++;runSearch()}
+  }else{viewMode="indexed";datePreset++;runSearch()}
 };
 function changeSort(mode){
  $("sort").value=mode;
@@ -672,7 +671,7 @@ fetch("./data/topics/"+source+".tsv",{signal:AbortSignal.timeout(6500)})
  .finally(()=>{
   const needsBioScope=source==="biorxiv"&&selected.category&&($("query").value||$("author").value);
   if(source==="arxiv"){
-   if((params.get("announced")==="latest"||(!params.has("mode")&&shouldBrowseAnnouncements()))&&
+   if(params.get("announced")==="latest"&&
       !$("from").value&&!$("to").value)showLatestAnnouncement();
    else runSearch({persist:false});
   }else if(!search||selected.topic||selected.refine||needsBioScope)runSearch({persist:false});
