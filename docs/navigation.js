@@ -118,6 +118,13 @@
   const script=document.createElement("script");script.defer=true;
   script.src=new URL("./axiovo-blueprint-ui.js?v=20261111-single-home-v2",location.href).href;
   script.dataset.axiovoBlueprint="true";document.head.append(script);
+  // Per-page design is presentational; all original handlers stay intact.
+  const pageStyle=document.createElement("link");pageStyle.rel="stylesheet";
+  pageStyle.href=new URL("./axiovo-page-design-v4.css?v=20261111-complete-v1",location.href).href;
+  pageStyle.dataset.axiovoPageDesign="v4";document.head.append(pageStyle);
+  const pageScript=document.createElement("script");pageScript.defer=true;
+  pageScript.src=new URL("./axiovo-page-design-v4.js?v=20261111-complete-v1",location.href).href;
+  pageScript.dataset.axiovoPageDesign="v4";document.head.append(pageScript);
  }
  function loadRobot(){
   if(document.querySelector('script[data-axiovo-robot]'))return;
