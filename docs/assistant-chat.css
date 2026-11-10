@@ -1,0 +1,38 @@
+/* Conversational layout for Research Assistant. Existing IDs and retrieval logic stay intact. */
+.axiovo-assistant .assistant-page{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(255px,310px);grid-template-areas:"intro intro" "chat sources" "composer sources" "tools tools";column-gap:18px;row-gap:12px;max-width:1160px!important;align-items:start}
+.axiovo-assistant .assistant-page>.rd-desk-heading{grid-area:intro;padding:4px 0 8px}
+.axiovo-assistant .assistant-page>.rd-desk-heading h1{font-size:clamp(1.65rem,3.3vw,2.35rem);margin:0 0 5px}
+.axiovo-assistant .assistant-page>.rd-desk-heading>p:last-child{max-width:72ch;font-size:.9rem;line-height:1.55}
+.axiovo-assistant .assistant-page>.assistant-compose{grid-area:composer;border-radius:18px;border-color:var(--rd-border);box-shadow:0 5px 20px #00000008;min-width:0;padding:17px}
+.axiovo-assistant .assistant-page>.assistant-results{display:contents}
+.axiovo-assistant .assistant-results>.rd-panel:first-child{grid-area:chat;min-width:0;min-height:clamp(320px,48vh,600px);border-radius:18px;padding:18px;display:flex;flex-direction:column}
+.axiovo-assistant .assistant-results>.rd-panel:nth-child(2){grid-area:sources;min-width:0;border-radius:18px;padding:16px;position:sticky;top:12px;max-height:calc(100vh - 30px);overflow:auto}
+.axiovo-assistant .assistant-page>.assistant-indexed-tools{grid-area:tools;min-width:0}
+.axiovo-assistant .assistant-results #conversation{flex:1;min-height:220px;max-height:clamp(300px,53vh,680px);overflow-y:auto;overflow-x:hidden;padding:14px 4px;scrollbar-width:thin}
+.axiovo-assistant .assistant-results #conversation>.rd-small:first-child{border:1px dashed var(--rd-border);border-radius:14px;padding:26px;margin:22px auto;text-align:center;max-width:45ch}
+.axiovo-assistant .assistant-results .message{width:fit-content;max-width:min(88%,780px);border:0;box-shadow:none;border-radius:17px;padding:13px 16px;margin:12px 0;line-height:1.65;font-size:.94rem;white-space:pre-wrap;overflow-wrap:anywhere}
+.axiovo-assistant .assistant-results .message.user{background:var(--rd-soft);margin-left:auto;border-bottom-right-radius:5px}
+.axiovo-assistant .assistant-results .message.assistant{background:transparent;padding-left:10px;border-left:3px solid var(--rd-link);border-radius:0;max-width:96%}
+.axiovo-assistant .assistant-results .message h4{font-size:.77rem;letter-spacing:.01em;font-weight:800;margin-bottom:7px}
+.axiovo-assistant .assistant-compose #question{min-height:90px;border-radius:14px;font-size:1rem;line-height:1.5;padding:14px 16px;resize:vertical}
+.axiovo-assistant .assistant-compose .assistant-task-row{gap:9px;margin-bottom:12px}
+.axiovo-assistant .assistant-task-row .mode{border-radius:99px;min-height:39px}
+.axiovo-assistant .assistant-compose>.rd-actions{margin:10px 0;display:flex;flex-wrap:wrap;gap:8px}
+.axiovo-assistant .assistant-compose>.rd-actions #ask{min-height:44px;padding-inline:19px;border-radius:11px}
+.axiovo-assistant .assistant-compose>.rd-actions #search-openalex{border-radius:11px}
+.axiovo-assistant .assistant-compose .assistant-privacy{font-size:.77rem;max-width:78ch;line-height:1.5}
+.axiovo-assistant .assistant-page details{max-width:100%}
+.axiovo-assistant .assistant-results #evidence-list{max-height:none;overflow:visible}
+@media(max-width:800px){
+ .axiovo-assistant .assistant-page{grid-template-columns:minmax(0,1fr);grid-template-areas:"intro" "chat" "composer" "sources" "tools";row-gap:12px}
+ .axiovo-assistant .assistant-results>.rd-panel:nth-child(2){position:static;max-height:none}
+ .axiovo-assistant .assistant-results>.rd-panel:first-child{min-height:340px}
+ .axiovo-assistant .assistant-results #conversation{max-height:55vh;overflow-y:auto}
+}
+@media(max-width:480px){
+ .axiovo-assistant .assistant-page{padding:16px 12px 48px!important}
+ .axiovo-assistant .assistant-results>.rd-panel:first-child,.axiovo-assistant .assistant-page>.assistant-compose,.axiovo-assistant .assistant-results>.rd-panel:nth-child(2){padding:14px;border-radius:14px}
+ .axiovo-assistant .assistant-results .message{max-width:96%;font-size:.91rem}
+ .axiovo-assistant .assistant-compose>.rd-actions{display:grid;grid-template-columns:1fr}
+ .axiovo-assistant .assistant-compose>.rd-actions button{width:100%}
+}
