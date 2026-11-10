@@ -51,10 +51,39 @@ def stage(destination: Path, keep_days: int = 21) -> dict:
             shard.unlink()
             removed.append(shard.name)
 
+    # Large source-verified monthly JSON is preserved in GitHub rather than
+    # duplicated in the Pages artifact. The current browser application uses
+    # the published manifests, compact feed and live/snapshot providers, not
+    # these archived monthly materializations.
+    archived_monthly = 0
+    for subdir in ("data/index/v1", "data/records"):
+        root = destination / subdir
+        if root.exists():
+            for item in root.rglob("*.json"):
+                if item.name == "manifest.json":
+                    continue
+                # Remove only month-formatted materializations, not coverage
+                # reports or control metadata.
+                if not __import__("re").fullmatch(r"\\d{4}-\\d{2}", item.stem):
+                    continue
+                item.unlink()
+                archived_monthly += 1
+
+    # The full ePrint snapshot remains accessible from the same public repo
+    # through the existing source-verified reader's GitHub raw fallback.
+    eprint_path = destination / "data/eprint.json"
+    raw_eprint = SOURCE / "data/eprint.json"
+    if not raw_eprint.is_file() or raw_eprint.stat().st_size == 0:
+        raise ValueError("Missing original ePrint snapshot")
+    if eprint_path.is_file():
+        eprint_path.unlink()
+
     # The authoritative index, original files and all other datasets stay intact.
     assert manifest_path.exists()
     assert (destination / "data/arxiv-days/manifest.json").is_file()
-    assert (destination / "data/eprint.json").is_file()
+    assert (SOURCE / "data/eprint.json").is_file()
+    assert (destination / "data/index/v1/manifest.json").is_file()
+    assert (destination / "data/records/manifest.json").is_file()
     assert (destination / "data/biorxiv.json").is_file()
     assert (destination / "data/chemrxiv.json").is_file()
     assert (destination / "data/feed.json").is_file()
@@ -70,6 +99,8 @@ def stage(destination: Path, keep_days: int = 21) -> dict:
         "source_daily_shards": len(before),
         "published_daily_shards": len(before) - len(removed),
         "github_raw_daily_shards": len(removed),
+        "monthly_records_retained_in_git": archived_monthly,
+        "eprint_snapshots_retained_in_git": 1,
         "recent_day_cutoff": cutoff.isoformat(),
         "data_retained_in_repository": True,
     }
