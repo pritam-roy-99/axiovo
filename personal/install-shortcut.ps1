@@ -38,6 +38,14 @@ foreach($folder in @($desktop,$menu)) {
   $shortcut.Description='Axiovo Personal: private Windows research assistant, ChatGPT and local Ollama'
   $shortcut.Save()
 }
+# Keep a visible, easy stop action in the Windows Start Menu.
+$stopShortcut=$wsh.CreateShortcut((Join-Path $menu 'Stop Axiovo Personal.lnk'))
+$stopShortcut.TargetPath=$powerShell
+$stopShortcut.Arguments='-NoProfile -ExecutionPolicy Bypass -File "'+(Join-Path $PSScriptRoot 'stop.ps1')+'"'
+$stopShortcut.WorkingDirectory=$root
+$stopShortcut.IconLocation=$ico+',0'
+$stopShortcut.Description='Stop the Axiovo Personal localhost server on this laptop'
+$stopShortcut.Save()
 Write-Host 'Axiovo Personal icon added to Desktop and Start Menu.' -ForegroundColor Green
 Write-Host 'Double-click Axiovo Personal to open the local research workspace.' -ForegroundColor Green
 Write-Host 'Right-click the icon and choose Pin to taskbar if desired.'
