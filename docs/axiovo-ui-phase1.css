@@ -55,7 +55,7 @@ body.axiovo-assistant :is(button,a,textarea,select):focus-visible{outline:3px so
 @media(max-width:600px){
  body .rl-global-header{row-gap:7px!important}
  body .rl-global-header .rl-nav{order:4!important;width:100%!important;flex:1 0 100%!important;display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:2px!important}
- body .rl-global-header .rl-nav a{display:flex!important;align-items:center!important;justify-content:center!important;text-align:center!important;font-size:clamp(9px,2.3vw,11px)!important;line-height:1.15!important;padding:10px 3px!important;overflow-wrap:anywhere!important}
+ body .rl-global-header .rl-nav a{display:flex!important;align-items:center!important;justify-content:center!important;text-align:center!important;font-size:clamp(9px,2.3vw,11px)!important;line-height:1.15!important;padding:5px 3px!important;height:52px!important;min-height:52px!important;max-height:52px!important;box-sizing:border-box!important;overflow-wrap:anywhere!important}
  body .rl-global-header .axiovo-nav-return{gap:4px!important}
  body .rl-global-header .axiovo-nav-return :is(a,button){min-width:0!important;padding:8px!important;min-height:39px!important;font-size:11px!important}
  body .rl-global-header .axiovo-header-appearance{margin-left:auto!important;gap:4px!important}
