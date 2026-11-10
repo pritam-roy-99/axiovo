@@ -38,7 +38,7 @@ $("ollama-suggest").addEventListener("click",async()=>{
  chatMessage("user",question);$("prooflab-prompt").value="";const pending=waitingMessage();
  $("ollama-status").textContent="Generating with "+model+"…";
  try{
-  const answer=await O.suggest({model,statement:project.statement,assumptions:project.assumptions,obligations:project.obligations,question,history:chatHistory});
+  const attachmentText=window.AxiovoProofLabAttachments?.approvedText?.()||"";\n  const answer=await O.suggest({model,statement:project.statement,assumptions:project.assumptions,obligations:project.obligations,question,history:chatHistory,attachmentText});\n  if(attachmentText)$("prooflab-send-files").checked=false;
   pending.remove();chatMessage("assistant",answer);
   chatHistory.push({role:"user",content:question},{role:"assistant",content:answer});chatHistory=chatHistory.slice(-8);
   $("ollama-output").textContent=answer;
