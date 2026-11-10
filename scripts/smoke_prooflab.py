@@ -33,6 +33,10 @@ def main():
                 page.locator("#create").click()
                 assert page.locator("#workspace").is_visible()
                 assert "Unverified draft" in page.locator("#project-status").inner_text()
+                page.locator("#prooflab-prompt").fill("Derive a CHSH bound.")
+                page.locator("#ollama-suggest").click()
+                assert "No model selected" in page.locator("#prooflab-thread").inner_text()
+                assert "Derive a CHSH bound." in page.locator("#prooflab-prompt").input_value()
                 page.locator("#obligation").fill("Show that the CHSH operator squared is bounded by 8I.")
                 page.locator("#add").click()
                 assert page.locator("#obligations li").count() == 1
