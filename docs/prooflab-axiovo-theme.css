@@ -10,8 +10,10 @@ body.axiovo-research.prooflab-body{
  margin:0!important;background:var(--rd-bg)!important;color:var(--rd-ink)!important;
  font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif!important;
 }
+/* Inherit the shared header display: flex on desktop, grid on mobile.
+   Forcing display:flex here split Settings/Night onto a third mobile row. */
 html body.prooflab-body>header.rl-global-header{
- display:flex!important;visibility:visible!important;
+ visibility:visible!important;
  position:relative!important;z-index:50!important;
 }
 html body.prooflab-body .pl-app-shell{
