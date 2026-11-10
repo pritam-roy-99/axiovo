@@ -4,10 +4,10 @@ const assert=require("node:assert/strict");
 const fs=require("node:fs");
 const vm=require("node:vm");
 const events=[];
-const root={dispatchEvent:e=>events.push(e),addEventListener(){},AxiovoArxiv:{parse(v){const m=String(v).match(/(\d{4}\.\d{4,5})(?:v(\d+))?/);return m?{base:m[1],version:m[2]?Number(m[2]):null,requested:m[0]}:null},abs:v=>"https://arxiv.org/abs/"+v,pdf:v=>"https://arxiv.org/pdf/"+v}};
+const root={URL,URLSearchParams,AbortSignal,Event:class{constructor(type){this.type=type}},dispatchEvent:e=>events.push(e),addEventListener(){},AxiovoArxiv:{parse(v){const m=String(v).match(/(\d{4}\.\d{4,5})(?:v(\d+))?/);return m?{base:m[1],version:m[2]?Number(m[2]):null,requested:m[0]}:null},abs:v=>"https://arxiv.org/abs/"+v,pdf:v=>"https://arxiv.org/pdf/"+v}};
 root.window=root;
 root.localStorage={getItem(){return null},setItem(){}};
-root.Event=class{constructor(type){this.type=type}};
+
 vm.runInNewContext(fs.readFileSync("docs/archive-data.js","utf8"),root);
 const api=root.AxiovoArchiveData;
 const original={source:"arxiv",id:"2601.00001",recordId:"2601.00001v1",version:1,date:"2026-01-01"};
