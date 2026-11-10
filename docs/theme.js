@@ -26,9 +26,13 @@ try {
   theme=value==="dark"?"dark":"light";
   document.documentElement.dataset.theme=theme;
   try{localStorage.setItem(KEY,theme)}catch{}
-  const b=document.querySelector(".theme-toggle");
-  if(b){b.textContent=theme==="dark"?"☀ Day":"☾ Night";
-   b.setAttribute("aria-label","Switch to "+(theme==="dark"?"light":"dark")+" mode")}
+  for(const button of document.querySelectorAll(".theme-toggle")){
+   button.textContent=theme==="dark"?"☀ Day":"☾ Night";
+   button.setAttribute("aria-label","Switch to "+(theme==="dark"?"light":"dark")+" mode");
+   button.setAttribute("aria-pressed",String(theme==="dark"));
+  }
+  const mobile=document.querySelector(".ax-menu-theme");
+  if(mobile)mobile.textContent=theme==="dark"?"☀ Switch to Day":"☾ Switch to Night";
  }
  function applyPalette(value){
   if(!allowed.includes(value))return false;
