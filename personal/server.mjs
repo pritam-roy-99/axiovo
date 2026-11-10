@@ -7,7 +7,7 @@ import { resolve, dirname, join, extname, sep } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { readFile, realpath } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
-import { spawnSync } from 'node:child_process';
+import { spawnSync, spawn } from 'node:child_process';
 import { randomBytes } from 'node:crypto';
 
 if (process.platform !== 'win32') { console.error('This personal companion is configured for Windows DPAPI only.'); process.exit(1); }
@@ -43,8 +43,11 @@ const chatgpt=createChatGPT({
  credentialEncryption:{id:'windows-dpapi-current-user-v1',isAvailable:()=>true,encrypt:s=>protect(s,'encrypt'),decrypt:b=>protect(b,'decrypt')},
  openBrowser:async url=>{
   const u=new URL(url);if(u.origin!=='https://auth.openai.com')throw Error('Unexpected ChatGPT authorization URL');
-  const result=spawnSync('cmd.exe',['/c','start','',u.href],{windowsHide:true,timeout:10000,stdio:'ignore'});
-  if(result.error||result.status!==0)throw Error('Could not open the ChatGPT sign-in browser.');
+  await new Promise((resolve,reject)=>{
+   const child=spawn('rundll32.exe',['url.dll,FileProtocolHandler',u.href],{windowsHide:true,stdio:'ignore',shell:false});
+   child.once('error',()=>reject(Error('Could not open the ChatGPT sign-in browser.')));
+   child.once('exit',code=>code===0?resolve():reject(Error('Could not open the sign-in browser.')));
+  });
  }
 });
 const csrf=randomBytes(32).toString('hex');
@@ -128,4 +131,5 @@ const server=http.createServer(async(req,res)=>{
 server.listen(port,'127.0.0.1',()=>{
  console.log('Axiovo Personal is available only on this computer: '+origin+'/prooflab.html');
  console.log('Sign in from ProofLab. No credentials are written to the GitHub repository.');
+ const child=spawn('rundll32.exe',['url.dll,FileProtocolHandler',origin+'/prooflab.html'],{windowsHide:true,stdio:'ignore',shell:false});child.on('error',()=>{});
 });
