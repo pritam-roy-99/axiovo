@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Bounded, paginated official bioRxiv metadata refresh.
 
-Harvest a rolling 14-day date window, follow cursor pages, preserve historical
+Harvest a rolling recent-date window, follow cursor pages, preserve historical
 verified records, and report whether the requested source window was exhausted.
 No empty/failed request may masquerade as a successful synchronization.
 """
@@ -22,7 +22,7 @@ BASE = "https://api.biorxiv.org/details/biorxiv"
 PAGE_SIZE = 100  # API may return fewer; advance by observed collection size
 MAX_PAGES = 150
 MAX_STORED = 5000
-RETRY = (5, 15, 35)
+RETRY = (2, 5, 10)
 
 def normalize(item):
     doi = str(item.get("doi") or "").strip()
@@ -82,7 +82,7 @@ def get(url, opener=None, sleep=time.sleep):
     })
     for attempt in range(len(RETRY) + 1):
         try:
-            with opener(request, timeout=45) as response:
+            with opener(request, timeout=20) as response:
                 return json.load(response)
         except (OSError, ValueError, json.JSONDecodeError) as error:
             if attempt == len(RETRY):
@@ -126,7 +126,8 @@ def fetch_window(start, end, fetcher=get, sleep=time.sleep, max_pages=MAX_PAGES)
         pages += 1
         if expected is not None and cursor >= expected:
             break
-        sleep(1.2)
+        # Avoid fixed 1.2s idle time for every cursor in large daily harvests.
+        sleep(0.15)
     complete = expected is not None and cursor >= expected
     if not index:
         raise ValueError("bioRxiv did not return valid DOI records")
@@ -143,7 +144,9 @@ def atomic_write(payload):
 
 def main():
     today = datetime.now(timezone.utc).date()
-    days = max(2, min(30, int(os.getenv("AXIOVO_BIORXIV_LOOKBACK_DAYS", "14"))))
+    # Keep the newest verified records moving within the GitHub Actions budget.
+    # Broader history is retained from previous successful windows, never deleted.
+    days = max(2, min(30, int(os.getenv("AXIOVO_BIORXIV_LOOKBACK_DAYS", "4"))))
     prior = {}
     try:
         prior = json.loads(TARGET.read_text(encoding="utf8"))
