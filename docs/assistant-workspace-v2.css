@@ -1,0 +1,262 @@
+/* Axiovo Research Assistant: responsive workspace redesign.
+   Added after legacy styles, preserving every existing application control and ID. */
+.axiovo-assistant{
+ --assistant-accent:var(--axiovo-accent,#14789e);
+ --assistant-border:var(--rd-border,#d7e3ec);
+ --assistant-panel:var(--rd-surface,#fff);
+ --assistant-quiet:var(--rd-soft,#eff5f9);
+}
+.axiovo-assistant .assistant-page{
+ box-sizing:border-box;
+ width:min(100%,1480px)!important;
+ max-width:1480px!important;
+ display:grid!important;
+ grid-template-columns:minmax(0,1fr) minmax(280px,350px)!important;
+ grid-template-areas:"intro intro" "composer sources" "chat sources" "tools tools"!important;
+ gap:20px!important;
+ align-items:start;
+ padding:clamp(20px,3vw,44px)!important;
+}
+.axiovo-assistant .assistant-page>.rd-desk-heading{
+ grid-area:intro!important;
+ padding:0 0 12px!important;
+ border-bottom:1px solid var(--assistant-border);
+}
+.axiovo-assistant .assistant-page>.rd-desk-heading .rd-kicker{
+ margin:0 0 8px!important;
+ font-size:.7rem!important;letter-spacing:.17em;
+}
+.axiovo-assistant .assistant-page>.rd-desk-heading h1{
+ margin:0 0 10px!important;
+ font-size:clamp(2.2rem,3.6vw,3.65rem)!important;
+ line-height:1.08!important;
+ letter-spacing:-.055em!important;
+ color:var(--rd-ink,#17344d);
+}
+.axiovo-assistant .assistant-page>.rd-desk-heading>p:last-child{
+ max-width:78ch!important;font-size:clamp(.92rem,1.1vw,1.02rem)!important;
+ line-height:1.65!important;
+}
+.axiovo-assistant .assistant-page>.assistant-compose,
+.axiovo-assistant .assistant-results>.rd-panel,
+.axiovo-assistant .assistant-indexed-tools{
+ background:var(--assistant-panel)!important;
+ border:1px solid var(--assistant-border)!important;
+ border-radius:22px!important;
+ box-shadow:0 8px 36px rgba(12,42,67,.055)!important;
+ min-width:0;
+}
+.axiovo-assistant .assistant-page>.assistant-compose{
+ grid-area:composer!important;
+ padding:clamp(18px,2.5vw,28px)!important;
+ display:grid;gap:13px;
+}
+.axiovo-assistant .assistant-task-row{
+ display:flex!important;align-items:center!important;flex-wrap:wrap!important;
+ gap:9px!important;margin:0!important;
+}
+.axiovo-assistant .assistant-task-row .mode{
+ min-height:42px!important;
+ padding:10px 16px!important;
+ border-radius:11px!important;
+ font-weight:750!important;
+ font-size:.86rem!important;
+}
+.axiovo-assistant .assistant-task-row .mode.active,
+.axiovo-assistant .assistant-task-row .mode[aria-pressed="true"]{
+ color:#fff!important;
+ background:var(--assistant-accent)!important;
+ border-color:var(--assistant-accent)!important;
+ box-shadow:none!important;
+}
+.axiovo-assistant .assistant-task-row>a{
+ margin-left:auto!important;
+ display:inline-flex!important;align-items:center;
+ min-height:42px;padding:8px 12px!important;
+ text-decoration:none!important;border-radius:10px;
+ border:1px solid var(--assistant-border);
+ background:var(--assistant-quiet);
+}
+.axiovo-assistant .assistant-prooflab-row{
+ display:flex;justify-content:flex-end;
+ margin:0!important;
+}
+.axiovo-assistant .assistant-prooflab-cta{
+ display:inline-flex!important;align-items:center;justify-content:center;
+ gap:9px;max-width:100%;
+ padding:12px 16px!important;border-radius:12px;
+ background:linear-gradient(125deg,var(--assistant-accent),#0d497a)!important;
+ border:1px solid transparent;
+ color:#fff!important;font-size:.87rem!important;
+ font-weight:800!important;text-decoration:none!important;
+ box-shadow:0 6px 15px rgba(14,87,125,.16);
+ white-space:normal;text-align:center;
+ transition:transform .16s ease,box-shadow .16s ease;
+}
+.axiovo-assistant .assistant-prooflab-cta:hover{
+ transform:translateY(-1px);
+ box-shadow:0 10px 22px rgba(14,87,125,.24);
+}
+.axiovo-assistant .assistant-compose #assistant-question-label{
+ font-size:1rem!important;font-weight:780!important;
+ margin:3px 0 -5px!important;
+}
+.axiovo-assistant .assistant-compose #question{
+ box-sizing:border-box;
+ width:100%!important;
+ min-height:126px!important;
+ padding:17px 18px!important;
+ border:1.5px solid var(--assistant-border)!important;
+ background:var(--assistant-panel)!important;color:var(--rd-ink)!important;
+ border-radius:15px!important;line-height:1.6!important;
+ font-size:1rem!important;box-shadow:inset 0 1px 3px rgba(0,0,0,.02);
+}
+.axiovo-assistant .assistant-compose #question:focus{
+ border-color:var(--assistant-accent)!important;
+ outline:3px solid color-mix(in srgb,var(--assistant-accent) 14%,transparent)!important;
+}
+.axiovo-assistant .assistant-compose>.rd-actions{
+ margin:0!important;gap:10px!important;align-items:center;
+}
+.axiovo-assistant .assistant-compose>.rd-actions #ask{
+ background:var(--assistant-accent)!important;
+ color:#fff!important;
+ min-height:46px!important;font-weight:800!important;
+ border-radius:12px!important;
+}
+.axiovo-assistant .assistant-compose>.rd-actions #search-openalex{
+ min-height:46px!important;
+ border-radius:12px!important;
+}
+.axiovo-assistant .assistant-compose .assistant-privacy{
+ max-width:100%!important;font-size:.78rem!important;line-height:1.65!important;
+ color:var(--rd-muted)!important;
+ padding:13px 15px;border:1px solid var(--assistant-border);
+ background:var(--assistant-quiet);border-radius:12px;
+}
+.axiovo-assistant .assistant-compose .assistant-advanced{
+ padding:12px 14px!important;background:var(--assistant-panel);
+ border:1px solid var(--assistant-border);
+ border-radius:12px;
+}
+.axiovo-assistant .assistant-page>.assistant-results{display:contents!important;}
+.axiovo-assistant .assistant-results>.rd-panel:first-child{
+ grid-area:chat!important;
+ min-height:400px!important;
+ padding:24px!important;
+ display:flex!important;flex-direction:column;
+}
+.axiovo-assistant .assistant-panel-head{
+ display:flex!important;align-items:center!important;
+ justify-content:space-between!important;gap:14px!important;
+ padding:0 0 14px!important;
+ margin:0 0 12px!important;
+ border-bottom:1px solid var(--assistant-border);
+}
+.axiovo-assistant .assistant-panel-head h2{
+ font-size:1.18rem!important;font-weight:800!important;letter-spacing:-.025em;
+}
+.axiovo-assistant .assistant-results #conversation{
+ flex:1;
+ min-height:260px!important;
+ max-height:min(62vh,820px)!important;
+ padding:6px 2px 18px!important;
+}
+.axiovo-assistant .assistant-results #conversation>.rd-small:first-child{
+ max-width:54ch!important;
+ border:1px dashed var(--assistant-border)!important;
+ background:var(--assistant-quiet)!important;
+ border-radius:17px!important;padding:32px 24px!important;
+ color:var(--rd-muted)!important;
+ margin:35px auto!important;
+}
+.axiovo-assistant .assistant-results .message{
+ font-size:.96rem!important;line-height:1.72!important;
+ max-width:90%!important;
+}
+.axiovo-assistant .assistant-results .message.user{
+ background:var(--assistant-quiet)!important;
+ border:1px solid var(--assistant-border)!important;
+ border-radius:16px 16px 4px 16px!important;
+ padding:14px 17px!important;
+}
+.axiovo-assistant .assistant-results .message.assistant{
+ border-left:3px solid var(--assistant-accent)!important;
+ padding:11px 14px!important;
+ max-width:100%!important;
+}
+.axiovo-assistant .assistant-results>.rd-panel:nth-child(2){
+ grid-area:sources!important;
+ position:sticky!important;top:72px!important;
+ max-height:calc(100dvh - 90px)!important;overflow:auto!important;
+ padding:22px!important;
+}
+.axiovo-assistant .assistant-results .paper-sort-toolbar{
+ padding:13px!important;border-radius:13px!important;
+ border:1px solid var(--assistant-border)!important;
+ background:var(--assistant-quiet)!important;
+}
+.axiovo-assistant .assistant-results .source{
+ border:1px solid var(--assistant-border)!important;
+ border-radius:13px!important;
+ padding:14px!important;margin:9px 0!important;
+}
+.axiovo-assistant .assistant-page>.assistant-indexed-tools{
+ grid-area:tools!important;padding:18px 24px!important;margin:0!important;
+}
+.axiovo-assistant .assistant-page summary{
+ cursor:pointer;min-height:30px;line-height:1.5;
+}
+.axiovo-assistant .assistant-page :is(button,a,input,select,textarea,summary):focus-visible{
+ outline:3px solid var(--assistant-accent)!important;outline-offset:3px;
+}
+:root[data-theme="dark"] .axiovo-assistant .assistant-prooflab-cta{
+ background:linear-gradient(120deg,#177ba5,#164b78)!important;color:white!important;
+}
+@media(max-width:950px){
+ .axiovo-assistant .assistant-page{
+  grid-template-columns:minmax(0,1fr)!important;
+  grid-template-areas:"intro" "composer" "chat" "sources" "tools"!important;
+  gap:14px!important;
+  padding:20px 16px 44px!important;
+ }
+ .axiovo-assistant .assistant-results>.rd-panel:nth-child(2){
+  position:static!important;
+  max-height:none!important;
+  overflow:visible!important;
+ }
+ .axiovo-assistant .assistant-results #conversation{
+  max-height:60vh!important;min-height:230px!important;
+ }
+}
+@media(max-width:550px){
+ .axiovo-assistant .assistant-page{gap:12px!important;padding:15px 12px 38px!important;}
+ .axiovo-assistant .assistant-page>.rd-desk-heading h1{font-size:2.12rem!important;}
+ .axiovo-assistant .assistant-page>.assistant-compose,
+ .axiovo-assistant .assistant-results>.rd-panel:first-child,
+ .axiovo-assistant .assistant-results>.rd-panel:nth-child(2),
+ .axiovo-assistant .assistant-page>.assistant-indexed-tools{
+  padding:17px!important;border-radius:17px!important;
+ }
+ .axiovo-assistant .assistant-task-row{
+  display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
+ }
+ .axiovo-assistant .assistant-task-row .mode{width:100%;padding:10px 8px!important;}
+ .axiovo-assistant .assistant-task-row>a{
+  grid-column:1/-1;justify-content:center;margin-left:0!important;
+ }
+ .axiovo-assistant .assistant-prooflab-row{justify-content:stretch;}
+ .axiovo-assistant .assistant-prooflab-cta{width:100%;}
+ .axiovo-assistant .assistant-compose #question{min-height:115px!important;}
+ .axiovo-assistant .assistant-compose>.rd-actions{
+  display:grid!important;grid-template-columns:1fr!important;
+ }
+ .axiovo-assistant .assistant-compose>.rd-actions button{width:100%!important;white-space:normal;}
+ .axiovo-assistant .assistant-results>.rd-panel:first-child{min-height:310px!important;}
+ .axiovo-assistant .assistant-results .message{max-width:100%!important;font-size:.9rem!important;}
+ .axiovo-assistant .assistant-results #conversation{min-height:180px!important;}
+ .axiovo-assistant .assistant-results .paper-sort-toolbar{padding:10px!important;}
+}
+@media(prefers-reduced-motion:reduce){
+ .axiovo-assistant .assistant-prooflab-cta{transition:none!important;transform:none!important;}
+}
