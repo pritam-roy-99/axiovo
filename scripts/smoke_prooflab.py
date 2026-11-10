@@ -37,6 +37,26 @@ def main():
                 page.locator("#ollama-suggest").click()
                 assert "No model selected" in page.locator("#prooflab-thread").inner_text()
                 assert "Derive a CHSH bound." in page.locator("#prooflab-prompt").input_value()
+                # Math-aware output must remain safe and preserve actual TeX for typesetting.
+                math_check = page.evaluate("""() => {
+                    const node = document.createElement('div');
+                    document.body.append(node);
+                    window.AxiovoProofLabMath.render(node, String.raw`The CHSH identity is:
+\\[
+S^2 = 4I - [A_0,A_1] \\otimes [B_0,B_1]
+\\]
+
+\\frac{1}{\\sqrt{2}} + \\sigma_z
+
+<script>window.axiovoMathXss = 1</script>`);
+                    return {
+                        equations: node.querySelectorAll('.prooflab-equation').length,
+                        tex: node.textContent.includes('\\\\frac') && node.textContent.includes('S^2'),
+                        unsafe: !!node.querySelector('script') || window.axiovoMathXss === 1,
+                    };
+                }""")
+                assert math_check["equations"] >= 2, math_check
+                assert math_check["tex"] and not math_check["unsafe"], math_check
                 page.locator("#obligation").fill("Show that the CHSH operator squared is bounded by 8I.")
                 page.locator("#add").click()
                 assert page.locator("#obligations li").count() == 1
