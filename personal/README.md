@@ -19,7 +19,7 @@ cd axiovo
 git sparse-checkout set docs personal
 ```
 
-If the repository is already cloned, open it in PowerShell and run `git pull` after these changes are merged.
+If the repository is already cloned, open it in PowerShell and run `git pull` after these changes are merged. The sample clone commands use your Windows user folder, so they work even if Documents is redirected to OneDrive.
 
 Start the private companion:
 
