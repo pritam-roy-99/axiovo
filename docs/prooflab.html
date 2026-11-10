@@ -26,7 +26,7 @@
 </aside>
 <div class="pl-stage">
 <header class="pl-topbar"><div class="pl-topbrand"><span class="pl-topbrand-name">ProofLab</span><span class="pl-topbrand-sub">Research proof workspace</span></div>
-<div class="pl-topbar-center"><span class="pl-topbar-search-icon" aria-hidden="true">✦</span><span>Ask for a proof, lemma, or strategy in the conversation</span></div>
+<button class="pl-topbar-center" type="button" id="pl-focus-prompt" aria-label="Focus the proof conversation input"><span class="pl-topbar-search-icon" aria-hidden="true">✦</span><span>Ask for a proof, lemma, or strategy in the conversation</span></button>
 <div class="pl-topbar-actions"><a class="pl-topbar-link" href="#prooflab-model-title">Models</a><a class="pl-topbar-link" href="#prooflab-lean-title">Lean 4</a><span class="pl-topbar-dot" title="Local workspace" aria-label="Local workspace">●</span></div></header>
 <main class="rd-page prooflab-page">
 <nav class="pl-section-nav" aria-label="Workspace navigation"><a class="pl-section-current" href="#prooflab-chat-title">⌂ Workspace</a><a href="#prooflab-setup-title">▤ Project</a><a href="#prooflab-lean-title">⌘ Lean editor</a><a href="./copilot.html">✦ Research Assistant</a><span id="prooflab-toolbar-status" class="pl-local-status">Draft · Local workspace</span></nav>
@@ -49,7 +49,7 @@ Alice's operators commute with Bob's operators</textarea>
 </section>
 </aside>
 <section class="rd-panel prooflab-card prooflab-conversation" aria-labelledby="prooflab-chat-title">
-<div class="prooflab-chat-heading"><div class="prooflab-card-title"><span class="prooflab-glyph" aria-hidden="true">◉</span><h2 id="prooflab-chat-title">Proof conversation</h2></div><p class="prooflab-card-caption">Discuss strategies, lemmas, and gaps with your local research model.</p><span class="prooflab-unverified">● Draft · not verified</span></div>
+<div class="prooflab-chat-heading"><div class="prooflab-card-title"><span class="prooflab-glyph" aria-hidden="true">◉</span><h2 id="prooflab-chat-title">Proof conversation</h2></div><p class="prooflab-card-caption">Discuss strategies, lemmas, and gaps with your local research model.</p><span class="prooflab-unverified">● Draft · not verified</span><span id="pl-active-model" class="pl-active-model" aria-live="polite">Choose an AI model</span></div>
 <div id="prooflab-thread" class="prooflab-thread" role="log" aria-live="polite" aria-label="Proof discussion"><div class="prooflab-welcome"><span class="prooflab-welcome-icon" aria-hidden="true">✦</span><h3>Your proof starts here</h3><p>Ask for a structured proof strategy or investigate a specific lemma. Your local model can suggest arguments, but only Lean can verify them.</p></div></div>
 <pre class="prooflab-output-legacy" id="ollama-output" aria-label="Latest unverified local model suggestion"></pre>
 <div class="prooflab-composer"><label class="rd-sr-only" for="prooflab-prompt">Message Axiovo ProofLab</label><textarea id="prooflab-prompt" rows="3" maxlength="2000" placeholder="Message Axiovo ProofLab…"></textarea><div class="prooflab-composer-footer"><span>Choose Ollama or ChatGPT in the left panel · Ctrl+Enter to send</span><button class="rd-button rd-primary" id="ollama-suggest" type="button" aria-label="Send message to local AI">Send ↗</button></div></div>
