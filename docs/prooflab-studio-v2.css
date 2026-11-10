@@ -120,3 +120,12 @@ body.prooflab-body>header,body.prooflab-body>.rl-global-header,body.prooflab-bod
 :root[data-theme="dark"] .prooflab-page .prooflab-message-paragraph{color:#e5efff}
 :root[data-theme="dark"] .prooflab-page .prooflab-composer{background:#1b2e47}
 :root[data-theme="dark"] .prooflab-page .prooflab-equation{background:#182b44}
+
+/* Active-model status is informational; user still selects and explicitly authorizes models. */
+.pl-topbar button.pl-topbar-center{cursor:pointer;text-align:left;font-family:inherit;line-height:1.3;min-height:46px}
+.pl-topbar button.pl-topbar-center:hover{background:#1c4c7d;border-color:#80b7f2}
+.pl-topbar button.pl-topbar-center:focus-visible{outline:3px solid #8fe7ff;outline-offset:3px}
+.pl-active-model{display:inline-flex;align-items:center;margin:8px 0 0 40px;padding:5px 9px;border-radius:99px;background:#e9f3ff;color:#205b9b;border:1px solid #cfe4fc;font-size:.68rem;font-weight:740;max-width:calc(100% - 40px);overflow-wrap:anywhere}
+.pl-rail-nav a:focus-visible,.prooflab-page .pl-section-nav a:focus-visible{outline:3px solid #57b5fc;outline-offset:2px}
+@media(max-width:700px){.pl-active-model{margin-left:0;max-width:100%}}
+:root[data-theme="dark"] .pl-active-model{background:#153856;color:#a9d8ff;border-color:#426c90}
