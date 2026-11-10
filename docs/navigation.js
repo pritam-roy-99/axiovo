@@ -95,6 +95,11 @@
    detail.href=new URL("./axiovo-ui-phase2.css?v=1",location.href).href;
    detail.dataset.axiovoUiPhase2="true";document.head.append(detail);
   }
+  if(!document.querySelector('link[data-axiovo-ui-phase3]')){
+   const support=document.createElement("link");support.rel="stylesheet";
+   support.href=new URL("./axiovo-ui-phase3.css?v=1",location.href).href;
+   support.dataset.axiovoUiPhase3="true";document.head.append(support);
+  }
  }
  function addAssistantMark(){
   if(!document.body.classList.contains("axiovo-assistant"))return;
