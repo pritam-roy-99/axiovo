@@ -464,3 +464,18 @@ body.ax4 .ax4-skip:focus{top:12px}
  html:root body.ax4.prooflab-body.axiovo-reference-ui .prooflab-sidebar{grid-area:project!important;width:100%!important}
  html:root body.ax4.prooflab-body.axiovo-reference-ui .prooflab-tools{grid-area:tools!important;width:100%!important}
 }
+
+/* Keep Library's three primary destinations visible at 320px, without sideways scrolling. */
+@media(max-width:760px){
+ html:root body.ax4.axiovo-workspace-page .library-tabs{
+  display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:5px!important;overflow:visible!important;width:100%!important;
+ }
+ html:root body.ax4.axiovo-workspace-page .library-tabs>a{
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  min-width:0!important;width:100%!important;min-height:48px!important;height:auto!important;
+  padding:8px 3px!important;white-space:normal!important;
+  text-align:center!important;font-size:10px!important;line-height:1.2!important;
+  box-sizing:border-box!important;
+ }
+}
