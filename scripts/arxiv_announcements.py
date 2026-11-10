@@ -95,22 +95,17 @@ def parse_feed(raw: bytes, archive: str):
 
 
 def get(archive):
+    """Bound each RSS request so one slow category cannot exhaust the whole job.
+
+    Rate-limited categories are left incomplete for the next scheduled run.
+    Never treat a failed fetch as an empty, successfully checked category.
+    """
     request = urllib.request.Request(
         "https://rss.arxiv.org/rss/" + archive,
         headers={"User-Agent": os.getenv("ARXIV_USER_AGENT",
             "Axiovo/0.8 (https://github.com/pritam-roy-99/axiovo; daily announcement feed)")})
-    for attempt in range(3):
-        try:
-            with urllib.request.urlopen(request, timeout=50) as response:
-                return parse_feed(response.read(), archive)
-        except urllib.error.HTTPError as exc:
-            if exc.code not in (429, 500, 502, 503, 504) or attempt == 2:
-                raise
-        except (OSError, ET.ParseError, ValueError):
-            if attempt == 2:
-                raise
-        time.sleep(8 * (attempt + 1))
-    raise RuntimeError("RSS unavailable")
+    with urllib.request.urlopen(request, timeout=10) as response:
+        return parse_feed(response.read(), archive)
 
 
 def main():
@@ -142,7 +137,7 @@ def main():
         except (OSError, ValueError, ET.ParseError, RuntimeError) as exc:
             failed.append(archive + ": " + str(exc)[:120])
         if i < len(ARCHIVES)-1:
-            time.sleep(3.2)
+            time.sleep(2.0)
     if not by_day:
         raise RuntimeError("No official RSS announcement records; preserving old snapshot")
     latest = sorted(by_day)[-1]
