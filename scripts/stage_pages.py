@@ -64,7 +64,7 @@ def stage(destination: Path, keep_days: int = 21) -> dict:
                     continue
                 # Remove only month-formatted materializations, not coverage
                 # reports or control metadata.
-                if not __import__("re").fullmatch(r"\\d{4}-\\d{2}", item.stem):
+                if not __import__("re").fullmatch(r"\d{4}-\d{2}", item.stem):
                     continue
                 item.unlink()
                 archived_monthly += 1
