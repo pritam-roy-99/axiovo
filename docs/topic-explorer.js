@@ -246,7 +246,8 @@ function paperCard(p,c){
  const tokens=[hit?.term,...c.q.replaceAll('"',"").split(/\s+/)].filter(Boolean);
  const recordLabel=p.source==="biorxiv"&&p.version?p.recordId+" · v"+p.version:p.recordId;
  const releaseView=Boolean(search?.announcementOnly&&source==="arxiv");
- const meta=[recordLabel,
+ const versionTag=data.versionStatus(p)==="original"?"Original submission · v1":data.versionStatus(p)==="revised"?"Revised submission · v"+p.version:"Version not verified";
+ const meta=[recordLabel,versionTag,
   ...(releaseView?["Announced "+(p.announcementDate||"date unavailable")+" (US Eastern)",
     p.date?"First submitted "+p.date+" (UTC)":"First-submission date unavailable"]:
    [p.date?(p.source==="arxiv"?"First submitted "+p.date+" (UTC)":"Posted "+p.date):
@@ -337,7 +338,7 @@ function drawResults(state){
   $("scope-label").textContent="Scope: all available indexed years · "+(pathText()||"all "+name+" subjects")+" (coverage may be partial).";
  }
  if(sorter&&sorter.value!==c.sort)sorter.value=c.sort||"relevance";
- const rows=filtered(state),results=$("results"),actions=$("result-actions");
+ const matchedRows=filtered(state),rows=(state.announcementOnly||state.recentOnly)?data.firstSubmissionsFirst(matchedRows):matchedRows,results=$("results"),actions=$("result-actions");
  if($("sort-note"))$("sort-note").textContent=window.AxiovoPaperSort?.note(rows,c.sort)||"";
  $("result-count").textContent=rows.length.toLocaleString()+" matching "+name+" record"+(rows.length===1?"":"s")+
   (state.announcementOnly?" · latest official announcement":state.recentOnly?" · latest 7 days":!c.from&&!c.to?" · indexed search across available years":"")+
