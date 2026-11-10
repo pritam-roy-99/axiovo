@@ -82,7 +82,7 @@
  }
  function loadRobot(){
   if(document.querySelector('script[data-axiovo-robot]'))return;
-  const script=document.createElement("script");script.src=new URL("./axiovo-robot-help.js?v=20261111-research-v2",document.currentScript?.src||location.href).href;
+  const script=document.createElement("script");script.src=new URL("./axiovo-robot-help.js?v=20261111-p0p1-v1",document.currentScript?.src||location.href).href;
   script.defer=true;script.dataset.axiovoRobot="1";document.head.append(script);
  }
  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",()=>{mount();loadRobot()});
