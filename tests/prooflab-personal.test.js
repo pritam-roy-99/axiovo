@@ -39,3 +39,22 @@ test("Windows startup updater never forces reset and supports opt-out",()=>{
  assert.equal((startup.match(/^\$project = \(Resolve-Path/gm)||[]).length,1,"startup project setup must not be duplicated");
  assert.equal((startup.match(/^function Update-Axiovo/gm)||[]).length,1,"updater must not be duplicated");
 });
+
+
+test("Windows Axiovo Personal icon opens the homepage, not ProofLab",()=>{
+ const launch=fs.readFileSync(path.join(root,"personal/launch.ps1"),"utf8");
+ const startup=fs.readFileSync(path.join(root,"personal/start.ps1"),"utf8");
+ assert.match(launch,/127\.0\.0\.1:4317\/index\.html/);
+ assert.doesNotMatch(launch,/4317\/prooflab\.html/);
+ assert.match(startup,/Opening http:\/\/127\.0\.0\.1:4317\/index\.html/);
+ assert.match(server,/u\.pathname==='\/'\?'\/index\.html'/);
+ assert.match(server,/origin\+'\/index\.html'/);
+});
+test("Windows shortcut installer tolerates a restricted Start Menu",()=>{
+ const installer=fs.readFileSync(path.join(root,"personal/install-shortcut.ps1"),"utf8");
+ assert.match(installer,/\$desktopOK=\$true/);
+ assert.match(installer,/\$menuOK=\$false/);
+ assert.match(installer,/catch \{/);
+ assert.match(installer,/Windows denied Start Menu shortcut access/);
+ assert.match(installer,/if \(-not \$desktopOK -and -not \$menuOK\)/);
+});
