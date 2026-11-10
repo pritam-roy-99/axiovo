@@ -117,3 +117,23 @@ body.axiovo-reference-ui.axiovo-home .axiovo-archive-card{background:#f5fafc;bor
 }
 @media(max-width:350px){body.axiovo-reference-ui .ax-home-search button{padding:9px 8px}body.axiovo-reference-ui header.rl-global-header nav.rl-nav>a{font-size:8px!important}}
 @media(prefers-reduced-motion:reduce){body.axiovo-reference-ui .axiovo-cta{transition:none!important}}
+
+/* Approved vector-wrapped logo from the supplied UI blueprint. */
+.ax-sidebar-logo{padding:4px 8px!important}
+.ax-sidebar-logo img{display:block!important;max-width:100%!important;width:178px!important;height:auto!important;aspect-ratio:260/79!important;object-fit:contain!important}
+@media(max-width:760px){
+ body.axiovo-reference-ui header.rl-global-header .rl-logo{font-size:0!important;gap:0!important;min-width:0!important}
+ body.axiovo-reference-ui header.rl-global-header .rl-logo .rl-logo-mark{
+  width:130px!important;min-width:130px!important;height:44px!important;
+  display:inline-flex!important;align-items:center!important;justify-content:center!important;
+  background:#fff!important;border-radius:9px!important;overflow:hidden!important;
+ }
+ body.axiovo-reference-ui header.rl-global-header .rl-logo .rl-logo-mark img{
+  display:block!important;width:125px!important;height:42px!important;object-fit:contain!important
+ }
+}
+.ax-menu-panel .ax-menu-theme{
+ display:block;width:100%;min-height:44px;padding:11px;border:0;border-radius:9px;
+ background:#fff;text-align:left;color:#133d57;font:700 13px Inter,system-ui,sans-serif;cursor:pointer
+}
+.ax-menu-panel .ax-menu-theme:hover{background:#e9f8f8}
