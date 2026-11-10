@@ -528,10 +528,9 @@ $("topic").onchange=()=>selectPath({category:selected.category,topic:$("topic").
 $("subfield").onchange=()=>selectPath({category:selected.category,topic:selected.topic,subtopic:$("subfield").value});
 $("clear-path").onclick=()=>selectPath({});
 $("show-results").onclick=()=>{
-  if(search?.announcementOnly&&!$("from").value&&!$("to").value){
-   search.criteria=criteriaFromForm();search.visible=12;
-   savePrefs();syncAnnouncementURL(search.criteria);drawResults(search);
-  }else{viewMode="indexed";datePreset++;runSearch()}
+ // The primary search action always searches indexed history with relevance.
+ // The distinct "Latest announced papers" button retains the release-only mode.
+ viewMode="indexed";datePreset++;runSearch();
  const heading=$("results-heading");
  if(!heading)return;
  heading.setAttribute("tabindex","-1");
@@ -550,11 +549,7 @@ $("topic-find").onkeydown=e=>{
 };
 $("search-form").onsubmit=e=>{
  e.preventDefault();
- if(search?.announcementOnly&&!search.loading&&!$("from").value&&!$("to").value&&
-    !data.identifier($("query").value).arxiv&&!data.identifier($("query").value).doi){
-  search.criteria=criteriaFromForm();search.visible=12;
-   savePrefs();syncAnnouncementURL(search.criteria);drawResults(search);
-  }else{viewMode="indexed";datePreset++;runSearch()}
+ viewMode="indexed";datePreset++;runSearch();
 };
 function changeSort(mode){
  $("sort").value=mode;
