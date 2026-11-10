@@ -15,7 +15,16 @@ class InstallableAppTests(unittest.TestCase):
         self.assertEqual(data["display"], "standalone")
         self.assertEqual(data["start_url"], "./")
         for icon in data["icons"]:
-            self.assertTrue((DOCS / icon["src"]).is_file(), icon["src"])
+            # Manifest icon sources are URLs; version query strings are not filenames.
+            from urllib.parse import urlsplit, unquote
+            src = icon["src"]
+            parsed = urlsplit(src)
+            self.assertFalse(parsed.scheme or parsed.netloc, src)
+            path = unquote(parsed.path)
+            self.assertTrue(path.startswith("./"), src)
+            relative = Path(path.removeprefix("./"))
+            self.assertNotIn("..", relative.parts, src)
+            self.assertTrue((DOCS / relative).is_file(), src)
 
     def test_primary_pages_are_installable(self):
         for page in PAGES:
