@@ -36,7 +36,7 @@
  if(appearance){header.insertBefore(status,appearance);header.insertBefore(search,appearance);}
  const menu=document.createElement("details");menu.className="ax-mobile-menu";
  menu.innerHTML=['<summary aria-label="More pages">☰</summary><div class="ax-menu-panel">',
- '<a href="./index.html">Home</a><a href="./lab.html">Research Tools</a><a href="./prooflab.html">ProofLab</a>',
+ '<a href="./index.html?axiovo_return=1">Home</a><a href="./lab.html">Research Tools</a><a href="./prooflab.html">ProofLab</a>',
  '<a href="./research-hub.html">Research Hub</a><a href="./community.html">Community</a>',
  '<a href="./profiles.html">Settings and appearance</a><button type="button" class="ax-menu-theme">☾ Toggle day / night</button><a href="./install.html">Install Axiovo</a>',
  '<a href="./tutorial.html">Tutorial</a><a href="./methodology.html">Source methodology</a></div>'].join("");
