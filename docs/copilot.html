@@ -14,6 +14,7 @@
 <link rel="stylesheet" href="./research-desk.css">
 <link rel="stylesheet" href="./research-workspace.css?v=20261108-mobile-research-v1">
 <link rel="stylesheet" href="./assistant-chat.css">
+<link rel="stylesheet" href="./assistant-workspace-v2.css?v=20261110-redesign-v1">
 <script defer src="./theme.js"></script>
 <script defer src="./navigation.js?v=20261108-home-history-v5"></script>
 <script defer src="./arxiv-versions.js"></script>
@@ -42,7 +43,7 @@
    <button class="rd-button rd-secondary mode" data-mode="claims" aria-pressed="false" type="button">Inspect a paper</button>
    <a class="rd-text-link" href="./desk.html#rd-queue-heading">Compare papers →</a>
   </div>
-  <p class="rd-small"><a class="rd-text-link" href="./prooflab.html">Open ProofLab: theorem planning and Lean drafts →</a></p>
+  <div class="assistant-prooflab-row"><a class="assistant-prooflab-cta" href="./prooflab.html">Open ProofLab <span aria-hidden="true">↗</span><span class="rd-sr-only">: theorem planning and Lean drafts</span></a></div>
   <label class="rd-label" for="question" id="assistant-question-label">Research question or keywords</label>
   <textarea id="question" rows="2" maxlength="3500" placeholder="Enter a research question or keywords"></textarea>
   <div class="rd-actions">
