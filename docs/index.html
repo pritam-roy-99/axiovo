@@ -36,6 +36,10 @@
 <script defer src="./source-pulse.js"></script>
 <script defer src="./pwa.js"></script>
 <style>
+.axiovo-install-link{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:baseline;margin:14px 0 0;font-size:.87rem;line-height:1.6;color:#d3eaf4}
+.axiovo-install-link a{color:#aef3e8;text-decoration:underline;text-underline-offset:3px;font-weight:750}
+.axiovo-install-link a:focus-visible{outline:3px solid #aef3e8;outline-offset:4px;border-radius:3px}
+.axiovo-install-link span{color:#d3eaf4}
 /* Explicit contrast: the home hero is dark in both light and dark modes. */
 .rd-home-hero .axiovo-name-meaning{
  display:grid;gap:7px;box-sizing:border-box;
@@ -103,8 +107,9 @@
     <span class="axiovo-cta-copy"><strong>Explore archives</strong><small>Browse sources and subjects</small></span>
    </a>
   </div>
+  <p class="axiovo-install-link"><a href="./install.html">Install Axiovo on Android, Windows, Linux or macOS</a><span>Android uses the browser app; local AI and ChatGPT Personal have platform limitations.</span></p>
  </div>
- <div class="axiovo-welcome-media" id="axiovo-start-here">
+ <div class="axiovo-welcome-media" id="axiovo-start-here"
   <div class="axiovo-demo-heading">
    <div><span class="axiovo-demo-tag">START HERE</span><h2 id="axiovo-tour-heading">See how Axiovo works</h2><p>One guided introduction to discovering, reading and organizing research.</p></div>
    <span class="axiovo-demo-subtitle">Narrated video · Real Axiovo interface</span>
