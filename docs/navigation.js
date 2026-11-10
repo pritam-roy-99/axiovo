@@ -111,17 +111,20 @@
   heading.before(wrap);wrap.append(icon,heading);
  }
  function activateBlueprint(){
-  if(document.querySelector('link[data-axiovo-blueprint]'))return;
-  const sheet=document.createElement("link");sheet.rel="stylesheet";
-  sheet.href=new URL("./axiovo-blueprint-ui.css?v=20261111-reference",location.href).href;
-  sheet.dataset.axiovoBlueprint="true";document.head.append(sheet);
+  if(!document.querySelector('link[data-axiovo-blueprint]')){
+   const sheet=document.createElement("link");sheet.rel="stylesheet";
+   sheet.href=new URL("./axiovo-blueprint-ui.css?v=20261111-reference",location.href).href;
+   sheet.dataset.axiovoBlueprint="true";document.head.append(sheet);
+  }
   const script=document.createElement("script");script.defer=true;
   script.src=new URL("./axiovo-blueprint-ui.js?v=20261111-single-home-v2",location.href).href;
   script.dataset.axiovoBlueprint="true";document.head.append(script);
   // Per-page design is presentational; all original handlers stay intact.
-  const pageStyle=document.createElement("link");pageStyle.rel="stylesheet";
-  pageStyle.href=new URL("./axiovo-page-design-v4.css?v=20261111-complete-v1",location.href).href;
-  pageStyle.dataset.axiovoPageDesign="v4";document.head.append(pageStyle);
+  if(!document.querySelector('link[data-axiovo-page-design]')){
+   const pageStyle=document.createElement("link");pageStyle.rel="stylesheet";
+   pageStyle.href=new URL("./axiovo-page-design-v4.css?v=20261111-complete-v1",location.href).href;
+   pageStyle.dataset.axiovoPageDesign="v4";document.head.append(pageStyle);
+  }
   const pageScript=document.createElement("script");pageScript.defer=true;
   pageScript.src=new URL("./axiovo-page-design-v4.js?v=20261111-complete-v1",location.href).href;
   pageScript.dataset.axiovoPageDesign="v4";document.head.append(pageScript);
