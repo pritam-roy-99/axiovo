@@ -6,7 +6,20 @@
  let papers=[],shown=[],page=1,loaded=false,stamp="",complete=false,offlineSubset=false,sourceName="";
  const form=$("crypto-search-form");
  const fields=["query","field","topic","subtopic","author","sort","from","to"];
- let viewMode=new URLSearchParams(location.search).get("mode")==="indexed"?"indexed":"recent";
+ let viewMode=new URLSearchParams(location.search).get("mode")==="recent"?"recent":"indexed";
+const shortcutIds=["topic-latest","latest","latest-verified","week","date-open","history"];
+let activeShortcut=null;
+function selectShortcut(id){
+ activeShortcut=shortcutIds.includes(id)?id:null;
+ for(const key of shortcutIds){
+  const b=$("crypto-"+key);if(!b)continue;
+  const active=key===activeShortcut;
+  b.classList.toggle("is-active",active);
+  b.classList.toggle("rd-primary",active);
+  b.classList.toggle("rd-secondary",!active);
+  b.setAttribute("aria-pressed",String(active));
+ }
+}
  const utcDay=()=>new Date().toISOString().slice(0,10);
  const daysBefore=n=>new Date(Date.now()-n*86400000).toISOString().slice(0,10);
  function el(tag,text,cls){
@@ -143,14 +156,15 @@
  function search(){
   page=1;updateURL();render();
  }
- form.addEventListener("submit",e=>{e.preventDefault();search()});
+ form.addEventListener("submit",e=>{e.preventDefault();viewMode="indexed";selectShortcut($("crypto-from").value||$("crypto-to").value?"date-open":null);search()});
  for(const key of ["sort","from","to"])
-  $("crypto-"+key).addEventListener("change",search);
+  $("crypto-"+key).addEventListener("change",()=>{if(key==="from"||key==="to")selectShortcut("date-open");search()});
  $("crypto-result-sort").addEventListener("change",()=>{$("crypto-sort").value=$("crypto-result-sort").value;search()});
  $("crypto-topic-latest").onclick=()=>{
-  viewMode="recent";$("crypto-from").value="";$("crypto-to").value="";$("crypto-sort").value="recent";search();
+  selectShortcut("topic-latest");viewMode="recent";$("crypto-from").value="";$("crypto-to").value="";$("crypto-sort").value="recent";search();
  };
  $("crypto-latest").onclick=()=>{
+   selectShortcut("latest");
   viewMode="indexed";
   $("crypto-from").value="";$("crypto-to").value="";
   $("crypto-sort").value="recent";search();
@@ -161,13 +175,14 @@
    const snapshot=await window.AxiovoArchiveData.snapshot("eprint");
    const latest=(snapshot.papers||[]).map(p=>p.date).filter(d=>/^\d{4}-\d{2}-\d{2}$/.test(d)).sort().at(-1);
    if(!latest)throw Error("No verified source day");
-   viewMode="indexed";$("crypto-from").value=latest;$("crypto-to").value=latest;$("crypto-sort").value="recent";search();
+   selectShortcut("latest-verified");viewMode="indexed";$("crypto-from").value=latest;$("crypto-to").value=latest;$("crypto-sort").value="recent";search();
   }catch{$("crypto-results-status").textContent="No verified source day is available in the indexed IACR records."}
   finally{button.disabled=false}
  };
- $("crypto-week").onclick=()=>{viewMode="recent";const d=new Date();$("crypto-to").value=d.toISOString().slice(0,10);d.setUTCDate(d.getUTCDate()-7);$("crypto-from").value=d.toISOString().slice(0,10);search()};
- $("crypto-date-open").onclick=()=>{$("crypto-advanced").open=true;$("crypto-from").focus()};
+ $("crypto-week").onclick=()=>{selectShortcut("week");viewMode="recent";const d=new Date();$("crypto-to").value=d.toISOString().slice(0,10);d.setUTCDate(d.getUTCDate()-7);$("crypto-from").value=d.toISOString().slice(0,10);search()};
+ $("crypto-date-open").onclick=()=>{selectShortcut("date-open");$("crypto-advanced").open=true;$("crypto-from").focus()};
  $("crypto-history")?.addEventListener("click",()=>{
+   selectShortcut("history");
   viewMode="indexed";
   $("crypto-from").value="";$("crypto-to").value="";
   $("crypto-sort").value="oldest";
@@ -179,7 +194,7 @@
  $("crypto-reset").onclick=()=>{
   window.AxiovoCryptoTopics?.clear?.();
   for(const key of ["query","author","sort","from","to"])$("crypto-"+key).value=key==="sort"?"relevance":"";
-  viewMode="recent";search();
+  selectShortcut(null);viewMode="indexed";search();
  };
  $("crypto-follow").onclick=()=>{
   const current=getPath();const term=current.subtopic||current.topic||current.field;
@@ -192,6 +207,7 @@
  };
  window.addEventListener("storage",e=>{if(e.key==="axiovo-eprint-reading-v1")render(false)});
  fromURL();
+  selectShortcut(null);
  function applySnapshot(value){
   papers=Array.isArray(value.papers)?value.papers:[];
   stamp=value.stamp||"";
