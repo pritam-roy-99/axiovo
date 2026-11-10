@@ -7,8 +7,11 @@
   const header=document.querySelector("header");if(!header)return;
   const toggle=header.querySelector(".theme-toggle");
   const logo=document.createElement("a");logo.className="rl-logo";logo.href=HOME;logo.setAttribute("aria-label","Axiovo home");
-  const mark=document.createElement("span");mark.className="rl-logo-mark";mark.textContent="A";
-  logo.append(mark,document.createTextNode(" Axiovo"));
+  const mark=document.createElement("span");mark.className="rl-logo-mark";
+  const brandImg=document.createElement("img");brandImg.src=new URL("./icons/axiovo-brand.svg",location.href).href;
+  brandImg.width=38;brandImg.height=38;brandImg.alt="";brandImg.setAttribute("aria-hidden","true");
+  mark.append(brandImg);
+  logo.append(mark,document.createTextNode("Axiovo"));
   const nav=document.createElement("nav");nav.className="rl-nav";nav.setAttribute("aria-label","Main navigation");
   const file=location.pathname.split("/").pop()||"index.html";
   const archivePage=["arxiv.html","biorxiv.html","chemrxiv.html","crypto.html"].includes(file);
@@ -72,7 +75,7 @@
    window.AxiovoAppearance.setTheme(window.AxiovoAppearance.getTheme());
   }
   const footer=document.createElement("div");footer.className="axiovo-credit";
-  const stamp=document.createElement("span");stamp.textContent="Built with ChatGPT by OpenAI ❤️";
+  const stamp=document.createElement("span");stamp.className="axiovo-chatgpt-credit";stamp.textContent="Built with ChatGPT by OpenAI ❤️";
   const attribution=document.createElement("span");
   attribution.textContent="Independent open-source project; not an official OpenAI product.";
   const methods=document.createElement("a");methods.href="./methodology.html";methods.textContent="Methods & limitations";
@@ -80,11 +83,28 @@
   footer.append(stamp,attribution,methods,privacy);
   if(!document.querySelector(".axiovo-credit"))document.body.append(footer);
  }
+ function enablePhaseOneStyles(){
+  if(document.querySelector('link[data-axiovo-ui-phase1]'))return;
+  const css=document.createElement("link");
+  css.rel="stylesheet";
+  css.href=new URL("./axiovo-ui-phase1.css?v=1",document.currentScript?.src||location.href).href;
+  css.dataset.axiovoUiPhase1="true";
+  document.head.append(css);
+ }
+ function addAssistantMark(){
+  if(!document.body.classList.contains("axiovo-assistant"))return;
+  const heading=document.querySelector(".assistant-page .rd-desk-heading h1");
+  if(!heading||heading.parentElement?.classList.contains("axiovo-v2-assistant-title"))return;
+  const wrap=document.createElement("div");wrap.className="axiovo-v2-assistant-title";
+  const icon=document.createElement("img");icon.src=new URL("./icons/research-assistant-evidence.svg",location.href).href;
+  icon.alt="";icon.setAttribute("aria-hidden","true");icon.width=46;icon.height=46;
+  heading.before(wrap);wrap.append(icon,heading);
+ }
  function loadRobot(){
   if(document.querySelector('script[data-axiovo-robot]'))return;
   const script=document.createElement("script");script.src=new URL("./axiovo-robot-help.js?v=20261111-p0p1-v1",document.currentScript?.src||location.href).href;
   script.defer=true;script.dataset.axiovoRobot="1";document.head.append(script);
  }
- if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",()=>{mount();loadRobot()});
- else {mount();loadRobot()}
+ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",()=>{mount();enablePhaseOneStyles();addAssistantMark();loadRobot()});
+ else {mount();enablePhaseOneStyles();addAssistantMark();loadRobot()}
 })();
