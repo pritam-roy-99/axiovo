@@ -22,6 +22,53 @@ class SourceHarvestTests(unittest.TestCase):
         self.assertTrue(status["complete_window"])
         self.assertEqual(status["records_paginated"],3)
 
+    def test_biorxiv_failed_refresh_preserves_published_snapshot(self):
+        import json
+        import tempfile
+        from pathlib import Path
+        from unittest.mock import patch
+        with tempfile.TemporaryDirectory() as directory:
+            target = Path(directory) / "biorxiv.json"
+            original = {"generated_at": "2026-11-09T00:00:00Z",
+                        "count": 1, "papers": [{"doi": "10.1101/2026.11.01.000001",
+                        "title": "Previously verified paper"}]}
+            target.write_text(json.dumps(original), encoding="utf8")
+            with patch.object(bio, "TARGET", target), patch.object(
+                bio, "fetch_window", side_effect=TimeoutError("upstream stalled")
+            ), patch.dict("os.environ", {"AXIOVO_BIORXIV_LOOKBACK_DAYS": "4"}):
+                with self.assertRaises(SystemExit) as caught:
+                    bio.main()
+                self.assertEqual(caught.exception.code, 1)
+            self.assertEqual(json.loads(target.read_text(encoding="utf8")), original)
+
+    def test_biorxiv_recent_window_merges_old_records_without_data_loss(self):
+        import json
+        import tempfile
+        from pathlib import Path
+        from datetime import datetime, timezone, timedelta
+        from unittest.mock import patch
+        with tempfile.TemporaryDirectory() as directory:
+            target = Path(directory) / "biorxiv.json"
+            old = {"doi": "10.1101/2025.01.01.000001", "title": "Older verified paper",
+                   "date": "2025-01-01", "version": "1"}
+            target.write_text(json.dumps({"papers": [old]}), encoding="utf8")
+            new = {"doi": "10.1101/2026.11.10.000001", "title": "New verified paper",
+                   "date": "2026-11-10", "version": "1"}
+            status = {"complete_window": True, "source_total": 1,
+                      "records_paginated": 1, "pages": 1}
+            with patch.object(bio, "TARGET", target), patch.object(
+                bio, "fetch_window", return_value=([new], status)
+            ) as fetch, patch.dict("os.environ",
+                                  {"AXIOVO_BIORXIV_LOOKBACK_DAYS": "4"}):
+                bio.main()
+                requested_start, requested_end = fetch.call_args.args[:2]
+                self.assertEqual(requested_end - requested_start, timedelta(days=4))
+            published = json.loads(target.read_text(encoding="utf8"))
+            self.assertEqual(published["count"], 2)
+            self.assertEqual({p["doi"] for p in published["papers"]},
+                             {old["doi"], new["doi"]})
+            self.assertTrue(published["complete_window"])
+
     def test_biorxiv_never_certifies_truncated_window(self):
         def fetch(url):
             return {"messages":[{"total":"1000"}],"collection":[
