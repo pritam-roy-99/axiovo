@@ -15,9 +15,12 @@ class FourArchiveUX(unittest.TestCase):
   self.assertNotIn("54-second",svg)
  def test_visible_homepage_buttons_have_explicit_icons_and_labels(self):
   html=(ROOT/"docs/index.html").read_text("utf8")
-  self.assertEqual(html.count('class="axiovo-cta-icon"'),2)
+  self.assertEqual(html.count('class="axiovo-cta-icon"'),3)
   self.assertIn("<strong>Search papers</strong>",html)
   self.assertIn("<strong>Explore archives</strong>",html)
+  self.assertIn("<strong>Install Axiovo</strong>",html)
+  self.assertIn('href="./install.html#privacy"',html)
+  self.assertIn('class="axiovo-cta axiovo-cta-install"',html)
   self.assertIn('id="axiovo-source-pulse"',html)
   self.assertIn('src="./source-pulse.js"',html)
   css=(ROOT/"docs/home-landing.css").read_text("utf8")
