@@ -105,6 +105,7 @@ async function send(){
    }
   }
   if(!finished)throw Error("The stream ended without a completion confirmation.");
+  if(answer.trim()&&window.AxiovoProofLabMath)window.AxiovoProofLabMath.render(output,answer);
   if(!answer.trim())output.textContent="ChatGPT returned no text.";
   history.push({role:"user",content:question},{role:"assistant",content:answer});history=history.slice(-8);
   $("prooflab-prompt").value="";
