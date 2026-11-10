@@ -277,7 +277,11 @@ def main():
                 assert page.locator("#axiovo-home-video").is_visible()
                 assert page.locator("#axiovo-tour").is_hidden()
                 page.goto(base+"feed.html",wait_until="domcontentloaded")
-                page.locator(".axiovo-home-link").click()
+                if phone:
+                    page.locator(".ax-mobile-menu summary").click()
+                    page.locator('.ax-menu-panel a[href="./index.html?axiovo_return=1"]').click()
+                else:
+                    page.locator(".axiovo-home-link").click()
                 page.wait_for_url(lambda url: urlsplit(url).path.endswith("/index.html"))
                 assert page.locator("#axiovo-home-video").is_visible()
                 assert page.evaluate("location.hash")=="" , "Home must land at the start"
@@ -289,7 +293,11 @@ def main():
                 # the video still exists somewhere above the viewport.
                 page.evaluate("window.scrollTo(0,document.body.scrollHeight)")
                 page.goto(base+"feed.html",wait_until="domcontentloaded")
-                page.locator(".axiovo-home-link").click()
+                if phone:
+                    page.locator(".ax-mobile-menu summary").click()
+                    page.locator('.ax-menu-panel a[href="./index.html?axiovo_return=1"]').click()
+                else:
+                    page.locator(".axiovo-home-link").click()
                 page.wait_for_url(lambda url: urlsplit(url).path.endswith("/index.html"))
                 page.wait_for_function("window.scrollY<5",timeout=5000)
                 assert page.locator("#axiovo-home-video").is_visible()
