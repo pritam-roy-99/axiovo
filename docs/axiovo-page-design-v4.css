@@ -533,3 +533,20 @@ html:root body.ax4.axiovo-assistant .assistant-page>.assistant-indexed-tools{gri
   position:static!important;max-height:none!important
  }
 }
+
+/* On tablet and desktop the topic panel is narrower than the browser viewport.
+   Keep primary and secondary actions vertically stacked at every breakpoint. */
+html:root body.ax4.axiovo-explore .ex-guide-actions{
+ display:grid!important;grid-template-columns:minmax(0,1fr)!important;
+ grid-template-rows:auto auto!important;width:100%!important;gap:7px!important;
+}
+html:root body.ax4.axiovo-explore .ex-guide-actions>#archive-show-results{
+ box-sizing:border-box!important;width:100%!important;max-width:100%!important;
+ min-width:0!important;height:48px!important;min-height:48px!important;max-height:48px!important;
+ white-space:nowrap!important;line-height:1.15!important;
+ display:flex!important;align-items:center!important;justify-content:center!important;
+ gap:5px!important;font-size:12px!important;padding:8px 5px!important;
+}
+html:root body.ax4.axiovo-explore .ex-guide-actions>#archive-clear-path{
+ display:block!important;width:100%!important;min-height:44px!important;box-sizing:border-box!important;
+}
