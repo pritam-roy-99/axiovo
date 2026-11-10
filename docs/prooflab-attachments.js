@@ -67,6 +67,7 @@ async function readFile(file){
  if(!out.trim())throw Error("No selectable text found in the PDF. Scanned PDFs need OCR, which is not enabled.");
  return out.slice(0,MAX_CHARS);
 }
+$("pl-attach-trigger")?.addEventListener("click",()=>{$("pl-chat-files")?.click();});
 $("pl-chat-files")?.addEventListener("change",async e=>{
  const selected=Array.from(e.target.files||[]);
  for(const file of selected){
