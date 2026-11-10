@@ -153,7 +153,7 @@ def main():
       page.locator("#archive-announced").click()
       # The indexed history may already have cards; wait for the asynchronous
       # announcement response rather than reading a stale first card.
-      paper=page.locator(".ex-paper").filter(has_text="Lieb-Robinson bounds").first
+      paper=page.locator(".ex-paper").filter(has=page.locator("h3").filter(has_text="Lieb-Robinson bounds")).first
       paper.wait_for(timeout=18000)
       expect(page.locator("#archive-sync-status")).to_contain_text(
        "Official arXiv",timeout=18000)
