@@ -30,5 +30,4 @@ $env:AXIOVO_SIWC_DEVKIT = $devkit
 Write-Host ''
 Write-Host 'Axiovo Personal is restricted to this computer only.' -ForegroundColor Green
 Write-Host 'Opening http://127.0.0.1:4317/prooflab.html' -ForegroundColor Green
-Start-Process 'http://127.0.0.1:4317/prooflab.html'
 & node (Join-Path $PSScriptRoot 'server.mjs')
