@@ -41,10 +41,13 @@ jobs:
         run: |
           $tokens = $null
           $parseErrors = $null
-          [System.Management.Automation.Language.Parser]::ParseFile((Resolve-Path personal/start.ps1).Path, [ref]$tokens, [ref]$parseErrors) | Out-Null
-          if ($parseErrors.Count -ne 0) {
-            $parseErrors | ForEach-Object { Write-Error $_.Message }
-            exit 1
+          foreach ($script in @('personal/start.ps1', 'personal/launch.ps1', 'personal/install-shortcut.ps1', 'personal/stop.ps1')) {
+            $parseErrors = $null
+            [System.Management.Automation.Language.Parser]::ParseFile((Resolve-Path $script).Path, [ref]$tokens, [ref]$parseErrors) | Out-Null
+            if ($parseErrors.Count -ne 0) {
+              $parseErrors | ForEach-Object { Write-Error "$script : $($_.Message)" }
+              exit 1
+            }
           }
       - name: Run ProofLab unit tests
         run: node --test tests/prooflab.test.js tests/prooflab-ollama.test.js tests/prooflab-personal.test.js
