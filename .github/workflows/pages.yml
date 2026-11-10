@@ -24,6 +24,18 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: '3.12'
+      - name: Generate Android PNG launcher icons from current Axiovo logo
+        run: |
+          python -m pip install --disable-pip-version-check cairosvg
+          python - <<'PY'
+          import cairosvg
+          from pathlib import Path
+          source=Path("docs/icons/axiovo.svg")
+          for size in (192,512):
+              target=Path(f"docs/icons/axiovo-{size}.png")
+              cairosvg.svg2png(url=str(source),write_to=str(target),output_width=size,output_height=size)
+              assert target.stat().st_size>1000
+          PY
       - name: Test metadata processing
         id: test_metadata_processing
         run: python -m unittest discover -s tests -v
