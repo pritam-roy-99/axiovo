@@ -258,24 +258,24 @@ body.ax4.prooflab-body .prooflab-obligation-panel{border-top:3px solid var(--ax4
 body.ax4.prooflab-body .prooflab-setup :is(input,textarea),body.ax4.prooflab-body .prooflab-model-card select{width:100%}
 
 /* 15: Research Tools */
-body.ax4.rl-lab .rl-welcome{
+body.ax4.ax4-lab .rl-welcome{
  display:flex;align-items:center;justify-content:space-between;gap:19px;
  background:var(--ax4-surface);padding:22px 23px;border:1px solid var(--ax4-line);border-radius:15px;
  box-shadow:var(--ax4-shadow);margin-bottom:15px
 }
-body.ax4.rl-lab .rl-welcome h1{font-size:36px}
-body.ax4.rl-lab .lab-tabs{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:17px}
-body.ax4.rl-lab .lab-tabs a{
+body.ax4.ax4-lab .rl-welcome h1{font-size:36px}
+body.ax4.ax4-lab .lab-tabs{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:17px}
+body.ax4.ax4-lab .lab-tabs a{
  border:1px solid var(--ax4-line);background:var(--ax4-surface);border-radius:12px;
  min-height:44px;padding:10px 14px;font-size:12px;font-weight:800;color:var(--ax4-ink)
 }
-body.ax4.rl-lab .lab-tabs a:focus,body.ax4.rl-lab .lab-tabs a:hover{background:var(--ax4-tint);color:var(--ax4-ocean)}
-body.ax4.rl-lab .lab-block{padding:21px!important;margin-bottom:16px}
-body.ax4.rl-lab .lab-block h2{font-size:22px}
-body.ax4.rl-lab .lab-form-inline{gap:11px;align-items:end}
-body.ax4.rl-lab .lab-reader-grid{gap:15px}
-body.ax4.rl-lab .lab-notes{padding:17px;border-radius:12px;background:var(--ax4-soft);border:1px solid var(--ax4-line)}
-body.ax4.rl-lab .lab-canvas-shell{border-radius:12px;background:#e4ebf0}
+body.ax4.ax4-lab .lab-tabs a:focus,body.ax4.ax4-lab .lab-tabs a:hover{background:var(--ax4-tint);color:var(--ax4-ocean)}
+body.ax4.ax4-lab .lab-block{padding:21px!important;margin-bottom:16px}
+body.ax4.ax4-lab .lab-block h2{font-size:22px}
+body.ax4.ax4-lab .lab-form-inline{gap:11px;align-items:end}
+body.ax4.ax4-lab .lab-reader-grid{gap:15px}
+body.ax4.ax4-lab .lab-notes{padding:17px;border-radius:12px;background:var(--ax4-soft);border:1px solid var(--ax4-line)}
+body.ax4.ax4-lab .lab-canvas-shell{border-radius:12px;background:#e4ebf0}
 
 /* 16-18: Paper detail, comparison, Community */
 body.ax4.ax4-paper main{max-width:1450px;padding:20px clamp(15px,2.3vw,28px) 40px}
@@ -408,12 +408,12 @@ body.ax4.ax4-hub .rh-section{padding:22px!important;margin:15px 0}
  body.ax4.prooflab-body .pl-section-nav{display:flex;flex-wrap:nowrap;overflow:auto;gap:5px}
  body.ax4.prooflab-body .pl-section-nav a{white-space:nowrap;flex:none;min-height:44px}
  body.ax4.prooflab-body .prooflab-thread{min-height:210px}
- body.ax4.rl-lab .rl-welcome{display:block;padding:15px}
- body.ax4.rl-lab .rl-welcome h1{font-size:31px}
- body.ax4.rl-lab .lab-tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
- body.ax4.rl-lab .lab-tabs a{min-width:0;min-height:44px;font-size:11px}
- body.ax4.rl-lab .lab-block{padding:15px!important}
- body.ax4.rl-lab .lab-reader-grid{display:flex;flex-direction:column}
+ body.ax4.ax4-lab .rl-welcome{display:block;padding:15px}
+ body.ax4.ax4-lab .rl-welcome h1{font-size:31px}
+ body.ax4.ax4-lab .lab-tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+ body.ax4.ax4-lab .lab-tabs a{min-width:0;min-height:44px;font-size:11px}
+ body.ax4.ax4-lab .lab-block{padding:15px!important}
+ body.ax4.ax4-lab .lab-reader-grid{display:flex;flex-direction:column}
  body.ax4.ax4-paper main .grid{display:flex!important;flex-direction:column}
  body.ax4.ax4-paper main .grid>div,body.ax4.ax4-paper main .grid>aside{width:100%}
  body.ax4.ax4-paper .paper,body.ax4.ax4-paper .panel{padding:15px!important}
@@ -436,3 +436,7 @@ body.ax4.ax4-hub .rh-section{padding:22px!important;margin:15px 0}
  body.ax4.axiovo-feed-page .feed-tabs button{font-size:10px}
 }
 @media(prefers-reduced-motion:reduce){body.ax4 main :is(button,a){transition:none!important;transform:none!important}}
+
+body.ax4 .ax4-skip{position:fixed;z-index:99999;top:-75px;left:242px;background:#0C2741;color:white;padding:12px 16px;border-radius:10px;font-weight:800;box-shadow:var(--ax4-shadow)}
+body.ax4 .ax4-skip:focus{top:12px}
+@media(max-width:760px){body.ax4 .ax4-skip{left:12px}}
