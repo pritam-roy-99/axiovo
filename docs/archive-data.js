@@ -425,9 +425,10 @@ function live(source,criteria,signal,cursor){
   provider:data.fullOaiTraversal?"IACR OAI-PMH full available history traversal (not an archive-wide census)":"IACR OAI-PMH indexed snapshot (partial coverage)",next:null}));
  if(source==="biorxiv"){
   criteria=sourceDateWindow(source,criteria);
-  const browse=!criteria.q&&!criteria.author&&!criteria.refinement&&!criteria.topicTerms?.length;
-  const orderedSearch=!criteria.category&&(criteria.sort==="oldest"||criteria.sort==="cited");
-  return criteria.recentOnly||parseDOI(criteria.q)||(browse&&!orderedSearch)?bioNative(criteria,signal,cursor):bioIndex(criteria,signal,cursor);
+  // Historical relevance search is standard; the official rolling-date API
+  // is reserved for an explicitly chosen recent window or an exact DOI.
+  return criteria.recentOnly||parseDOI(criteria.q)
+   ?bioNative(criteria,signal,cursor):bioIndex(criteria,signal,cursor);
  }
  return chemLive(sourceDateWindow(source,criteria),signal,cursor);
 }
