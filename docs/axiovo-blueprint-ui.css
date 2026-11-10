@@ -225,3 +225,13 @@ body.axiovo-reference-ui.axiovo-home .axiovo-archive-card{background:#f5fafc;bor
   color:#123c57!important;background:transparent!important
  }
 }
+
+/* Sidebar reduces central width: keep the native archive result action single-line. */
+@media(min-width:761px){
+ body.axiovo-reference-ui .ex-guide .ex-show-papers{
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  width:100%!important;min-height:46px!important;max-height:55px!important;
+  padding:9px 4px!important;white-space:nowrap!important;
+  font-size:clamp(11px,.94vw,13px)!important;line-height:1.2!important;
+ }
+}
