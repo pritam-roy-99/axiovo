@@ -1,0 +1,30 @@
+name: Capture exact current Axiovo public UI
+on:
+  push:
+    branches:
+      - audit/exact-current-ui-20261110
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  capture-ui:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Install screenshot and PDF tools
+        run: |
+          python -m pip install --disable-pip-version-check playwright==1.56.0 reportlab Pillow
+          python -m playwright install --with-deps chromium
+      - name: Capture actual current public UI at desktop and Android widths
+        run: python scripts/capture_public_ui.py
+      - name: Upload real screenshots, capture log and PDF
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: axiovo-actual-public-ui
+          path: ui_capture/
+          retention-days: 7
