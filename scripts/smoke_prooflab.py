@@ -49,6 +49,19 @@ def main():
                 assert page.locator(".pl-app-shell").count() == 1
                 assert page.locator(".pl-topbar").is_visible()
                 assert page.locator(".prooflab-studio").is_visible()
+                assert page.locator("#pl-chat-settings > details.pl-aux-settings").count() == 1, "Ollama settings must appear immediately above the conversation"
+                assert page.locator("#pl-chat-settings .prooflab-model-card").count() == 1
+                assert page.locator(".prooflab-sidebar .prooflab-model-card").count() == 0
+                top = page.locator("#pl-chat-settings").bounding_box()
+                heading = page.locator(".prooflab-chat-heading").bounding_box()
+                assert top and heading and top["y"] < heading["y"], "Model settings must precede the conversation heading"
+                assert page.locator(".pl-section-nav a[href='./install.html']").count() == 1
+                page.goto(base + "install.html", wait_until="domcontentloaded")
+                for platform in ("windows", "ubuntu", "macos"):
+                    assert page.locator("#" + platform).is_visible(), ("Missing public installation guide", platform)
+                assert "not supported" in page.locator("#modes").inner_text().lower()
+                page.goto(base + "prooflab.html", wait_until="domcontentloaded")
+
                 if width >= 700:
                     page.locator("#pl-focus-prompt").click()
                     assert page.locator("#prooflab-prompt").evaluate("(el) => document.activeElement === el")
