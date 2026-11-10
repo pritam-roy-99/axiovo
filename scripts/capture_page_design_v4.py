@@ -35,7 +35,14 @@ try:
           nav:box('header.rl-global-header .rl-nav'),
           cardCount:document.querySelectorAll('main :is(.rd-panel,.rl-section,.panel,.feed-side-card,.feed-stream,.card)').length,
           pageStyle:!!document.querySelector('link[data-axiovo-page-design]'),
-          font:getComputedStyle(document.querySelector('main h1')||document.body).fontFamily};
+          font:getComputedStyle(document.querySelector('main h1')||document.body).fontFamily,
+          overflows:[...document.querySelectorAll('body *')].filter(el=>{
+            const style=getComputedStyle(el),r=el.getBoundingClientRect();
+            return style.display!=='none' && r.width>0 && r.right>innerWidth+12;
+          }).slice(0,15).map(el=>{const r=el.getBoundingClientRect();return {
+            tag:el.tagName,id:el.id,className:String(el.className).slice(0,100),
+            x:Math.round(r.x),right:Math.round(r.right),width:Math.round(r.width)
+          }})};
        }"""))
      # Scrutinize more than the first visible screen: lower controls must not be cropped.
      out=OUT/f"{mode}_{name}.png"
