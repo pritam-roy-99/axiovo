@@ -16,7 +16,7 @@
 .axiovo-assistant .assistant-results .message h4{font-size:.77rem;letter-spacing:.01em;font-weight:800;margin-bottom:7px}
 .axiovo-assistant .assistant-compose #question{min-height:90px;border-radius:14px;font-size:1rem;line-height:1.5;padding:14px 16px;resize:vertical}
 .axiovo-assistant .assistant-compose .assistant-task-row{gap:9px;margin-bottom:12px}
-.axiovo-assistant .assistant-task-row .mode{border-radius:99px;min-height:39px}
+.axiovo-assistant .assistant-task-row .mode{border-radius:99px;min-height:44px}
 .axiovo-assistant .assistant-compose>.rd-actions{margin:10px 0;display:flex;flex-wrap:wrap;gap:8px}
 .axiovo-assistant .assistant-compose>.rd-actions #ask{min-height:44px;padding-inline:19px;border-radius:11px}
 .axiovo-assistant .assistant-compose>.rd-actions #search-openalex{border-radius:11px}
