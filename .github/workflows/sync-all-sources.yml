@@ -5,6 +5,8 @@ on:
     paths:
       - '.github/workflows/sync-all-sources.yml'
       - 'scripts/arxiv_catchup.py'
+      - 'scripts/sync_biorxiv.py'
+      - 'tests/test_source_harvest.py'
       - 'scripts/validate_sync_snapshots.py'
   workflow_dispatch:
   schedule:
@@ -136,6 +138,11 @@ jobs:
       - name: Synchronize official bioRxiv API
         id: biorxiv
         continue-on-error: true
+        env:
+          # Refresh latest bioRxiv updates inside the Actions time budget.
+          # Previously published records remain preserved between windows.
+          AXIOVO_BIORXIV_LOOKBACK_DAYS: '4'
+          PYTHONUNBUFFERED: '1'
         run: timeout --signal=TERM --kill-after=10s 180s python -m scripts.sync_biorxiv
       - name: Synchronize verified ChemRxiv records
         id: chemrxiv
