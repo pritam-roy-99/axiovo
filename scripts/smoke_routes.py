@@ -201,7 +201,8 @@ def main():
                               icons:a.querySelectorAll("svg").length,visible:a.getBoundingClientRect().width>0};
                           });
                         }""")
-                        assert len(cta_contrast)==2,(width,"Homepage start actions missing",cta_contrast)
+                        assert len(cta_contrast)==3,(width,"Homepage start actions missing",cta_contrast)
+                         assert [x["label"] for x in cta_contrast]==["Search papers","Explore archives","Install Axiovo"],(width,"Homepage actions changed order",cta_contrast)
                         assert all(x["ratio"]>=4.5 and x["help"]>=4.5 and x["icons"]==1 and x["visible"]
                                    for x in cta_contrast),(width,"CTA contrast or icon regression",cta_contrast)
                         if width<=390:
@@ -220,7 +221,7 @@ def main():
                             gap=geometry["actions"]["top"]-geometry["copy"]["bottom"]
                             assert 0<=gap<=45,(width,"Unexpected blank space before mobile homepage buttons",gap,geometry)
                             assert geometry["copy"]["height"]<430,(width,"Mobile copy retains desktop minimum height",geometry)
-                            assert geometry["header"]["height"]<620,(width,"Welcome pushes tutorial below first screen",geometry)
+                            assert geometry["header"]["height"]<700,(width,"Welcome intro and installation controls are too tall on small phones",geometry)
                             assert geometry["tutorial"]["top"]>=geometry["actions"]["bottom"],(width,"Tutorial overlaps buttons",geometry)
                             assert abs(geometry["primary"]["top"]-geometry["secondary"]["top"])<=3,(width,"Mobile CTAs not aligned",geometry)
 
