@@ -1,0 +1,28 @@
+name: Preview Axiovo reference UI (desktop/mobile)
+on:
+  push:
+    branches:
+      - design/blueprint-faithful-ui-20261111
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  screenshot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - run: |
+          pip install playwright==1.56.0
+          python -m playwright install --with-deps chromium
+      - name: Capture rendered desktop and Android page previews
+        run: python scripts/capture_blueprint_preview.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: axiovo-blueprint-live-render
+          path: ui-preview/
+          retention-days: 7
