@@ -550,3 +550,55 @@ html:root body.ax4.axiovo-explore .ex-guide-actions>#archive-show-results{
 html:root body.ax4.axiovo-explore .ex-guide-actions>#archive-clear-path{
  display:block!important;width:100%!important;min-height:44px!important;box-sizing:border-box!important;
 }
+
+/* Research Tools home: six functional, descriptive launch cards. These are the
+   original six anchors, not duplicates or fake tools. Detailed controls remain below. */
+body.ax4.ax4-lab .lab-tabs{
+ display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;
+ gap:13px!important;margin:12px 0 22px!important;
+}
+body.ax4.ax4-lab .lab-tabs>a{
+ display:flex!important;flex-direction:column;align-items:flex-start!important;
+ justify-content:space-between!important;gap:11px;
+ min-height:142px!important;height:auto!important;min-width:0!important;
+ padding:20px!important;border:1px solid var(--ax4-line)!important;
+ border-radius:15px!important;box-shadow:var(--ax4-shadow);
+ background:var(--ax4-surface)!important;color:var(--ax4-ink)!important;
+ font-family:var(--ax4-head)!important;font-size:19px!important;
+ font-weight:800!important;letter-spacing:-.02em!important;text-decoration:none!important;
+}
+body.ax4.ax4-lab .lab-tabs>a::before{
+ content:"▤";display:grid;place-items:center;width:29px;height:29px;
+ border-radius:9px;background:var(--ax4-tint);color:var(--ax4-ocean);font-size:19px;
+}
+body.ax4.ax4-lab .lab-tabs>a:nth-child(2)::before{content:"▧"}
+body.ax4.ax4-lab .lab-tabs>a:nth-child(3)::before{content:"⇄"}
+body.ax4.ax4-lab .lab-tabs>a:nth-child(4)::before{content:"⤴"}
+body.ax4.ax4-lab .lab-tabs>a:nth-child(5)::before{content:"◷"}
+body.ax4.ax4-lab .lab-tabs>a:nth-child(6)::before{content:"⇩"}
+body.ax4.ax4-lab .lab-tabs>a::after{
+ content:"Find source-linked research literature";display:block;
+ font:500 12px/1.4 var(--ax4-body);letter-spacing:normal;
+ color:var(--ax4-muted);
+}
+body.ax4.ax4-lab .lab-tabs>a:nth-child(2)::after{content:"Read, annotate and export PDF notes"}
+body.ax4.ax4-lab .lab-tabs>a:nth-child(3)::after{content:"Compare original records side by side"}
+body.ax4.ax4-lab .lab-tabs>a:nth-child(4)::after{content:"Examine cited and related scholarship"}
+body.ax4.ax4-lab .lab-tabs>a:nth-child(5)::after{content:"Monitor new papers in followed topics"}
+body.ax4.ax4-lab .lab-tabs>a:nth-child(6)::after{content:"Manage data backup and restore"}
+body.ax4.ax4-lab .lab-tabs>a:hover{transform:translateY(-2px);border-color:var(--ax4-teal)!important}
+@media(min-width:761px) and (max-width:1050px){
+ body.ax4.ax4-lab .lab-tabs{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}
+@media(max-width:760px){
+ body.ax4.ax4-lab .lab-tabs{grid-template-columns:minmax(0,1fr)!important;gap:9px!important}
+ body.ax4.ax4-lab .lab-tabs>a{
+  min-height:68px!important;padding:13px 15px!important;
+  display:grid!important;grid-template-columns:33px minmax(0,1fr)!important;
+  grid-template-rows:1fr 1fr!important;column-gap:9px!important;
+  align-content:center!important;align-items:center!important;
+  font-size:16px!important;
+ }
+ body.ax4.ax4-lab .lab-tabs>a::before{grid-column:1!important;grid-row:1/3!important}
+ body.ax4.ax4-lab .lab-tabs>a::after{grid-column:2!important;grid-row:2!important;font-size:11px!important}
+}
