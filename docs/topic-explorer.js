@@ -327,6 +327,16 @@ function filtered(state){
  // Merge source records first, then score and sort once. Filtering each source
  // separately creates redundant full-text passes and blocks mobile scrolling.
  const groups=state.complete?[state.batch]:[state.local,state.batch,state.remote];
+ // Recent views must not collapse v1 into v2 before ordering. Historical
+ // search retains its existing work-level deduplication and ranking.
+ if(state.announcementOnly||state.recentOnly){
+  const byVersion=new Map();
+  for(const paper of groups.flat()){
+   const key=paper.source+":"+(paper.recordId||paper.id)+":"+(paper.version??"unknown");
+   if(!byVersion.has(key))byVersion.set(key,paper);
+  }
+  return data.filter([...byVersion.values()],state.criteria);
+ }
  return data.filter(data.merge(...groups),state.criteria);
 }
 function drawResults(state){
