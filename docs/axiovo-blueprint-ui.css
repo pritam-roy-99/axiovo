@@ -211,3 +211,17 @@ body.axiovo-reference-ui.axiovo-home .axiovo-archive-card{background:#f5fafc;bor
   grid-column:1/-1!important;
  }
 }
+
+/* Force the screenshot's white desktop toolbar even against legacy high-specificity navy header rules. */
+@media(min-width:761px) {
+ html:root body.axiovo-reference-ui header.rl-global-header,
+ html:root body.axiovo-reference-ui header.rl-global-header.rl-global-header {
+  background:#ffffff!important;background-color:#ffffff!important;
+  background-image:none!important;color:#16394e!important;
+  border-bottom:1px solid #d4e5ed!important;
+ }
+ html:root body.axiovo-reference-ui header.rl-global-header > a.ax-header-home,
+ html:root body.axiovo-reference-ui header.rl-global-header > a.ax-header-home:visited {
+  color:#123c57!important;background:transparent!important
+ }
+}
