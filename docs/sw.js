@@ -1,11 +1,11 @@
 /* Axiovo offline shell. Scholarly metadata, video and PDFs stay network-only. */
 "use strict";
-const CACHE = "axiovo-shell-v95";
+const CACHE = "axiovo-shell-v96-robot-mobile";
 const SHELL = [
   "./", "./index.html", "./workspace.html", "./icons/axiovo.svg",
   "./manifest.webmanifest", "./theme.css", "./research-entry.css", "./axiovo-shell.css?v=20261108-mobile-research-v3",
   "./research-desk.css", "./home-landing.css?v=20261107-mobile-ui-v1", "./theme.js", "./research-entry.js",
-  "./navigation.js?v=20261108-home-history-v5", "./archive-taxonomy.js", "./arxiv-versions.js", "./archive-data.js",
+  "./navigation.js?v=20261111-robot-mobile-v1", "./axiovo-robot-help.js?v=20261111-robot-mobile-v1", "./archive-taxonomy.js", "./arxiv-versions.js", "./archive-data.js",
   "./author-follow.js", "./feed-preferences.js", "./feed-core.js", "./feed-preview.js",
   "./source-pulse.js", "./pwa.js", "./voice-search.js?v=20261109-visible-v2", "./assets/axiovo-tour-poster.svg?v=four-sources-2", "./home-tour.js?v=20261108-video-recovery-v2",
   "./workspace.css", "./paper-actions.css", "./paper-card-polish.css?v=20261106-save2", "./research-workflow.css",
