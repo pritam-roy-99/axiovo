@@ -8,7 +8,7 @@ const SHELL = [
   "./research-hub.html", "./research-hub.css", "./research-hub.js",
   "./navigation.js?v=20261111-tutorial-stage-v3", "./axiovo-blueprint-ui.js?v=20261111-tutorial-stage-v3", "./axiovo-blueprint-ui.css?v=20261111-current-ui-v4", "./axiovo-page-design-v4.css?v=20261111-complete-v1", "./axiovo-page-design-v4.js?v=20261111-complete-v1", "./icons/axiovo-approved.svg", "./axiovo-robot-help.js?v=20261111-p0p1-v1", "./archive-taxonomy.js", "./arxiv-versions.js", "./archive-data.js",
   "./author-follow.js", "./feed-preferences.js", "./feed-core.js", "./feed-preview.js",
-  "./source-pulse.js", "./pwa.js", "./voice-search.js?v=20261109-visible-v2", "./assets/axiovo-tour-poster.svg?v=four-sources-2", "./home-tour.js?v=20261111-current-ui-v4",
+  "./source-pulse.js", "./pwa.js", "./voice-search.js?v=20261109-visible-v2", "./assets/axiovo-tour-poster.svg?v=current-axiovo-ui-20261111-v4", "./home-tour.js?v=20261111-current-ui-v4",
   "./workspace.css", "./paper-actions.css", "./paper-card-polish.css?v=20261106-save2", "./research-workflow.css",
   "./citation-evidence.js?v=20261107-verified2", "./citation-evidence.css?v=20261107-verified2", "./paper-sort.js", "./abstract-audio.js?v=20261108-android-recovery-v6",
   "./workspace.js", "./interests.js", "./relevance.js", "./research-intelligence.js",
