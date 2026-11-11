@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-10T23:36:56.755121+00:00",
+  "generated_at": "2026-11-11T00:00:54.649807+00:00",
   "source": "official arXiv OAI-PMH and verified submission-date Atom batches, with category fallback",
   "index_scope": "all-category recent OAI harvest (partial if incomplete) and independently verified full submission-day shards; older history remains partial",
   "refresh_methods": [
@@ -39386,6 +39386,76 @@
       "metadata_source": "arXiv OAI-PMH"
     },
     {
+      "id": "2611.06918",
+      "version": 1,
+      "title": "From Pixels to Actions--Towards Native Vision-Language-Action Policies",
+      "abstract": "Vision-language-action models are typically built on a simple premise: perception is first compressed by visual encoders, and action reasoning begins only afterwards. Yet manipulation often hinges on precisely the visual signals most vulnerable to this abstraction, e.g., local geometry, boundaries, depth, and subtle state changes. This raises a fundamental question: should action policies inherit a fixed visual endpoint, or directly access evolving visual computation? We introduce NEO-VLA, a structurally encoder-free vision-language-action framework. Images are tokenized by lightweight patch convolutional layers and evolve jointly with language throughout the backbone, allowing a flow-matching action expert to draw from instruction-conditioned visual representations at different depths. This simple change reveals a consistent pattern. Native architectures outperform encoder-based counterparts under controlled comparisons; full fine-tuning reduces but does not erase the gap, and additional scale alone cannot recover it. More strikingly, layer-wise probing shows that the action-critical signals often peak well before the final visual representation. Across diverse manipulation settings and distribution shifts, NEO-VLA consequently achieves stronger and more robust control. Together, these results suggest that embodied control benefits from access to visual representations across the computational hierarchy, rather than a fixed encoder output.",
+      "authors": [
+        "Weichen Fan",
+        "Haiwen Diao",
+        "Penghao Wu",
+        "Siyuan Hu",
+        "Ziqi Huang",
+        "Tianqi Liu",
+        "Mingze Sun",
+        "Ziyi Wang",
+        "Zhongang Cai",
+        "Hanming Deng",
+        "Quan Wang",
+        "Lei Yang",
+        "Lewei Lu",
+        "Fangzhou Hong",
+        "Zhaoxi Chen",
+        "Dahua Lin",
+        "Ziwei Liu"
+      ],
+      "categories": [
+        "cs.CV"
+      ],
+      "primary_category": "cs.CV",
+      "published": "2026-11-09T00:00:00Z",
+      "published_date_precision": "day",
+      "updated": "2026-11-10T00:00:00Z",
+      "link": "https://arxiv.org/abs/2611.06918",
+      "topics": [],
+      "doi": "",
+      "metadata_source": "arXiv OAI-PMH"
+    },
+    {
+      "id": "2611.06079",
+      "version": 1,
+      "title": "TauLang: A Language and Compiler for Space-Time Programming on Statically Scheduled Accelerators",
+      "abstract": "Statically scheduled accelerators such as Groq's Tensor Streaming Processor (TSP) achieve low-latency large language model inference by stripping dynamic synchronization hardware from the chip. With no caches, arbiters, or hardware schedulers, the compiler must fix the exact slice and issue cycle of every operation, so when an operation runs is a condition for correctness. Existing kernel languages cannot target such machines because they rely on hardware to resolve cycle timing and instead encode schedules implicitly in code structure. We present TauLang, a kernel language and compiler that makes time a first-class citizen of the program. The programmer schedules operations, loops, and composed kernels with parameterized explicit times, so exploring schedules means changing parameter values rather than rewriting code. TauLang validates explicit times algebraically in TauIR, its timed intermediate representation. It then solves tensor placement and cycle scheduling jointly in an integer linear program, using explicit times to group connected operations into timing clusters that prune the search space. On a cycleaccurate model of a TSP-like machine, joint search achieves a $1.40\\times$ latency speedup across ten kernels over a space-first flow. A few explicit time pins keep latency within one cycle of the untimed schedules and scale joint search to 1,636 GEMM blocks, whereas untimed search finds no schedule at 32.",
+      "authors": [
+        "Xuxiao Yang",
+        "Junchi Wu",
+        "Yuqi Peng",
+        "Feiyang Wu",
+        "Zhuoran Li",
+        "Wei Kong",
+        "Shuo Tao",
+        "Dongyi Fan",
+        "Yiming Zhang",
+        "Keqin Luo",
+        "Xingrui Gao",
+        "Hao Zhang",
+        "Xuehai Qian",
+        "Youwei Zhuo"
+      ],
+      "categories": [
+        "cs.PL",
+        "cs.AR"
+      ],
+      "primary_category": "cs.PL",
+      "published": "2026-11-09T00:00:00Z",
+      "published_date_precision": "day",
+      "updated": "2026-11-10T00:00:00Z",
+      "link": "https://arxiv.org/abs/2611.06079",
+      "topics": [],
+      "doi": "",
+      "metadata_source": "arXiv OAI-PMH"
+    },
+    {
       "id": "2611.05877",
       "version": 1,
       "title": "When Does Better Confidence Improve a Knowledge-Graph Audit?",
@@ -62055,6 +62125,30 @@
       "updated": "2026-11-10T00:00:00Z",
       "link": "https://arxiv.org/abs/2607.08061",
       "topics": [],
+      "doi": "",
+      "metadata_source": "arXiv OAI-PMH"
+    },
+    {
+      "id": "2611.06194",
+      "version": 1,
+      "title": "Cross-Asset Knowledge Transfer for Early Fault Detection of Data-Scarce Assets Without Target Fault Data",
+      "abstract": "Reliability management of industrial fleets depends on early fault warnings, yet lifecycle data across similar assets are highly imbalanced. A few assets accumulate run-to-failure histories, while newly installed or rarely failing assets provide only normal-condition data. This paper asks how diagnostic knowledge can be transferred from a data-rich source asset to a data-scarce target asset when no fault data have been observed on the target. We formulate cross-asset early fault detection as a zero-shot domain adaptation problem, in which zero-shot refers to the absence of target fault samples, and propose a framework that requires only normal data from the target. The framework comprises (1) a statistical process control step that labels the source asset run-to-failure data with an exponentially weighted moving average chart, reducing manual annotation to verifying flagged segments, (2) an Adapted Domain-Adversarial Neural Network (ADANN) that combines domain-adversarial training and a Maximum Mean Discrepancy penalty with an Adapted Classification-Domain (ACD) loss, which anchors the classifier normal region to the target own normal data, and (3) an ahead-of-time labeling scheme with a prediction horizon that targets incipient faults. Under an exact-classification assumption, a theoretical analysis characterizes the domain-adversarial term for a normal-only target and the alignment state in which source fault features remain separated from target normal features. On a public run-to-failure bearing dataset, ADANN attains the highest mean F1-score among four transfer baselines, with a nominally significant precision gain over the strongest baseline, and its robustness is examined under synthetic noise.",
+      "authors": [
+        "Zekai Wang",
+        "Yuxuan Li",
+        "Zhangyue Shi"
+      ],
+      "categories": [
+        "cs.LG"
+      ],
+      "primary_category": "cs.LG",
+      "published": "2026-11-08T00:00:00Z",
+      "published_date_precision": "day",
+      "updated": "2026-11-10T00:00:00Z",
+      "link": "https://arxiv.org/abs/2611.06194",
+      "topics": [
+        "computer-ai"
+      ],
       "doi": "",
       "metadata_source": "arXiv OAI-PMH"
     },
@@ -85214,6 +85308,28 @@
       "metadata_source": "arXiv OAI-PMH"
     },
     {
+      "id": "2611.06744",
+      "version": 1,
+      "title": "A family of symmetric counterexamples to the bent sum decomposition conjecture",
+      "abstract": "In this paper, we provide an infinite family of counterexamples to Tokareva's conjecture on sums of two bent functions. The conjecture states that every Boolean function in an even number of variables $n$ of algebraic degree at most $n/2$ can be written as the sum of two bent functions. We show that for every $n=2^k\\geq 8$, the symmetric function $F_n=1+σ_2+σ_4+σ_6+\\cdots+σ_{n/2}$ has degree $n/2$ and cannot be written as a sum of at most two bent functions. Here $σ_j$ is the elementary symmetric Boolean polynomial of degree $j$. Furthermore, we show that the eight-variable member of this family can be represented as the sum of exactly three bent functions. Using the connection between bent-sum decompositions and derivatives of bent functions, we also obtain an infinite family of balanced Boolean functions that cannot be derivatives of bent functions.",
+      "authors": [
+        "Máté Róbert Kepes",
+        "Anita Kercsó-Molnár",
+        "András Viczián"
+      ],
+      "categories": [
+        "math.CO"
+      ],
+      "primary_category": "math.CO",
+      "published": "2026-11-07T00:00:00Z",
+      "published_date_precision": "day",
+      "updated": "2026-11-10T00:00:00Z",
+      "link": "https://arxiv.org/abs/2611.06744",
+      "topics": [],
+      "doi": "",
+      "metadata_source": "arXiv OAI-PMH"
+    },
+    {
       "id": "2611.09894",
       "version": 1,
       "title": "Video-Coder: Reinforcing Agentic Coding for Video Generation",
@@ -88478,96 +88594,6 @@
       "published": "2026-11-06T17:18:35Z",
       "updated": "2026-11-06T17:18:35Z",
       "link": "https://arxiv.org/abs/2611.09749",
-      "topics": [],
-      "doi": ""
-    },
-    {
-      "id": "2611.09748",
-      "version": 1,
-      "title": "Predicting fitness from genomic offset: a multivariate latent-trait framework",
-      "abstract": "Genomic offset methods quantify the genetic consequences of environmental change using genotype environment associations (GEA), but the conditions under which they predict fitness remain poorly understood. Here, we develop a theoretical framework linking genomic offset to relative fitness loss through multivariate latent adaptive traits under stabilizing selection. We show that squared genomic offset is linearly related to expected log relative fitness loss when averaged over genetic architectures, provided that direct environmental effects are absent. However, this relationship does not necessarily hold for a realized genetic architecture. We identify two complementary mechanisms that can explain high predictive accuracy of genomic offset statistics. First, when effective adaptive dimensionality is sufficiently large, the genetically mediated fitness response concentrates around its marginal expectation, reducing the dependence on the particular genetic architecture. Second, even with few adaptive traits, accurate predictions can arise from geometric alignment between the complete fitness loss matrix and the GEA metric. This second mechanism also encompasses direct environmental effects and their interactions with genetically mediated responses, which may preserve or weaken predictive accuracy depending on their alignment. We further derive bounds on predictive accuracy that characterize these effects. Our results clarify the assumptions and limitations underlying genomic offset predictions and suggest that genomic offset is best interpreted as a measure of genetically informed adaptive mismatch, rather than a direct predictor of realized fitness or any particular phenotypic trait.",
-      "authors": [
-        "Olivier François"
-      ],
-      "categories": [
-        "q-bio.PE"
-      ],
-      "primary_category": "q-bio.PE",
-      "published": "2026-11-06T17:18:19Z",
-      "updated": "2026-11-06T17:18:19Z",
-      "link": "https://arxiv.org/abs/2611.09748",
-      "topics": [
-        "genomics"
-      ],
-      "doi": ""
-    },
-    {
-      "id": "2611.09747",
-      "version": 1,
-      "title": "Contention Resolution Against an Adversarial Scheduler",
-      "abstract": "In the classical contention-resolution problem, a set of players share a broadcast channel, and a player succeeds in a given time step if it is the only player to broadcast during that step. Implicit in the classical problem is the assumption that every player is free to act on every step: once a player arrives, it participates until it succeeds. We study what happens when that assumption is removed. In our model, an adversarial \\emph{scheduler} decides, on each step, which subset of the players gets scheduled to participate in the step. An unscheduled player simply sleeps through the step. We measure a protocol by its \\emph{efficiency}: the number of players divided by the expected number of steps in which at least one player was active. Our first result says that, so long as the players are given access to a global clock and to shared randomness, they can achieve efficiency $Ω(1/\\log n)$. The players are able to achieve this bound without requiring any channel feedback, and even if the adversarial scheduler is adaptive. We also give a matching lower bound of $O(1 / \\log n)$, which holds even with channel feedback, and even for an oblivious scheduler. Our upper bounds all require the players to have access to a shared global clock and to shared randomness. Our final result says that this type of implicit shared state is necessary. If the players have neither a global clock nor shared randomness, then no protocol can achieve efficiency better than $O(\\log n / n)$; and this holds even if the other aspects of the problem are designed to be as favorable for the players as possible (the channel gives ternary feedback and the adversary is oblivious).",
-      "authors": [
-        "Michael A. Bender",
-        "Martín Farach-Colton",
-        "Andrew Krapivin",
-        "Pritom Kundu",
-        "John Kuszmaul",
-        "Margaret Kuszmaul",
-        "William Kuszmaul",
-        "Jingxun Liang"
-      ],
-      "categories": [
-        "cs.DS"
-      ],
-      "primary_category": "cs.DS",
-      "published": "2026-11-06T17:17:41Z",
-      "updated": "2026-11-06T17:17:41Z",
-      "link": "https://arxiv.org/abs/2611.09747",
-      "topics": [],
-      "doi": ""
-    },
-    {
-      "id": "2611.09746",
-      "version": 1,
-      "title": "Continuous wavelet-based feature extraction for laser-induced breakdown spectroscopy classification of human plasma samples",
-      "abstract": "Extracting discriminative features from laser-induced breakdown spectroscopy (LIBS) spectra is important for the classification of complex biological samples. This study evaluates continuous wavelet transform (CWT)-based spectral peak extraction for distinguishing human plasma samples labeled as SARS-CoV-2-positive or negative. Plasma specimens from 181 individuals, comprising 53 positive samples and 128 negative controls, were deposited as 5 μL droplets on silicon substrates and dried before analysis. Spectra were acquired using a nanosecond Nd:YAG laser operating at 1064 nm, with 100 single-shot measurements collected per specimen and averaged after intensity-based outlier rejection. CWT-based peak detection was coupled with a support vector machine (SVM) classifier. The reported leave-one-out evaluation yielded an accuracy of 93.00%, sensitivity of 94.67%, and specificity of 91.61%; these estimates remain provisional pending reconciliation with specimen-level predictions. Features identified by the CWT pipeline included emission lines assigned to Ca II, K I, and N I. The workflow provides a basis for examining spectral features associated with the studied plasma groups. Independent validation and assessment of specimen, substrate, and acquisition-related variability are required to establish generalizability and diagnostic relevance.",
-      "authors": [
-        "Md Mahmudur Rahman",
-        "Atqiya Munawara Mahi",
-        "Nazim Ahmed Belabbaci",
-        "Mohammad Arif Ul Alam"
-      ],
-      "categories": [
-        "cs.AI"
-      ],
-      "primary_category": "cs.AI",
-      "published": "2026-11-06T17:17:07Z",
-      "updated": "2026-11-06T17:17:07Z",
-      "link": "https://arxiv.org/abs/2611.09746",
-      "topics": [],
-      "doi": ""
-    },
-    {
-      "id": "2611.09745",
-      "version": 1,
-      "title": "Multiscale Closing Index (MCI) for measuring structural similarity between 2D point sets",
-      "abstract": "We introduce Multi-scale Closing Index (MCI), a new dissimilarity measure for evaluating the alignment of two 2D point sets. MCI is bounded between 0 and 1 and is based on multiscale mathematical morphology operations, with smaller values indicating greater structural agreement. The measure was motivated by the need to assess the quality of registration between point sets representing cell populations in biological images. To evaluate its behaviour under controlled conditions, we generated synthetic point clouds from Perlin-noise-based spatial structures, following established approaches for simulating biologically plausible spatial organization. We assessed MCI between those point clouds and different transformed versions, obtained by local perturbation, point removal, translation, rotation and addition of impulsive noise. Across these experiments, the dissimilarity MCI increased gradually and consistently with perturbation severity, while showing a clear discontinuity between clouds originating from the same underlying spatial structure and point clouds generated from different structures. We further compared MCI with commonly used point-set distances, including Hausdorff-based measures and Sliced Wasserstein distance. These experiments show the ability of MCI to capture structural agreement and quantify deviations between point sets, highlighting its potential as a complementary metric for evaluating two-dimensional point-set registration.",
-      "authors": [
-        "Nicolò Zava",
-        "Angel Franco-Alvarez",
-        "Samy Blusseau",
-        "Santiago Velasco-Forero",
-        "Maria-Jose Jimenez"
-      ],
-      "categories": [
-        "math.MG",
-        "cs.CG",
-        "cs.CV"
-      ],
-      "primary_category": "math.MG",
-      "published": "2026-11-06T17:16:58Z",
-      "updated": "2026-11-06T17:16:58Z",
-      "link": "https://arxiv.org/abs/2611.09745",
       "topics": [],
       "doi": ""
     }
