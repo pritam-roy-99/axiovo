@@ -3,17 +3,32 @@
 (function(){
  "use strict";
  const steps=[
-  {label:"WELCOME TO AXIOVO",title:"Research discovery, made simpler.",description:"Start with a source, topic or question. Axiovo helps you move from finding a preprint to verifying and organizing it.",pills:["arXiv","bioRxiv","ChemRxiv","Crypto ePrint"],action:"Explore archives",href:"./arxiv.html"},
-  {label:"STEP 1 · DISCOVER",title:"Find your research area.",description:"Select arXiv, bioRxiv, ChemRxiv, or Cryptology ePrint. Narrow your search using subjects, research subfields and specific topics.",pills:["Subject","Subfield","Topic"],action:"Explore arXiv",href:"./arxiv.html"},
-  {label:"STEP 2 · SEARCH",title:"Search across all four archives.",description:"Search by title, keyword, author or identifier. Refine by date and sort the papers you see.",pills:["IACR IDs","Date filters","Sort papers"],action:"Open Research Desk",href:"./desk.html"},
-  {label:"STEP 3 · VERIFY & SAVE",title:"Keep the papers that matter.",description:"Read source-linked abstracts, inspect original records, and save papers, notes and collections to your private Library.",pills:["Original source","Save paper","Collections"],action:"Open My Library",href:"./workspace.html"},
-  {label:"STEP 4 · FOLLOW",title:"A personalized research feed.",description:"Follow authors and subtopics, then browse relevant papers and suggestions in My Feed.",pills:["Authors","Topics","My Feed"],action:"Open My Feed",href:"./feed.html"},
-  {label:"STEP 5 · ANALYZE",title:"Go further with research tools.",description:"Use Research Assistant for source-linked questions and Research Tools to work with papers, citations and comparisons.",pills:["Research Assistant","Research Tools","Evidence"],action:"Open Research Assistant",href:"./copilot.html"}
- ];
+  {label:"START · RESEARCH DISCOVERY",title:"Welcome to the new Axiovo.",description:"Explore a free, open-source research workspace that helps you discover papers across four archives, verify source records, and organize your own literature.",pills:["arXiv","bioRxiv","ChemRxiv","IACR ePrint"],action:"Explore the four archives",href:"./arxiv.html"},
+  {label:"01 · DISCOVER",title:"From broad subjects to specific topics.",description:"Choose a source and narrow research using a subject, subfield and subtopic. Customize research paths without losing the original archive classification.",pills:["Subject","Subfield","Subtopic","Custom paths"],action:"Browse arXiv subjects",href:"./arxiv.html"},
+  {label:"02 · LATEST PAPERS",title:"Check current announcements and versions.",description:"Browse the most recent available papers, choose dates, and distinguish an arXiv first submission (v1) from later revisions. Coverage indicators warn when an archive is incomplete.",pills:["Latest announcements","v1 / revisions","Date range"],action:"Browse recent arXiv papers",href:"./arxiv.html"},
+  {label:"03 · RESEARCH DESK",title:"One search across four archives.",description:"Search titles, authors, keywords and identifiers. Filter by date, select archives and inspect source-linked results. Axiovo does not claim missing papers are indexed.",pills:["Four sources","Author search","Filter / sort"],action:"Open Research Desk",href:"./desk.html"},
+  {label:"04 · VERIFY",title:"Trust the original research record.",description:"Inspect source identifiers, available versions, abstracts and references. Open the original paper to verify any claim before citing it.",pills:["Original record","Exact versions","Citations"],action:"Search the evidence",href:"./desk.html"},
+  {label:"05 · LIBRARY",title:"Build your private reading collection.",description:"Save interesting papers, add notes and collections, compare sources and export citations. Your browser-local data stays on your device unless you choose to export or back it up.",pills:["Save","Notes","BibTeX / RIS","Backup"],action:"Open your Library",href:"./workspace.html"},
+  {label:"06 · MY FEED",title:"Follow authors and research interests.",description:"Follow authors, subjects and subtopics and revisit personalized suggestions. Check why each paper is recommended and open its source record.",pills:["Follow authors","Follow topics","My Feed"],action:"Open My Feed",href:"./feed.html"},
+  {label:"07 · RESEARCH ASSISTANT",title:"Ask literature questions with evidence.",description:"Use the Research Assistant to investigate indexed papers and source-linked citations. Available local or hosted model support depends on the user's setup.",pills:["Research questions","Source links","Local-first"],action:"Open Research Assistant",href:"./copilot.html"},
+  {label:"08 · PROOFLAB & TOOLS",title:"Move from reading to research work.",description:"Use ProofLab and Research Tools for structured work, PDF reading, research notes, source comparison and mathematical reasoning. Verify generated claims independently.",pills:["ProofLab","PDF tools","Comparisons"],action:"Open ProofLab",href:"./prooflab.html"},
+  {label:"09 · ACCESS & APPEARANCE",title:"Make Axiovo your workspace.",description:"Install Axiovo as a browser app, choose Day or Night mode and one of five color palettes, and use the movable Need help? robot where it is available.",pills:["Install","Day / Night","Five palettes","Need help?"],action:"Open Settings",href:"./profiles.html"}
+ ]
  function initialize(){
   const root=document.getElementById("axiovo-tour");if(!root)return;
   const video=document.getElementById("axiovo-home-video");
   if(video){
+   const switcher=document.querySelector(".axiovo-tour-mode-switch");
+   // Both modes share one stable stage below the same two buttons.
+   let stage=document.getElementById("axiovo-tour-stage");
+   if(!stage){
+    stage=document.createElement("div");
+    stage.id="axiovo-tour-stage";
+    stage.className="axiovo-tour-stage";
+    stage.setAttribute("aria-label","Axiovo tutorial content");
+    if(switcher)switcher.after(stage);else video.before(stage);
+   }
+   stage.append(video,root);
    const watch=document.getElementById("axiovo-tour-show-video");
    const guide=document.getElementById("axiovo-tour-show-guide");
    const retry=document.getElementById("axiovo-tour-retry-video");
@@ -28,8 +43,11 @@
    function display(next){
     mode=next;
     const isVideo=next==="video";
+    stage.dataset.mode=isVideo?"video":"guide";
     video.hidden=!isVideo;
     root.hidden=isVideo;
+    const side=stage.querySelector(".ax-home-guide");
+    if(side)side.hidden=!isVideo;
     watch?.setAttribute("aria-pressed",String(isVideo));
     guide?.setAttribute("aria-pressed",String(!isVideo));
     if(watch)watch.classList.toggle("rd-primary",isVideo);
@@ -112,6 +130,7 @@
   }
   const overline=document.getElementById("axiovo-tour-overline"),title=document.getElementById("axiovo-tour-title"),description=document.getElementById("axiovo-tour-description"),illustration=document.getElementById("axiovo-tour-illustration"),counter=document.getElementById("axiovo-tour-counter"),progress=document.getElementById("axiovo-tour-progress"),action=document.getElementById("axiovo-tour-action"),prev=document.getElementById("axiovo-tour-prev"),next=document.getElementById("axiovo-tour-next");
   let current=0;const dots=[];
+  progress.replaceChildren();
   steps.forEach((step,i)=>{
    const b=document.createElement("button");b.type="button";b.setAttribute("aria-label","Go to tutorial step "+(i+1));b.addEventListener("click",()=>render(i));progress.append(b);dots.push(b);
   });
