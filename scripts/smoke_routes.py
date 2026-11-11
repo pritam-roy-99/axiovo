@@ -147,6 +147,27 @@ def main():
                         assert page.locator(".ax-header-search").is_visible()
                     if width<=428:
                         check_phone_content(page,path,width)
+                    if width in (390,1360) and path in ("","desk.html","copilot.html"):
+                        bot=page.locator("#axiovo-robot .robot-mascot")
+                        bot.wait_for(state="visible",timeout=15000)
+                        assert "assets/axiovo-assistant-mascot.svg" in bot.get_attribute("src")
+                        assert page.locator("#axiovo-robot .robot-fab").is_visible()
+                        assert page.locator("#axiovo-robot .robot-help-label").is_visible()
+                        if phone:
+                            robot_geometry=page.evaluate("""() => {
+                              const box=s=>document.querySelector(s).getBoundingClientRect();
+                              const bot=box('#axiovo-robot .robot-fab');
+                              const bar=box('header.rl-global-header nav.rl-nav');
+                              return {bottom:bot.bottom,top:bar.top};
+                            }""")
+                            assert robot_geometry["bottom"] < robot_geometry["top"],(
+                                width,path,"Assistant covers bottom navigation",robot_geometry)
+                        if path=="":
+                            page.locator("#axiovo-robot .robot-fab").click()
+                            page.locator("#axiovo-robot-language").select_option("bn-IN")
+                            assert "সাহায্য" in page.locator(".robot-help-label").inner_text()
+                            page.locator("#axiovo-robot-language").select_option("auto")
+                            page.get_by_role("button",name="Close robot help").click()
                     if not path:
                         # Both modes must share one stage below their own
                         # controls, not jump above/below when toggled.

@@ -9,6 +9,7 @@ style.textContent+="\n#axiovo-robot .robot-launcher{display:flex!important;align
 style.textContent+="\n/* Fixed viewport launcher: independent of page layout, including mobile keyboard and open chat. */\n#axiovo-robot{--robot-panel:#f8fbfe;--robot-ink:#17324a;--robot-head:#123e5d;--robot-bubble:#e5f0f8;--robot-user:#d3eafb;--robot-border:#a2c8de;--robot-control:#ffffff;--robot-control-ink:#17425c;--robot-muted:#47647a;position:fixed!important;left:auto!important;right:16px!important;top:auto!important;bottom:calc(16px + env(safe-area-inset-bottom,0px))!important;z-index:2147483000!important;overflow:visible!important;display:block!important;visibility:visible!important;opacity:1!important}\n#axiovo-robot .robot-launcher{position:relative!important;display:flex!important;flex-flow:row nowrap!important;align-items:center!important;justify-content:flex-end!important;gap:8px!important;width:max-content!important;max-width:calc(100vw - 16px)!important;min-height:56px!important;visibility:visible!important;opacity:1!important;transform:none!important}\n#axiovo-robot .robot-help-label{display:inline-flex!important;align-items:center!important;visibility:visible!important;opacity:1!important;max-width:none!important;background:var(--robot-head)!important;color:#fff!important;box-shadow:0 5px 16px #081e3833!important;border:1px solid #88b8d2!important;border-radius:13px!important;padding:9px 12px!important;font-size:14px!important;font-weight:800!important;white-space:nowrap!important}\n#axiovo-robot .robot-fab{position:relative!important;flex:none!important;visibility:visible!important;opacity:1!important;background:var(--robot-head)!important;color:#fff!important;z-index:2!important}\n#axiovo-robot .robot-panel{position:fixed!important;left:auto!important;right:16px!important;top:auto!important;bottom:calc(84px + env(safe-area-inset-bottom,0px))!important;width:min(375px,calc(100vw - 20px))!important;max-width:calc(100vw - 20px)!important;height:min(510px,calc(100dvh - 125px))!important;max-height:calc(100dvh - 125px)!important;background:var(--robot-panel)!important;color:var(--robot-ink)!important;border-color:var(--robot-border)!important;z-index:2147483001!important}\n#axiovo-robot .robot-panel[hidden]{display:none!important}\n#axiovo-robot .robot-head{background:var(--robot-head)!important;color:#fff!important}\n#axiovo-robot .robot-msg{background:var(--robot-bubble)!important;color:var(--robot-ink)!important}\n#axiovo-robot .robot-msg.user{background:var(--robot-user)!important}\n#axiovo-robot .robot-voice-settings,#axiovo-robot .robot-note,#axiovo-robot .robot-voice-status{color:var(--robot-muted)!important}\n#axiovo-robot .robot-actions button,#axiovo-robot .robot-speak-reply,#axiovo-robot .robot-form button,#axiovo-robot .robot-voice-settings button,#axiovo-robot .robot-voice-settings select{background:var(--robot-control)!important;color:var(--robot-control-ink)!important;border-color:var(--robot-border)!important}\n#axiovo-robot .robot-form input{background:var(--robot-control)!important;color:var(--robot-ink)!important;border-color:var(--robot-border)!important}\nhtml[data-theme=\"dark\"] #axiovo-robot{--robot-panel:#122638;--robot-ink:#eaf5fd;--robot-head:#061b2d;--robot-bubble:#223c51;--robot-user:#174c68;--robot-border:#4a6d83;--robot-control:#1c364b;--robot-control-ink:#e9f5fd;--robot-muted:#c1d8e6}\n@media(max-width:760px){#axiovo-robot{left:auto!important;right:10px!important;top:auto!important;bottom:calc(12px + env(safe-area-inset-bottom,0px))!important}#axiovo-robot .robot-panel{left:10px!important;right:10px!important;top:auto!important;bottom:calc(83px + env(safe-area-inset-bottom,0px))!important;width:auto!important;height:min(480px,calc(100dvh - 116px))!important;max-height:calc(100dvh - 116px)!important}#axiovo-robot .robot-launcher{min-height:54px!important}#axiovo-robot .robot-help-label{font-size:13px!important}}\n";
 style.textContent+="\n/* Guided tour places the launcher beside the highlighted feature, never over it. */\n#axiovo-robot.axiovo-guiding{transition:left .35s ease,top .35s ease}\n#axiovo-robot.axiovo-guiding .robot-launcher{pointer-events:auto!important}\n.axiovo-robot-target{outline:3px solid #22b5dd!important;outline-offset:5px!important;box-shadow:0 0 0 8px rgba(34,181,221,.15)!important;scroll-margin-top:112px!important;position:relative;z-index:1}\n@media(prefers-reduced-motion:reduce){#axiovo-robot.axiovo-guiding{transition:none!important}}\n";
 style.textContent+="\n#axiovo-robot .robot-paper-card{padding:9px 0;border-bottom:1px solid var(--robot-border);display:grid;gap:4px}\n#axiovo-robot .robot-paper-title{display:block;color:var(--robot-control-ink);font-weight:750;text-decoration:underline;overflow-wrap:anywhere}\n#axiovo-robot .robot-paper-meta{color:var(--robot-muted);font-size:11px}\n#axiovo-robot .robot-paper-snippet{margin:4px 0;font-size:12px;line-height:1.5}\n#axiovo-robot .robot-paper-save{justify-self:start;border:1px solid var(--robot-border);background:var(--robot-control);color:var(--robot-control-ink);border-radius:7px;padding:6px 9px;cursor:pointer}\n";
+style.textContent+="\n/* User-approved animated mascot: the original help operations remain intact. */\n#axiovo-robot .robot-fab{\n width:82px!important;height:82px!important;min-width:68px!important;\n position:relative;display:grid!important;place-items:center!important;\n border:2px solid #42a9c5!important;border-radius:24px!important;\n background:#fff!important;box-shadow:0 9px 24px #052a4966!important;\n overflow:visible!important;isolation:isolate;\n}\n#axiovo-robot .robot-mascot{\n width:100%!important;height:100%!important;display:block!important;\n object-fit:contain!important;object-position:center!important;\n border-radius:20px;pointer-events:none;user-select:none;\n animation:axiovo-mascot-float 3.1s ease-in-out infinite;\n}\n#axiovo-robot .robot-fab:hover .robot-mascot,\n#axiovo-robot .robot-fab:focus-visible .robot-mascot{\n animation:axiovo-mascot-wave .65s ease-in-out 2;\n}\n#axiovo-robot.robot-speaking .robot-mascot{\n animation:axiovo-mascot-talk .55s ease-in-out infinite;\n}\n#axiovo-robot.robot-listening .robot-fab{\n box-shadow:0 0 0 5px #25b3d244,0 9px 24px #052a4966!important;\n border-color:#18c4d8!important;\n}\n#axiovo-robot .robot-speaking-bars{\n pointer-events:none;display:none;position:absolute;bottom:-5px;right:-5px;\n align-items:flex-end;gap:2px;padding:4px 5px;\n background:#073752;border:2px solid #fff;border-radius:9px;height:22px;\n}\n#axiovo-robot.robot-speaking .robot-speaking-bars,\n#axiovo-robot.robot-listening .robot-speaking-bars{display:flex}\n#axiovo-robot .robot-speaking-bars i{\n display:block;width:3px;background:#78f3fb;border-radius:2px;\n animation:axiovo-mascot-audio .65s ease-in-out infinite alternate;\n}\n#axiovo-robot .robot-speaking-bars i:nth-child(2){animation-delay:.16s}\n#axiovo-robot .robot-speaking-bars i:nth-child(3){animation-delay:.32s}\n#axiovo-robot .robot-language-select{\n flex:1 1 100%!important;width:100%!important;max-width:none!important;\n min-height:38px!important;border:1px solid var(--robot-border)!important;\n background:var(--robot-control)!important;color:var(--robot-control-ink)!important;\n}\n#axiovo-robot .robot-voice-settings select:not(.robot-language-select){\n flex:1 1 145px!important;max-width:100%!important;\n}\n#axiovo-robot .robot-help-label{font-size:13px!important}\n@keyframes axiovo-mascot-float{\n 0%,100%{transform:translateY(0) rotate(-2deg)}\n 50%{transform:translateY(-4px) rotate(2deg)}\n}\n@keyframes axiovo-mascot-wave{\n 0%,100%{transform:rotate(-4deg) translateY(0)}\n 50%{transform:rotate(9deg) translateY(-5px)}\n}\n@keyframes axiovo-mascot-talk{\n 0%,100%{transform:translateY(0) scale(1)}\n 50%{transform:translateY(-2px) scale(1.035)}\n}\n@keyframes axiovo-mascot-audio{\n 0%{height:5px}100%{height:15px}\n}\n@media(max-width:760px){\n #axiovo-robot .robot-fab{width:68px!important;height:68px!important;border-radius:19px!important}\n #axiovo-robot .robot-mascot{border-radius:16px}\n #axiovo-robot .robot-launcher{min-height:68px!important}\n #axiovo-robot .robot-help-label{font-size:12px!important}\n}\n@media(prefers-reduced-motion:reduce){\n #axiovo-robot .robot-mascot,#axiovo-robot .robot-speaking-bars i{animation:none!important}\n}\n";
 const make=(tag,cl,txt)=>{const n=document.createElement(tag);if(cl)n.className=cl;if(txt!==undefined)n.textContent=txt;return n};
 function setup(){
 if(document.getElementById("axiovo-robot"))return;
@@ -18,6 +19,22 @@ const head=make("div","robot-head"),heading=make("div"),close=make("button","rob
 heading.append(make("strong",null,"Axiovo Robot Help · Need help?"),make("small",null,"Page-aware guide · optional voice"));close.type="button";close.setAttribute("aria-label","Close robot help");head.append(heading,close);
 const log=make("div","robot-log");log.setAttribute("role","log");log.setAttribute("aria-live","polite");
 const voiceSettings=make("div","robot-voice-settings");
+const languageSelect=make("select","robot-language-select");
+languageSelect.id="axiovo-robot-language";
+languageSelect.setAttribute("aria-label","Assistant language for speech and replies");
+const languageOptions=[
+ ["auto","Auto (device language)"],["en-IN","English (India)"],["bn-IN","বাংলা · Bengali"],
+ ["hi-IN","हिन्दी · Hindi"],["ur-IN","اردو · Urdu"],["ta-IN","தமிழ் · Tamil"],
+ ["te-IN","తెలుగు · Telugu"],["ml-IN","മലയാളം · Malayalam"],["mr-IN","मराठी · Marathi"],
+ ["gu-IN","ગુજરાતી · Gujarati"],["kn-IN","ಕನ್ನಡ · Kannada"],["pa-IN","ਪੰਜਾਬੀ · Punjabi"],
+ ["ne-NP","नेपाली · Nepali"],["es-ES","Español · Spanish"],["fr-FR","Français · French"],
+ ["de-DE","Deutsch · German"],["pt-BR","Português"],["it-IT","Italiano"],
+ ["ar-SA","العربية · Arabic"],["zh-CN","中文 · Chinese"],["ja-JP","日本語 · Japanese"],
+ ["ko-KR","한국어 · Korean"],["ru-RU","Русский · Russian"],["id-ID","Bahasa Indonesia"],
+ ["tr-TR","Türkçe · Turkish"]
+];
+for(const [value,label] of languageOptions)languageSelect.add(new Option(label,value));
+try{const saved=localStorage.getItem("axiovo-robot-language-v1");if(languageOptions.some(x=>x[0]===saved))languageSelect.value=saved}catch{}
 const voiceLabel=make("label",null,"Spoken replies"),voiceEnabled=make("input");
 voiceEnabled.type="checkbox";voiceEnabled.checked=true;voiceEnabled.setAttribute("aria-label","Enable spoken help replies");
 voiceLabel.prepend(voiceEnabled);
@@ -25,63 +42,202 @@ const voiceSelect=make("select");voiceSelect.setAttribute("aria-label","Choose s
 const testVoice=make("button",null,"Test");testVoice.type="button";
 const stopVoice=make("button",null,"Stop");stopVoice.type="button";
 const voiceStatus=make("div","robot-voice-status","Tap Speak reply once to enable audio on this device.");
-voiceSettings.append(voiceLabel,voiceSelect,testVoice,stopVoice,voiceStatus);
+voiceSettings.append(languageSelect,voiceLabel,voiceSelect,testVoice,stopVoice,voiceStatus);
 const suggestions=make("div","robot-actions"),form=make("form","robot-form"),input=make("input"),mic=make("button",null,"🎙"),send=make("button",null,"➤");
 input.type="text";input.maxLength=600;input.placeholder="Ask about Axiovo";input.setAttribute("aria-label","Ask Axiovo");
 mic.type="button";mic.setAttribute("aria-label","Voice question");send.type="submit";send.setAttribute("aria-label","Submit question");
 form.append(input,mic,send);
 panel.append(head,voiceSettings,log,suggestions,form,make("div","robot-note","Voice uses voices installed in your browser or device. Speech input may use your browser provider; Axiovo stores no audio."));
 const fab=make("button","robot-fab");fab.type="button";fab.title="Need help? Click to ask or drag the robot";fab.setAttribute("aria-label","Need help? Open the movable Axiovo voice assistant");
-fab.innerHTML='<svg width="37" height="37" viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M24 4v7" stroke="#8ae4ff" stroke-width="3"/><circle cx="24" cy="4" r="3" fill="#8ae4ff"/><rect x="6" y="12" width="36" height="29" rx="10" fill="#f5fbff"/><rect x="10" y="18" width="28" height="17" rx="7" fill="#164567"/><circle cx="18" cy="27" r="3" fill="#66deff"/><circle cx="30" cy="27" r="3" fill="#66deff"/><path d="M20 36h8" stroke="#164567" stroke-width="2.5" stroke-linecap="round"/></svg>';
+const mascot=make("img","robot-mascot");mascot.src=new URL("assets/axiovo-assistant-mascot.svg",base).href;
+mascot.alt="";mascot.width=78;mascot.height=78;mascot.decoding="async";mascot.draggable=false;
+const voiceBars=make("span","robot-speaking-bars");voiceBars.setAttribute("aria-hidden","true");
+voiceBars.append(make("i"),make("i"),make("i"));
+fab.replaceChildren(mascot,voiceBars);
 const launcher=make("div","robot-launcher"),helpLabel=make("span","robot-help-label","Need help?");
 launcher.append(helpLabel,fab);root.append(panel,launcher);document.body.append(root);
 let speechVoices=[];let speechUnlocked=false;let lastAssistantReply="";let speechTimer=null;
+let detectedLanguage="";
+const localeFromText=text=>{
+ const value=String(text||"");
+ if(/[\u0980-\u09ff]/.test(value))return "bn-IN";
+ if(/[\u0900-\u097f]/.test(value))return "hi-IN";
+ if(/[\u0b80-\u0bff]/.test(value))return "ta-IN";
+ if(/[\u0c00-\u0c7f]/.test(value))return "te-IN";
+ if(/[\u0d00-\u0d7f]/.test(value))return "ml-IN";
+ if(/[\u0600-\u06ff]/.test(value))return "ar-SA";
+ if(/[\u4e00-\u9fff]/.test(value))return "zh-CN";
+ if(/[\u3040-\u30ff]/.test(value))return "ja-JP";
+ if(/[\uac00-\ud7af]/.test(value))return "ko-KR";
+ if(/[\u0400-\u04ff]/.test(value))return "ru-RU";
+ return "";
+};
+const currentLanguage=()=>languageSelect.value==="auto"?
+ (detectedLanguage||document.documentElement.lang||navigator.language||"en-IN"):languageSelect.value;
+const sayLabel={
+ en:"Need help?",bn:"সাহায্য লাগবে?",hi:"मदद चाहिए?",ta:"உதவி வேண்டுமா?",
+ te:"సహాయం కావాలా?",ml:"സഹായം വേണോ?",ur:"مدد چاہیے؟",
+ es:"¿Necesitas ayuda?",fr:"Besoin d’aide ?",de:"Brauchen Sie Hilfe?",
+ pt:"Precisa de ajuda?",ar:"هل تحتاج مساعدة؟",zh:"需要帮助吗？",ja:"お困りですか？",
+ ko:"도움이 필요하신가요?",ru:"Нужна помощь?"
+};
+const welcome={
+ en:"Hello! I am your Axiovo assistant. How can I help?",
+ bn:"নমস্কার! আমি অ্যাক্সিওভোর সহকারী। কীভাবে সাহায্য করতে পারি?",
+ hi:"नमस्ते! मैं Axiovo का सहायक हूँ। मैं आपकी कैसे मदद कर सकता हूँ?",
+ ta:"வணக்கம்! நான் Axiovo உதவியாளர். உங்களுக்கு எப்படி உதவலாம்?",
+ te:"నమస్కారం! నేను Axiovo సహాయకుడిని. మీకు ఎలా సహాయపడగలను?",
+ ml:"നമസ്കാരം! ഞാൻ Axiovo സഹായിയാണ്. എന്താണ് സഹായം വേണ്ടത്?",
+ es:"¡Hola! Soy el asistente de Axiovo. ¿Cómo puedo ayudarte?",
+ fr:"Bonjour ! Je suis l’assistant Axiovo. Comment puis-je vous aider ?",
+ de:"Hallo! Ich bin der Axiovo-Assistent. Wie kann ich helfen?",
+ pt:"Olá! Sou o assistente Axiovo. Como posso ajudar?",
+ ar:"مرحبًا! أنا مساعد Axiovo. كيف يمكنني المساعدة؟",
+ zh:"你好！我是 Axiovo 助手。有什么可以帮你？",
+ ja:"こんにちは！Axiovoアシスタントです。どのようにお手伝いできますか？",
+ ko:"안녕하세요! Axiovo 도우미입니다. 무엇을 도와드릴까요?",
+ ru:"Здравствуйте! Я помощник Axiovo. Чем могу помочь?"
+};
+const baseLanguage=()=>currentLanguage().split("-")[0].toLowerCase();
+function updateLanguageLabel(){
+ helpLabel.textContent=sayLabel[baseLanguage()]||sayLabel.en;
+ input.placeholder=baseLanguage()==="en"?"Ask about Axiovo":(welcome[baseLanguage()]||"Ask about Axiovo");
+ root.lang=currentLanguage();
+}
 function voiceScore(v){
- const n=(v.name+" "+v.lang).toLowerCase();
- return (/en-in/.test(n)?40:0)+(/female|woman|zira|heera|samantha|aria|jenny|neerja|swara|susan|victoria|karen|moira/.test(n)?105:0)+(/natural|neural|enhanced|premium/.test(n)?20:0)+(/^en/.test(v.lang.toLowerCase())?15:0);
+ const n=(v.name+" "+v.lang).toLowerCase(),target=currentLanguage().toLowerCase();
+ const matching=v.lang.toLowerCase().split("-")[0]===target.split("-")[0];
+ return (matching?250:0)+(v.lang.toLowerCase()===target?80:0)+
+  (/female|woman|zira|heera|samantha|aria|jenny|neerja|swara|susan|victoria|karen|moira/.test(n)?35:0)+
+  (/natural|neural|enhanced|premium/.test(n)?20:0);
 }
 function refreshVoices(){
- if(!("speechSynthesis" in window)){voiceSelect.replaceChildren();voiceSelect.add(new Option("Text only: voice not supported",""));voiceSelect.disabled=true;voiceEnabled.checked=false;voiceEnabled.disabled=true;return}
- speechVoices=window.speechSynthesis.getVoices().filter(v=>v.lang?.toLowerCase().startsWith("en")).sort((a,b)=>voiceScore(b)-voiceScore(a));
- const previous=voiceSelect.value;voiceSelect.replaceChildren();
+ if(!("speechSynthesis" in window)){
+  voiceSelect.replaceChildren(new Option("Text only: device speech unsupported",""));
+  voiceSelect.disabled=true;voiceEnabled.checked=false;voiceEnabled.disabled=true;
+  return;
+ }
+ const prev=speechVoices[Number(voiceSelect.value)]?.voiceURI;
+ speechVoices=window.speechSynthesis.getVoices().slice().sort((a,b)=>voiceScore(b)-voiceScore(a));
+ voiceSelect.replaceChildren();
  speechVoices.forEach((v,i)=>voiceSelect.add(new Option(v.name+" ("+v.lang+")",String(i))));
- if(!speechVoices.length){voiceSelect.add(new Option("Use device default voice",""))}
+ if(!speechVoices.length)voiceSelect.add(new Option("Use device default voice",""));
  let saved="";try{saved=localStorage.getItem("axiovo-robot-voice-v1")||""}catch{}
- const found=speechVoices.findIndex(v=>v.voiceURI===saved);
- voiceSelect.value=found>=0?String(found):(previous && [...voiceSelect.options].some(o=>o.value===previous)?previous:voiceSelect.options[0]?.value||"");
+ const preferred=speechVoices.findIndex(v=>v.voiceURI===saved&&v.lang.toLowerCase().split("-")[0]===baseLanguage());
+ const previous=speechVoices.findIndex(v=>v.voiceURI===prev&&v.lang.toLowerCase().split("-")[0]===baseLanguage());
+ voiceSelect.value=String(preferred>=0?preferred:previous>=0?previous:0);
+ const available=speechVoices.some(v=>v.lang.toLowerCase().split("-")[0]===baseLanguage());
+ voiceStatus.textContent=available?"Available browser/device voices for "+currentLanguage()+". Tap Test to hear one.":
+  "No matching installed voice for "+currentLanguage()+". Text help remains available; install a voice in your device settings.";
 }
 function speak(text,gesture=false){
  if(!("speechSynthesis" in window)||!window.SpeechSynthesisUtterance){
-  voiceStatus.textContent="Speech output is not supported in this browser. Please use a browser with text-to-speech support.";return;
+  voiceStatus.textContent="Speech output unavailable in this browser.";return;
  }
- if(!voiceEnabled.checked){voiceStatus.textContent="Turn on Spoken replies above to hear the answer.";return}
+ if(!voiceEnabled.checked){voiceStatus.textContent="Enable Spoken replies to hear the answer.";return}
  if(gesture)speechUnlocked=true;
- if(!speechUnlocked){voiceStatus.textContent="Tap Speak reply to enable audio on this device.";return}
+ if(!speechUnlocked){voiceStatus.textContent="Tap Speak reply or Test to enable audio.";return}
  try{
   if(speechTimer){clearTimeout(speechTimer);speechTimer=null}
   const synth=window.speechSynthesis;
-  synth.cancel();
+  synth.cancel();root.classList.remove("robot-speaking");
   const spoken=String(text||"").replace(/https?:\/\/\S+/g," link ").replace(/\s+/g," ").trim().slice(0,950);
   if(!spoken)return;
   const utterance=new SpeechSynthesisUtterance(spoken);
-  utterance.lang="en-IN";utterance.rate=.93;utterance.pitch=1.02;utterance.volume=1;
-  const selected=speechVoices[Number(voiceSelect.value)];
-  if(selected){utterance.voice=selected;utterance.lang=selected.lang}
-  utterance.onstart=()=>{voiceStatus.textContent="Speaking now · "+(selected?.name||"device voice")};
-  utterance.onend=()=>{voiceStatus.textContent="Finished speaking. Tap Speak reply to listen again."};
-  utterance.onerror=e=>{voiceStatus.textContent="Speech failed ("+(e.error||"device error")+"). Try another voice or tap Test.";};
+  const target=currentLanguage(),selected=speechVoices[Number(voiceSelect.value)];
+  const matching=speechVoices.some(v=>v.lang.toLowerCase().split("-")[0]===target.toLowerCase().split("-")[0]);
+  utterance.lang=target;utterance.rate=.94;utterance.pitch=1.02;utterance.volume=1;
+  if(selected&&selected.lang.toLowerCase().split("-")[0]===target.toLowerCase().split("-")[0]){
+   utterance.voice=selected;utterance.lang=selected.lang;
+  }else if(!matching){
+   voiceStatus.textContent="A spoken voice for "+target+" is not installed on this device. The answer remains readable.";
+   return;
+  }
+  utterance.onstart=()=>{root.classList.add("robot-speaking");voiceStatus.textContent="Speaking · "+(selected?.name||target)};
+  const done=()=>root.classList.remove("robot-speaking");
+  utterance.onend=()=>{done();voiceStatus.textContent="Finished. Tap Speak reply to listen again."};
+  utterance.onerror=e=>{done();voiceStatus.textContent="Speech unavailable ("+(e.error||"device error")+"). Try another voice."};
   synth.speak(utterance);
   if(synth.paused)synth.resume();
-  speechTimer=setTimeout(()=>{if(synth.pending&&!synth.speaking){voiceStatus.textContent="Voice is waiting for browser permission. Tap Speak reply again."}},1100);
- }catch(e){voiceStatus.textContent="Unable to play speech. Please choose another device voice.";console.warn("Axiovo speech error",e)}
+  speechTimer=setTimeout(()=>{if(synth.pending&&!synth.speaking){voiceStatus.textContent="Browser speech may require another tap on Speak reply."}},1100);
+ }catch(e){
+  root.classList.remove("robot-speaking");
+  voiceStatus.textContent="Could not play speech with this device voice.";
+  console.warn("Axiovo speech error",e);
+ }
 }
-refreshVoices();
-if("speechSynthesis" in window){speechSynthesis.addEventListener?.("voiceschanged",refreshVoices)}
-voiceSelect.addEventListener("change",()=>{const v=speechVoices[Number(voiceSelect.value)];try{if(v)localStorage.setItem("axiovo-robot-voice-v1",v.voiceURI)}catch{}});
-testVoice.addEventListener("click",()=>speak("Hello! I am your Axiovo help assistant. How can I help you today?",true));
-stopVoice.addEventListener("click",()=>{if("speechSynthesis" in window)speechSynthesis.cancel()});
-voiceEnabled.addEventListener("change",()=>{if(!voiceEnabled.checked&&"speechSynthesis" in window)speechSynthesis.cancel()});
-function message(s,user=false,links=[]){const n=make("div","robot-msg"+(user?" user":""),s);if(links.length){const wrap=make("div","robot-links");links.forEach(([label,url])=>{const a=make("a",null,label);a.href=new URL(url,base).href;wrap.append(a)});n.append(wrap)}if(!user){lastAssistantReply=s;const play=make("button","robot-speak-reply","🔊 Speak reply");play.type="button";play.setAttribute("aria-label","Speak this answer aloud");play.addEventListener("click",()=>speak(s,true));n.append(play)}log.append(n);log.scrollTop=log.scrollHeight;if(!user&&speechUnlocked)speak(s)}
+updateLanguageLabel();refreshVoices();
+languageSelect.addEventListener("change",()=>{
+ detectedLanguage="";
+ try{localStorage.setItem("axiovo-robot-language-v1",languageSelect.value)}catch{}
+ if("speechSynthesis" in window)speechSynthesis.cancel();
+ root.classList.remove("robot-speaking");
+ updateLanguageLabel();refreshVoices();
+});
+if("speechSynthesis" in window)speechSynthesis.addEventListener?.("voiceschanged",refreshVoices);
+voiceSelect.addEventListener("change",()=>{
+ const v=speechVoices[Number(voiceSelect.value)];
+ try{if(v)localStorage.setItem("axiovo-robot-voice-v1",v.voiceURI)}catch{}
+});
+testVoice.addEventListener("click",()=>speak(welcome[baseLanguage()]||welcome.en,true));
+stopVoice.addEventListener("click",()=>{
+ if("speechSynthesis" in window)speechSynthesis.cancel();
+ root.classList.remove("robot-speaking");
+});
+voiceEnabled.addEventListener("change",()=>{
+ if(!voiceEnabled.checked&&"speechSynthesis" in window)speechSynthesis.cancel();
+ if(!voiceEnabled.checked)root.classList.remove("robot-speaking");
+});
+const translators=new Map();
+async function translateReply(text,language){
+ const target=language.split("-")[0].toLowerCase();
+ if(target==="en")return text;
+ if(!window.Translator?.create)return null;
+ try{
+  if(!translators.has(target))
+   translators.set(target,window.Translator.create({sourceLanguage:"en",targetLanguage:target}));
+  const translator=await translators.get(target);
+  return await translator.translate(text);
+ }catch{
+  translators.delete(target);return null;
+ }
+}
+function message(s,user=false,links=[],alreadyLocalized=false){
+ const text=String(s||"");
+ const n=make("div","robot-msg"+(user?" user":""));
+ const content=document.createTextNode(text);n.append(content);
+ if(links.length){
+  const wrap=make("div","robot-links");
+  links.forEach(([label,url])=>{
+   const a=make("a",null,label);a.href=new URL(url,base).href;wrap.append(a);
+  });
+  n.append(wrap);
+ }
+ let spokenText=text;
+ if(!user){
+  lastAssistantReply=text;
+  const play=make("button","robot-speak-reply","🔊 Speak reply");
+  play.type="button";play.setAttribute("aria-label","Speak this answer aloud");
+  play.addEventListener("click",()=>speak(spokenText,true));
+  n.append(play);
+ }
+ log.append(n);log.scrollTop=log.scrollHeight;
+ if(user)return;
+ const locale=currentLanguage(),baseLang=baseLanguage();
+ const nativeScript=localeFromText(text);
+ const isNative=alreadyLocalized||baseLang==="en"||nativeScript?.split("-")[0]===baseLang;
+ if(isNative){if(speechUnlocked)speak(text);return}
+ // Local on-device translation is optional: do not claim broad translation
+ // support in browsers that lack the Translator API.
+ void translateReply(text,locale).then(translated=>{
+  if(translated){
+   content.textContent=translated;spokenText=translated;lastAssistantReply=translated;
+   if(speechUnlocked)speak(translated);
+  }else{
+   voiceStatus.textContent="No translation engine for "+locale+" is available here. Use Axiovo Research Assistant for an answer in that language.";
+  }
+ }).catch(()=>{voiceStatus.textContent="Translation unavailable. The original response is still shown."});
+}
 function clean(s){return String(s||"").replace(/\s+/g," ").trim().slice(0,170)}
 function visible(n){return n.getClientRects().length>0&&!n.closest("#axiovo-robot,[aria-hidden=true]")}
 function snapshot(){
@@ -255,13 +411,24 @@ async function searchPapers(question){
  }
 }
 function routeToCopilot(question){
- const msgText="For a research explanation, derivation, review or general question, I'll pass your exact question to Axiovo's full Research Assistant. Its answer depends on available sources and configured AI; I won't invent an answer.";
- message(msgText,false,[["Open Research Assistant", "copilot.html?q="+encodeURIComponent(question.slice(0,500))]]);
+ const msgText={
+ bn:"আপনার প্রশ্নটি মূল ভাষাতেই Axiovo Research Assistant-এ পাঠানো হবে। উত্তর উপলব্ধ তথ্য ও AI সেটিংসের উপর নির্ভর করে।",
+ hi:"आपका प्रश्न उसी भाषा में Axiovo Research Assistant को भेजा जाएगा। उत्तर उपलब्ध स्रोतों और AI सेटिंग पर निर्भर करता है।",
+ es:"Enviaré tu pregunta original al asistente de investigación de Axiovo. La respuesta depende de las fuentes disponibles.",
+ fr:"Votre question sera transmise telle quelle à l’assistant de recherche Axiovo. La réponse dépend des sources disponibles.",
+ ar:"سأرسل سؤالك بلغته الأصلية إلى مساعد البحث في Axiovo. تعتمد الإجابة على المصادر المتاحة."
+ }[baseLanguage()]||"I'll pass your exact question to Axiovo Research Assistant in the same language. Its response depends on available evidence and configured AI; I cannot promise an answer in every language.";
+ message(msgText,false,[["Open Research Assistant", "copilot.html?q="+encodeURIComponent(question.slice(0,500))]],baseLanguage()!=="en"&&Boolean({bn:1,hi:1,es:1,fr:1,ar:1}[baseLanguage()]));
 }
 
 const aliases=[["Research Hub",/\b(research hub|research map|connection graph|knowledge graph|paper graph)\b/],["ProofLab",/\bproof\s*lab\b/],["Research Assistant",/\b(copilot|research assistant)\b/],["Research Desk",/\b(research desk|desk)\b/],["Library",/\b(library|workspace)\b/],["Settings",/\bsettings\b/],["My Feed",/\b(my feed|feed)\b/],["Research Tools",/\b(research tools|pdf reader)\b/],["Home",/\b(home|homepage)\b/],["ChemRxiv",/\bchemrxiv\b/],["bioRxiv",/\bbiorxiv\b/],["Cryptology ePrint",/\b(cryptology|crypto|eprint|iacr)\b/],["arXiv",/\barxiv\b/]];
 function ask(raw){
-const question=clean(raw);if(!question)return;message(question,true);
+const question=clean(raw);if(!question)return;
+if(languageSelect.value==="auto"){
+ detectedLanguage=localeFromText(question)||detectedLanguage;
+ updateLanguageLabel();
+}
+message(question,true);
 const q=question.toLowerCase(),state=snapshot();
 const shortcuts=[
  {test:/\b(graph|connections|research map|knowledge map)\b/,file:"research-hub.html#relationships",label:"Research connections"},
@@ -292,7 +459,14 @@ message("Use Research Desk to search across archives.",false,[["Open Research De
 if(/(what|about|explain|purpose|understand|how).*(this page|here|current page)|(this page|here).*(do|work|for)/.test(q)){
 const intro=document.querySelector("main h1,[role=main] h1");if(intro)showTarget(intro,"page introduction");
 message("This is "+state.name+". "+(state.desc||"Part of Axiovo.")+(state.headings.length?"\n\nCurrent sections: "+state.headings.slice(0,9).join("; ")+".":"")+"\n\nI read the live page, including new headings after updates.");return}
-if(/^(hi|hello|hey)[!. ]*$/.test(q)){message("Hello! Ask what this page does, or tell me to open Research Desk, ProofLab, or another section.");return}
+if(/^(hi|hello|hey)[!. ]*$/.test(q)||/^(नमस्ते|नमस्कार|হ্যালো|নমস্কার|வணக்கம்|నమస్కారం|مرحبا|hola|bonjour|hallo|olá|你好|こんにちは|안녕하세요)[!.,。 ]*$/iu.test(q)){
+ message(welcome[baseLanguage()]||welcome.en,false,[],true);return;
+}
+if(baseLanguage()!=="en"){
+ // Do not pretend that fixed English-only keyword rules understand every
+ // language. Delegate intact native-language questions to Research Assistant.
+ routeToCopilot(question);return;
+}
 const ignored=new Set("what where which when why how does can please tell show about this that there here with from page axiovo help the and are for you your use using open my want need".split(" "));
 const tokens=s=>[...new Set((s.toLowerCase().match(/[a-z0-9]{3,}/g)||[]).filter(x=>!ignored.has(x)))];
 const terms=tokens(question),candidates=[...state.headings.map(x=>({text:x,type:"section"})),...state.controls.map(x=>({text:x,type:"control"})),...Object.keys(pages).map(x=>({text:x,type:"page"}))];
@@ -301,7 +475,7 @@ const hits=candidates.filter(x=>x.score>0).sort((a,b)=>b.score-a.score).slice(0,
 if(hits.length){const best=findGuideTarget(question);if(best)showTarget(best.node,best.name.slice(0,75));message("Related items I found: "+hits.map(x=>x.text+" ("+x.type+")").join("; ")+".\n\nThese are verified page labels, not an AI-generated explanation.",false,hits.filter(x=>x.type==="page").map(x=>[x.text,pages[x.text]]));return}
 routeToCopilot(question);
 }
-message("Hi! Ask me to find research papers across Axiovo’s four archives, save a paper, explain a page, or guide you to a feature. I can also pass deeper questions to Research Assistant.");
+message(welcome[baseLanguage()]||"Hi! Ask me to find papers across Axiovo's four archives, explain a page, or guide you to a feature.",false,[],Boolean(welcome[baseLanguage()]));
 for(const name of ["Find papers on quantum information","Open Research Hub","What does this page do?"]){const b=make("button",null,name);b.type="button";b.addEventListener("click",()=>ask(name));suggestions.append(b)}
 let drag=null,wasDragged=false,lastPos=null;
 function move(x,y){const w=launcher.offsetWidth,h=launcher.offsetHeight;x=Math.max(5,Math.min(innerWidth-w-5,x));y=Math.max(5,Math.min(innerHeight-h-5,y));lastPos={x,y};root.style.setProperty("right","auto","important");root.style.setProperty("bottom","auto","important");root.style.setProperty("left",x+"px","important");root.style.setProperty("top",y+"px","important");if(innerWidth>760){panel.style.setProperty("right","auto","important");panel.style.setProperty("bottom","auto","important");panel.style.setProperty("left",Math.max(8,Math.min(innerWidth-panel.offsetWidth-8,x<innerWidth/2?x:x+w-panel.offsetWidth))+"px","important");panel.style.setProperty("top",Math.max(8,Math.min(innerHeight-panel.offsetHeight-8,y-panel.offsetHeight-12))+"px","important")}}
@@ -312,7 +486,22 @@ fab.addEventListener("pointerup",e=>{if(!drag||drag.id!==e.pointerId)return;drag
 fab.addEventListener("click",e=>{if(e.detail===0){panel.hidden=!panel.hidden;if(!panel.hidden)input.focus()}});
 close.addEventListener("click",()=>{stopGuide();panel.hidden=true;if("speechSynthesis" in window)speechSynthesis.cancel();fab.focus()});
 form.addEventListener("submit",e=>{e.preventDefault();const q=input.value;input.value="";ask(q)});
-mic.addEventListener("click",()=>{const Speech=window.SpeechRecognition||window.webkitSpeechRecognition;if(!Speech){message("Voice recognition isn't supported in this browser. Please type.");return}if(!confirm("Your browser's speech provider may process audio remotely. Axiovo does not store recordings. Continue?"))return;const rec=new Speech();rec.lang=document.documentElement.lang||navigator.language||"en-US";mic.disabled=true;mic.textContent="●";rec.onresult=e=>ask(e.results?.[0]?.[0]?.transcript||"");rec.onerror=e=>message("Microphone unavailable: "+(e.error||"unknown"));rec.onend=()=>{mic.disabled=false;mic.textContent="🎙"};try{rec.start()}catch{rec.onend();message("Could not start voice input.")}});
+mic.addEventListener("click",()=>{
+ const Speech=window.SpeechRecognition||window.webkitSpeechRecognition;
+ if(!Speech){message("Voice recognition is not supported by this browser. You can still type in your language.");return}
+ if(!confirm("Your browser's speech service may send audio to its provider. Axiovo does not store recordings. Continue?"))return;
+ const rec=new Speech();
+ rec.lang=currentLanguage();rec.interimResults=false;rec.maxAlternatives=1;
+ mic.disabled=true;mic.textContent="●";root.classList.add("robot-listening");
+ rec.onresult=e=>{
+  const words=e.results?.[0]?.[0]?.transcript||"";
+  if(words){if(languageSelect.value==="auto")detectedLanguage=localeFromText(words)||rec.lang;
+   updateLanguageLabel();refreshVoices();ask(words)}
+ };
+ rec.onerror=e=>message("Microphone unavailable for "+rec.lang+": "+(e.error||"unknown")+". You can type instead.");
+ rec.onend=()=>{mic.disabled=false;mic.textContent="🎙";root.classList.remove("robot-listening")};
+ try{rec.start()}catch{rec.onend();message("Could not start voice input for "+rec.lang+". Try another language or type.");}
+});
 window.addEventListener("resize",()=>{if(guideTarget)positionGuide();else if(innerWidth>760&&lastPos)move(lastPos.x,lastPos.y)});
 window.addEventListener("scroll",()=>{if(guideTarget)positionGuide()},{passive:true});
 window.AxiovoRobotGuide={show:(selector)=>{const node=document.querySelector(selector);return showTarget(node,selector)},stop:stopGuide};

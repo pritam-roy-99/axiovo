@@ -61,7 +61,7 @@ class NavigationTests(unittest.TestCase):
         self.assertIn("padding:12px 60px 12px 14px!important",css)
         self.assertIn("width:44px!important;height:44px!important",css)
         self.assertIn("calc(165px + env(safe-area-inset-bottom,0px))",css)
-        self.assertIn("axiovo-blueprint-ui.css?v=20261111-mobile-controls-v6",nav)
+        self.assertIn("axiovo-blueprint-ui.css?v=20261111-multilingual-mascot-v1",nav)
         self.assertIn("voice-search.js?v=20261111-mobile-input-v4",desk)
         self.assertIn('id="rd-query"',desk)
 

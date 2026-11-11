@@ -814,19 +814,21 @@ body.axiovo-reference-ui.axiovo-home .axiovo-tour-stage .axiovo-tour-preview-log
  /* The help launcher sits above the bottom tabs, with smaller touch targets;
     research results can scroll clear of both fixed controls. */
  html:root body.axiovo-reference-ui #axiovo-robot{
-  bottom:calc(82px + env(safe-area-inset-bottom,0px))!important;
+  bottom:calc(88px + env(safe-area-inset-bottom,0px))!important;
   right:10px!important;
  }
  html:root body.axiovo-reference-ui #axiovo-robot .robot-fab{
-  width:48px!important;height:48px!important;border-radius:15px!important;
+  width:68px!important;height:68px!important;border-radius:19px!important;
  }
  html:root body.axiovo-reference-ui #axiovo-robot .robot-launcher{
-  min-height:48px!important;gap:5px!important;
+  min-height:68px!important;gap:5px!important;
  }
  html:root body.axiovo-reference-ui #axiovo-robot .robot-help-label{
   min-height:36px!important;font-size:12px!important;padding:7px 9px!important;
  }
  html:root body.axiovo-reference-ui #axiovo-robot .robot-panel{
-  bottom:calc(143px + env(safe-area-inset-bottom,0px))!important;
+  bottom:calc(165px + env(safe-area-inset-bottom,0px))!important;
+  height:min(490px,calc(100dvh - 185px - env(safe-area-inset-bottom,0px)))!important;
+  max-height:calc(100dvh - 185px - env(safe-area-inset-bottom,0px))!important;
  }
 }

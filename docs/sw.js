@@ -1,12 +1,12 @@
 /* Axiovo offline shell. Scholarly metadata, video and PDFs stay network-only. */
 "use strict";
-const CACHE = "axiovo-shell-v113";
+const CACHE = "axiovo-shell-v114";
 const SHELL = [
   "./", "./index.html", "./workspace.html", "./icons/axiovo.svg",
   "./manifest.webmanifest", "./icons/axiovo-192.png", "./icons/axiovo-512.png", "./theme.css", "./research-entry.css", "./axiovo-shell.css?v=20261108-mobile-research-v3",
   "./research-desk.css", "./home-landing.css?v=20261107-mobile-ui-v1", "./theme.js", "./research-entry.js",
   "./research-hub.html", "./research-hub.css", "./research-hub.js",
-  "./navigation.js?v=20261111-tutorial-stage-v3", "./axiovo-blueprint-ui.js?v=20261111-tutorial-stage-v3", "./axiovo-blueprint-ui.css?v=20261111-mobile-controls-v6", "./axiovo-page-design-v4.css?v=20261111-complete-v1", "./axiovo-page-design-v4.js?v=20261111-complete-v1", "./icons/axiovo-approved.svg", "./axiovo-robot-help.js?v=20261111-p0p1-v1", "./archive-taxonomy.js", "./arxiv-versions.js", "./archive-data.js",
+  "./navigation.js?v=20261111-tutorial-stage-v3", "./axiovo-blueprint-ui.js?v=20261111-tutorial-stage-v3", "./axiovo-blueprint-ui.css?v=20261111-multilingual-mascot-v1", "./axiovo-page-design-v4.css?v=20261111-complete-v1", "./axiovo-page-design-v4.js?v=20261111-complete-v1", "./icons/axiovo-approved.svg", "./assets/axiovo-assistant-mascot.svg", "./axiovo-robot-help.js?v=20261111-multilingual-mascot-v1", "./archive-taxonomy.js", "./arxiv-versions.js", "./archive-data.js",
   "./author-follow.js", "./feed-preferences.js", "./feed-core.js", "./feed-preview.js",
   "./source-pulse.js", "./pwa.js", "./voice-search.js?v=20261109-visible-v2", "./assets/axiovo-tutorial-thumbnail.webp?v=20261111-approved-cover-v1", "./home-tour.js?v=20261111-approved-logo-v5",
   "./workspace.css", "./paper-actions.css", "./paper-card-polish.css?v=20261106-save2", "./research-workflow.css",
