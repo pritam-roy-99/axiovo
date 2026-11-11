@@ -27,6 +27,14 @@ style.textContent += `
 @keyframes axiovo-aura-talk{0%,100%{opacity:.35;transform:scale(.98)}50%{opacity:1;transform:scale(1.12)}}
 @media(prefers-reduced-motion:reduce){#axiovo-robot .robot-aura{animation:none!important}}
 `;
+style.textContent += `
+#axiovo-robot .robot-fab[data-mascot-fallback]::after{content:attr(data-mascot-fallback);font-size:38px;position:absolute;inset:0;display:grid;place-items:center}
+@media(max-width:760px){
+ #axiovo-robot:not(.axiovo-guiding){bottom:calc(104px + env(safe-area-inset-bottom,0px))!important}
+ #axiovo-robot .robot-panel{bottom:calc(185px + env(safe-area-inset-bottom,0px))!important;height:min(460px,calc(100dvh - 210px))!important}
+ #axiovo-robot .robot-help-label{max-width:112px!important;white-space:normal!important;text-align:center!important;line-height:1.2!important}
+}
+`;
 const make=(tag,cl,txt)=>{const n=document.createElement(tag);if(cl)n.className=cl;if(txt!==undefined)n.textContent=txt;return n};
 function setup(){
 if(document.getElementById("axiovo-robot"))return;
@@ -66,11 +74,12 @@ mic.type="button";mic.setAttribute("aria-label","Voice question");send.type="sub
 form.append(input,mic,send);
 panel.append(head,voiceSettings,log,suggestions,form,make("div","robot-note","Voice uses voices installed in your browser or device. Speech input may use your browser provider; Axiovo stores no audio."));
 const fab=make("button","robot-fab");fab.type="button";fab.title="Need help? Click to ask or drag the robot";fab.setAttribute("aria-label","Need help? Open the movable Axiovo voice assistant");
-const mascot=make("img","robot-mascot");mascot.src=new URL("assets/axiovo-assistant-mascot.svg",base).href;
+const mascot=make("img","robot-mascot");mascot.src=new URL("assets/axiovo-assistant-mascot.svg?v=20261111-native",base).href;
 mascot.alt="";mascot.width=78;mascot.height=78;mascot.decoding="async";mascot.draggable=false;
 const voiceBars=make("span","robot-speaking-bars");voiceBars.setAttribute("aria-hidden","true");
 voiceBars.append(make("i"),make("i"),make("i"));
 fab.replaceChildren(mascot,voiceBars);
+mascot.addEventListener("error",()=>{mascot.style.display="none";fab.setAttribute("data-mascot-fallback","🤖");});
 const launcher=make("div","robot-launcher"),helpLabel=make("span","robot-help-label","Need help?");
 const robotAura=make("span","robot-aura");robotAura.setAttribute("aria-hidden","true");fab.prepend(robotAura);
 launcher.append(helpLabel,fab);root.append(panel,launcher);document.body.append(root);
@@ -91,7 +100,7 @@ const localeFromText=text=>{
  return "";
 };
 const currentLanguage=()=>languageSelect.value==="auto"?
- (detectedLanguage||document.documentElement.lang||navigator.language||"en-IN"):languageSelect.value;
+ (detectedLanguage||document.documentElement.lang||"en"):languageSelect.value;
 const sayLabel={
  en:"Need help?",bn:"সাহায্য লাগবে?",hi:"मदद चाहिए?",ta:"உதவி வேண்டுமா?",
  te:"సహాయం కావాలా?",ml:"സഹായം വേണോ?",ur:"مدد چاہیے؟",
