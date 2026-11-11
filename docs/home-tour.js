@@ -137,7 +137,58 @@
   function render(i){
    current=Math.max(0,Math.min(steps.length-1,i));const step=steps[current];
    overline.textContent=step.label;title.textContent=step.title;description.textContent=step.description;
-   illustration.replaceChildren(...step.pills.map(p=>{const s=document.createElement("span");s.textContent=p;return s;}));
+   // Display the same modern light workspace language used by Axiovo's
+   // real navigation and cards, rather than the legacy dark four-tile slide.
+   const display=document.createElement("div");
+   display.className="axiovo-tour-preview";
+   const rail=document.createElement("div");
+   rail.className="axiovo-tour-preview-rail";
+   const emblem=document.createElement("strong");
+   emblem.textContent="✦ AXIOVO";
+   rail.append(emblem);
+   for(const label of ["Explore","Research Desk","My Feed","Library","Research Assistant"]){
+    const item=document.createElement("span");
+    item.textContent=label;
+    if((step.href.includes("desk")&&label==="Research Desk")||
+       (step.href.includes("feed")&&label==="My Feed")||
+       (step.href.includes("workspace")&&label==="Library")||
+       (step.href.includes("copilot")&&label==="Research Assistant")||
+       (!/desk|feed|workspace|copilot/.test(step.href)&&label==="Explore"))
+     item.classList.add("is-active");
+    rail.append(item);
+   }
+   const workspace=document.createElement("div");
+   workspace.className="axiovo-tour-preview-main";
+   const toolbar=document.createElement("div");
+   toolbar.className="axiovo-tour-preview-toolbar";
+   const origin=document.createElement("span");
+   origin.textContent="Research workspace";
+   const mode=document.createElement("span");
+   mode.textContent="⌕  Search all papers     ☾";
+   toolbar.append(origin,mode);
+   const hero=document.createElement("div");
+   hero.className="axiovo-tour-preview-hero";
+   const kicker=document.createElement("small");
+   kicker.textContent=step.label;
+   const heading=document.createElement("strong");
+   heading.textContent=step.action;
+   const hint=document.createElement("span");
+   hint.textContent="Source-first · free and open";
+   hero.append(kicker,heading,hint);
+   const features=document.createElement("div");
+   features.className="axiovo-tour-preview-features";
+   for(const name of step.pills){
+    const chip=document.createElement("span");
+    chip.className="axiovo-tour-preview-feature";
+    chip.textContent=name;
+    features.append(chip);
+   }
+   const footer=document.createElement("div");
+   footer.className="axiovo-tour-preview-footer";
+   footer.textContent="Open this workflow in Axiovo →";
+   workspace.append(toolbar,hero,features,footer);
+   display.append(rail,workspace);
+   illustration.replaceChildren(display);
    counter.textContent=(current+1)+" / "+steps.length;action.textContent=step.action+" ↗";action.href=step.href;
    prev.disabled=current===0;next.textContent=current===steps.length-1?"Start again ↻":"Next step →";
    dots.forEach((b,j)=>{if(j===current)b.setAttribute("aria-current","step");else b.removeAttribute("aria-current");});
