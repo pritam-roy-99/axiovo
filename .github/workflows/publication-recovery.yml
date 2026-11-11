@@ -4,71 +4,154 @@ on:
     workflows: ["Verify and deploy Axiovo"]
     types: [completed]
   schedule:
-    - cron: '17,47 * * * *'
+    # 15-minute fallback. GitHub cron timing is best-effort.
+    - cron: '4,19,34,49 * * * *'
   workflow_dispatch:
 permissions:
   actions: write
   contents: read
+  issues: write
 concurrency:
   group: axiovo-publication-recovery
   cancel-in-progress: false
 jobs:
   recover:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
-      - name: Inspect deployment and retry safely
+      - name: Compare main with latest verified publication; recover or alert
         env:
           GH_TOKEN: ${{ github.token }}
-          REPO: ${{ github.repository }}
+          GH_REPO: ${{ github.repository }}
         shell: bash
         run: |
+          set -euo pipefail
           python - <<'PY'
           import datetime as dt
           import json
           import os
           import subprocess
-          import sys
 
-          repo = os.environ["REPO"]
+          repo = os.environ["GH_REPO"]
+          now = dt.datetime.now(dt.timezone.utc)
+          prefix = "[Axiovo publication watchdog]"
+          def gh(*args, check=True):
+              return subprocess.run(["gh", *args], capture_output=True,
+                                    text=True, check=check)
           def api(path):
-              result = subprocess.check_output(
-                  ["gh", "api", "-H", "Accept: application/vnd.github+json", path],
-                  text=True,
+              return json.loads(gh("api", "-H",
+                  "Accept: application/vnd.github+json", path).stdout)
+          def timestamp(value):
+              return dt.datetime.fromisoformat(value.replace("Z", "+00:00"))
+          def summary(line):
+              print(line)
+              with open(os.environ["GITHUB_STEP_SUMMARY"], "a") as out:
+                  out.write(line + "\n")
+          def open_alerts():
+              try:
+                  result = gh("issue", "list", "--repo", repo, "--state", "open",
+                              "--limit", "100", "--json", "number,title")
+                  return [item for item in json.loads(result.stdout)
+                          if item["title"].startswith(prefix)]
+              except subprocess.CalledProcessError as error:
+                  summary("::warning::Could not query GitHub Issues: " + error.stderr.strip()[:200])
+                  return []
+          def resolve_alerts():
+              for issue in open_alerts():
+                  closed = gh("issue", "close", str(issue["number"]), "--repo", repo,
+                              "--comment", "A newer main revision has passed the complete Pages deployment and verification gates.",
+                              check=False)
+                  if closed.returncode:
+                      summary("::warning::Could not close issue #" + str(issue["number"]))
+          def report_blocker(head, runs, latest):
+              title = prefix + " current main cannot publish " + head[:12]
+              if any(i["title"] == title for i in open_alerts()):
+                  return
+              last_success = next((r for r in runs if r.get("conclusion") == "success"), None)
+              body = (
+                  "Axiovo's automatic publication has failed repeatedly for the current main commit.\n\n"
+                  f"- Current main SHA: `{head}`\n"
+                  f"- Latest deployment: {latest['html_url']} ({latest.get('conclusion')})\n"
+                  f"- Last successful deployment: {last_success['html_url'] if last_success else 'not found in recent history'}\n"
+                  "- The watchdog continues retrying with capped backoff.\n"
+                  "- Investigate the first failed required gate and fix the underlying code or content.\n"
+                  "- Never bypass required security, source identity, video or browser checks.\n"
+                  "- Once a later main revision deploys successfully, the watchdog closes this alert."
               )
-              return json.loads(result)
+              created = gh("issue", "create", "--repo", repo, "--title", title,
+                           "--body", body, check=False)
+              if created.returncode:
+                  summary("::warning::Repeated publication failures; automatic issue creation failed: "
+                          + created.stderr.strip()[:200])
+              else:
+                  summary("::warning::Created publication alert: " + created.stdout.strip())
 
           head = api(f"repos/{repo}/commits/main")["sha"]
+          # Read the newest workflow runs, including failures and cancelled runs.
+          # This is a rolling operational window, not an historical audit.
           runs = api(f"repos/{repo}/actions/workflows/pages.yml/runs?per_page=100")["workflow_runs"]
-          relevant = sorted(
-              (r for r in runs if r.get("head_sha") == head),
-              key=lambda r: r["created_at"],
-              reverse=True,
-          )
-          now = dt.datetime.now(dt.timezone.utc)
+          relevant = sorted((r for r in runs if r.get("head_sha") == head),
+                            key=lambda r: r["created_at"], reverse=True)
+          last_success = next((r for r in runs if r["status"] == "completed"
+                               and r.get("conclusion") == "success"), None)
+          # Archive commits can arrive every 30 minutes, continually changing
+          # head SHA. Detect stale public releases across those SHAs as well.
+          stale = (not last_success or
+                   (now - timestamp(last_success.get("updated_at")
+                                    or last_success["created_at"])) > dt.timedelta(hours=2))
+          summary("### Axiovo publication recovery")
+          summary(f"- Current main: `{head[:12]}`")
+          if stale:
+              last_link = last_success["html_url"] if last_success else "none in recent runs"
+              title = prefix + " site release older than two hours"
+              if not any(i["title"] == title for i in open_alerts()):
+                  result = gh("issue", "create", "--repo", repo, "--title", title,
+                              "--body", "GitHub Pages has not had a successful full deployment in more than two hours. "
+                              f"Current main: `{head}`. Latest successful run: {last_link}. "
+                              "The recovery watchdog will keep dispatching with backoff. "
+                              "Inspect required deployment gates and resolve persistent failures.",
+                              check=False)
+                  if result.returncode:
+                      summary("::warning::Cannot create stale-site alert: " + result.stderr.strip()[:200])
+                  else:
+                      summary("::warning::Created stale-site alert: " + result.stdout.strip())
+          published = next((r for r in relevant if r["status"] == "completed"
+                            and r.get("conclusion") == "success"), None)
+          if published:
+              summary(f"- Current main published successfully: {published['html_url']}")
+              resolve_alerts()
+              raise SystemExit(0)
+
+          if any(r["status"] != "completed" for r in relevant):
+              active = next(r for r in relevant if r["status"] != "completed")
+              summary(f"- Current main deployment already pending/running: {active['html_url']}")
+              raise SystemExit(0)
+
           if not relevant:
-              print("No deployment for current main; dispatching publication.")
+              summary("- No current-main deployment attempt. Dispatching first check.")
           else:
               latest = relevant[0]
-              print(f"Current main: {head}; latest run {latest['id']} "
-                    f"status={latest['status']} conclusion={latest['conclusion']}")
-              if latest["status"] != "completed":
-                  print("Publication already queued or running; no duplicate.")
-                  sys.exit(0)
-              if any(r["conclusion"] == "success" for r in relevant):
-                  print("Current main already published successfully.")
-                  sys.exit(0)
-              age = now - dt.datetime.fromisoformat(latest["created_at"].replace("Z", "+00:00"))
-              if age < dt.timedelta(minutes=20):
-                  print("Waiting 20 minutes before retry to avoid a deployment storm.")
-                  sys.exit(0)
-              attempts = sum(r["event"] == "workflow_dispatch" for r in relevant)
-              if attempts >= 6:
-                  print("::error::Publication failed after six automatic retries for this commit. "
-                        "Manual code repair required; last working site is preserved.")
-                  sys.exit(1)
-              print(f"Retry {attempts+1}/6 for current commit.")
-          subprocess.run(
-              ["gh", "workflow", "run", "pages.yml", "--repo", repo, "--ref", "main"],
-              check=True,
-          )
+              failed = sum(r.get("conclusion") in ("failure", "timed_out", "cancelled")
+                           for r in relevant)
+              # Do not retry immediately on workflow_run completion. Repeated
+              # permanent failures need conservative backoff, not a run storm.
+              backoff_minutes = min(240, 10 * (2 ** min(max(failed - 1, 0), 5)))
+              finish = timestamp(latest.get("updated_at") or latest["created_at"])
+              elapsed = (now - finish).total_seconds() / 60
+              summary(f"- Latest result: {latest.get('conclusion')}; "
+                      f"{failed} unsuccessful runs for this SHA.")
+              if failed >= 4:
+                  report_blocker(head, runs, latest)
+              if elapsed < backoff_minutes:
+                  summary(f"- Retry due after {backoff_minutes} minutes; "
+                          f"last completion {elapsed:.1f} minutes ago.")
+                  raise SystemExit(0)
+
+          result = gh("workflow", "run", "pages.yml", "--repo", repo, "--ref", "main",
+                      check=False)
+          if result.returncode:
+              summary("::error::Could not dispatch Pages: " + result.stderr.strip()[:300])
+              raise SystemExit(result.returncode)
+          summary("- Dispatched a new full validation and publication for current main.")
+          summary("- Retry continues with capped backoff until a complete deployment succeeds.")
           PY
