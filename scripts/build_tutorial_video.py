@@ -27,7 +27,7 @@ from playwright.sync_api import sync_playwright
 ROOT=Path(__file__).resolve().parents[1]
 DOCS=ROOT/"docs"
 OUT=DOCS/"assets"
-W,H=960,540
+W,H=1280,720
 
 class Quiet(SimpleHTTPRequestHandler):
     def log_message(self,*args):pass
@@ -49,17 +49,17 @@ def focus(page,selector):
 def stamp(png,title,instruction,number,target=None):
     pic=Image.open(png).convert("RGB").resize((W,H))
     draw=ImageDraw.Draw(pic,"RGBA")
-    draw.rounded_rectangle((10,12,440,51),radius=11,fill=(9,30,51,235))
-    draw.text((23,22),f"STEP {number:02}  {title}",font=font(19,True),fill=(242,251,255,255))
-    draw.rectangle((0,426,W,H),fill=(7,23,42,237))
-    for line,chunk in enumerate(textwrap.wrap(instruction,width=76)[:2]):
-        draw.text((26,438+line*29),chunk,font=font(19,True),fill=(245,250,255,255))
-    draw.text((26,488),"AXIOVO  |  HOW TO USE THE RESEARCH PLATFORM",font=font(13),fill=(160,211,236,255))
+    draw.rounded_rectangle((14,16,610,70),radius=14,fill=(9,30,51,235))
+    draw.text((31,30),f"STEP {number:02}  {title}",font=font(24,True),fill=(242,251,255,255))
+    draw.rectangle((0,H-155,W,H),fill=(7,23,42,237))
+    for line,chunk in enumerate(textwrap.wrap(instruction,width=74)[:2]):
+        draw.text((34,H-142+line*35),chunk,font=font(24,True),fill=(245,250,255,255))
+    draw.text((34,H-57),"AXIOVO  |  UPDATED RESEARCH WORKSPACE WALKTHROUGH",font=font(17),fill=(160,211,236,255))
     if target:
         x=target["x"]*W/1280;y=target["y"]*H/720
         x2=(target["x"]+target["width"])*W/1280
         y2=(target["y"]+target["height"])*H/720
-        if y2<425:
+        if y2<H-155:
             draw.rounded_rectangle((x-5,y-5,x2+5,y2+5),radius=9,outline=(31,232,222,255),width=5)
     pic.save(png)
 
@@ -113,7 +113,12 @@ def main():
         ("PDF Research Tools", "Read a PDF and use the research utilities.", "Open Research Tools to read local PDFs, use available annotations and explore research utilities.", "lab.html", "#lab-local-pdf", None),
         ("Paper workspace", "Inspect arXiv versions and private notes.", "The paper workspace preserves version-exact arXiv links and supports personal research notes.", "paper.html?id=2608.13942v2", "#axiovo-paper-notes", None),
         ("Settings and themes", "Choose appearance and research preferences.", "Use Settings for preferences. Switch Night and Day appearance with the same accessible controls on every page.", "profiles.html", ".axiovo-header-appearance", None),
-        ("Explore Axiovo", "Return home, browse, search and organize.", "You've now seen the main Axiovo workflows. Search broadly, save carefully, and always open the original research record to verify technical claims.", "", ".axiovo-welcome", None),
+        ("Latest announcements", "Check newly indexed records and actual available coverage.", "Recent announcements appear on the homepage and archive pages. Distinguish the first arXiv submission, version one, from later revisions. Source freshness and coverage notices tell you what has really been indexed.", "", ".axiovo-live-release", None),
+        ("ProofLab research workspace", "Use structured analysis, mathematical writing and evidence.", "ProofLab is a separate research workspace for exploring technical questions, mathematical reasoning and research notes. Check the source evidence and calculations instead of assuming generated conclusions are verified.", "prooflab.html", ".prooflab-studio", None),
+        ("Customize your appearance", "One Day or Night control plus five color palettes.", "Choose Day or Night mode and one of five palettes in Settings. The new colors update navigation, panels and buttons across desktop and mobile.", "profiles.html", "#axiovo-palette-options", None),
+        ("Need help? robot", "Find the movable help assistant where available.", "The small Need help button can explain how to use Axiovo's features. Look for it on supported pages, and remember that external speech recognition may use the browser's own provider.", "", "#axiovo-robot", None),
+        ("Interactive walkthrough", "Switch between the same-position video and guide.", "On the homepage, Watch tutorial video and Interactive step-by-step guide now share exactly the same content space. Choose either option without having the tutorial jump above or below its controls.", "", ".axiovo-tour-stage", None),
+        ("Explore Axiovo", "Return home, browse, search and organize.", "You've now seen Axiovo's main workflows. Search broadly, save carefully, and always open the original research record to verify technical claims.", "", ".axiovo-welcome", None),
     ]
     try:
         with tempfile.TemporaryDirectory() as temp:
@@ -183,7 +188,7 @@ def main():
                 "-f","concat","-safe","0","-i",str(audio_list),
                 "-map","0:v:0","-map","1:a:0",
                 "-c:v","libx264","-preset","veryfast","-crf","27",
-                "-pix_fmt","yuv420p","-r","12","-c:a","aac","-b:a","96k",
+                "-pix_fmt","yuv420p","-r","24","-c:a","aac","-b:a","96k",
                 "-af","apad","-shortest","-movflags","+faststart",str(output)
             ],check=True)
             (OUT/"axiovo-tour.vtt").write_text("\n".join(captions)+"\n",encoding="utf-8")
@@ -194,7 +199,7 @@ def main():
                 "voice_version":VOICE_VERSION,"voice_engine":VOICE_ENGINE,"voice_locale":VOICE_LOCALE,
                 "media_sha256":media_sha256,
                 "chapters":chapters,
-                "source":"Real Chromium page captures","pronunciation":"Spoken-word technical corrections"
+                "source":"Updated real Chromium page captures, 1280x720 H264","pronunciation":"Spoken-word technical corrections"
             },indent=2),encoding="utf-8")
             print(f"Axiovo tutorial recorded from actual pages: {len(steps)} steps, ~{elapsed:.0f} seconds, {output.stat().st_size} bytes",flush=True)
     finally:
