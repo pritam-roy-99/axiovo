@@ -43,6 +43,20 @@ class BrandIntroTest(unittest.TestCase):
         self.assertIn("axiovo-tour-preview-hero",css)
         self.assertNotIn("Explore research in four archives",poster)
 
+    def test_all_tutorial_steps_use_only_approved_logo(self):
+        tour=(ROOT/"docs/home-tour.js").read_text(encoding="utf8")
+        css=(ROOT/"docs/axiovo-blueprint-ui.css").read_text(encoding="utf8")
+        approved=ROOT/"docs/icons/axiovo-approved.svg"
+        self.assertTrue(approved.is_file())
+        self.assertIn('class="axiovo-demo-approved-logo"',HOME)
+        self.assertIn('src="./icons/axiovo-approved.svg"',HOME)
+        self.assertNotIn('aria-hidden="true">A</span> AXIOVO',HOME)
+        self.assertIn('emblem.src="./icons/axiovo-approved.svg"',tour)
+        self.assertNotIn('emblem.textContent="✦ AXIOVO"',tour)
+        self.assertIn("axiovo-tour-preview-logo",css)
+        self.assertIn("axiovo-demo-approved-logo",css)
+        self.assertIn("home-tour.js?v=20261111-approved-logo-v5",HOME)
+
     def test_one_video_with_captions_and_a_guide(self):
         self.assertIn('src="./assets/axiovo-tour.mp4',HOME)
         self.assertIn('src="./assets/axiovo-tour.vtt',HOME)
