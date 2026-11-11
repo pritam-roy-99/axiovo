@@ -38,8 +38,7 @@ class AnimatedRobotTest(unittest.TestCase):
         js=(DOCS/"axiovo-robot-help.js").read_text(encoding="utf-8")
         self.assertIn('id="axiovo-robot-language"',js)
         self.assertIn("axiovo-robot-language-v1",js)
-        for name in ("bn-IN","hi-IN","ta-IN","te-IN","ur-IN","es-ES","fr-FR","ar-SA","zh-CN","ja-JP"):
-            self.assertIn(name,js)
+        self.assertIn('const languageOptions=[["en-IN","English (India)"]]',js)
         self.assertIn("rec.lang=currentLanguage()",js)
         self.assertIn("window.SpeechRecognition||window.webkitSpeechRecognition",js)
         self.assertIn("confirm(",js)
