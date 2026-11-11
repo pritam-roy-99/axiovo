@@ -49,6 +49,22 @@ class NavigationTests(unittest.TestCase):
         self.assertIn('href="./arxiv.html">Find a paper',html)
         self.assertIn('href="./workspace.html">Open Library',html)
         self.assertNotIn("discover.html#",html)
+    def test_mobile_search_and_navigation_controls_have_accessible_spacing(self):
+        css=(DOCS/"axiovo-blueprint-ui.css").read_text(encoding="utf8")
+        desk=(DOCS/"desk.html").read_text(encoding="utf8")
+        nav=(DOCS/"navigation.js").read_text(encoding="utf8")
+        self.assertIn("Mobile usability 2026-11-11",css)
+        self.assertIn("header.rl-global-header>a.ax-header-search",css)
+        self.assertIn('border:3px solid #07546b!important',css)
+        self.assertIn("grid-template-columns:repeat(5,minmax(0,1fr))!important",css)
+        self.assertIn(".rd-searchbar>.axiovo-voice-wrap",css)
+        self.assertIn("padding:12px 60px 12px 14px!important",css)
+        self.assertIn("width:44px!important;height:44px!important",css)
+        self.assertIn("calc(165px + env(safe-area-inset-bottom,0px))",css)
+        self.assertIn("axiovo-blueprint-ui.css?v=20261111-mobile-controls-v6",nav)
+        self.assertIn("voice-search.js?v=20261111-mobile-input-v4",desk)
+        self.assertIn('id="rd-query"',desk)
+
     def test_back_navigation_is_scoped_to_axiovo(self):
         src=(DOCS/"navigation.js").read_text(encoding="utf8")
         self.assertIn("url.origin===base.origin&&url.pathname.startsWith(base.pathname)",src)
