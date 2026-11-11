@@ -1,0 +1,74 @@
+name: Recover failed Axiovo publication
+on:
+  workflow_run:
+    workflows: ["Verify and deploy Axiovo"]
+    types: [completed]
+  schedule:
+    - cron: '17,47 * * * *'
+  workflow_dispatch:
+permissions:
+  actions: write
+  contents: read
+concurrency:
+  group: axiovo-publication-recovery
+  cancel-in-progress: false
+jobs:
+  recover:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Inspect deployment and retry safely
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          python - <<'PY'
+          import datetime as dt
+          import json
+          import os
+          import subprocess
+          import sys
+
+          repo = os.environ["REPO"]
+          def api(path):
+              result = subprocess.check_output(
+                  ["gh", "api", "-H", "Accept: application/vnd.github+json", path],
+                  text=True,
+              )
+              return json.loads(result)
+
+          head = api(f"repos/{repo}/commits/main")["sha"]
+          runs = api(f"repos/{repo}/actions/workflows/pages.yml/runs?per_page=100")["workflow_runs"]
+          relevant = sorted(
+              (r for r in runs if r.get("head_sha") == head),
+              key=lambda r: r["created_at"],
+              reverse=True,
+          )
+          now = dt.datetime.now(dt.timezone.utc)
+          if not relevant:
+              print("No deployment for current main; dispatching publication.")
+          else:
+              latest = relevant[0]
+              print(f"Current main: {head}; latest run {latest['id']} "
+                    f"status={latest['status']} conclusion={latest['conclusion']}")
+              if latest["status"] != "completed":
+                  print("Publication already queued or running; no duplicate.")
+                  sys.exit(0)
+              if any(r["conclusion"] == "success" for r in relevant):
+                  print("Current main already published successfully.")
+                  sys.exit(0)
+              age = now - dt.datetime.fromisoformat(latest["created_at"].replace("Z", "+00:00"))
+              if age < dt.timedelta(minutes=20):
+                  print("Waiting 20 minutes before retry to avoid a deployment storm.")
+                  sys.exit(0)
+              attempts = sum(r["event"] == "workflow_dispatch" for r in relevant)
+              if attempts >= 6:
+                  print("::error::Publication failed after six automatic retries for this commit. "
+                        "Manual code repair required; last working site is preserved.")
+                  sys.exit(1)
+              print(f"Retry {attempts+1}/6 for current commit.")
+          subprocess.run(
+              ["gh", "workflow", "run", "pages.yml", "--repo", repo, "--ref", "main"],
+              check=True,
+          )
+          PY
