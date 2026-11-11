@@ -4,7 +4,7 @@
 No global completeness claim is inferred from a successful sync or cached data.
 """
 from __future__ import annotations
-from collections import Counter
+import re
 from datetime import datetime, timezone
 import json
 from pathlib import Path
@@ -29,7 +29,7 @@ def arxiv_report(data):
     for paper in papers:
         if not isinstance(paper, dict) or not paper.get("id"):
             continue
-        identifier = str(paper["id"]).split("v")[0]
+        identifier = re.sub(r"v[0-9]+$", "", str(paper["id"]))
         unique.setdefault(identifier, paper)
         cats = set(str(c) for c in (paper.get("categories") or []) if c)
         primary = paper.get("primary_category")
@@ -41,7 +41,7 @@ def arxiv_report(data):
             bucket["unique"].add(identifier)
             typ = str(paper.get("announce_type") or "").lower()
             version = paper.get("version")
-            if typ in ("cross", "crosslist", "cross-list"):
+            if typ in ("cross", "crosslist", "cross-list") or (primary and cat != str(primary) and typ == "new"):
                 bucket["crosslisted"].add(identifier)
             elif typ in ("replace", "replacement") or (isinstance(version, int) and version > 1):
                 bucket["replacements"].add(identifier)
