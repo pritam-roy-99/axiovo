@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720" role="img" aria-label="Preview of the current Axiovo homepage with teal navigation, research search hero, and four archive cards">
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720" role="img" aria-label="Preview of the current Axiovo homepage with teal navigation, research search hero, and four archives and current archive cards">
 <defs>
  <linearGradient id="nav" x1="0" y1="0" x2=".2" y2="1"><stop stop-color="#063650"/><stop offset="1" stop-color="#087f87"/></linearGradient>
  <linearGradient id="hero" x1="0" y1="0" x2="1" y2=".5"><stop stop-color="#073c54"/><stop offset="1" stop-color="#058794"/></linearGradient>
