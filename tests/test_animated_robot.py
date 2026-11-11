@@ -11,7 +11,8 @@ class AnimatedRobotTest(unittest.TestCase):
         self.assertTrue(asset.is_file())
         image=asset.read_text(encoding="utf-8")
         self.assertIn('viewBox="0 0 200 200"',image)
-        self.assertIn('<path',image)\n        self.assertNotIn('data:image/webp;base64,',image)
+        self.assertIn('<path',image) 
+        self.assertNotIn('data:image/webp;base64,',image)
         self.assertGreater(len(image),1200)
         sw=(DOCS/"sw.js").read_text()
         self.assertIn("./assets/axiovo-assistant-mascot.svg",sw)
@@ -19,7 +20,8 @@ class AnimatedRobotTest(unittest.TestCase):
 
     def test_assistant_reuses_existing_help_functions(self):
         js=(DOCS/"axiovo-robot-help.js").read_text(encoding="utf-8")
-        self.assertIn('const mascot=make("span","robot-mascot")',js)\n        self.assertIn('mascot.innerHTML=',js)
+        self.assertIn('const mascot=make("span","robot-mascot")',js) 
+        self.assertIn('mascot.innerHTML=',js)
         self.assertIn("robot-mascot",js)
         self.assertIn("robot-speaking",js)
         self.assertIn("robot-listening",js)
