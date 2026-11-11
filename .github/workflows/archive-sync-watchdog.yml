@@ -1,13 +1,14 @@
 name: Archive synchronization watchdog
 on:
   workflow_run:
-    workflows: ['Verify and deploy Axiovo']
+    workflows: ['Verify and deploy Axiovo', 'Synchronize all scholarly archives']
     types: [completed]
   workflow_dispatch:
   schedule:
     # Independent fallback, fifteen minutes after the primary 30-minute cadence.
     # GitHub-hosted cron is best-effort and can be delayed or skipped.
     - cron: '22,52 * * * *'
+    - cron: '11,41 * * * *' # Additional staggered fallback if a cron window is skipped
 permissions:
   actions: write
   contents: read
