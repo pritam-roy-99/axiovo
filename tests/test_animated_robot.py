@@ -16,7 +16,7 @@ class AnimatedRobotTest(unittest.TestCase):
         self.assertGreater(len(image),1200)
         sw=(DOCS/"sw.js").read_text()
         self.assertIn("./assets/axiovo-assistant-mascot.svg",sw)
-        self.assertIn("axiovo-shell-v116",sw)
+        self.assertIn("axiovo-shell-v117",sw)
 
     def test_assistant_reuses_existing_help_functions(self):
         js=(DOCS/"axiovo-robot-help.js").read_text(encoding="utf-8")
@@ -50,7 +50,7 @@ class AnimatedRobotTest(unittest.TestCase):
 
     def test_all_pages_load_one_robot_from_navigation(self):
         nav=(DOCS/"navigation.js").read_text()
-        self.assertIn("axiovo-robot-help.js?v=20261111-english-only-v3",nav)
+        self.assertIn("axiovo-robot-help.js?v=20261111-english-only-v4",nav)
         self.assertIn('script[data-axiovo-robot]',nav)
         css=(DOCS/"axiovo-blueprint-ui.css").read_text()
         self.assertIn("bottom:calc(88px + env(safe-area-inset-bottom,0px))!important",css)
