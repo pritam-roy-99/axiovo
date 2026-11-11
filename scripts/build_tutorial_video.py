@@ -211,7 +211,7 @@ def main():
                 "voice_version":VOICE_VERSION,"voice_engine":VOICE_ENGINE,"voice_locale":VOICE_LOCALE,
                 "media_sha256":media_sha256,
                 "chapters":chapters,
-                "source":"Updated real Chromium page captures, 1280x720 H264","pronunciation":"Spoken-word technical corrections"
+                "source":"Real Chromium page captures","pronunciation":"Spoken-word technical corrections"
             },indent=2),encoding="utf-8")
             print(f"Axiovo tutorial recorded from actual pages: {len(steps)} steps, ~{elapsed:.0f} seconds, {output.stat().st_size} bytes",flush=True)
     finally:
