@@ -66,7 +66,7 @@ const voiceSelect=make("select");voiceSelect.setAttribute("aria-label","Choose s
 const testVoice=make("button",null,"Test");testVoice.type="button";
 const stopVoice=make("button",null,"Stop");stopVoice.type="button";
 const voiceStatus=make("div","robot-voice-status","Tap Speak reply once to enable audio on this device.");
-voiceSettings.append(languageSelect,voiceLabel,voiceSelect,testVoice,stopVoice,voiceStatus);
+voiceSettings.append(voiceLabel,voiceSelect,testVoice,stopVoice,voiceStatus);
 const suggestions=make("div","robot-actions"),form=make("form","robot-form"),input=make("input"),mic=make("button",null,"🎙"),send=make("button",null,"➤");
 input.type="text";input.maxLength=600;input.placeholder="Ask about Axiovo";input.setAttribute("aria-label","Ask Axiovo");
 mic.type="button";mic.setAttribute("aria-label","Voice question");send.type="submit";send.setAttribute("aria-label","Submit question");
@@ -98,6 +98,7 @@ const localeFromText=text=>{
  return "";
 };
 const currentLanguage=()=>"en-IN";
+languageSelect.value="en-IN";
 const sayLabel={
  en:"Need help?",bn:"সাহায্য লাগবে?",hi:"मदद चाहिए?",ta:"உதவி வேண்டுமா?",
  te:"సహాయం కావాలా?",ml:"സഹായം വേണോ?",ur:"مدد چاہیے؟",
