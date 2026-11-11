@@ -347,3 +347,114 @@ body.axiovo-reference-ui.axiovo-home .axiovo-archive-card{background:#f5fafc;bor
   max-width:calc(100% - 194px)!important;
  }
 }
+
+
+/* Unified appearance v2: both the full surface scheme and the active accent
+   follow the one AxiovoAppearance state shared by all pages. */
+:root[data-accent="ocean"]{--ax-brand:#087b92;--ax-brand-dark:#085c74;--ax-brand-bright:#52e0df;--ax-brand-rgb:8,123,146;--ax-brand-hero:#09364f;--ax-brand-hero2:#067887}
+:root[data-accent="forest"]{--ax-brand:#237454;--ax-brand-dark:#165c45;--ax-brand-bright:#9bf0c3;--ax-brand-rgb:35,116,84;--ax-brand-hero:#153e32;--ax-brand-hero2:#287d5e}
+:root[data-accent="violet"]{--ax-brand:#7355b5;--ax-brand-dark:#584092;--ax-brand-bright:#d5bbff;--ax-brand-rgb:115,85,181;--ax-brand-hero:#30254b;--ax-brand-hero2:#7151ad}
+:root[data-accent="rose"]{--ax-brand:#a34c79;--ax-brand-dark:#813459;--ax-brand-bright:#ffc0d9;--ax-brand-rgb:163,76,121;--ax-brand-hero:#46263b;--ax-brand-hero2:#a34c79}
+:root[data-accent="amber"]{--ax-brand:#8c5d19;--ax-brand-dark:#70470c;--ax-brand-bright:#ffe0a2;--ax-brand-rgb:140,93,25;--ax-brand-hero:#463417;--ax-brand-hero2:#a47729}
+:root[data-accent]{
+ --axiovo-accent:var(--ax-brand);--axiovo-hero:var(--ax-brand-hero);--axiovo-hero-2:var(--ax-brand-hero2);
+ --ax4-deep:var(--ax-brand-hero);--ax4-ocean:var(--ax-brand);--ax4-teal:var(--ax-brand-dark);
+ --ax-deep:var(--ax-brand-hero);--ax-teal:var(--ax-brand);
+ --ax-bg:#f1f6f9;--ax4-surface:#ffffff;--ax4-soft:#ecf3f7;
+ --ax4-ink:#173449;--ax4-muted:#526b7f;--ax4-line:#cbdce6;
+ --ax4-tint:rgba(var(--ax-brand-rgb),.09);
+ --rl-panel:#fff;--rl-surface:#fff;--rl-text:#173449;--rl-muted:#526b7f;--rl-border:#cbdce6;
+ --rd-surface:#fff;--rd-ink:#173449;--rd-muted:#526b7f;--rd-border:#cbdce6;--rd-link:var(--ax-brand-dark);
+ color-scheme:light;
+}
+:root[data-theme="dark"][data-accent]{
+ --ax-bg:#091724;--ax-border:#385165;--ax-shadow:0 7px 28px #0005;
+ --ax4-surface:#162b3b;--ax4-soft:#1c3445;--ax4-ink:#edf7fe;--ax4-muted:#b7cbd9;
+ --ax4-line:#425d6f;--ax4-tint:rgba(var(--ax-brand-rgb),.21);
+ --rl-panel:#162b3b;--rl-surface:#162b3b;--rl-text:#edf7fe;--rl-muted:#b7cbd9;--rl-border:#425d6f;
+ --rd-surface:#162b3b;--rd-ink:#edf7fe;--rd-muted:#b7cbd9;--rd-border:#425d6f;--rd-link:var(--ax-brand-bright);
+ --ax4-ocean:var(--ax-brand-dark);--ax4-teal:var(--ax-brand-bright);
+ color-scheme:dark;
+}
+html:root[data-accent] body.axiovo-reference-ui{
+ background:var(--ax-bg)!important;color:var(--ax4-ink)!important;
+}
+html:root[data-accent] body.axiovo-reference-ui .ax-sidebar,
+html:root[data-accent] body.ax4.axiovo-reference-ui .ax-sidebar{
+ background:linear-gradient(165deg,var(--ax-brand-hero),var(--ax-brand-hero2))!important;
+}
+html:root[data-accent] body.axiovo-reference-ui header.rl-global-header{
+ background:var(--ax4-surface)!important;color:var(--ax4-ink)!important;
+ border-bottom:1px solid var(--ax4-line)!important;
+}
+html:root[data-accent] body.axiovo-reference-ui header.rl-global-header :is(.ax-header-status,.ax-header-search),
+html:root[data-accent] body.axiovo-reference-ui header.rl-global-header .axiovo-header-appearance :is(.theme-toggle,.rl-settings-link),
+html:root[data-accent] body.axiovo-reference-ui header.rl-global-header .axiovo-nav-return :is(.axiovo-back-button,.axiovo-home-link){
+ background:var(--ax4-soft)!important;border:1px solid var(--ax4-line)!important;color:var(--ax4-ink)!important;
+}
+html:root[data-accent] body.axiovo-reference-ui header.rl-global-header .theme-toggle{
+ font-weight:800!important;min-width:84px!important;white-space:nowrap!important;
+}
+html:root[data-accent] body.axiovo-reference-ui header.rl-global-header nav.rl-nav>a[aria-current="page"]{
+ background:rgba(255,255,255,.20)!important;box-shadow:inset 3px 0 var(--ax-brand-bright)!important;
+}
+html:root[data-accent] body.axiovo-reference-ui.axiovo-home .axiovo-welcome-header{
+ background:linear-gradient(115deg,var(--ax-brand-hero),var(--ax-brand-hero2))!important;color:#fff!important;
+}
+html:root[data-accent] body.axiovo-reference-ui :is(.ax-home-search button,.axiovo-cta-primary,.rd-button.rd-primary,.rl-button.primary,.btn.primary){
+ background:var(--ax-brand-dark)!important;border-color:var(--ax-brand-dark)!important;color:#fff!important;
+}
+html:root[data-accent] body.axiovo-reference-ui :is(.ax-home-search button,.axiovo-cta-primary,.rd-button.rd-primary,.rl-button.primary,.btn.primary):hover{
+ filter:brightness(1.14);
+}
+html:root[data-accent] body.axiovo-reference-ui main :is(.rd-panel,.rl-section,.feed-stream,.feed-side-card,.ex-guide,.ex-search,.prooflab-card,.panel,.card,.paper,.axiovo-archive-card,.axiovo-color-option,.lab-tabs>a){
+ background-color:var(--ax4-surface)!important;border-color:var(--ax4-line)!important;
+ color:var(--ax4-ink)!important;
+}
+html:root[data-accent] body.axiovo-reference-ui main :is(h1,h2,h3,h4,p,label,li,summary){
+ color:inherit;
+}
+html:root[data-theme="dark"][data-accent] body.axiovo-reference-ui main :is(.rd-panel,.rl-section,.feed-stream,.feed-side-card,.ex-guide,.ex-search,.prooflab-card,.panel,.card,.paper,.axiovo-archive-card,.axiovo-color-option,.lab-tabs>a) :is(h1,h2,h3,h4,strong,b){
+ color:#f1f8ff!important;
+}
+html:root[data-accent] body.axiovo-reference-ui main :is(input:not([type="checkbox"]):not([type="radio"]),textarea,select){
+ background:var(--ax4-surface)!important;color:var(--ax4-ink)!important;
+ border-color:var(--ax4-line)!important;
+}
+html:root[data-accent] body.axiovo-reference-ui main :is(a:not(.btn):not(.rd-button):not(.axiovo-cta),.rd-text-link){
+ color:var(--ax-brand-dark);
+}
+html:root[data-theme="dark"][data-accent] body.axiovo-reference-ui main :is(a:not(.btn):not(.rd-button):not(.axiovo-cta),.rd-text-link){
+ color:var(--ax-brand-bright)!important;
+}
+html:root[data-theme="dark"][data-accent] body.axiovo-reference-ui :is(.ax-menu-panel,.axiovo-credit){
+ background:#152b3b!important;color:#e9f5fb!important;border-color:#425d6f!important;
+}
+html:root[data-theme="dark"][data-accent] body.axiovo-reference-ui :is(.ax-menu-panel a,.ax-menu-panel button,.axiovo-credit span){
+ color:#edf7fe!important;
+}
+html:root[data-theme="dark"][data-accent] body.axiovo-reference-ui main :is(.muted,.rd-small,.rl-subtext,.meta,.hint){
+ color:#b7cbd9!important;
+}
+html:root[data-accent] body.axiovo-reference-ui main :is(.rd-button,.btn,.ex-path-button,.topic-btn)[aria-pressed="true"],
+html:root[data-accent] body.axiovo-reference-ui main :is(.feed-tabs button,.lab-tabs a)[aria-current="page"]{
+ background:var(--ax-brand-dark)!important;color:#fff!important;border-color:var(--ax-brand-dark)!important;
+}
+html:root[data-accent] body.axiovo-reference-ui :is(button,a,input,select,textarea):focus-visible{
+ outline:3px solid var(--ax-brand-bright)!important;outline-offset:2px!important;
+}
+@media(max-width:760px){
+ html:root[data-accent] body.axiovo-reference-ui header.rl-global-header{
+  background:var(--ax-brand-hero)!important;color:#fff!important;
+ }
+ html:root[data-accent] body.axiovo-reference-ui .ax-menu-panel{
+  background:var(--ax4-surface)!important;color:var(--ax4-ink)!important;
+  border-color:var(--ax4-line)!important;
+ }
+ html:root[data-accent] body.axiovo-reference-ui .ax-menu-panel :is(a,button){
+  color:var(--ax4-ink)!important;
+ }
+ html:root[data-accent] body.axiovo-reference-ui .rl-global-header .rl-nav{
+  background:var(--ax-brand-hero)!important;
+ }
+}
