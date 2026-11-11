@@ -11,6 +11,7 @@ on:
   workflow_dispatch:
   schedule:
     # Every 30 minutes; publication occurs only when validated source files change.
+    # A second watchdog now also runs after Pages releases to recover missed cron runs.
     # GitHub Actions scheduled start times are approximate, not guaranteed.
     - cron: '7,37 * * * *'
 permissions:
