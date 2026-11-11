@@ -11,6 +11,7 @@ on:
 permissions:
   actions: write
   contents: read
+  issues: write
 concurrency:
   group: axiovo-archive-watchdog
   cancel-in-progress: false
@@ -37,11 +38,25 @@ jobs:
               select(($now - (.created_at | sub("Z$"; "Z") | fromdateiso8601)) < 2400)
             ] | length' <<< "$runs")
           echo "- Recent primary attempts (past 40 min): $recent" >> "$GITHUB_STEP_SUMMARY"
-          if [ "$recent" -eq 0 ]; then
+          latest_status=$(jq -r '.workflow_runs[0].status // "missing"' <<< "$runs")
+          latest_result=$(jq -r '.workflow_runs[0].conclusion // "none"' <<< "$runs")
+          latest_age=$(jq -r --argjson now "$now" 'if .workflow_runs[0] then ($now - (.workflow_runs[0].created_at | fromdateiso8601)) else 999999 end' <<< "$runs")
+          # A recent failed attempt is not a healthy sync. Retry after a
+          # minimum 15-minute cooldown, avoiding an Actions dispatch storm.
+          if [ "$recent" -eq 0 ] || { [ "$latest_status" = completed ] && [ "$latest_result" != success ] && [ "$latest_age" -ge 900 ]; }; then
             gh workflow run sync-all-sources.yml --repo "$GH_REPO" --ref main
             echo "- Recovery: dispatched primary synchronization." >> "$GITHUB_STEP_SUMMARY"
           else
-            echo "- Recovery: not needed; a recent primary run exists." >> "$GITHUB_STEP_SUMMARY"
+            echo "- Recovery: recent successful or active attempt; no duplicate dispatch." >> "$GITHUB_STEP_SUMMARY"
+          fi
+          # Persistent sync outage must be visible without asking ChatGPT.
+          if [ "$latest_age" -gt 10800 ]; then
+            title="[Axiovo archive watchdog] no archive sync attempt for three hours"
+            existing=$(gh issue list --repo "$GH_REPO" --state open --search "$title in:title" --json title --jq '[.[] | select(.title == "'"$title"'")] | length' || echo 0)
+            if [ "$existing" = 0 ]; then
+              gh issue create --repo "$GH_REPO" --title "$title" --body "The primary archive synchronization has not started for more than three hours. The watchdog attempted to dispatch it. Inspect GitHub Actions schedules and repository settings." || true
+            fi
+            echo "::warning::Archive synchronization absent for more than three hours." 
           fi
           # A green workflow does not mean every individual archive was fetched:
           # those source steps intentionally continue-on-error to preserve data.
