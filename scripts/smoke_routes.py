@@ -471,14 +471,26 @@ def main():
                     page.locator("#ask").click()
                     page.wait_for_function("document.querySelector('#retrieval-status').textContent.includes('0 relevant sources')")
                     assert set(attempted)==set(providers),("No public fallback after an indexed miss",attempted)
+                    # Exact-ID fallback is tested with deterministic offline
+                    # provider responses. Slow public APIs must not decide if
+                    # our original-paper link appears in the interface.
+                    unavailable_exact=lambda route:route.fulfill(status=404,content_type="application/json",body='{}')
+                    page.route("https://api.semanticscholar.org/graph/v1/paper/**",unavailable_exact)
+                    page.route("https://api.datacite.org/dois/**",unavailable_exact)
                     for requested in ("2611.11003v9","2611.11999"):
                         page.goto(base+"copilot.html?id="+requested,wait_until="domcontentloaded")
                         assert page.locator("#question").input_value()==requested
                         page.locator("#ask").click()
-                        original=page.locator("#retrieval-status a")
-                        original.wait_for()
+                        original=page.locator("#retrieval-status a[data-original-source]")
+                        original.wait_for(timeout=15000)
                         assert original.get_attribute("href")=="https://arxiv.org/abs/"+requested
                         assert page.locator("#evidence-list .source").count()==0
+                        # Asynchronously loaded metadata can change the
+                        # status message, never remove the source action.
+                        page.wait_for_timeout(150)
+                        assert original.count()==1
+                    page.unroute("https://api.semanticscholar.org/graph/v1/paper/**",unavailable_exact)
+                    page.unroute("https://api.datacite.org/dois/**",unavailable_exact)
                     for host in providers:
                         page.unroute(f"https://{host}/**",empty_public_lookup)
                     page.unroute("**/data/eprint.json")
