@@ -30,6 +30,12 @@ const row=document.createElement('div');row.className='details';row.textContent=
 }
 const caveat=document.createElement('small');caveat.textContent=data.complete?'Verified only within the stated source scope.':'Coverage incomplete or not independently certified.';card.append(caveat);root.append(card);
 }
+const repair=report.sources.arxiv?.repair_queue;
+if(Array.isArray(repair)){
+const note=document.createElement('p');
+note.textContent='arXiv submission-date repair queue: '+repair.length+' visible dates'+(report.sources.arxiv.repair_queue_total!==undefined?' ('+report.sources.arxiv.repair_queue_total+' total)':'')+'. Dates: '+(repair.slice(0,8).join(', ')||'none');
+document.querySelector('section').prepend(note);
+}
 const body=document.getElementById('categories');
 for(const [category,counts] of Object.entries(report.sources.arxiv?.categories||{}).sort(([a],[b])=>a.localeCompare(b))){
 const tr=document.createElement('tr');
