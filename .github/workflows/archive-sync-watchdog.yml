@@ -1,5 +1,8 @@
 name: Archive synchronization watchdog
 on:
+  workflow_run:
+    workflows: ['Verify and deploy Axiovo']
+    types: [completed]
   workflow_dispatch:
   schedule:
     # Independent fallback, fifteen minutes after the primary 30-minute cadence.
