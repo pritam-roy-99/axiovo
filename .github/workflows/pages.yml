@@ -154,6 +154,8 @@ jobs:
           python -m scripts.audit_literature_coverage
       - name: Validate Archive Reliability 2.0 coverage accounting
         run: python -m unittest discover -s tests -p test_archive_reliability.py -v
+      - name: Test live archive publication parity comparator
+        run: python -m unittest discover -s tests -p test_archive_publication_parity.py -v
       - name: Build Archive Reliability 2.0 report
         run: python -m scripts.build_archive_reliability
       - name: Build honest four-source freshness summary
