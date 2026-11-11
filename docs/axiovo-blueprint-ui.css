@@ -713,3 +713,120 @@ body.axiovo-reference-ui.axiovo-home .axiovo-tour-stage .axiovo-tour-preview-log
   max-height:30px!important;padding:2px 1px!important;
  }
 }
+
+
+/* Mobile usability 2026-11-11: Search Desk / global search / tab bar.
+   Correct contrast, reserve a real microphone touch target and keep the
+   five navigation tabs equal-width on 320px–760px screens. */
+@media(max-width:760px){
+ html:root body.axiovo-reference-ui header.rl-global-header>a.ax-header-search{
+  position:relative!important;display:grid!important;place-items:center!important;
+  flex:0 0 46px!important;width:46px!important;min-width:46px!important;
+  max-width:46px!important;height:46px!important;min-height:46px!important;
+  padding:0!important;background:#eaf7fb!important;border:1px solid #b6d9e8!important;
+  color:#07546b!important;border-radius:12px!important;box-shadow:none!important;
+  text-decoration:none!important;font-size:0!important;
+ }
+ html:root body.axiovo-reference-ui header.rl-global-header>a.ax-header-search::before{
+  content:""!important;width:16px!important;height:16px!important;
+  display:block!important;position:absolute!important;top:11px;left:11px;
+  border:3px solid #07546b!important;border-radius:50%!important;
+  background:transparent!important;box-sizing:border-box!important;
+ }
+ html:root body.axiovo-reference-ui header.rl-global-header>a.ax-header-search::after{
+  content:""!important;display:block!important;width:13px!important;height:3px!important;
+  position:absolute!important;left:26px!important;top:29px!important;
+  border-radius:2px!important;background:#07546b!important;
+  transform:rotate(48deg)!important;transform-origin:left center!important;
+ }
+ html:root body.axiovo-reference-ui header.rl-global-header>a.ax-header-search:focus-visible{
+  outline:3px solid #76f1dc!important;outline-offset:3px!important;
+ }
+ html:root body.axiovo-reference-ui header.rl-global-header>nav.rl-nav[aria-label]{
+  left:0!important;right:0!important;bottom:0!important;width:100%!important;
+  max-width:100vw!important;min-width:0!important;
+  display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;
+  gap:0!important;box-sizing:border-box!important;
+  padding:5px 6px max(7px,env(safe-area-inset-bottom,0px))!important;
+  overflow:hidden!important;
+  border-radius:17px 17px 0 0!important;background:var(--ax4-surface,#fff)!important;
+  border:1px solid var(--ax4-line,#d1e2ea)!important;
+  box-shadow:0 -5px 20px #072c4a24!important;
+ }
+ html:root body.axiovo-reference-ui header.rl-global-header>nav.rl-nav[aria-label]>a{
+  box-sizing:border-box!important;width:100%!important;max-width:100%!important;
+  min-width:0!important;padding:5px 1px!important;margin:0!important;
+  gap:2px!important;text-align:center!important;
+  border:0!important;border-radius:11px!important;
+  background:transparent!important;box-shadow:none!important;
+  color:var(--ax4-muted,#526b7f)!important;
+ }
+ html:root body.axiovo-reference-ui header.rl-global-header>nav.rl-nav[aria-label]>a::before{
+  margin:0!important;flex:0 0 23px!important;line-height:23px!important;
+  font-size:21px!important;color:inherit!important;
+ }
+ html:root body.axiovo-reference-ui header.rl-global-header>nav.rl-nav[aria-label]>a::after{
+  font:750 clamp(10px,2.45vw,12px)/1.15 Inter,system-ui,sans-serif!important;
+  color:inherit!important;display:block!important;
+  white-space:nowrap!important;overflow:hidden!important;
+ }
+ html:root body.axiovo-reference-ui header.rl-global-header>nav.rl-nav[aria-label]>a[aria-current="page"]{
+  background:#e0f5f2!important;color:#075f72!important;border:0!important;
+  box-shadow:inset 0 0 0 1px #8bdcd0!important;
+ }
+ html:root[data-theme="dark"] body.axiovo-reference-ui header.rl-global-header>nav.rl-nav[aria-label]>a[aria-current="page"]{
+  background:#214c57!important;color:#bbfff1!important;
+  box-shadow:inset 0 0 0 1px #54a99f!important;
+ }
+ html:root body.axiovo-reference-ui.axiovo-desk .rd-searchbar{
+  display:flex!important;flex-direction:column!important;align-items:stretch!important;
+  gap:10px!important;width:100%!important;min-width:0!important;
+ }
+ html:root body.axiovo-reference-ui.axiovo-desk .rd-searchbar>.axiovo-voice-wrap{
+  position:relative!important;display:block!important;flex:0 0 auto!important;
+  width:100%!important;max-width:100%!important;min-width:0!important;
+  box-sizing:border-box!important;
+ }
+ html:root body.axiovo-reference-ui.axiovo-desk #rd-query{
+  display:block!important;width:100%!important;min-width:0!important;
+  box-sizing:border-box!important;min-height:54px!important;
+  padding:12px 60px 12px 14px!important;
+  font-size:16px!important;line-height:1.3!important;
+  text-overflow:ellipsis;
+ }
+ html:root body.axiovo-reference-ui.axiovo-desk .rd-searchbar>.axiovo-voice-wrap>.axiovo-voice-button{
+  right:7px!important;top:50%!important;transform:translateY(-50%)!important;
+  display:grid!important;place-items:center!important;
+  width:44px!important;height:44px!important;min-width:44px!important;
+  border-radius:11px!important;border:1px solid var(--ax4-line,#cadfe8)!important;
+  color:#075b75!important;background:var(--ax4-soft,#eaf3f7)!important;
+ }
+ html:root[data-theme="dark"] body.axiovo-reference-ui.axiovo-desk .rd-searchbar>.axiovo-voice-wrap>.axiovo-voice-button{
+  color:#bbfff1!important;
+ }
+ html:root body.axiovo-reference-ui.axiovo-desk .rd-searchbar>.rd-primary{
+  width:100%!important;max-width:100%!important;flex:0 0 auto!important;
+  box-sizing:border-box!important;min-height:48px!important;
+ }
+ html:root body.axiovo-reference-ui.axiovo-desk>main.rd-page{
+  padding-bottom:calc(165px + env(safe-area-inset-bottom,0px))!important;
+ }
+ /* The help launcher sits above the bottom tabs, with smaller touch targets;
+    research results can scroll clear of both fixed controls. */
+ html:root body.axiovo-reference-ui #axiovo-robot{
+  bottom:calc(82px + env(safe-area-inset-bottom,0px))!important;
+  right:10px!important;
+ }
+ html:root body.axiovo-reference-ui #axiovo-robot .robot-fab{
+  width:48px!important;height:48px!important;border-radius:15px!important;
+ }
+ html:root body.axiovo-reference-ui #axiovo-robot .robot-launcher{
+  min-height:48px!important;gap:5px!important;
+ }
+ html:root body.axiovo-reference-ui #axiovo-robot .robot-help-label{
+  min-height:36px!important;font-size:12px!important;padding:7px 9px!important;
+ }
+ html:root body.axiovo-reference-ui #axiovo-robot .robot-panel{
+  bottom:calc(143px + env(safe-area-inset-bottom,0px))!important;
+ }
+}
