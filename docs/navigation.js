@@ -113,7 +113,7 @@
  function activateBlueprint(){
   if(!document.querySelector('link[data-axiovo-blueprint]')){
    const sheet=document.createElement("link");sheet.rel="stylesheet";
-   sheet.href=new URL("./axiovo-blueprint-ui.css?v=20261111-approved-logo-v5",location.href).href;
+   sheet.href=new URL("./axiovo-blueprint-ui.css?v=20261111-mobile-controls-v6",location.href).href;
    sheet.dataset.axiovoBlueprint="true";document.head.append(sheet);
   }
   const script=document.createElement("script");script.defer=true;
