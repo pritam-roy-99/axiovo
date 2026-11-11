@@ -79,6 +79,7 @@ def main():
             for width, height in ((320, 740), (360, 850), (390, 850), (428, 926), (740, 390), (844, 390),
                                   (768, 850), (1360, 850)):
                 phone = width <= 760
+                nav_selector = "header.rl-global-header nav.rl-nav" if phone else ".ax-sidebar .ax-sidebar-nav"
                 mobile = pw.devices["Pixel 7"] if phone else {}
                 ctx = browser.new_context(**{**mobile, "viewport": {"width": width, "height": height}},
                                           service_workers="block", reduced_motion="reduce")
@@ -391,7 +392,7 @@ def main():
                 # Explore in the global header must not bypass the Home
                 # tutorial by navigating directly to the archive-card anchor.
                 page.goto(base+"feed.html",wait_until="domcontentloaded")
-                page.locator(".rl-nav").get_by_role("link",name="Explore",exact=False).click()
+                page.locator(nav_selector).get_by_role("link",name="Explore",exact=False).click()
                 page.wait_for_url(lambda url: urlsplit(url).path.endswith("/index.html"))
                 assert page.evaluate("location.hash")=="" , "Explore from Feed skipped the tutorial"
                 assert page.locator("#axiovo-home-video").is_visible()
@@ -399,7 +400,7 @@ def main():
                 # Returning from a BFCache-restored interactive guide must
                 # explicitly restore the tutorial video as the default.
                 page.locator("#axiovo-tour-show-guide").click()
-                page.locator(".rl-nav").get_by_role("link",name="My Feed",exact=False).click()
+                page.locator(nav_selector).get_by_role("link",name="My Feed",exact=False).click()
                 page.wait_for_url(lambda url: urlsplit(url).path.endswith("/feed.html"))
                 page.go_back(wait_until="domcontentloaded")
                 assert page.locator("#axiovo-home-video").is_visible()
@@ -434,7 +435,7 @@ def main():
                 page.get_by_role("link",name="Open Library").click()
                 page.wait_for_url(lambda url: urlsplit(url).path.endswith("/workspace.html"))
                 # Navigation labels should describe the destination and remain usable.
-                nav = page.locator(".rl-nav a")
+                nav = page.locator(nav_selector+" > a")
                 assert nav.count()==5, "Expected Explore, Research Desk, My Feed, Library and Research Assistant"
                 assert all(nav.nth(i).get_attribute("title") for i in range(5))
                 page.goto(base+"desk.html",wait_until="domcontentloaded")
