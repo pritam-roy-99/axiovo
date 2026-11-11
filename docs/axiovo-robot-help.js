@@ -55,20 +55,10 @@ const log=make("div","robot-log");log.setAttribute("role","log");log.setAttribut
 const voiceSettings=make("div","robot-voice-settings");
 const languageSelect=make("select","robot-language-select");
 languageSelect.id="axiovo-robot-language";
-languageSelect.setAttribute("aria-label","Assistant language for speech and replies");
-const languageOptions=[
- ["auto","Auto (device language)"],["en-IN","English (India)"],["bn-IN","বাংলা · Bengali"],
- ["hi-IN","हिन्दी · Hindi"],["ur-IN","اردو · Urdu"],["ta-IN","தமிழ் · Tamil"],
- ["te-IN","తెలుగు · Telugu"],["ml-IN","മലയാളം · Malayalam"],["mr-IN","मराठी · Marathi"],
- ["gu-IN","ગુજરાતી · Gujarati"],["kn-IN","ಕನ್ನಡ · Kannada"],["pa-IN","ਪੰਜਾਬੀ · Punjabi"],
- ["ne-NP","नेपाली · Nepali"],["es-ES","Español · Spanish"],["fr-FR","Français · French"],
- ["de-DE","Deutsch · German"],["pt-BR","Português"],["it-IT","Italiano"],
- ["ar-SA","العربية · Arabic"],["zh-CN","中文 · Chinese"],["ja-JP","日本語 · Japanese"],
- ["ko-KR","한국어 · Korean"],["ru-RU","Русский · Russian"],["id-ID","Bahasa Indonesia"],
- ["tr-TR","Türkçe · Turkish"]
-];
+languageSelect.setAttribute("aria-label","English speech and replies");
+const languageOptions=[["en-IN","English (India)"]];
 for(const [value,label] of languageOptions)languageSelect.add(new Option(label,value));
-try{const saved=localStorage.getItem("axiovo-robot-language-v1");if(languageOptions.some(x=>x[0]===saved))languageSelect.value=saved}catch{}
+try{const saved=localStorage.getItem("axiovo-robot-language-v1");if(saved==="en-IN")languageSelect.value=saved}catch{}
 const voiceLabel=make("label",null,"Spoken replies"),voiceEnabled=make("input");
 voiceEnabled.type="checkbox";voiceEnabled.checked=true;voiceEnabled.setAttribute("aria-label","Enable spoken help replies");
 voiceLabel.prepend(voiceEnabled);
@@ -107,8 +97,7 @@ const localeFromText=text=>{
  if(/[\u0400-\u04ff]/.test(value))return "ru-RU";
  return "";
 };
-const currentLanguage=()=>languageSelect.value==="auto"?
- (detectedLanguage||"en"):languageSelect.value;
+const currentLanguage=()=>"en-IN";
 const sayLabel={
  en:"Need help?",bn:"সাহায্য লাগবে?",hi:"मदद चाहिए?",ta:"உதவி வேண்டுமா?",
  te:"సహాయం కావాలా?",ml:"സഹായം വേണോ?",ur:"مدد چاہیے؟",
@@ -153,7 +142,7 @@ function refreshVoices(){
   return;
  }
  const prev=speechVoices[Number(voiceSelect.value)]?.voiceURI;
- speechVoices=window.speechSynthesis.getVoices().slice().sort((a,b)=>voiceScore(b)-voiceScore(a));
+ speechVoices=window.speechSynthesis.getVoices().filter(v=>/^en(?:-|$)/i.test(v.lang)).sort((a,b)=>voiceScore(b)-voiceScore(a));
  voiceSelect.replaceChildren();
  speechVoices.forEach((v,i)=>voiceSelect.add(new Option(v.name+" ("+v.lang+")",String(i))));
  if(!speechVoices.length)voiceSelect.add(new Option("Use device default voice",""));
@@ -459,10 +448,7 @@ function routeToCopilot(question){
 const aliases=[["Research Hub",/\b(research hub|research map|connection graph|knowledge graph|paper graph)\b/],["ProofLab",/\bproof\s*lab\b/],["Research Assistant",/\b(copilot|research assistant)\b/],["Research Desk",/\b(research desk|desk)\b/],["Library",/\b(library|workspace)\b/],["Settings",/\bsettings\b/],["My Feed",/\b(my feed|feed)\b/],["Research Tools",/\b(research tools|pdf reader)\b/],["Home",/\b(home|homepage)\b/],["ChemRxiv",/\bchemrxiv\b/],["bioRxiv",/\bbiorxiv\b/],["Cryptology ePrint",/\b(cryptology|crypto|eprint|iacr)\b/],["arXiv",/\barxiv\b/]];
 function ask(raw){
 const question=clean(raw);if(!question)return;
-if(languageSelect.value==="auto"){
- detectedLanguage=localeFromText(question)||"en";
- updateLanguageLabel();
-}
+
 message(question,true);
 const q=question.toLowerCase(),state=snapshot();
 const shortcuts=[
@@ -530,7 +516,7 @@ mic.addEventListener("click",()=>{
  mic.disabled=true;mic.textContent="●";root.classList.add("robot-listening");
  rec.onresult=e=>{
   const words=e.results?.[0]?.[0]?.transcript||"";
-  if(words){if(languageSelect.value==="auto")detectedLanguage=localeFromText(words)||"en";
+  if(words){
    updateLanguageLabel();refreshVoices();ask(words)}
  };
  rec.onerror=e=>message("Microphone unavailable for "+rec.lang+": "+(e.error||"unknown")+". You can type instead.");
