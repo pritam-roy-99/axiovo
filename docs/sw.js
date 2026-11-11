@@ -38,6 +38,7 @@ self.addEventListener("activate", event => {
 });
 function isShell(url) {
   if (url.origin !== self.location.origin) return false;
+  if (url.pathname.endsWith("/assets/axiovo-tutorial-thumbnail.webp")) return true;
   return /\/data\/topics\/(arxiv|biorxiv|chemrxiv)\.tsv$/.test(url.pathname) || url.pathname.endsWith("/") || /\.(?:html|js|css|svg|webmanifest)$/.test(url.pathname);
 }
 self.addEventListener("fetch", event => {
