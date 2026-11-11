@@ -832,3 +832,30 @@ body.axiovo-reference-ui.axiovo-home .axiovo-tour-stage .axiovo-tour-preview-log
   max-height:calc(100dvh - 185px - env(safe-area-inset-bottom,0px))!important;
  }
 }
+
+/* 2026-11-11: mobile viewport containment and sidebar collision repair.
+   This is intentionally last to override legacy desktop shell declarations. */
+html,body{max-width:100%;overflow-x:clip}
+body.axiovo-reference-ui{min-width:0!important}
+body.axiovo-reference-ui :is(main,.cards,.card,.rd-page,.ex-page,.feed-layout,.rl-section){min-width:0;box-sizing:border-box}
+body.axiovo-reference-ui main :is(h1,h2,h3,p,a,button){overflow-wrap:break-word}
+body.axiovo-reference-ui .ax-sidebar-eyebrow{position:static!important;display:block!important;height:auto!important;min-height:0!important;margin:20px 8px 9px!important;line-height:1.5!important;white-space:normal!important;transform:none!important}
+body.axiovo-reference-ui .ax-sidebar-extra{margin-top:28px!important}
+body.axiovo-reference-ui .ax-sidebar :is(a,button){min-width:0!important;max-width:100%;white-space:normal!important;overflow-wrap:anywhere}
+@media(max-width:760px){
+ html body.axiovo-reference-ui .ax-sidebar{display:none!important;visibility:hidden!important;pointer-events:none!important}
+ html body.axiovo-reference-ui>main,html body.axiovo-reference-ui>.pl-app-shell{
+  margin-left:0!important;width:100%!important;max-width:100%!important;
+  min-width:0!important;box-sizing:border-box!important
+ }
+ html body.axiovo-reference-ui header.rl-global-header{
+  margin-left:0!important;width:100%!important;max-width:100%!important;
+  min-width:0!important;box-sizing:border-box!important
+ }
+ html body.axiovo-reference-ui .axiovo-credit{margin-left:0!important;width:100%!important}
+ html body.axiovo-reference-ui main{padding-left:14px!important;padding-right:14px!important}
+ html body.axiovo-reference-ui main .cards{display:grid!important;grid-template-columns:minmax(0,1fr)!important}
+ html body.axiovo-reference-ui main .card{width:100%!important;max-width:100%!important;min-width:0!important}
+ html body.axiovo-reference-ui main :is(img,video,iframe,canvas){max-width:100%}
+ html body.axiovo-reference-ui main :is(pre,table){max-width:100%;overflow-x:auto}
+}
