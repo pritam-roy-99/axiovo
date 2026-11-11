@@ -98,6 +98,16 @@ def build(root=ROOT):
                 "complete": complete, "scope": scope, "indexed_unique": count,
                 "checked_at": data.get("checked_at") or data.get("generated_at"),
                 "not_global_completeness": True}
+    health = load(root / "literature-health.json")
+    if health and isinstance(health.get("arxiv"), dict):
+        state = health["arxiv"]
+        queue = state.get("repair_queue")
+        if isinstance(queue, list):
+            result["sources"]["arxiv"]["repair_queue"] = [d for d in queue if isinstance(d, str) and len(d) == 10][:50]
+            result["sources"]["arxiv"]["repair_queue_total"] = state.get("queue_total")
+            result["sources"]["arxiv"]["verified_submission_days"] = state.get("verified_days")
+            result["sources"]["arxiv"]["latest_verified_submission_day"] = state.get("verified_latest")
+            result["sources"]["arxiv"]["submission_coverage_status"] = state.get("status")
     return result
 
 def main():
