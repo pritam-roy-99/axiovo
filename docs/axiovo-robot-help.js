@@ -188,7 +188,56 @@ voiceEnabled.addEventListener("change",()=>{
  if(!voiceEnabled.checked&&"speechSynthesis" in window)speechSynthesis.cancel();
  if(!voiceEnabled.checked)root.classList.remove("robot-speaking");
 });
-function message(s,user=false,links=[]){const n=make("div","robot-msg"+(user?" user":""),s);if(links.length){const wrap=make("div","robot-links");links.forEach(([label,url])=>{const a=make("a",null,label);a.href=new URL(url,base).href;wrap.append(a)});n.append(wrap)}if(!user){lastAssistantReply=s;const play=make("button","robot-speak-reply","🔊 Speak reply");play.type="button";play.setAttribute("aria-label","Speak this answer aloud");play.addEventListener("click",()=>speak(s,true));n.append(play)}log.append(n);log.scrollTop=log.scrollHeight;if(!user&&speechUnlocked)speak(s)}
+const translators=new Map();
+async function translateReply(text,language){
+ const target=language.split("-")[0].toLowerCase();
+ if(target==="en")return text;
+ if(!window.Translator?.create)return null;
+ try{
+  if(!translators.has(target))
+   translators.set(target,window.Translator.create({sourceLanguage:"en",targetLanguage:target}));
+  const translator=await translators.get(target);
+  return await translator.translate(text);
+ }catch{
+  translators.delete(target);return null;
+ }
+}
+function message(s,user=false,links=[],alreadyLocalized=false){
+ const text=String(s||"");
+ const n=make("div","robot-msg"+(user?" user":""));
+ const content=document.createTextNode(text);n.append(content);
+ if(links.length){
+  const wrap=make("div","robot-links");
+  links.forEach(([label,url])=>{
+   const a=make("a",null,label);a.href=new URL(url,base).href;wrap.append(a);
+  });
+  n.append(wrap);
+ }
+ let spokenText=text;
+ if(!user){
+  lastAssistantReply=text;
+  const play=make("button","robot-speak-reply","🔊 Speak reply");
+  play.type="button";play.setAttribute("aria-label","Speak this answer aloud");
+  play.addEventListener("click",()=>speak(spokenText,true));
+  n.append(play);
+ }
+ log.append(n);log.scrollTop=log.scrollHeight;
+ if(user)return;
+ const locale=currentLanguage(),baseLang=baseLanguage();
+ const nativeScript=localeFromText(text);
+ const isNative=alreadyLocalized||baseLang==="en"||nativeScript?.split("-")[0]===baseLang;
+ if(isNative){if(speechUnlocked)speak(text);return}
+ // Local on-device translation is optional: do not claim broad translation
+ // support in browsers that lack the Translator API.
+ void translateReply(text,locale).then(translated=>{
+  if(translated){
+   content.textContent=translated;spokenText=translated;lastAssistantReply=translated;
+   if(speechUnlocked)speak(translated);
+  }else{
+   voiceStatus.textContent="No translation engine for "+locale+" is available here. Use Axiovo Research Assistant for an answer in that language.";
+  }
+ }).catch(()=>{voiceStatus.textContent="Translation unavailable. The original response is still shown."});
+}
 function clean(s){return String(s||"").replace(/\s+/g," ").trim().slice(0,170)}
 function visible(n){return n.getClientRects().length>0&&!n.closest("#axiovo-robot,[aria-hidden=true]")}
 function snapshot(){
@@ -369,7 +418,7 @@ function routeToCopilot(question){
  fr:"Votre question sera transmise telle quelle à l’assistant de recherche Axiovo. La réponse dépend des sources disponibles.",
  ar:"سأرسل سؤالك بلغته الأصلية إلى مساعد البحث في Axiovo. تعتمد الإجابة على المصادر المتاحة."
  }[baseLanguage()]||"I'll pass your exact question to Axiovo Research Assistant in the same language. Its response depends on available evidence and configured AI; I cannot promise an answer in every language.";
- message(msgText,false,[["Open Research Assistant", "copilot.html?q="+encodeURIComponent(question.slice(0,500))]]);
+ message(msgText,false,[["Open Research Assistant", "copilot.html?q="+encodeURIComponent(question.slice(0,500))]],baseLanguage()!=="en"&&Boolean({bn:1,hi:1,es:1,fr:1,ar:1}[baseLanguage()]));
 }
 
 const aliases=[["Research Hub",/\b(research hub|research map|connection graph|knowledge graph|paper graph)\b/],["ProofLab",/\bproof\s*lab\b/],["Research Assistant",/\b(copilot|research assistant)\b/],["Research Desk",/\b(research desk|desk)\b/],["Library",/\b(library|workspace)\b/],["Settings",/\bsettings\b/],["My Feed",/\b(my feed|feed)\b/],["Research Tools",/\b(research tools|pdf reader)\b/],["Home",/\b(home|homepage)\b/],["ChemRxiv",/\bchemrxiv\b/],["bioRxiv",/\bbiorxiv\b/],["Cryptology ePrint",/\b(cryptology|crypto|eprint|iacr)\b/],["arXiv",/\barxiv\b/]];
@@ -411,7 +460,7 @@ if(/(what|about|explain|purpose|understand|how).*(this page|here|current page)|(
 const intro=document.querySelector("main h1,[role=main] h1");if(intro)showTarget(intro,"page introduction");
 message("This is "+state.name+". "+(state.desc||"Part of Axiovo.")+(state.headings.length?"\n\nCurrent sections: "+state.headings.slice(0,9).join("; ")+".":"")+"\n\nI read the live page, including new headings after updates.");return}
 if(/^(hi|hello|hey)[!. ]*$/.test(q)||/^(नमस्ते|नमस्कार|হ্যালো|নমস্কার|வணக்கம்|నమస్కారం|مرحبا|hola|bonjour|hallo|olá|你好|こんにちは|안녕하세요)[!.,。 ]*$/iu.test(q)){
- message(welcome[baseLanguage()]||welcome.en);return;
+ message(welcome[baseLanguage()]||welcome.en,false,[],true);return;
 }
 if(baseLanguage()!=="en"){
  // Do not pretend that fixed English-only keyword rules understand every
@@ -426,7 +475,7 @@ const hits=candidates.filter(x=>x.score>0).sort((a,b)=>b.score-a.score).slice(0,
 if(hits.length){const best=findGuideTarget(question);if(best)showTarget(best.node,best.name.slice(0,75));message("Related items I found: "+hits.map(x=>x.text+" ("+x.type+")").join("; ")+".\n\nThese are verified page labels, not an AI-generated explanation.",false,hits.filter(x=>x.type==="page").map(x=>[x.text,pages[x.text]]));return}
 routeToCopilot(question);
 }
-message("Hi! Ask me to find research papers across Axiovo’s four archives, save a paper, explain a page, or guide you to a feature. I can also pass deeper questions to Research Assistant.");
+message(welcome[baseLanguage()]||"Hi! Ask me to find papers across Axiovo's four archives, explain a page, or guide you to a feature.",false,[],Boolean(welcome[baseLanguage()]));
 for(const name of ["Find papers on quantum information","Open Research Hub","What does this page do?"]){const b=make("button",null,name);b.type="button";b.addEventListener("click",()=>ask(name));suggestions.append(b)}
 let drag=null,wasDragged=false,lastPos=null;
 function move(x,y){const w=launcher.offsetWidth,h=launcher.offsetHeight;x=Math.max(5,Math.min(innerWidth-w-5,x));y=Math.max(5,Math.min(innerHeight-h-5,y));lastPos={x,y};root.style.setProperty("right","auto","important");root.style.setProperty("bottom","auto","important");root.style.setProperty("left",x+"px","important");root.style.setProperty("top",y+"px","important");if(innerWidth>760){panel.style.setProperty("right","auto","important");panel.style.setProperty("bottom","auto","important");panel.style.setProperty("left",Math.max(8,Math.min(innerWidth-panel.offsetWidth-8,x<innerWidth/2?x:x+w-panel.offsetWidth))+"px","important");panel.style.setProperty("top",Math.max(8,Math.min(innerHeight-panel.offsetHeight-8,y-panel.offsetHeight-12))+"px","important")}}
