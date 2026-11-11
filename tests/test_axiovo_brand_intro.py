@@ -22,7 +22,7 @@ class BrandIntroTest(unittest.TestCase):
 
     def test_narration_keeps_brand_intro(self):
         first=TOUR.split("steps=[",1)[1].split('("Four research archives"',1)[0]
-        self.assertIn('Meet the current Axiovo',first)
+        self.assertIn('Axiovo = Axiom + Novo',first)
         self.assertIn("foundational starting point for reasoning",first)
         self.assertIn('".axiovo-welcome"',first)
         self.assertIn('("Axiovo = Axiom + Novo"',INTRO)
