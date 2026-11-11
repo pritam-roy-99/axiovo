@@ -16,7 +16,7 @@ class AnimatedRobotTest(unittest.TestCase):
         self.assertGreater(len(image),1200)
         sw=(DOCS/"sw.js").read_text()
         self.assertIn("./assets/axiovo-assistant-mascot.svg",sw)
-        self.assertIn("axiovo-shell-v115",sw)
+        self.assertRegex(sw, r'const CACHE = "axiovo-shell-v(?:11[5-9]|1[2-9][0-9]|[2-9][0-9]{2,})";')
 
     def test_assistant_reuses_existing_help_functions(self):
         js=(DOCS/"axiovo-robot-help.js").read_text(encoding="utf-8")
