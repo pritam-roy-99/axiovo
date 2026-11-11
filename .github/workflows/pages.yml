@@ -316,7 +316,8 @@ jobs:
         if: steps.chromium_deps.outcome == 'success'
         id: smoke_full
         run: |
-          python scripts/smoke_routes.py
+          # Retry transient browser/network failures once; never bypass a persistently failing gate.
+          python scripts/smoke_routes.py || { sleep 15; python scripts/smoke_routes.py; }
           python scripts/smoke_feed.py
           python scripts/smoke_recommendations.py
           python scripts/smoke_search_links.py
