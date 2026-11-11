@@ -16,6 +16,15 @@ class ArchiveReliabilityTests(unittest.TestCase):
         self.assertEqual(report["categories"]["quant-ph"]["replacements"],1)
         self.assertEqual(report["categories"]["cs.IT"]["unique"],1)
 
+    def test_version_suffix_and_old_style_identifiers(self):
+        batch={"complete":True,"count":2,"papers":[
+            {"id":"2611.00001v2","version":2,"announce_type":"replace","categories":["quant-ph"]},
+            {"id":"hep-th/9901001","version":1,"announce_type":"new","categories":["hep-th"]}]}
+        result=arxiv_report(batch)
+        self.assertTrue(result["complete"])
+        self.assertEqual(result["indexed_unique"],2)
+        self.assertEqual(result["categories"]["hep-th"]["v1"],1)
+
     def test_duplicates_cannot_be_certified(self):
         batch={"complete":True,"count":2,"papers":[{"id":"a"},{"id":"a"}]}
         self.assertFalse(arxiv_report(batch)["complete"])
