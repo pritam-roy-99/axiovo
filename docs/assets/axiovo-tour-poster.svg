@@ -1,29 +1,48 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720" role="img" aria-label="Axiovo four archive tutorial poster: arXiv, bioRxiv, ChemRxiv and Cryptology ePrint">
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720" role="img" aria-label="Preview of the current Axiovo homepage with teal navigation, research search hero, and four archive cards">
 <defs>
-<linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#0b2138"/><stop offset="1" stop-color="#176081"/></linearGradient>
-<linearGradient id="tile" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#193d56"/><stop offset="1" stop-color="#1d4c61"/></linearGradient>
+ <linearGradient id="nav" x1="0" y1="0" x2=".2" y2="1"><stop stop-color="#063650"/><stop offset="1" stop-color="#087f87"/></linearGradient>
+ <linearGradient id="hero" x1="0" y1="0" x2="1" y2=".5"><stop stop-color="#073c54"/><stop offset="1" stop-color="#058794"/></linearGradient>
+ <filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="7" stdDeviation="11" flood-color="#113f57" flood-opacity=".17"/></filter>
 </defs>
-<rect width="1280" height="720" fill="url(#bg)"/>
-<rect x="56" y="42" width="1168" height="636" rx="27" fill="#102a42" stroke="#4b92aa" stroke-width="2"/>
-<circle cx="105" cy="110" r="13" fill="#80e5dc"/>
-<text x="133" y="122" font-family="Arial, sans-serif" font-size="31" fill="#d8f6ff" font-weight="800">AXIOVO</text>
-<text x="104" y="208" font-family="Arial, sans-serif" font-size="49" fill="#fff" font-weight="800">Explore research in four archives</text>
-<text x="104" y="251" font-family="Arial, sans-serif" font-size="23" fill="#cde8f4">Real website walkthrough · source-linked papers · private research library</text>
-<g font-family="Arial, sans-serif">
-<rect x="104" y="306" width="250" height="186" rx="18" fill="url(#tile)" stroke="#6aa9bf"/>
-<rect x="378" y="306" width="250" height="186" rx="18" fill="url(#tile)" stroke="#6aa9bf"/>
-<rect x="652" y="306" width="250" height="186" rx="18" fill="url(#tile)" stroke="#6aa9bf"/>
-<rect x="926" y="306" width="250" height="186" rx="18" fill="url(#tile)" stroke="#6aa9bf"/>
-<g fill="#fff" font-size="27" font-weight="700">
-<text x="125" y="368">arXiv</text><text x="399" y="368">bioRxiv</text><text x="673" y="368">ChemRxiv</text><text x="947" y="368" font-size="24">Cryptology</text><text x="947" y="403" font-size="24">ePrint</text>
+<rect width="1280" height="720" fill="#edf4f8"/>
+<rect width="227" height="720" fill="url(#nav)"/>
+<rect x="20" y="26" width="184" height="77" rx="13" fill="#fff"/>
+<text x="39" y="78" fill="#063f5a" font-family="Arial,sans-serif" font-size="31" font-weight="bold">✦axiovo</text>
+<text x="22" y="146" fill="#8cebe0" font-family="Arial,sans-serif" font-size="13" font-weight="bold" letter-spacing="2">RESEARCH WORKSPACE</text>
+<rect x="15" y="163" width="193" height="44" rx="9" fill="#ffffff35"/>
+<g fill="#f4fbfd" font-family="Arial,sans-serif" font-size="17" font-weight="bold">
+ <text x="34" y="192">⌕   Explore</text><text x="34" y="248">▤   Research Desk</text><text x="34" y="304">≋   My Feed</text><text x="34" y="360">▤   Library</text><text x="34" y="416">✦   Research Assistant</text>
 </g>
-<g fill="#d7edf8" font-size="18">
-<text x="125" y="421">Physics · Mathematics</text><text x="125" y="451">Computing</text>
-<text x="399" y="421">Life sciences</text><text x="399" y="451">Genomics</text>
-<text x="673" y="421">Chemistry · Materials</text><text x="673" y="451">Molecular science</text>
-<text x="947" y="441">Cryptography</text><text x="947" y="471">Quantum security</text>
+<path d="M25 464h170" stroke="#ffffff40"/>
+<g fill="#e9f9ff" font-family="Arial,sans-serif" font-size="15"><text x="34" y="509">Research Tools</text><text x="34" y="555">ProofLab</text><text x="34" y="601">Settings</text></g>
+<rect x="227" y="0" width="1053" height="61" fill="#fff"/>
+<g fill="#345267" font-family="Arial,sans-serif" font-size="15"><text x="775" y="37">Search all papers</text><text x="1015" y="37">Settings</text><text x="1158" y="37">☾ Night</text></g>
+<rect x="255" y="90" width="994" height="340" rx="19" fill="url(#hero)" filter="url(#shadow)"/>
+<circle cx="1130" cy="196" r="154" fill="none" stroke="#91ece0" stroke-opacity=".2" stroke-width="3"/>
+<text x="289" y="131" fill="#9deddf" font-family="Arial,sans-serif" font-size="13" font-weight="bold" letter-spacing="1">AXIOVO · FROM KNOWLEDGE TO DISCOVERY</text>
+<text x="289" y="187" fill="#fff" font-family="Arial,sans-serif" font-size="40" font-weight="bold">Find research. Follow the evidence.</text>
+<text x="289" y="226" fill="#e5fafc" font-family="Arial,sans-serif" font-size="19">Search across arXiv, bioRxiv, ChemRxiv and Cryptology ePrint.</text>
+<text x="289" y="254" fill="#e5fafc" font-family="Arial,sans-serif" font-size="19">Discover new papers, verify sources, save and follow research.</text>
+<rect x="289" y="279" width="705" height="55" rx="12" fill="#fff"/>
+<text x="311" y="315" fill="#648396" font-family="Arial,sans-serif" font-size="18">⌕   Paper title, author, DOI, arXiv ID or research question</text>
+<rect x="870" y="286" width="111" height="41" rx="9" fill="#09617a"/>
+<text x="894" y="312" fill="#fff" font-family="Arial,sans-serif" font-size="17" font-weight="bold">Search</text>
+<rect x="289" y="355" width="172" height="50" rx="25" fill="#075c77"/>
+<rect x="475" y="355" width="190" height="50" rx="25" fill="#fff"/>
+<rect x="679" y="355" width="179" height="50" rx="25" fill="#fff"/>
+<g font-family="Arial,sans-serif" font-size="16" font-weight="bold">
+ <text x="318" y="387" fill="#fff">⌕ Search papers</text><text x="493" y="387" fill="#07536b">Explore archives</text><text x="703" y="387" fill="#07536b">Install Axiovo</text>
 </g>
+<text x="255" y="481" font-family="Arial,sans-serif" font-weight="bold" font-size="15" fill="#087d89" letter-spacing="1">START HERE   •   CURRENT AXIOVO INTERFACE</text>
+<text x="255" y="520" font-family="Arial,sans-serif" font-weight="bold" font-size="30" fill="#113d56">See how Axiovo works</text>
+<text x="255" y="550" font-family="Arial,sans-serif" font-size="18" fill="#537388">A real website walkthrough of discovery, Library, My Feed, ProofLab and more.</text>
+<rect x="255" y="582" width="994" height="99" rx="16" fill="#fff" stroke="#c4d9e5"/>
+<g font-family="Arial,sans-serif" font-size="18" font-weight="bold">
+ <text x="293" y="620" fill="#16465d">arXiv</text><text x="518" y="620" fill="#16465d">bioRxiv</text><text x="757" y="620" fill="#16465d">ChemRxiv</text><text x="997" y="620" fill="#16465d">Cryptology ePrint</text>
 </g>
-<circle cx="640" cy="582" r="39" fill="#7be8e2"/><path d="M629 562v42l35-21z" fill="#09273c"/>
-<text x="104" y="644" fill="#cce9f6" font-family="Arial,sans-serif" font-size="19">Watch the current Axiovo feature walkthrough</text>
+<g font-family="Arial,sans-serif" font-size="13" fill="#6a8494">
+ <text x="293" y="649">Physics and math</text><text x="518" y="649">Life sciences</text><text x="757" y="649">Chemical sciences</text><text x="997" y="649">Cryptography</text>
+</g>
+<circle cx="640" cy="344" r="49" fill="#fff" opacity=".96" stroke="#a3d8e3" stroke-width="3"/>
+<path d="M628 321l36 23-36 23z" fill="#075b77"/>
 </svg>
