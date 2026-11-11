@@ -373,6 +373,10 @@ jobs:
       - name: Verify public release matches tested artifact
         timeout-minutes: 4
         run: python scripts/verify_release.py
+      - name: Verify live archive reliability parity after deployment
+        id: archive_live_parity
+        timeout-minutes: 4
+        run: python scripts/check_archive_publication_parity.py
       - name: Audit deployed Axiovo pages, live links, navigation and video
         id: postdeploy_audit
         continue-on-error: true
