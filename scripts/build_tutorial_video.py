@@ -8,6 +8,7 @@ Run after installing playwright/Chromium, Pillow, ffmpeg and edge-tts 7.3.1.
 from __future__ import annotations
 
 import functools
+from concurrent.futures import ThreadPoolExecutor
 import asyncio
 from hashlib import file_digest
 import json
@@ -62,6 +63,16 @@ def stamp(png,title,instruction,number,target=None):
         if y2<H-155:
             draw.rounded_rectangle((x-5,y-5,x2+5,y2+5),radius=9,outline=(31,232,222,255),width=5)
     pic.save(png)
+
+def render_narration(narration: str, sound: Path) -> None:
+    # Playwright's synchronous API runs an event loop in the main thread.
+    # edge-tts also uses asyncio.run(), so render in a separate worker thread.
+    # Exceptions must propagate to fail the recording without publishing media.
+    def speak():
+        render(narration, sound, voice=VOICE)
+    with ThreadPoolExecutor(max_workers=1) as narrator:
+        narrator.submit(speak).result()
+
 
 def cue(t):
     ms=round(t*1000)
@@ -164,7 +175,7 @@ def main():
                     page.screenshot(path=str(shot))
                     stamp(shot,title,hint,index,target)
                     sound=work/f"{index:02d}.wav"
-                    render(narration, sound, voice=VOICE)
+                    render_narration(narration, sound)
                     voice=VOICE
                     voices_used.add(voice)
                     # Convert every clip to one PCM format before ffmpeg concatenation.
