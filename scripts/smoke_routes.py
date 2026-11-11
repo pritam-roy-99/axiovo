@@ -150,7 +150,7 @@ def main():
                     if width in (390,1360) and path in ("","desk.html","copilot.html"):
                         bot=page.locator("#axiovo-robot .robot-mascot")
                         bot.wait_for(state="visible",timeout=15000)
-                        assert "assets/axiovo-assistant-mascot.svg" in bot.get_attribute("src")
+                        assert bot.locator("svg").count() == 1, "Inline SVG mascot must be present"
                         assert page.locator("#axiovo-robot .robot-fab").is_visible()
                         assert page.locator("#axiovo-robot .robot-help-label").is_visible()
                         if phone:
