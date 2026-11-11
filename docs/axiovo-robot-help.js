@@ -35,6 +35,15 @@ style.textContent += `
  #axiovo-robot .robot-help-label{max-width:112px!important;white-space:normal!important;text-align:center!important;line-height:1.2!important}
 }
 `;
+style.textContent += `
+#axiovo-robot .robot-mascot{display:grid!important;place-items:center!important;width:100%!important;height:100%!important;overflow:visible!important}
+#axiovo-robot .robot-mascot svg{display:block;width:100%;height:100%;pointer-events:none}
+#axiovo-robot .robot-fab{overflow:visible!important}
+@media(max-width:760px){
+ #axiovo-robot:not(.axiovo-guiding){bottom:calc(110px + env(safe-area-inset-bottom,0px))!important}
+ #axiovo-robot .robot-panel{bottom:calc(200px + env(safe-area-inset-bottom,0px))!important}
+}
+`;
 const make=(tag,cl,txt)=>{const n=document.createElement(tag);if(cl)n.className=cl;if(txt!==undefined)n.textContent=txt;return n};
 function setup(){
 if(document.getElementById("axiovo-robot"))return;
@@ -74,12 +83,11 @@ mic.type="button";mic.setAttribute("aria-label","Voice question");send.type="sub
 form.append(input,mic,send);
 panel.append(head,voiceSettings,log,suggestions,form,make("div","robot-note","Voice uses voices installed in your browser or device. Speech input may use your browser provider; Axiovo stores no audio."));
 const fab=make("button","robot-fab");fab.type="button";fab.title="Need help? Click to ask or drag the robot";fab.setAttribute("aria-label","Need help? Open the movable Axiovo voice assistant");
-const mascot=make("img","robot-mascot");mascot.src=new URL("assets/axiovo-assistant-mascot.svg?v=20261111-native",base).href;
-mascot.alt="";mascot.width=78;mascot.height=78;mascot.decoding="async";mascot.draggable=false;
+const mascot=make("span","robot-mascot");mascot.setAttribute("aria-hidden","true");mascot.innerHTML="<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 200\" role=\"img\" aria-label=\"Smiling Axiovo robot waving with a research tablet\">\n<defs><linearGradient id=\"shell\" x2=\".8\" y2=\"1\"><stop stop-color=\"#fff\"/><stop offset=\"1\" stop-color=\"#b8d5e9\"/></linearGradient><linearGradient id=\"blue\" x2=\"1\" y2=\"1\"><stop stop-color=\"#5ce9ff\"/><stop offset=\"1\" stop-color=\"#0067aa\"/></linearGradient></defs>\n<ellipse cx=\"100\" cy=\"180\" rx=\"75\" ry=\"9\" fill=\"#50cfe8\" opacity=\".22\"/>\n<path d=\"M99 39V23\" stroke=\"#265b94\" stroke-width=\"7\" stroke-linecap=\"round\"/><circle cx=\"99\" cy=\"20\" r=\"12\" fill=\"url(#blue)\"/>\n<path d=\"M68 132Q48 137 39 119\" fill=\"none\" stroke=\"#244e78\" stroke-width=\"13\" stroke-linecap=\"round\"/><path d=\"M40 119L28 102M40 119L20 115M40 119L37 97\" fill=\"none\" stroke=\"#204a78\" stroke-width=\"9\" stroke-linecap=\"round\"/>\n<path d=\"M130 131q19 4 27-11\" fill=\"none\" stroke=\"#244e78\" stroke-width=\"13\" stroke-linecap=\"round\"/>\n<ellipse cx=\"100\" cy=\"145\" rx=\"45\" ry=\"40\" fill=\"url(#shell)\" stroke=\"#66b8dc\" stroke-width=\"3\"/>\n<path d=\"M100 145l-11 21h7l4-9 4 9h7z\" fill=\"#086b9d\"/><path d=\"M84 169q20 7 33-1\" fill=\"none\" stroke=\"#29cce3\" stroke-width=\"3\"/>\n<rect x=\"34\" y=\"44\" width=\"132\" height=\"94\" rx=\"42\" fill=\"url(#shell)\" stroke=\"#238ac0\" stroke-width=\"4\"/>\n<rect x=\"44\" y=\"55\" width=\"112\" height=\"70\" rx=\"31\" fill=\"#101f38\"/>\n<path d=\"M66 89q10-17 21 0M113 89q10-17 21 0\" fill=\"none\" stroke=\"#79edff\" stroke-width=\"7\" stroke-linecap=\"round\"/>\n<path d=\"M87 104q13 17 26 0z\" fill=\"#e8ffff\"/>\n<ellipse cx=\"33\" cy=\"91\" rx=\"11\" ry=\"23\" fill=\"url(#blue)\"/><ellipse cx=\"167\" cy=\"91\" rx=\"11\" ry=\"23\" fill=\"url(#blue)\"/>\n<g transform=\"rotate(13 147 151)\"><rect x=\"125\" y=\"122\" width=\"54\" height=\"58\" rx=\"7\" fill=\"#173a61\" stroke=\"#20c8e9\" stroke-width=\"3\"/><text x=\"152\" y=\"153\" font-size=\"23\" text-anchor=\"middle\" font-weight=\"bold\" font-family=\"Arial,sans-serif\" fill=\"white\">A</text><path d=\"M139 162h27\" stroke=\"#58e5fa\" stroke-width=\"3\"/></g>\n</svg>";
 const voiceBars=make("span","robot-speaking-bars");voiceBars.setAttribute("aria-hidden","true");
 voiceBars.append(make("i"),make("i"),make("i"));
 fab.replaceChildren(mascot,voiceBars);
-mascot.addEventListener("error",()=>{mascot.style.display="none";fab.setAttribute("data-mascot-fallback","🤖");});
+
 const launcher=make("div","robot-launcher"),helpLabel=make("span","robot-help-label","Need help?");
 const robotAura=make("span","robot-aura");robotAura.setAttribute("aria-hidden","true");fab.prepend(robotAura);
 launcher.append(helpLabel,fab);root.append(panel,launcher);document.body.append(root);
@@ -100,7 +108,7 @@ const localeFromText=text=>{
  return "";
 };
 const currentLanguage=()=>languageSelect.value==="auto"?
- (detectedLanguage||document.documentElement.lang||"en"):languageSelect.value;
+ (detectedLanguage||"en"):languageSelect.value;
 const sayLabel={
  en:"Need help?",bn:"সাহায্য লাগবে?",hi:"मदद चाहिए?",ta:"உதவி வேண்டுமா?",
  te:"సహాయం కావాలా?",ml:"സഹായം വേണോ?",ur:"مدد چاہیے؟",
@@ -452,7 +460,7 @@ const aliases=[["Research Hub",/\b(research hub|research map|connection graph|kn
 function ask(raw){
 const question=clean(raw);if(!question)return;
 if(languageSelect.value==="auto"){
- detectedLanguage=localeFromText(question)||detectedLanguage;
+ detectedLanguage=localeFromText(question)||"en";
  updateLanguageLabel();
 }
 message(question,true);
@@ -522,7 +530,7 @@ mic.addEventListener("click",()=>{
  mic.disabled=true;mic.textContent="●";root.classList.add("robot-listening");
  rec.onresult=e=>{
   const words=e.results?.[0]?.[0]?.transcript||"";
-  if(words){if(languageSelect.value==="auto")detectedLanguage=localeFromText(words)||rec.lang;
+  if(words){if(languageSelect.value==="auto")detectedLanguage=localeFromText(words)||"en";
    updateLanguageLabel();refreshVoices();ask(words)}
  };
  rec.onerror=e=>message("Microphone unavailable for "+rec.lang+": "+(e.error||"unknown")+". You can type instead.");
