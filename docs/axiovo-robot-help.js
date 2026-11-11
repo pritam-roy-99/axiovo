@@ -57,51 +57,137 @@ fab.replaceChildren(mascot,voiceBars);
 const launcher=make("div","robot-launcher"),helpLabel=make("span","robot-help-label","Need help?");
 launcher.append(helpLabel,fab);root.append(panel,launcher);document.body.append(root);
 let speechVoices=[];let speechUnlocked=false;let lastAssistantReply="";let speechTimer=null;
+let detectedLanguage="";
+const localeFromText=text=>{
+ const value=String(text||"");
+ if(/[\u0980-\u09ff]/.test(value))return "bn-IN";
+ if(/[\u0900-\u097f]/.test(value))return "hi-IN";
+ if(/[\u0b80-\u0bff]/.test(value))return "ta-IN";
+ if(/[\u0c00-\u0c7f]/.test(value))return "te-IN";
+ if(/[\u0d00-\u0d7f]/.test(value))return "ml-IN";
+ if(/[\u0600-\u06ff]/.test(value))return "ar-SA";
+ if(/[\u4e00-\u9fff]/.test(value))return "zh-CN";
+ if(/[\u3040-\u30ff]/.test(value))return "ja-JP";
+ if(/[\uac00-\ud7af]/.test(value))return "ko-KR";
+ if(/[\u0400-\u04ff]/.test(value))return "ru-RU";
+ return "";
+};
+const currentLanguage=()=>languageSelect.value==="auto"?
+ (detectedLanguage||document.documentElement.lang||navigator.language||"en-IN"):languageSelect.value;
+const sayLabel={
+ en:"Need help?",bn:"সাহায্য লাগবে?",hi:"मदद चाहिए?",ta:"உதவி வேண்டுமா?",
+ te:"సహాయం కావాలా?",ml:"സഹായം വേണോ?",ur:"مدد چاہیے؟",
+ es:"¿Necesitas ayuda?",fr:"Besoin d’aide ?",de:"Brauchen Sie Hilfe?",
+ pt:"Precisa de ajuda?",ar:"هل تحتاج مساعدة؟",zh:"需要帮助吗？",ja:"お困りですか？",
+ ko:"도움이 필요하신가요?",ru:"Нужна помощь?"
+};
+const welcome={
+ en:"Hello! I am your Axiovo assistant. How can I help?",
+ bn:"নমস্কার! আমি অ্যাক্সিওভোর সহকারী। কীভাবে সাহায্য করতে পারি?",
+ hi:"नमस्ते! मैं Axiovo का सहायक हूँ। मैं आपकी कैसे मदद कर सकता हूँ?",
+ ta:"வணக்கம்! நான் Axiovo உதவியாளர். உங்களுக்கு எப்படி உதவலாம்?",
+ te:"నమస్కారం! నేను Axiovo సహాయకుడిని. మీకు ఎలా సహాయపడగలను?",
+ ml:"നമസ്കാരം! ഞാൻ Axiovo സഹായിയാണ്. എന്താണ് സഹായം വേണ്ടത്?",
+ es:"¡Hola! Soy el asistente de Axiovo. ¿Cómo puedo ayudarte?",
+ fr:"Bonjour ! Je suis l’assistant Axiovo. Comment puis-je vous aider ?",
+ de:"Hallo! Ich bin der Axiovo-Assistent. Wie kann ich helfen?",
+ pt:"Olá! Sou o assistente Axiovo. Como posso ajudar?",
+ ar:"مرحبًا! أنا مساعد Axiovo. كيف يمكنني المساعدة؟",
+ zh:"你好！我是 Axiovo 助手。有什么可以帮你？",
+ ja:"こんにちは！Axiovoアシスタントです。どのようにお手伝いできますか？",
+ ko:"안녕하세요! Axiovo 도우미입니다. 무엇을 도와드릴까요?",
+ ru:"Здравствуйте! Я помощник Axiovo. Чем могу помочь?"
+};
+const baseLanguage=()=>currentLanguage().split("-")[0].toLowerCase();
+function updateLanguageLabel(){
+ helpLabel.textContent=sayLabel[baseLanguage()]||sayLabel.en;
+ input.placeholder=baseLanguage()==="en"?"Ask about Axiovo":(welcome[baseLanguage()]||"Ask about Axiovo");
+ root.lang=currentLanguage();
+}
 function voiceScore(v){
- const n=(v.name+" "+v.lang).toLowerCase();
- return (/en-in/.test(n)?40:0)+(/female|woman|zira|heera|samantha|aria|jenny|neerja|swara|susan|victoria|karen|moira/.test(n)?105:0)+(/natural|neural|enhanced|premium/.test(n)?20:0)+(/^en/.test(v.lang.toLowerCase())?15:0);
+ const n=(v.name+" "+v.lang).toLowerCase(),target=currentLanguage().toLowerCase();
+ const matching=v.lang.toLowerCase().split("-")[0]===target.split("-")[0];
+ return (matching?250:0)+(v.lang.toLowerCase()===target?80:0)+
+  (/female|woman|zira|heera|samantha|aria|jenny|neerja|swara|susan|victoria|karen|moira/.test(n)?35:0)+
+  (/natural|neural|enhanced|premium/.test(n)?20:0);
 }
 function refreshVoices(){
- if(!("speechSynthesis" in window)){voiceSelect.replaceChildren();voiceSelect.add(new Option("Text only: voice not supported",""));voiceSelect.disabled=true;voiceEnabled.checked=false;voiceEnabled.disabled=true;return}
- speechVoices=window.speechSynthesis.getVoices().filter(v=>v.lang?.toLowerCase().startsWith("en")).sort((a,b)=>voiceScore(b)-voiceScore(a));
- const previous=voiceSelect.value;voiceSelect.replaceChildren();
+ if(!("speechSynthesis" in window)){
+  voiceSelect.replaceChildren(new Option("Text only: device speech unsupported",""));
+  voiceSelect.disabled=true;voiceEnabled.checked=false;voiceEnabled.disabled=true;
+  return;
+ }
+ const prev=speechVoices[Number(voiceSelect.value)]?.voiceURI;
+ speechVoices=window.speechSynthesis.getVoices().slice().sort((a,b)=>voiceScore(b)-voiceScore(a));
+ voiceSelect.replaceChildren();
  speechVoices.forEach((v,i)=>voiceSelect.add(new Option(v.name+" ("+v.lang+")",String(i))));
- if(!speechVoices.length){voiceSelect.add(new Option("Use device default voice",""))}
+ if(!speechVoices.length)voiceSelect.add(new Option("Use device default voice",""));
  let saved="";try{saved=localStorage.getItem("axiovo-robot-voice-v1")||""}catch{}
- const found=speechVoices.findIndex(v=>v.voiceURI===saved);
- voiceSelect.value=found>=0?String(found):(previous && [...voiceSelect.options].some(o=>o.value===previous)?previous:voiceSelect.options[0]?.value||"");
+ const preferred=speechVoices.findIndex(v=>v.voiceURI===saved&&v.lang.toLowerCase().split("-")[0]===baseLanguage());
+ const previous=speechVoices.findIndex(v=>v.voiceURI===prev&&v.lang.toLowerCase().split("-")[0]===baseLanguage());
+ voiceSelect.value=String(preferred>=0?preferred:previous>=0?previous:0);
+ const available=speechVoices.some(v=>v.lang.toLowerCase().split("-")[0]===baseLanguage());
+ voiceStatus.textContent=available?"Available browser/device voices for "+currentLanguage()+". Tap Test to hear one.":
+  "No matching installed voice for "+currentLanguage()+". Text help remains available; install a voice in your device settings.";
 }
 function speak(text,gesture=false){
  if(!("speechSynthesis" in window)||!window.SpeechSynthesisUtterance){
-  voiceStatus.textContent="Speech output is not supported in this browser. Please use a browser with text-to-speech support.";return;
+  voiceStatus.textContent="Speech output unavailable in this browser.";return;
  }
- if(!voiceEnabled.checked){voiceStatus.textContent="Turn on Spoken replies above to hear the answer.";return}
+ if(!voiceEnabled.checked){voiceStatus.textContent="Enable Spoken replies to hear the answer.";return}
  if(gesture)speechUnlocked=true;
- if(!speechUnlocked){voiceStatus.textContent="Tap Speak reply to enable audio on this device.";return}
+ if(!speechUnlocked){voiceStatus.textContent="Tap Speak reply or Test to enable audio.";return}
  try{
   if(speechTimer){clearTimeout(speechTimer);speechTimer=null}
   const synth=window.speechSynthesis;
-  synth.cancel();
+  synth.cancel();root.classList.remove("robot-speaking");
   const spoken=String(text||"").replace(/https?:\/\/\S+/g," link ").replace(/\s+/g," ").trim().slice(0,950);
   if(!spoken)return;
   const utterance=new SpeechSynthesisUtterance(spoken);
-  utterance.lang="en-IN";utterance.rate=.93;utterance.pitch=1.02;utterance.volume=1;
-  const selected=speechVoices[Number(voiceSelect.value)];
-  if(selected){utterance.voice=selected;utterance.lang=selected.lang}
-  utterance.onstart=()=>{voiceStatus.textContent="Speaking now · "+(selected?.name||"device voice")};
-  utterance.onend=()=>{voiceStatus.textContent="Finished speaking. Tap Speak reply to listen again."};
-  utterance.onerror=e=>{voiceStatus.textContent="Speech failed ("+(e.error||"device error")+"). Try another voice or tap Test.";};
+  const target=currentLanguage(),selected=speechVoices[Number(voiceSelect.value)];
+  const matching=speechVoices.some(v=>v.lang.toLowerCase().split("-")[0]===target.toLowerCase().split("-")[0]);
+  utterance.lang=target;utterance.rate=.94;utterance.pitch=1.02;utterance.volume=1;
+  if(selected&&selected.lang.toLowerCase().split("-")[0]===target.toLowerCase().split("-")[0]){
+   utterance.voice=selected;utterance.lang=selected.lang;
+  }else if(!matching){
+   voiceStatus.textContent="A spoken voice for "+target+" is not installed on this device. The answer remains readable.";
+   return;
+  }
+  utterance.onstart=()=>{root.classList.add("robot-speaking");voiceStatus.textContent="Speaking · "+(selected?.name||target)};
+  const done=()=>root.classList.remove("robot-speaking");
+  utterance.onend=()=>{done();voiceStatus.textContent="Finished. Tap Speak reply to listen again."};
+  utterance.onerror=e=>{done();voiceStatus.textContent="Speech unavailable ("+(e.error||"device error")+"). Try another voice."};
   synth.speak(utterance);
   if(synth.paused)synth.resume();
-  speechTimer=setTimeout(()=>{if(synth.pending&&!synth.speaking){voiceStatus.textContent="Voice is waiting for browser permission. Tap Speak reply again."}},1100);
- }catch(e){voiceStatus.textContent="Unable to play speech. Please choose another device voice.";console.warn("Axiovo speech error",e)}
+  speechTimer=setTimeout(()=>{if(synth.pending&&!synth.speaking){voiceStatus.textContent="Browser speech may require another tap on Speak reply."}},1100);
+ }catch(e){
+  root.classList.remove("robot-speaking");
+  voiceStatus.textContent="Could not play speech with this device voice.";
+  console.warn("Axiovo speech error",e);
+ }
 }
-refreshVoices();
-if("speechSynthesis" in window){speechSynthesis.addEventListener?.("voiceschanged",refreshVoices)}
-voiceSelect.addEventListener("change",()=>{const v=speechVoices[Number(voiceSelect.value)];try{if(v)localStorage.setItem("axiovo-robot-voice-v1",v.voiceURI)}catch{}});
-testVoice.addEventListener("click",()=>speak("Hello! I am your Axiovo help assistant. How can I help you today?",true));
-stopVoice.addEventListener("click",()=>{if("speechSynthesis" in window)speechSynthesis.cancel()});
-voiceEnabled.addEventListener("change",()=>{if(!voiceEnabled.checked&&"speechSynthesis" in window)speechSynthesis.cancel()});
+updateLanguageLabel();refreshVoices();
+languageSelect.addEventListener("change",()=>{
+ detectedLanguage="";
+ try{localStorage.setItem("axiovo-robot-language-v1",languageSelect.value)}catch{}
+ if("speechSynthesis" in window)speechSynthesis.cancel();
+ root.classList.remove("robot-speaking");
+ updateLanguageLabel();refreshVoices();
+});
+if("speechSynthesis" in window)speechSynthesis.addEventListener?.("voiceschanged",refreshVoices);
+voiceSelect.addEventListener("change",()=>{
+ const v=speechVoices[Number(voiceSelect.value)];
+ try{if(v)localStorage.setItem("axiovo-robot-voice-v1",v.voiceURI)}catch{}
+});
+testVoice.addEventListener("click",()=>speak(welcome[baseLanguage()]||welcome.en,true));
+stopVoice.addEventListener("click",()=>{
+ if("speechSynthesis" in window)speechSynthesis.cancel();
+ root.classList.remove("robot-speaking");
+});
+voiceEnabled.addEventListener("change",()=>{
+ if(!voiceEnabled.checked&&"speechSynthesis" in window)speechSynthesis.cancel();
+ if(!voiceEnabled.checked)root.classList.remove("robot-speaking");
+});
 function message(s,user=false,links=[]){const n=make("div","robot-msg"+(user?" user":""),s);if(links.length){const wrap=make("div","robot-links");links.forEach(([label,url])=>{const a=make("a",null,label);a.href=new URL(url,base).href;wrap.append(a)});n.append(wrap)}if(!user){lastAssistantReply=s;const play=make("button","robot-speak-reply","🔊 Speak reply");play.type="button";play.setAttribute("aria-label","Speak this answer aloud");play.addEventListener("click",()=>speak(s,true));n.append(play)}log.append(n);log.scrollTop=log.scrollHeight;if(!user&&speechUnlocked)speak(s)}
 function clean(s){return String(s||"").replace(/\s+/g," ").trim().slice(0,170)}
 function visible(n){return n.getClientRects().length>0&&!n.closest("#axiovo-robot,[aria-hidden=true]")}
