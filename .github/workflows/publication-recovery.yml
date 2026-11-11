@@ -92,8 +92,29 @@ jobs:
           runs = api(f"repos/{repo}/actions/workflows/pages.yml/runs?per_page=100")["workflow_runs"]
           relevant = sorted((r for r in runs if r.get("head_sha") == head),
                             key=lambda r: r["created_at"], reverse=True)
+          last_success = next((r for r in runs if r["status"] == "completed"
+                               and r.get("conclusion") == "success"), None)
+          # Archive commits can arrive every 30 minutes, continually changing
+          # head SHA. Detect stale public releases across those SHAs as well.
+          stale = (not last_success or
+                   (now - timestamp(last_success.get("updated_at")
+                                    or last_success["created_at"])) > dt.timedelta(hours=2))
           summary("### Axiovo publication recovery")
           summary(f"- Current main: `{head[:12]}`")
+          if stale:
+              last_link = last_success["html_url"] if last_success else "none in recent runs"
+              title = prefix + " site release older than two hours"
+              if not any(i["title"] == title for i in open_alerts()):
+                  result = gh("issue", "create", "--repo", repo, "--title", title,
+                              "--body", "GitHub Pages has not had a successful full deployment in more than two hours. "
+                              f"Current main: `{head}`. Latest successful run: {last_link}. "
+                              "The recovery watchdog will keep dispatching with backoff. "
+                              "Inspect required deployment gates and resolve persistent failures.",
+                              check=False)
+                  if result.returncode:
+                      summary("::warning::Cannot create stale-site alert: " + result.stderr.strip()[:200])
+                  else:
+                      summary("::warning::Created stale-site alert: " + result.stdout.strip())
           published = next((r for r in relevant if r["status"] == "completed"
                             and r.get("conclusion") == "success"), None)
           if published:
