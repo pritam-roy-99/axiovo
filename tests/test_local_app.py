@@ -26,6 +26,17 @@ class InstallableAppTests(unittest.TestCase):
             self.assertNotIn("..", relative.parts, src)
             self.assertTrue((DOCS / relative).is_file(), src)
 
+    def test_launcher_art_matches_approved_logo(self):
+        # Prevent the installed desktop and Android app from reverting to the old A.
+        approved = (DOCS / "icons/axiovo-approved.svg").read_text()
+        launcher = (DOCS / "icons/axiovo.svg").read_text()
+        logo = re.search(r"data:image/webp;base64,([A-Za-z0-9+/=]+)", approved)
+        self.assertIsNotNone(logo, "Approved wordmark image missing")
+        self.assertIn(logo.group(1), launcher, "Launcher does not use the official Axiovo artwork")
+        self.assertIn('viewBox="0 0 96 79"', launcher, "Launcher must crop the A mark, not the entire wordmark")
+        manifest = json.loads((DOCS / "manifest.webmanifest").read_text())
+        self.assertTrue(all("approved-desktop-v3" in icon["src"] for icon in manifest["icons"]))
+
     def test_primary_pages_are_installable(self):
         for page in PAGES:
             with self.subTest(page=page):
