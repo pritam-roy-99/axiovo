@@ -187,8 +187,9 @@ def main():
                 "-f","concat","-safe","0","-i",str(video_list),
                 "-f","concat","-safe","0","-i",str(audio_list),
                 "-map","0:v:0","-map","1:a:0",
-                "-c:v","libx264","-preset","veryfast","-crf","27",
-                "-pix_fmt","yuv420p","-r","24","-c:a","aac","-b:a","96k",
+                "-c:v","libx264","-preset","medium","-crf","24",
+                "-pix_fmt","yuv420p","-r","24","-c:a","aac","-b:a","128k",
+                "-af","loudnorm=I=-16:LRA=9:TP=-1.5",
                 "-af","apad","-shortest","-movflags","+faststart",str(output)
             ],check=True)
             (OUT/"axiovo-tour.vtt").write_text("\n".join(captions)+"\n",encoding="utf-8")
