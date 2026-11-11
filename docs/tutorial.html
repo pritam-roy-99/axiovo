@@ -51,16 +51,16 @@
 <main class="watch-wrap">
 <p class="rd-kicker">AXIOVO VIDEO TUTORIAL · FREE AND OPEN SOURCE</p>
 <h1>How to use Axiovo to discover and organize research papers</h1>
-<p class="intro">Watch this guided demonstration of free research-paper discovery using arXiv, bioRxiv, ChemRxiv and Cryptology ePrint. Learn to search by field, topic, subtopic, author and date, then verify original papers and save useful results.</p>
+<p class="intro">Watch this guided demonstration of free research-paper discovery using arXiv, bioRxiv, ChemRxiv and Cryptology ePrint. Learn to browse recent papers and revisions, search across archives, verify original records, save and follow research, and explore Research Assistant, ProofLab and appearance options.</p>
 <video class="watch-player" controls playsinline preload="metadata" poster="./assets/axiovo-tour-poster.svg" aria-label="Axiovo research paper discovery narrated tutorial">
-<source src="./assets/axiovo-tour.mp4" type="video/mp4">
-<track kind="captions" src="./assets/axiovo-tour.vtt" srclang="en" label="English captions" default>
+<source src="./assets/axiovo-tour.mp4?v=axiovo-neerja-v1&amp;edition=20261111-v3" type="video/mp4">
+<track kind="captions" src="./assets/axiovo-tour.vtt?v=axiovo-neerja-v1&amp;edition=20261111-v3" srclang="en" label="English captions" default>
 Your browser cannot play this video. <a href="./assets/axiovo-tour.mp4">Open the MP4 tutorial</a>.
 </video>
-<p class="watch-meta">Narrated tutorial · Approximately 6 minutes · English captions · Recorded Axiovo interface</p>
+<p class="watch-meta">Narrated Axiovo walkthrough · English captions · Recorded website interface · Chapters follow the published recording</p>
 <div class="watch-actions"><a href="./desk.html">Start searching papers</a><a href="./">Axiovo homepage</a><a href="https://github.com/pritam-roy-99/axiovo" rel="noopener noreferrer">Open-source code</a></div>
 <div class="watch-sections">
-<section class="watch-panel" aria-labelledby="watch-chapters"><h2 id="watch-chapters">What's in the tutorial</h2><ol><li><strong>0:00</strong> What Axiovo means and the four archives</li>
+<section class="watch-panel" aria-labelledby="watch-chapters"><h2 id="watch-chapters">What's in the tutorial</h2><ol id="axiovo-video-chapters"><li><strong>0:00</strong> What Axiovo means and the four archives</li>
 <li><strong>0:38</strong> Find an arXiv subject and refine topics</li>
 <li><strong>1:01</strong> Search papers and filter by date</li>
 <li><strong>1:35</strong> Authors, cross-listing and personal research paths</li>
@@ -76,9 +76,32 @@ Your browser cannot play this video. <a href="./assets/axiovo-tour.mp4">Open the
 <li><a href="./biorxiv.html">Explore bioRxiv life sciences</a></li>
 <li><a href="./chemrxiv.html">Explore ChemRxiv chemistry</a></li>
 <li><a href="./crypto.html">Browse Cryptology ePrint</a></li>
-<li><a href="./copilot.html">Research Assistant</a></li>
+<li><a href="./copilot.html">Research Assistant</a></li><li><a href="./prooflab.html">ProofLab research workspace</a></li><li><a href="./profiles.html">Day/Night mode and five color palettes</a></li>
 </ul></section>
 </div>
 </main>
+<script>
+/* Chapters always match the recorded MP4's verified build manifest. */
+(async function(){
+ const list=document.getElementById("axiovo-video-chapters");
+ if(!list)return;
+ try{
+  const response=await fetch("./assets/axiovo-tour-build.json",{cache:"no-store"});
+  if(!response.ok)throw new Error("Chapters unavailable");
+  const metadata=await response.json();
+  if(!Array.isArray(metadata.chapters)||metadata.chapters.length<20)return;
+  const fragment=document.createDocumentFragment();
+  for(const chapter of metadata.chapters){
+   const item=document.createElement("li");
+   const when=document.createElement("strong");
+   const seconds=Math.max(0,Math.floor(Number(chapter.start_seconds)||0));
+   when.textContent=String(Math.floor(seconds/60))+":"+String(seconds%60).padStart(2,"0");
+   item.append(when,document.createTextNode(" "+String(chapter.title||"Research workflow")));
+   fragment.append(item);
+  }
+  list.replaceChildren(fragment);
+ }catch(_){/* Retain readable offline chapters. */}
+})();
+</script>
 </body>
 </html>

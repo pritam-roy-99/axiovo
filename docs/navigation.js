@@ -113,11 +113,11 @@
  function activateBlueprint(){
   if(!document.querySelector('link[data-axiovo-blueprint]')){
    const sheet=document.createElement("link");sheet.rel="stylesheet";
-   sheet.href=new URL("./axiovo-blueprint-ui.css?v=20261111-appearance-v2",location.href).href;
+   sheet.href=new URL("./axiovo-blueprint-ui.css?v=20261111-tutorial-stage-v3",location.href).href;
    sheet.dataset.axiovoBlueprint="true";document.head.append(sheet);
   }
   const script=document.createElement("script");script.defer=true;
-  script.src=new URL("./axiovo-blueprint-ui.js?v=20261111-appearance-v2",location.href).href;
+  script.src=new URL("./axiovo-blueprint-ui.js?v=20261111-tutorial-stage-v3",location.href).href;
   script.dataset.axiovoBlueprint="true";document.head.append(script);
   // Per-page design is presentational; all original handlers stay intact.
   if(!document.querySelector('link[data-axiovo-page-design]')){

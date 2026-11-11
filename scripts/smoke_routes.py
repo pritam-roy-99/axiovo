@@ -148,6 +148,29 @@ def main():
                     if width<=428:
                         check_phone_content(page,path,width)
                     if not path:
+                        # Both modes must share one stage below their own
+                        # controls, not jump above/below when toggled.
+                        stage=page.locator("#axiovo-tour-stage")
+                        stage.wait_for(state="visible")
+                        page.locator(".ax-home-guide").wait_for(state="attached")
+                        assert page.evaluate("""() => {
+                          const tabs=document.querySelector(".axiovo-tour-mode-switch");
+                          const stage=document.querySelector("#axiovo-tour-stage");
+                          return tabs?.nextElementSibling===stage &&
+                            ["axiovo-home-video","axiovo-tour"].every(id=>stage.contains(document.getElementById(id))) &&
+                            stage.contains(document.querySelector(".ax-home-guide"));
+                        }"""),(width,"Video and interactive guide do not share the same stage")
+                        page.locator("#axiovo-tour-show-guide").click()
+                        assert stage.get_attribute("data-mode")=="guide"
+                        assert page.locator("#axiovo-tour").is_visible()
+                        assert page.locator("#axiovo-home-video").is_hidden()
+                        assert page.locator(".ax-home-guide").is_hidden()
+                        assert page.locator("#axiovo-tour-progress button").count()==10
+                        page.locator("#axiovo-tour-show-video").click()
+                        assert stage.get_attribute("data-mode")=="video"
+                        assert page.locator("#axiovo-home-video").is_visible()
+                        assert page.locator("#axiovo-tour").is_hidden()
+                        assert page.locator(".ax-home-guide").is_visible()
                         # The unified hero has a dark gradient, and the name
                         # meaning is inline text rather than a separate panel.
                         # Compare real computed text colors against the darkest

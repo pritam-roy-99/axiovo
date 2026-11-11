@@ -458,3 +458,93 @@ html:root[data-accent] body.axiovo-reference-ui :is(button,a,input,select,textar
   background:var(--ax-brand-hero)!important;
  }
 }
+
+
+/* Tutorial 2026: one stable viewport for either video or interactive guide.
+   Override the former two-column placement applied directly to the video. */
+body.axiovo-reference-ui.axiovo-home .axiovo-welcome-media{
+ display:flex!important;flex-direction:column!important;align-items:stretch!important;
+ gap:12px!important;
+}
+body.axiovo-reference-ui.axiovo-home .axiovo-welcome-media>.axiovo-demo-heading{order:0;width:100%}
+body.axiovo-reference-ui.axiovo-home .axiovo-welcome-media>.axiovo-tour-mode-switch{
+ order:1!important;display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
+ gap:10px!important;margin:0!important;
+}
+body.axiovo-reference-ui.axiovo-home .axiovo-welcome-media>.axiovo-tour-mode-switch button{
+ min-height:49px!important;font-weight:800!important;border-radius:12px!important;
+ background:var(--ax4-surface,#fff)!important;color:var(--ax4-ink,#173449)!important;
+ border:1px solid var(--ax4-line,#bfd5e1)!important;
+}
+body.axiovo-reference-ui.axiovo-home .axiovo-welcome-media>.axiovo-tour-mode-switch button[aria-pressed="true"]{
+ background:var(--ax-brand-dark,#08617a)!important;color:#fff!important;
+ border-color:var(--ax-brand-dark,#08617a)!important;
+}
+body.axiovo-reference-ui.axiovo-home .axiovo-tour-stage{
+ order:2;display:grid!important;grid-template-columns:minmax(0,1.3fr) minmax(240px,.7fr);
+ gap:14px!important;align-items:stretch;width:100%;min-width:0;min-height:260px;
+}
+body.axiovo-reference-ui.axiovo-home .axiovo-tour-stage[data-mode="guide"]{grid-template-columns:minmax(0,1fr)}
+body.axiovo-reference-ui.axiovo-home .axiovo-tour-stage>.axiovo-home-video{
+ display:block!important;grid-row:auto!important;grid-column:1!important;
+ width:100%!important;min-width:0;max-width:100%;height:auto;aspect-ratio:16/9;
+ border-radius:16px!important;object-fit:contain!important;background:#091e30;
+}
+body.axiovo-reference-ui.axiovo-home .axiovo-tour-stage>.ax-home-guide{
+ display:block!important;grid-row:auto!important;grid-column:2!important;
+ min-width:0;overflow-wrap:anywhere;background:var(--ax4-surface,#fff)!important;
+ color:var(--ax4-ink,#173449)!important;border-color:var(--ax4-line,#cbdce6)!important;
+}
+body.axiovo-reference-ui.axiovo-home .axiovo-tour-stage>.ax-home-guide :is(h3,strong){color:var(--ax4-ink,#173449)!important}
+body.axiovo-reference-ui.axiovo-home .axiovo-tour-stage>.ax-home-guide li{color:var(--ax4-muted,#526b7f)!important}
+body.axiovo-reference-ui.axiovo-home .axiovo-tour-stage>.axiovo-demo-frame{
+ grid-column:1/-1!important;grid-row:auto!important;width:100%!important;min-width:0;
+ border-radius:17px!important;
+}
+body.axiovo-reference-ui.axiovo-home .axiovo-tour-stage> :is(.axiovo-home-video,.ax-home-guide,.axiovo-demo-frame)[hidden]{display:none!important}
+body.axiovo-reference-ui.axiovo-home .axiovo-tour-stage[data-mode="guide"]>.ax-home-guide{display:none!important}
+body.axiovo-reference-ui.axiovo-home .axiovo-welcome-media>.axiovo-tour-media-status{
+ order:3!important;min-height:20px;margin:0!important;color:var(--ax4-muted,#526b7f)!important;
+}
+body.axiovo-reference-ui.axiovo-home .axiovo-welcome-media>.axiovo-video-direct-link,
+body.axiovo-reference-ui.axiovo-home .axiovo-welcome-media>.axiovo-video-watch-link{order:4;margin:0!important}
+body.axiovo-reference-ui.axiovo-home .axiovo-welcome-media>.axiovo-demo-bottom{order:5!important;margin:0!important}
+body.axiovo-reference-ui.axiovo-home .axiovo-welcome-media>.axiovo-transcript{order:6!important}
+body.axiovo-reference-ui.axiovo-home .axiovo-tour-stage .axiovo-demo-screen{
+ min-height:270px;display:flex!important;flex-direction:column!important;
+ gap:12px;padding:clamp(22px,3vw,35px)!important;
+ background:linear-gradient(125deg,#092b45,#0b3b53)!important;
+}
+body.axiovo-reference-ui.axiovo-home .axiovo-tour-stage .axiovo-demo-illustration{
+ display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;
+ gap:9px;max-width:none!important;
+}
+body.axiovo-reference-ui.axiovo-home .axiovo-tour-stage .axiovo-demo-illustration span{
+ min-width:0;min-height:52px!important;border-radius:10px!important;
+ background:#164962!important;border-color:#387a91!important;color:#f2fbff!important;
+}
+body.axiovo-reference-ui.axiovo-home .axiovo-tour-stage .axiovo-demo-progress{
+ flex-wrap:wrap;gap:7px;max-width:60%;
+}
+@media(max-width:820px){
+ body.axiovo-reference-ui.axiovo-home .axiovo-tour-stage{
+  grid-template-columns:minmax(0,1fr)!important;min-height:0;
+ }
+ body.axiovo-reference-ui.axiovo-home .axiovo-tour-stage>.ax-home-guide{
+  grid-column:1!important;
+ }
+ body.axiovo-reference-ui.axiovo-home .axiovo-tour-stage .axiovo-demo-illustration{
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+ }
+}
+@media(max-width:480px){
+ body.axiovo-reference-ui.axiovo-home .axiovo-welcome-media>.axiovo-tour-mode-switch button{
+  min-width:0;font-size:12px!important;line-height:1.4!important;padding:12px 8px!important;
+ }
+ body.axiovo-reference-ui.axiovo-home .axiovo-tour-stage .axiovo-demo-controls{
+  flex-wrap:wrap!important;
+ }
+ body.axiovo-reference-ui.axiovo-home .axiovo-tour-stage .axiovo-demo-progress{
+  order:3;flex-basis:100%;max-width:100%;justify-content:center;
+ }
+}
