@@ -37,5 +37,25 @@ class DeploymentPolicyTests(unittest.TestCase):
         self.assertNotIn("schedule:",oai)
         self.assertNotIn("git push",oai)
 
+    def test_publication_watchdog_recovers_and_alerts_without_unsafe_bypass(self):
+        recovery=(Path(__file__).resolve().parents[1]/".github/workflows/publication-recovery.yml").read_text()
+        self.assertIn("workflow_run:",recovery)
+        self.assertIn("workflow_dispatch:",recovery)
+        self.assertIn("schedule:",recovery)
+        self.assertIn("cancel-in-progress: false",recovery)
+        self.assertIn("issues: write",recovery)
+        self.assertIn("head_sha",recovery)
+        self.assertIn("status",recovery)
+        self.assertIn("backoff_minutes",recovery)
+        self.assertIn("min(240",recovery)
+        self.assertIn("report_blocker",recovery)
+        self.assertIn("site release older than two hours",recovery)
+        self.assertIn('"issue", "create"',recovery)
+        self.assertIn('"issue", "close"',recovery)
+        self.assertIn('"workflow", "run", "pages.yml"',recovery)
+        self.assertNotIn("continue-on-error: true",recovery)
+        self.assertNotIn("gh workflow run pages.yml --repo",recovery)
+        self.assertIn("cancel-in-progress: false",WORKFLOW)
+
 if __name__=="__main__":
     unittest.main()
