@@ -108,6 +108,28 @@ def build(root=ROOT):
             result["sources"]["arxiv"]["verified_submission_days"] = state.get("verified_days")
             result["sources"]["arxiv"]["latest_verified_submission_day"] = state.get("verified_latest")
             result["sources"]["arxiv"]["submission_coverage_status"] = state.get("status")
+    # The audited window report is authoritative for bioRxiv completeness.
+    # Cached snapshot metadata alone may not carry official pagination totals.
+    if health and isinstance(health.get("biorxiv"), dict):
+        state = health["biorxiv"]
+        b = result["sources"]["biorxiv"]
+        total, fetched = state.get("official_window_total"), state.get("paginated_records")
+        verified = (state.get("status") == "window_verified"
+                    and isinstance(total, int) and total >= 0
+                    and isinstance(fetched, int) and fetched == total)
+        b.update({"scope": "bounded-date-window", "complete": verified,
+                  "status": "verified_scope" if verified else "partial",
+                  "official_window_total": total, "paginated_records": fetched,
+                  "requested_from": state.get("requested_from"),
+                  "requested_through": state.get("requested_through"),
+                  "checked_at": state.get("last_success")})
+    if health and isinstance(health.get("chemrxiv"), dict):
+        state = health["chemrxiv"]
+        c = result["sources"]["chemrxiv"]
+        c.update({"status": "partial", "complete": False,
+                  "scope": state.get("scope") or "doi-prefix-discovery",
+                  "prefix_pages_checked": state.get("prefix_pages_checked"),
+                  "checked_at": state.get("last_success")})
     return result
 
 def main():
