@@ -7,7 +7,7 @@
   "voice_version": "axiovo-neerja-v1",
   "voice_engine": "edge-tts",
   "voice_locale": "en-IN",
-  "media_sha256": "b58a45b53b044846a5b3263976191b547a4b9bee6ff1a2729995053f400e8d27",
+  "media_sha256": "e9c68fb3e738700d7070aa31bc967d78b1ab4f3844be79b3b29d409062ca1711",
   "chapters": [
     {
       "step": 1,
