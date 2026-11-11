@@ -143,8 +143,15 @@
    display.className="axiovo-tour-preview";
    const rail=document.createElement("div");
    rail.className="axiovo-tour-preview-rail";
-   const emblem=document.createElement("strong");
-   emblem.textContent="✦ AXIOVO";
+   // Match the actual website sidebar branding across all ten steps.
+   // Reuse the same approved vector logo, never a recreated lettermark.
+   const emblem=document.createElement("img");
+   emblem.className="axiovo-tour-preview-logo";
+   emblem.src="./icons/axiovo-approved.svg";
+   emblem.alt="Axiovo official logo";
+   emblem.width=90;
+   emblem.height=28;
+   emblem.decoding="async";
    rail.append(emblem);
    for(const label of ["Explore","Research Desk","My Feed","Library","Research Assistant"]){
     const item=document.createElement("span");
