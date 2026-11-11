@@ -59,6 +59,8 @@
    '<li><b>3</b><div><strong>Organize & follow</strong><span>Save, curate, and keep up with new work.</span></div></li>',
    '</ol><a href="./tutorial.html">Watch walkthrough →</a>'].join("");
    video.after(guide);
+   const stage=video.closest("#axiovo-tour-stage");
+   if(stage)guide.hidden=stage.dataset.mode==="guide";
   }
  }
  const mobileRobot=document.createElement("style");
