@@ -53,11 +53,12 @@
   const video=document.querySelector("#axiovo-home-video");
   if(video){
    const guide=document.createElement("aside");guide.className="ax-home-guide";
-   guide.innerHTML=['<h3>▤ Start here</h3><ol>',
-   '<li><b>1</b><div><strong>Search & discover</strong><span>Find relevant papers across major archives.</span></div></li>',
-   '<li><b>2</b><div><strong>Explore & verify</strong><span>Inspect source links and read the evidence.</span></div></li>',
-   '<li><b>3</b><div><strong>Organize & follow</strong><span>Save, curate, and keep up with new work.</span></div></li>',
-   '</ol><a href="./tutorial.html">Watch walkthrough →</a>'].join("");
+   guide.innerHTML=['<h3>▤ Your Axiovo guide</h3><ol>',
+   '<li><b>1</b><div><strong>Discover & verify</strong><span>Find new papers, topics and exact arXiv versions.</span></div></li>',
+   '<li><b>2</b><div><strong>Save & follow</strong><span>Build a Library and follow your research interests.</span></div></li>',
+   '<li><b>3</b><div><strong>Analyze & work</strong><span>Explore source evidence, Research Assistant and ProofLab.</span></div></li>',
+   '<li><b>4</b><div><strong>Make it yours</strong><span>Choose your theme and find help when needed.</span></div></li>',
+   '</ol><a href="./tutorial.html">Open complete tutorial →</a>'].join("");
    video.after(guide);
    const stage=video.closest("#axiovo-tour-stage");
    if(stage)guide.hidden=stage.dataset.mode==="guide";
