@@ -321,7 +321,7 @@ def main():
                         assert action["clearBelow"] and action["clearHeight"]>=44,(action_width,source,action)
                     show.click()
                     assert page.evaluate("document.activeElement?.id")=="archive-results-heading",(source,"Results not focused")
-                    (page.locator(".rl-nav a:first-child") if phone else page.locator(".axiovo-home-link")).click()
+                    (page.locator("header.rl-global-header nav.rl-nav > a:first-child") if phone else page.locator(".axiovo-home-link")).click()
                     page.wait_for_url(lambda url: urlsplit(url).path.endswith("/index.html"))
                 # Regression: returning from My Feed must show the top of Home,
                 # not a restored anchor at the archive cards below the video.
