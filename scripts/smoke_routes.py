@@ -97,14 +97,16 @@ def main():
                         x:r.x,y:r.y,right:r.right,bottom:r.bottom,width:r.width,height:r.height
                       }};
                       const box = s => rect(qs(s));
-                      const nav=qs('.rl-nav');
+                      const nav=qs(window.innerWidth<=760
+                        ? 'header.rl-global-header nav.rl-nav'
+                        : '.ax-sidebar .ax-sidebar-nav');
                       return {
                         settings:box('.axiovo-header-appearance .rl-settings-link'),
                         theme:box('.axiovo-header-appearance .theme-toggle'),
                         logo:box('.rl-logo'),
                         back:box('.axiovo-back-button'),
                         home:box('.axiovo-home-link'),
-                        navigation:box('.rl-nav'),
+                        navigation:rect(nav),
                         overflow:document.documentElement.scrollWidth - window.innerWidth,
                         links:[...nav.querySelectorAll('a')].map(a=>({
                           ...rect(a),label:a.textContent,overflow:a.scrollWidth-a.clientWidth
@@ -139,6 +141,23 @@ def main():
                     else:
                         # A real desktop workspace sidebar replaces the old horizontal nav.
                         assert page.locator(".ax-sidebar").is_visible(),(width,path,"Desktop sidebar missing")
+                        # Both navigation groups are in one scrollable sidebar;
+                        # no group or clickable label may cover another.
+                        bounds=page.locator(
+                            ".ax-sidebar .ax-sidebar-nav>a, "
+                            ".ax-sidebar .ax-sidebar-extra>a, "
+                            ".ax-sidebar .ax-sidebar-bottom>a"
+                        ).evaluate_all("""nodes => nodes.map(n => {
+                            const r=n.getBoundingClientRect(),side=document.querySelector('.ax-sidebar').getBoundingClientRect();
+                            return {top:r.top,bottom:r.bottom,left:r.left,right:r.right,
+                                    height:r.height,sideLeft:side.left,sideRight:side.right,
+                                    textOverflow:n.scrollWidth-n.clientWidth};
+                        })""")
+                        assert len(bounds)==10,(width,path,"Missing sidebar actions",bounds)
+                        assert all(b["height"]>=44 and b["textOverflow"]<=2 for b in bounds),(width,path,"Unreadable sidebar action",bounds)
+                        assert all(b["left"]>=b["sideLeft"]-2 and b["right"]<=b["sideRight"]+2 for b in bounds),(width,path,"Sidebar action outside panel",bounds)
+                        assert all(bounds[i+1]["top"]>=bounds[i]["bottom"]+2 for i in range(len(bounds)-1)),(
+                            width,path,"Overlapping sidebar links",bounds)
                         nav=result["navigation"]
                         assert nav and nav["x"]<=16 and nav["right"]<width/2,(width,path,"Sidebar nav moved out",result)
                         assert all(x["height"]>=44 for x in links),(width,path,"Desktop nav touch targets",result)
