@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Archive Health | Axiovo</title><link rel="icon" href="./icons/axiovo.svg" type="image/svg+xml">
+<link rel="stylesheet" href="./theme.css"><link rel="stylesheet" href="./axiovo-shell.css">
+<style>main{max-width:1100px;margin:auto;padding:1.5rem}h1{margin-bottom:.25rem}.intro{opacity:.8}.sources{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1rem;margin-top:1.5rem}.source{border:1px solid #8886;border-radius:14px;padding:1.1rem;background:var(--surface,transparent)}.source h2{margin:0 0 .6rem}.status{font-weight:700}.details{margin-top:.8rem;font-size:.9rem;line-height:1.7}table{width:100%;border-collapse:collapse;margin-top:1rem}td,th{padding:.5rem;border-bottom:1px solid #8885;text-align:left}a{color:inherit}small{opacity:.75}#error{color:#b45309}</style>
+<script defer src="./theme.js"></script><script defer src="./navigation.js"></script></head>
+<body><main><p><a href="./index.html">← Axiovo Home</a></p>
+<h1>Archive Health</h1><p class="intro">Source-scoped verification for arXiv, bioRxiv, ChemRxiv and Cryptology ePrint. A successful synchronization does not imply complete historical coverage.</p>
+<p id="generated" role="status">Loading verified source snapshot…</p><p id="error" role="alert"></p>
+<div id="sources" class="sources" aria-live="polite"></div>
+<section><h2>arXiv subject coverage</h2><p>Counts may overlap across subjects because of cross-listings. These describe the verified announcement batch, not all historical arXiv papers.</p><div style="overflow-x:auto"><table><thead><tr><th>Subject</th><th>Unique</th><th>New v1</th><th>Cross-listed</th><th>Replacements</th><th>Unclassified</th></tr></thead><tbody id="categories"></tbody></table></div></section>
+<p><small>Information is read from the published archive-reliability.json report. Missing data is displayed as unavailable, never as zero.</small></p></main>
+<script>
+(async()=>{
+const root=document.getElementById('sources'), error=document.getElementById('error');
+try{
+const response=await fetch('./data/archive-reliability.json',{cache:'no-store'});
+if(!response.ok)throw Error('Published coverage report unavailable (HTTP '+response.status+')');
+const report=await response.json();
+if(report.schema_version!==2||!report.sources)throw Error('Invalid coverage report schema');
+document.getElementById('generated').textContent='Report generated: '+new Date(report.generated_at).toLocaleString();
+const names={arxiv:'arXiv',biorxiv:'bioRxiv',chemrxiv:'ChemRxiv',eprint:'Cryptology ePrint'};
+for(const [key,name] of Object.entries(names)){
+const data=report.sources[key]||{status:'unavailable'};
+const card=document.createElement('article');card.className='source';
+const heading=document.createElement('h2');heading.textContent=name;card.append(heading);
+for(const [label,value] of [['Status',data.status],['Scope',data.scope],['Indexed records',data.indexed_unique],['Last checked',data.checked_at],['Announcement date',data.announcement_date]]){
+if(value===undefined||value===null)continue;
+const row=document.createElement('div');row.className='details';row.textContent=label+': '+value;card.append(row);
+}
+const caveat=document.createElement('small');caveat.textContent=data.complete?'Verified only within the stated source scope.':'Coverage incomplete or not independently certified.';card.append(caveat);root.append(card);
+}
+const body=document.getElementById('categories');
+for(const [category,counts] of Object.entries(report.sources.arxiv?.categories||{}).sort(([a],[b])=>a.localeCompare(b))){
+const tr=document.createElement('tr');
+for(const value of [category,counts.unique,counts.v1,counts.crosslisted,counts.replacements,counts.unspecified]){
+const td=document.createElement('td');td.textContent=value??'Unavailable';tr.append(td);
+}body.append(tr);
+}
+if(!body.children.length){const tr=document.createElement('tr');const td=document.createElement('td');td.colSpan=6;td.textContent='No verified category records available';tr.append(td);body.append(tr);}
+}catch(e){document.getElementById('generated').textContent='Archive health unavailable';error.textContent=e.message;}
+})();
+</script></body></html>
