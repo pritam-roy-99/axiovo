@@ -362,13 +362,24 @@ async function searchPapers(question){
  }
 }
 function routeToCopilot(question){
- const msgText="For a research explanation, derivation, review or general question, I'll pass your exact question to Axiovo's full Research Assistant. Its answer depends on available sources and configured AI; I won't invent an answer.";
+ const msgText={
+ bn:"আপনার প্রশ্নটি মূল ভাষাতেই Axiovo Research Assistant-এ পাঠানো হবে। উত্তর উপলব্ধ তথ্য ও AI সেটিংসের উপর নির্ভর করে।",
+ hi:"आपका प्रश्न उसी भाषा में Axiovo Research Assistant को भेजा जाएगा। उत्तर उपलब्ध स्रोतों और AI सेटिंग पर निर्भर करता है।",
+ es:"Enviaré tu pregunta original al asistente de investigación de Axiovo. La respuesta depende de las fuentes disponibles.",
+ fr:"Votre question sera transmise telle quelle à l’assistant de recherche Axiovo. La réponse dépend des sources disponibles.",
+ ar:"سأرسل سؤالك بلغته الأصلية إلى مساعد البحث في Axiovo. تعتمد الإجابة على المصادر المتاحة."
+ }[baseLanguage()]||"I'll pass your exact question to Axiovo Research Assistant in the same language. Its response depends on available evidence and configured AI; I cannot promise an answer in every language.";
  message(msgText,false,[["Open Research Assistant", "copilot.html?q="+encodeURIComponent(question.slice(0,500))]]);
 }
 
 const aliases=[["Research Hub",/\b(research hub|research map|connection graph|knowledge graph|paper graph)\b/],["ProofLab",/\bproof\s*lab\b/],["Research Assistant",/\b(copilot|research assistant)\b/],["Research Desk",/\b(research desk|desk)\b/],["Library",/\b(library|workspace)\b/],["Settings",/\bsettings\b/],["My Feed",/\b(my feed|feed)\b/],["Research Tools",/\b(research tools|pdf reader)\b/],["Home",/\b(home|homepage)\b/],["ChemRxiv",/\bchemrxiv\b/],["bioRxiv",/\bbiorxiv\b/],["Cryptology ePrint",/\b(cryptology|crypto|eprint|iacr)\b/],["arXiv",/\barxiv\b/]];
 function ask(raw){
-const question=clean(raw);if(!question)return;message(question,true);
+const question=clean(raw);if(!question)return;
+if(languageSelect.value==="auto"){
+ detectedLanguage=localeFromText(question)||detectedLanguage;
+ updateLanguageLabel();
+}
+message(question,true);
 const q=question.toLowerCase(),state=snapshot();
 const shortcuts=[
  {test:/\b(graph|connections|research map|knowledge map)\b/,file:"research-hub.html#relationships",label:"Research connections"},
@@ -399,7 +410,14 @@ message("Use Research Desk to search across archives.",false,[["Open Research De
 if(/(what|about|explain|purpose|understand|how).*(this page|here|current page)|(this page|here).*(do|work|for)/.test(q)){
 const intro=document.querySelector("main h1,[role=main] h1");if(intro)showTarget(intro,"page introduction");
 message("This is "+state.name+". "+(state.desc||"Part of Axiovo.")+(state.headings.length?"\n\nCurrent sections: "+state.headings.slice(0,9).join("; ")+".":"")+"\n\nI read the live page, including new headings after updates.");return}
-if(/^(hi|hello|hey)[!. ]*$/.test(q)){message("Hello! Ask what this page does, or tell me to open Research Desk, ProofLab, or another section.");return}
+if(/^(hi|hello|hey)[!. ]*$/.test(q)||/^(नमस्ते|नमस्कार|হ্যালো|নমস্কার|வணக்கம்|నమస్కారం|مرحبا|hola|bonjour|hallo|olá|你好|こんにちは|안녕하세요)[!.,。 ]*$/iu.test(q)){
+ message(welcome[baseLanguage()]||welcome.en);return;
+}
+if(baseLanguage()!=="en"){
+ // Do not pretend that fixed English-only keyword rules understand every
+ // language. Delegate intact native-language questions to Research Assistant.
+ routeToCopilot(question);return;
+}
 const ignored=new Set("what where which when why how does can please tell show about this that there here with from page axiovo help the and are for you your use using open my want need".split(" "));
 const tokens=s=>[...new Set((s.toLowerCase().match(/[a-z0-9]{3,}/g)||[]).filter(x=>!ignored.has(x)))];
 const terms=tokens(question),candidates=[...state.headings.map(x=>({text:x,type:"section"})),...state.controls.map(x=>({text:x,type:"control"})),...Object.keys(pages).map(x=>({text:x,type:"page"}))];
@@ -419,7 +437,22 @@ fab.addEventListener("pointerup",e=>{if(!drag||drag.id!==e.pointerId)return;drag
 fab.addEventListener("click",e=>{if(e.detail===0){panel.hidden=!panel.hidden;if(!panel.hidden)input.focus()}});
 close.addEventListener("click",()=>{stopGuide();panel.hidden=true;if("speechSynthesis" in window)speechSynthesis.cancel();fab.focus()});
 form.addEventListener("submit",e=>{e.preventDefault();const q=input.value;input.value="";ask(q)});
-mic.addEventListener("click",()=>{const Speech=window.SpeechRecognition||window.webkitSpeechRecognition;if(!Speech){message("Voice recognition isn't supported in this browser. Please type.");return}if(!confirm("Your browser's speech provider may process audio remotely. Axiovo does not store recordings. Continue?"))return;const rec=new Speech();rec.lang=document.documentElement.lang||navigator.language||"en-US";mic.disabled=true;mic.textContent="●";rec.onresult=e=>ask(e.results?.[0]?.[0]?.transcript||"");rec.onerror=e=>message("Microphone unavailable: "+(e.error||"unknown"));rec.onend=()=>{mic.disabled=false;mic.textContent="🎙"};try{rec.start()}catch{rec.onend();message("Could not start voice input.")}});
+mic.addEventListener("click",()=>{
+ const Speech=window.SpeechRecognition||window.webkitSpeechRecognition;
+ if(!Speech){message("Voice recognition is not supported by this browser. You can still type in your language.");return}
+ if(!confirm("Your browser's speech service may send audio to its provider. Axiovo does not store recordings. Continue?"))return;
+ const rec=new Speech();
+ rec.lang=currentLanguage();rec.interimResults=false;rec.maxAlternatives=1;
+ mic.disabled=true;mic.textContent="●";root.classList.add("robot-listening");
+ rec.onresult=e=>{
+  const words=e.results?.[0]?.[0]?.transcript||"";
+  if(words){if(languageSelect.value==="auto")detectedLanguage=localeFromText(words)||rec.lang;
+   updateLanguageLabel();refreshVoices();ask(words)}
+ };
+ rec.onerror=e=>message("Microphone unavailable for "+rec.lang+": "+(e.error||"unknown")+". You can type instead.");
+ rec.onend=()=>{mic.disabled=false;mic.textContent="🎙";root.classList.remove("robot-listening")};
+ try{rec.start()}catch{rec.onend();message("Could not start voice input for "+rec.lang+". Try another language or type.");}
+});
 window.addEventListener("resize",()=>{if(guideTarget)positionGuide();else if(innerWidth>760&&lastPos)move(lastPos.x,lastPos.y)});
 window.addEventListener("scroll",()=>{if(guideTarget)positionGuide()},{passive:true});
 window.AxiovoRobotGuide={show:(selector)=>{const node=document.querySelector(selector);return showTarget(node,selector)},stop:stopGuide};
