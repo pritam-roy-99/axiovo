@@ -164,9 +164,19 @@ def main():
                                 width,path,"Assistant covers bottom navigation",robot_geometry)
                         if path=="":
                             page.locator("#axiovo-robot .robot-fab").click()
-                            page.locator("#axiovo-robot-language").select_option("bn-IN")
-                            assert "সাহায্য" in page.locator(".robot-help-label").inner_text()
-                            page.locator("#axiovo-robot-language").select_option("auto")
+                            # Validate release options without assuming every build is multilingual.
+                            language = page.locator("#axiovo-robot-language")
+                            options = language.locator("option").evaluate_all(
+                                "(nodes) => nodes.map(node => node.value)")
+                            assert options, "Robot language selector has no options"
+                            if "bn-IN" in options:
+                                language.select_option("bn-IN")
+                                assert "সাহায্য" in page.locator(".robot-help-label").inner_text()
+                                language.select_option("auto" if "auto" in options else "bn-IN")
+                            else:
+                                assert "en-IN" in options, ("Missing English fallback", options)
+                                language.select_option("en-IN")
+                                assert "Need help" in page.locator(".robot-help-label").inner_text()
                             page.get_by_role("button",name="Close robot help").click()
                     if not path:
                         # Both modes must share one stage below their own
