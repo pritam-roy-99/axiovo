@@ -1,67 +1,66 @@
-name: Build Axiovo narrated tutorial
+name: Rerecord Axiovo narrated tutorial
 on:
   push:
-    branches:
-      - release/reliability-2026-11-07
-    paths:
-      - .github/workflows/build-release-tour.yml
-      - scripts/build_tutorial_video.py
-  pull_request:
     branches: [main]
     paths:
+      - scripts/build_tutorial_video.py
+      - scripts/tutorial_voice.py
       - .github/workflows/build-release-tour.yml
   workflow_dispatch:
 concurrency:
-  group: axiovo-release-tour
-  cancel-in-progress: true
+  group: axiovo-tutorial-video-main
+  cancel-in-progress: false
 jobs:
   build-video:
     runs-on: ubuntu-latest
+    timeout-minutes: 45
     permissions:
       contents: write
-    timeout-minutes: 30
+      actions: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
-          ref: release/reliability-2026-11-07
-      - name: Detect existing published media
-        id: media
-        run: |
-          if test -s docs/assets/axiovo-tour.mp4 && test -s docs/assets/axiovo-tour.vtt && test -s docs/assets/axiovo-tour-build.json; then
-            echo "ready=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "ready=false" >> "$GITHUB_OUTPUT"
-          fi
-      - uses: actions/setup-python@v5
-        if: steps.media.outputs.ready != 'true'
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-python@v6
         with:
           python-version: '3.12'
-      - name: Install recording dependencies
-        if: steps.media.outputs.ready != 'true'
+      - name: Install screen recording and Indian-English narration dependencies
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y ffmpeg espeak-ng fonts-dejavu-core
-          python -m pip install pillow playwright
+          sudo apt-get install -y ffmpeg fonts-dejavu-core
+          python -m pip install --disable-pip-version-check pillow playwright edge-tts
           python -m playwright install --with-deps chromium
-      - name: Record real website and generate audio, captions and MP4
-        if: steps.media.outputs.ready != 'true'
+      - name: Record updated website, narrate and regenerate synchronized captions
         run: python scripts/build_tutorial_video.py
-      - name: Verify nonempty tutorial assets
-        if: steps.media.outputs.ready != 'true'
+      - name: Verify generated MP4, captions and metadata
         run: |
           test -s docs/assets/axiovo-tour.mp4
           test -s docs/assets/axiovo-tour.vtt
           test -s docs/assets/axiovo-tour-build.json
-          ffprobe -v error docs/assets/axiovo-tour.mp4
-      - name: Commit verified media on release branch
-        if: steps.media.outputs.ready != 'true'
+          ffprobe -v error -show_entries stream=codec_name,width,height -of default=noprint_wrappers=1 docs/assets/axiovo-tour.mp4
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          data=json.loads(Path("docs/assets/axiovo-tour-build.json").read_text())
+          assert data["scenes"]>=37, data
+          assert data["duration_seconds"]>180
+          assert data["voices"]==["en-IN-NeerjaNeural"]
+          assert Path("docs/assets/axiovo-tour.vtt").read_text().startswith("WEBVTT")
+          PY
+      - name: Commit and publish newly recorded tutorial on main
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add docs/assets/axiovo-tour.mp4 docs/assets/axiovo-tour.vtt docs/assets/axiovo-tour-build.json
           if ! git diff --cached --quiet; then
-            git commit -m "build: publish narrated tutorial recorded from Axiovo pages"
-            git fetch origin release/reliability-2026-11-07
-            git rebase FETCH_HEAD
-            git push origin HEAD:release/reliability-2026-11-07
+            git commit -m "media: publish updated narrated Axiovo 37-scene walkthrough [skip ci]"
+            git fetch origin main
+            git rebase origin/main
+            git push origin HEAD:main
+            # Bot pushes do not launch push workflows. Explicitly request a
+            # fresh site deployment after the verified media is committed.
+            gh workflow run pages.yml --ref main
           fi
