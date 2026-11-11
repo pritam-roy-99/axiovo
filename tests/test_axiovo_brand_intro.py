@@ -27,6 +27,19 @@ class BrandIntroTest(unittest.TestCase):
         self.assertIn('".axiovo-welcome"',first)
         self.assertIn('("Axiovo = Axiom + Novo"',INTRO)
 
+    def test_tutorial_visuals_match_current_shell(self):
+        poster=(ROOT/"docs/assets/axiovo-tour-poster.svg").read_text(encoding="utf8")
+        tour=(ROOT/"docs/home-tour.js").read_text(encoding="utf8")
+        css=(ROOT/"docs/axiovo-blueprint-ui.css").read_text(encoding="utf8")
+        self.assertIn("Find research. Follow the evidence.",poster)
+        self.assertIn("Research Desk",poster)
+        self.assertIn("Cryptology ePrint",poster)
+        self.assertIn("current-axiovo-ui-20261111-v4",HOME)
+        self.assertIn("axiovo-tour-preview",tour)
+        self.assertIn("axiovo-tour-preview-rail",css)
+        self.assertIn("axiovo-tour-preview-hero",css)
+        self.assertNotIn("Explore research in four archives",poster)
+
     def test_one_video_with_captions_and_a_guide(self):
         self.assertIn('src="./assets/axiovo-tour.mp4',HOME)
         self.assertIn('src="./assets/axiovo-tour.vtt',HOME)
