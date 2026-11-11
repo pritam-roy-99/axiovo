@@ -327,7 +327,7 @@ def main():
                 # Regression: returning from My Feed must show the top of Home,
                 # not a restored anchor at the archive cards below the video.
                 page.goto(base+"index.html#axiovo-archive-title",wait_until="domcontentloaded")
-                page.locator("a[href='./feed.html']").first.click()
+                page.locator(nav_selector+" > a[href='./feed.html']").click()
                 page.wait_for_url(lambda url: urlsplit(url).path.endswith("/feed.html"))
                 history_length = page.evaluate("history.length")
                 (page.go_back(wait_until="domcontentloaded") if phone else page.locator(".axiovo-back-button").click())
