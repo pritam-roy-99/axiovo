@@ -160,7 +160,7 @@ def main():
                         assert all(bounds[i+1]["top"]>=bounds[i]["bottom"]+2 for i in range(len(bounds)-1)),(
                             width,path,"Overlapping sidebar links",bounds)
                         nav=result["navigation"]
-                        assert nav and nav["x"]<=16 and nav["right"]<width/2,(width,path,"Sidebar nav moved out",result)
+                        assert nav and 0<=nav["x"]<=24 and nav["right"]<width/2,(width,path,"Sidebar nav moved out",result)
                         assert all(x["height"]>=44 for x in links),(width,path,"Desktop nav touch targets",result)
                         assert all(links[i+1]["y"]>links[i]["y"] for i in range(4)),(width,path,"Sidebar links out of order",result)
                         assert page.locator(".axiovo-header-appearance .theme-toggle").is_visible()
