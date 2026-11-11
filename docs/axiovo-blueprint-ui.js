@@ -23,6 +23,13 @@
   '<div class="ax-sidebar-extra"><a href="./lab.html">⚗ <span>Research Tools</span></a><a href="./prooflab.html">◈ <span>ProofLab</span></a><a href="./community.html">♧ <span>Community</span></a><a href="./install.html">↓ <span>Install Axiovo</span></a></div>',
   '<div class="ax-sidebar-bottom"><a href="./profiles.html">⚙ <span>Settings</span></a><small>Source-first, free and open</small><small class="ax-sidebar-credit">✦ Built with ChatGPT</small></div>'
  ].join("");
+ // Reuse the five shared navigation links inside the desktop sidebar.
+ // The original header navigation remains the one mobile bottom bar,
+ // so no links or mobile interactions are removed.
+ const sideNav=nav.cloneNode(true);
+ sideNav.classList.add("ax-sidebar-nav");
+ sideNav.setAttribute("aria-label","Research workspace sections");
+ sidebar.insertBefore(sideNav,sidebar.querySelector(".ax-sidebar-extra"));
  header.before(sidebar);
  // The shared navigation already provides one Back and one Home link on inner pages.
  // Do not inject another Home link into the header.

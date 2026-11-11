@@ -111,13 +111,24 @@
   heading.before(wrap);wrap.append(icon,heading);
  }
  function activateBlueprint(){
-  if(!document.querySelector('link[data-axiovo-blueprint]')){
+  // The shared desktop/sidebar rules are installed on every page.
+  // Refresh a prelinked stylesheet as well, so old page-specific URLs
+  // cannot keep the overlapping sidebar after this release.
+  const version="20261111-sidebar-flow-v1";
+  const existing=document.querySelector('link[data-axiovo-blueprint]');
+  if(existing){
+   const asset=new URL(existing.href,location.href);
+   if(asset.searchParams.get("v")!==version){
+    asset.searchParams.set("v",version);
+    existing.href=asset.href;
+   }
+  } else {
    const sheet=document.createElement("link");sheet.rel="stylesheet";
-   sheet.href=new URL("./axiovo-blueprint-ui.css?v=20261111-multilingual-mascot-v1",location.href).href;
+   sheet.href=new URL("./axiovo-blueprint-ui.css?v="+version,location.href).href;
    sheet.dataset.axiovoBlueprint="true";document.head.append(sheet);
   }
   const script=document.createElement("script");script.defer=true;
-  script.src=new URL("./axiovo-blueprint-ui.js?v=20261111-tutorial-stage-v3",location.href).href;
+  script.src=new URL("./axiovo-blueprint-ui.js?v="+version,location.href).href;
   script.dataset.axiovoBlueprint="true";document.head.append(script);
   // Per-page design is presentational; all original handlers stay intact.
   if(!document.querySelector('link[data-axiovo-page-design]')){

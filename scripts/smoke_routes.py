@@ -79,6 +79,7 @@ def main():
             for width, height in ((320, 740), (360, 850), (390, 850), (428, 926), (740, 390), (844, 390),
                                   (768, 850), (1360, 850)):
                 phone = width <= 760
+                nav_selector = "header.rl-global-header nav.rl-nav" if phone else ".ax-sidebar .ax-sidebar-nav"
                 mobile = pw.devices["Pixel 7"] if phone else {}
                 ctx = browser.new_context(**{**mobile, "viewport": {"width": width, "height": height}},
                                           service_workers="block", reduced_motion="reduce")
@@ -97,14 +98,16 @@ def main():
                         x:r.x,y:r.y,right:r.right,bottom:r.bottom,width:r.width,height:r.height
                       }};
                       const box = s => rect(qs(s));
-                      const nav=qs('.rl-nav');
+                      const nav=qs(window.innerWidth<=760
+                        ? 'header.rl-global-header nav.rl-nav'
+                        : '.ax-sidebar .ax-sidebar-nav');
                       return {
                         settings:box('.axiovo-header-appearance .rl-settings-link'),
                         theme:box('.axiovo-header-appearance .theme-toggle'),
                         logo:box('.rl-logo'),
                         back:box('.axiovo-back-button'),
                         home:box('.axiovo-home-link'),
-                        navigation:box('.rl-nav'),
+                        navigation:rect(nav),
                         overflow:document.documentElement.scrollWidth - window.innerWidth,
                         links:[...nav.querySelectorAll('a')].map(a=>({
                           ...rect(a),label:a.textContent,overflow:a.scrollWidth-a.clientWidth
@@ -139,6 +142,23 @@ def main():
                     else:
                         # A real desktop workspace sidebar replaces the old horizontal nav.
                         assert page.locator(".ax-sidebar").is_visible(),(width,path,"Desktop sidebar missing")
+                        # Both navigation groups are in one scrollable sidebar;
+                        # no group or clickable label may cover another.
+                        bounds=page.locator(
+                            ".ax-sidebar .ax-sidebar-nav>a, "
+                            ".ax-sidebar .ax-sidebar-extra>a, "
+                            ".ax-sidebar .ax-sidebar-bottom>a"
+                        ).evaluate_all("""nodes => nodes.map(n => {
+                            const r=n.getBoundingClientRect(),side=document.querySelector('.ax-sidebar').getBoundingClientRect();
+                            return {top:r.top,bottom:r.bottom,left:r.left,right:r.right,
+                                    height:r.height,sideLeft:side.left,sideRight:side.right,
+                                    textOverflow:n.scrollWidth-n.clientWidth};
+                        })""")
+                        assert len(bounds)==10,(width,path,"Missing sidebar actions",bounds)
+                        assert all(b["height"]>=44 and b["textOverflow"]<=2 for b in bounds),(width,path,"Unreadable sidebar action",bounds)
+                        assert all(b["left"]>=b["sideLeft"]-2 and b["right"]<=b["sideRight"]+2 for b in bounds),(width,path,"Sidebar action outside panel",bounds)
+                        assert all(bounds[i+1]["top"]>=bounds[i]["bottom"]+2 for i in range(len(bounds)-1)),(
+                            width,path,"Overlapping sidebar links",bounds)
                         nav=result["navigation"]
                         assert nav and nav["x"]<=16 and nav["right"]<width/2,(width,path,"Sidebar nav moved out",result)
                         assert all(x["height"]>=44 for x in links),(width,path,"Desktop nav touch targets",result)
@@ -302,12 +322,12 @@ def main():
                         assert action["clearBelow"] and action["clearHeight"]>=44,(action_width,source,action)
                     show.click()
                     assert page.evaluate("document.activeElement?.id")=="archive-results-heading",(source,"Results not focused")
-                    (page.locator(".rl-nav a:first-child") if phone else page.locator(".axiovo-home-link")).click()
+                    (page.locator("header.rl-global-header nav.rl-nav > a:first-child") if phone else page.locator(".axiovo-home-link")).click()
                     page.wait_for_url(lambda url: urlsplit(url).path.endswith("/index.html"))
                 # Regression: returning from My Feed must show the top of Home,
                 # not a restored anchor at the archive cards below the video.
                 page.goto(base+"index.html#axiovo-archive-title",wait_until="domcontentloaded")
-                page.locator("a[href='./feed.html']").first.click()
+                page.locator(nav_selector+" > a[href='./feed.html']").click()
                 page.wait_for_url(lambda url: urlsplit(url).path.endswith("/feed.html"))
                 history_length = page.evaluate("history.length")
                 (page.go_back(wait_until="domcontentloaded") if phone else page.locator(".axiovo-back-button").click())
@@ -372,7 +392,7 @@ def main():
                 # Explore in the global header must not bypass the Home
                 # tutorial by navigating directly to the archive-card anchor.
                 page.goto(base+"feed.html",wait_until="domcontentloaded")
-                page.locator(".rl-nav").get_by_role("link",name="Explore",exact=False).click()
+                page.locator(nav_selector).get_by_role("link",name="Explore",exact=False).click()
                 page.wait_for_url(lambda url: urlsplit(url).path.endswith("/index.html"))
                 assert page.evaluate("location.hash")=="" , "Explore from Feed skipped the tutorial"
                 assert page.locator("#axiovo-home-video").is_visible()
@@ -380,7 +400,7 @@ def main():
                 # Returning from a BFCache-restored interactive guide must
                 # explicitly restore the tutorial video as the default.
                 page.locator("#axiovo-tour-show-guide").click()
-                page.locator(".rl-nav").get_by_role("link",name="My Feed",exact=False).click()
+                page.locator(nav_selector).get_by_role("link",name="My Feed",exact=False).click()
                 page.wait_for_url(lambda url: urlsplit(url).path.endswith("/feed.html"))
                 page.go_back(wait_until="domcontentloaded")
                 assert page.locator("#axiovo-home-video").is_visible()
@@ -415,7 +435,7 @@ def main():
                 page.get_by_role("link",name="Open Library").click()
                 page.wait_for_url(lambda url: urlsplit(url).path.endswith("/workspace.html"))
                 # Navigation labels should describe the destination and remain usable.
-                nav = page.locator(".rl-nav a")
+                nav = page.locator(nav_selector+" > a")
                 assert nav.count()==5, "Expected Explore, Research Desk, My Feed, Library and Research Assistant"
                 assert all(nav.nth(i).get_attribute("title") for i in range(5))
                 page.goto(base+"desk.html",wait_until="domcontentloaded")
