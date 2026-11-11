@@ -18,6 +18,22 @@ const head=make("div","robot-head"),heading=make("div"),close=make("button","rob
 heading.append(make("strong",null,"Axiovo Robot Help · Need help?"),make("small",null,"Page-aware guide · optional voice"));close.type="button";close.setAttribute("aria-label","Close robot help");head.append(heading,close);
 const log=make("div","robot-log");log.setAttribute("role","log");log.setAttribute("aria-live","polite");
 const voiceSettings=make("div","robot-voice-settings");
+const languageSelect=make("select","robot-language-select");
+languageSelect.id="axiovo-robot-language";
+languageSelect.setAttribute("aria-label","Assistant language for speech and replies");
+const languageOptions=[
+ ["auto","Auto (device language)"],["en-IN","English (India)"],["bn-IN","বাংলা · Bengali"],
+ ["hi-IN","हिन्दी · Hindi"],["ur-IN","اردو · Urdu"],["ta-IN","தமிழ் · Tamil"],
+ ["te-IN","తెలుగు · Telugu"],["ml-IN","മലയാളം · Malayalam"],["mr-IN","मराठी · Marathi"],
+ ["gu-IN","ગુજરાતી · Gujarati"],["kn-IN","ಕನ್ನಡ · Kannada"],["pa-IN","ਪੰਜਾਬੀ · Punjabi"],
+ ["ne-NP","नेपाली · Nepali"],["es-ES","Español · Spanish"],["fr-FR","Français · French"],
+ ["de-DE","Deutsch · German"],["pt-BR","Português"],["it-IT","Italiano"],
+ ["ar-SA","العربية · Arabic"],["zh-CN","中文 · Chinese"],["ja-JP","日本語 · Japanese"],
+ ["ko-KR","한국어 · Korean"],["ru-RU","Русский · Russian"],["id-ID","Bahasa Indonesia"],
+ ["tr-TR","Türkçe · Turkish"]
+];
+for(const [value,label] of languageOptions)languageSelect.add(new Option(label,value));
+try{const saved=localStorage.getItem("axiovo-robot-language-v1");if(languageOptions.some(x=>x[0]===saved))languageSelect.value=saved}catch{}
 const voiceLabel=make("label",null,"Spoken replies"),voiceEnabled=make("input");
 voiceEnabled.type="checkbox";voiceEnabled.checked=true;voiceEnabled.setAttribute("aria-label","Enable spoken help replies");
 voiceLabel.prepend(voiceEnabled);
@@ -25,14 +41,18 @@ const voiceSelect=make("select");voiceSelect.setAttribute("aria-label","Choose s
 const testVoice=make("button",null,"Test");testVoice.type="button";
 const stopVoice=make("button",null,"Stop");stopVoice.type="button";
 const voiceStatus=make("div","robot-voice-status","Tap Speak reply once to enable audio on this device.");
-voiceSettings.append(voiceLabel,voiceSelect,testVoice,stopVoice,voiceStatus);
+voiceSettings.append(languageSelect,voiceLabel,voiceSelect,testVoice,stopVoice,voiceStatus);
 const suggestions=make("div","robot-actions"),form=make("form","robot-form"),input=make("input"),mic=make("button",null,"🎙"),send=make("button",null,"➤");
 input.type="text";input.maxLength=600;input.placeholder="Ask about Axiovo";input.setAttribute("aria-label","Ask Axiovo");
 mic.type="button";mic.setAttribute("aria-label","Voice question");send.type="submit";send.setAttribute("aria-label","Submit question");
 form.append(input,mic,send);
 panel.append(head,voiceSettings,log,suggestions,form,make("div","robot-note","Voice uses voices installed in your browser or device. Speech input may use your browser provider; Axiovo stores no audio."));
 const fab=make("button","robot-fab");fab.type="button";fab.title="Need help? Click to ask or drag the robot";fab.setAttribute("aria-label","Need help? Open the movable Axiovo voice assistant");
-fab.innerHTML='<svg width="37" height="37" viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M24 4v7" stroke="#8ae4ff" stroke-width="3"/><circle cx="24" cy="4" r="3" fill="#8ae4ff"/><rect x="6" y="12" width="36" height="29" rx="10" fill="#f5fbff"/><rect x="10" y="18" width="28" height="17" rx="7" fill="#164567"/><circle cx="18" cy="27" r="3" fill="#66deff"/><circle cx="30" cy="27" r="3" fill="#66deff"/><path d="M20 36h8" stroke="#164567" stroke-width="2.5" stroke-linecap="round"/></svg>';
+const mascot=make("img","robot-mascot");mascot.src=new URL("assets/axiovo-assistant-mascot.svg",base).href;
+mascot.alt="";mascot.width=78;mascot.height=78;mascot.decoding="async";mascot.draggable=false;
+const voiceBars=make("span","robot-speaking-bars");voiceBars.setAttribute("aria-hidden","true");
+voiceBars.append(make("i"),make("i"),make("i"));
+fab.replaceChildren(mascot,voiceBars);
 const launcher=make("div","robot-launcher"),helpLabel=make("span","robot-help-label","Need help?");
 launcher.append(helpLabel,fab);root.append(panel,launcher);document.body.append(root);
 let speechVoices=[];let speechUnlocked=false;let lastAssistantReply="";let speechTimer=null;
