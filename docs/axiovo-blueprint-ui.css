@@ -595,7 +595,7 @@ body.axiovo-reference-ui.axiovo-home .axiovo-tour-stage .axiovo-tour-preview{
 }
 body.axiovo-reference-ui.axiovo-home .axiovo-tour-stage .axiovo-tour-preview-rail{
  display:flex;flex-direction:column;gap:8px;padding:15px 9px;
- background:linear-gradient(155deg,#063b52,#08697a);color:#fff;
+ background:linear-gradient(155deg,var(--ax-brand-hero,#063b52),var(--ax-brand-hero2,#08697a));color:#fff;
 }
 body.axiovo-reference-ui.axiovo-home .axiovo-tour-stage .axiovo-tour-preview-rail strong{
  font-size:10px;white-space:nowrap;letter-spacing:.04em;color:#fff;
@@ -620,7 +620,7 @@ body.axiovo-reference-ui.axiovo-home .axiovo-tour-stage .axiovo-tour-preview-too
 }
 body.axiovo-reference-ui.axiovo-home .axiovo-tour-stage .axiovo-tour-preview-hero{
  display:flex;flex-direction:column;gap:7px;border-radius:11px;
- padding:17px 15px;background:linear-gradient(120deg,#063e56,#097f8b);color:white;
+ padding:17px 15px;background:linear-gradient(120deg,var(--ax-brand-hero,#063e56),var(--ax-brand-hero2,#097f8b));color:white;
 }
 body.axiovo-reference-ui.axiovo-home .axiovo-tour-stage .axiovo-tour-preview-hero small{
  color:#aef6e7;font-weight:850;letter-spacing:.07em;font-size:9px;
