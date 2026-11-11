@@ -196,7 +196,7 @@
    workspace.append(toolbar,hero,features,footer);
    display.append(rail,workspace);
    illustration.replaceChildren(display);
-   counter.textContent=(current+1)+" / "+steps.length;action.textContent=step.action+" ↗";action.href=step.href;
+   counter.textContent=(current+1)+" / "+steps.length;if(action){action.textContent=step.action+" ↗";action.href=step.href;}
    prev.disabled=current===0;next.textContent=current===steps.length-1?"Start again ↻":"Next step →";
    dots.forEach((b,j)=>{if(j===current)b.setAttribute("aria-current","step");else b.removeAttribute("aria-current");});
   }
