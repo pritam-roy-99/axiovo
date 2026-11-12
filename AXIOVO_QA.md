@@ -112,3 +112,36 @@ Review the GitHub Actions run for each commit; it may be pending or fail.
 Run the required tests and inspect generated
 `docs/data/index/v1/manifest.json`. Open the deployed website and compare
 it against mobile screenshot and source files before declaring finished.
+
+
+## Phase 1 v2 implementation review (2026-11-07)
+
+Implemented on feature branch `feature/source-reliability-phase1`:
+
+- [x] Source-specific arXiv/DOI identifier validation and pinned-revision schema.
+- [x] Separate arXiv submission, announcement and metadata update fields.
+- [x] Same-revision disagreement warnings instead of silent reconciliation.
+- [x] Deterministic version-specific v2 shard records and SHA-256 checks.
+- [x] Rejection reasons, observed counts and honest incomplete coverage in v2 manifest.
+- [x] Existing v1/legacy search and browser storage preserved.
+- [x] Read-only version-aware adapter and preservation tests.
+- [x] Repeated OAI continuation-token detection.
+- [x] CI source-contract tests and mandatory v2 integrity build.
+- [ ] All provider retry, checkpoint and atomic-failure paths independently verified.
+- [ ] Independent full-day source-count reconciliation for every date.
+- [ ] Migrate every user-facing search consumer to canonical v2.
+- [ ] Deploy to main after PR review and regression CI.
+- [ ] Test rollback from a deployed v2 release.
+
+**Acceptance remains partial.** The tests verify metadata integrity, not
+scientific correctness or exhaustive completeness. No production change is
+claimed until a deployment to `main` succeeds.
+
+Validation commands:
+```bash
+python -m unittest discover -s tests -v
+node tests/source-records.test.js
+node tests/library-preservation.test.js
+python -m scripts.build_source_v2
+python -c "from scripts.build_source_v2 import verify_index; verify_index('docs/data/index/v2')"
+```

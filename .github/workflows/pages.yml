@@ -186,6 +186,18 @@ jobs:
       - name: Build verified monthly source metadata shards
         id: normalized_build
         run: python -m scripts.build_normalized_index
+      - name: Build and validate additive canonical v2 source index (required)
+        run: |
+          python -m unittest discover -s tests -p test_record_contract.py -v
+          python -m scripts.build_source_v2
+          python - <<'PY'
+          from pathlib import Path
+          from scripts.build_source_v2 import verify_index
+          manifest=verify_index(Path("docs/data/index/v2"))
+          assert manifest["record_count"] > 0
+          assert not manifest["complete_dates"], "Unverified dates cannot claim complete archive coverage"
+          print("Integrity-verified v2 records:",manifest["record_count"])
+          PY
       - name: Test versioned taxonomy integrity
         run: python -m unittest discover -s tests -p test_taxonomy_json.py -v
       - name: Build curated versioned topic taxonomy
