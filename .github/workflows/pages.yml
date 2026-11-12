@@ -152,6 +152,12 @@ jobs:
         run: |
           python -m unittest discover -s tests -p test_literature_coverage.py -v
           python -m scripts.audit_literature_coverage
+      - name: Validate Archive Reliability 2.0 coverage accounting
+        run: python -m unittest discover -s tests -p test_archive_reliability.py -v
+      - name: Test live archive publication parity comparator
+        run: python -m unittest discover -s tests -p test_archive_publication_parity.py -v
+      - name: Build Archive Reliability 2.0 report
+        run: python -m scripts.build_archive_reliability
       - name: Build honest four-source freshness summary
         id: freshness_build
         run: |
@@ -367,6 +373,10 @@ jobs:
       - name: Verify public release matches tested artifact
         timeout-minutes: 4
         run: python scripts/verify_release.py
+      - name: Verify live archive reliability parity after deployment
+        id: archive_live_parity
+        timeout-minutes: 4
+        run: python scripts/check_archive_publication_parity.py
       - name: Audit deployed Axiovo pages, live links, navigation and video
         id: postdeploy_audit
         continue-on-error: true
