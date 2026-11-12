@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-12T01:06:35.520082+00:00",
+  "generated_at": "2026-11-12T20:25:19.622766+00:00",
   "source": "official arXiv OAI-PMH and verified submission-date Atom batches, with category fallback",
   "index_scope": "all-category recent OAI harvest (partial if incomplete) and independently verified full submission-day shards; older history remains partial",
   "refresh_methods": [
@@ -3258,11 +3258,13 @@
         "cs.SE"
       ],
       "primary_category": "quant-ph",
-      "published": "2026-11-10T17:31:11Z",
-      "updated": "2026-11-10T17:31:11Z",
+      "published": "2026-11-10T00:00:00Z",
+      "published_date_precision": "day",
+      "updated": "2026-11-11T00:00:00Z",
       "link": "https://arxiv.org/abs/2611.14376",
       "topics": [],
-      "doi": ""
+      "doi": "",
+      "metadata_source": "arXiv OAI-PMH"
     },
     {
       "id": "2611.14375",
@@ -3280,11 +3282,13 @@
         "math.AP"
       ],
       "primary_category": "cond-mat.stat-mech",
-      "published": "2026-11-10T17:30:38Z",
-      "updated": "2026-11-10T17:30:38Z",
+      "published": "2026-11-10T00:00:00Z",
+      "published_date_precision": "day",
+      "updated": "2026-11-11T00:00:00Z",
       "link": "https://arxiv.org/abs/2611.14375",
       "topics": [],
-      "doi": ""
+      "doi": "",
+      "metadata_source": "arXiv OAI-PMH"
     },
     {
       "id": "2611.14374",
@@ -3300,14 +3304,17 @@
       ],
       "categories": [
         "cs.LG",
+        "cs.SY",
         "eess.SY"
       ],
       "primary_category": "cs.LG",
-      "published": "2026-11-10T17:30:34Z",
-      "updated": "2026-11-10T17:30:34Z",
+      "published": "2026-11-10T00:00:00Z",
+      "published_date_precision": "day",
+      "updated": "2026-11-11T00:00:00Z",
       "link": "https://arxiv.org/abs/2611.14374",
       "topics": [],
-      "doi": ""
+      "doi": "",
+      "metadata_source": "arXiv OAI-PMH"
     },
     {
       "id": "2611.14373",
@@ -3324,11 +3331,13 @@
         "cs.RO"
       ],
       "primary_category": "cs.RO",
-      "published": "2026-11-10T17:30:20Z",
-      "updated": "2026-11-10T17:30:20Z",
+      "published": "2026-11-10T00:00:00Z",
+      "published_date_precision": "day",
+      "updated": "2026-11-11T00:00:00Z",
       "link": "https://arxiv.org/abs/2611.14373",
       "topics": [],
-      "doi": ""
+      "doi": "",
+      "metadata_source": "arXiv OAI-PMH"
     },
     {
       "id": "2611.14372",
