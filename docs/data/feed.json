@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-12T20:25:19.622766+00:00",
+  "generated_at": "2026-11-12T22:48:22.255128+00:00",
   "source": "official arXiv OAI-PMH and verified submission-date Atom batches, with category fallback",
   "index_scope": "all-category recent OAI harvest (partial if incomplete) and independently verified full submission-day shards; older history remains partial",
   "refresh_methods": [
@@ -3216,11 +3216,13 @@
         "math.RT"
       ],
       "primary_category": "math.RT",
-      "published": "2026-11-10T17:32:04Z",
-      "updated": "2026-11-10T17:32:04Z",
+      "published": "2026-11-10T00:00:00Z",
+      "published_date_precision": "day",
+      "updated": "2026-11-11T00:00:00Z",
       "link": "https://arxiv.org/abs/2611.14378",
       "topics": [],
-      "doi": ""
+      "doi": "",
+      "metadata_source": "arXiv OAI-PMH"
     },
     {
       "id": "2611.14377",
@@ -3234,13 +3236,15 @@
         "physics.chem-ph"
       ],
       "primary_category": "physics.chem-ph",
-      "published": "2026-11-10T17:31:44Z",
-      "updated": "2026-11-10T17:31:44Z",
+      "published": "2026-11-10T00:00:00Z",
+      "published_date_precision": "day",
+      "updated": "2026-11-11T00:00:00Z",
       "link": "https://arxiv.org/abs/2611.14377",
       "topics": [
         "many-body"
       ],
-      "doi": ""
+      "doi": "",
+      "metadata_source": "arXiv OAI-PMH"
     },
     {
       "id": "2611.14376",
