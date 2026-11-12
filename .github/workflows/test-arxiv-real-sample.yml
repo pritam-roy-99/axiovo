@@ -1,0 +1,20 @@
+name: Test real arXiv metadata sample (read-only)
+on:
+  pull_request:
+    paths:
+      - 'scripts/test_arxiv_real_snapshot_sample.py'
+      - '.github/workflows/test-arxiv-real-sample.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  real-sample:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Import 10 real metadata records from public mirror
+        run: python -m scripts.test_arxiv_real_snapshot_sample
