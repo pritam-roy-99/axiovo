@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-11T16:34:50.602371+00:00",
+  "generated_at": "2026-11-12T01:06:35.520082+00:00",
   "source": "official arXiv OAI-PMH and verified submission-date Atom batches, with category fallback",
   "index_scope": "all-category recent OAI harvest (partial if incomplete) and independently verified full submission-day shards; older history remains partial",
   "refresh_methods": [
@@ -3342,11 +3342,13 @@
         "physics.chem-ph"
       ],
       "primary_category": "physics.chem-ph",
-      "published": "2026-11-10T17:30:00Z",
-      "updated": "2026-11-10T17:30:00Z",
+      "published": "2026-11-10T00:00:00Z",
+      "published_date_precision": "day",
+      "updated": "2026-11-11T00:00:00Z",
       "link": "https://arxiv.org/abs/2611.14372",
       "topics": [],
-      "doi": ""
+      "doi": "",
+      "metadata_source": "arXiv OAI-PMH"
     },
     {
       "id": "2611.14371",
@@ -45123,6 +45125,30 @@
       "metadata_source": "arXiv OAI-PMH"
     },
     {
+      "id": "2611.08353",
+      "version": 1,
+      "title": "From elementary processes to chaos: a discrete-time two-stage contagion model and its continuous limit",
+      "abstract": "Two-stage contagion, in which adoption requires two contacts with adopters, combined with population turnover produces bistability and relaxation oscillations, but no chaos, in Katriel's differential equations. From the elementary reactions, without reference to the differential equations, we derive a deterministic map $F_τ$ for a large population updated in rounds of length $τ$, as in elections, meetings or turns of a game: each individual makes at most one transition per round, events compete as exponential risks, and adoptions take effect from the next round. Katriel's equations are recovered as $τ\\to0$. Taking the probability $p$ of adoption after a single contact as bifurcation parameter, with rates and round length fixed, the map goes from extinction through a window of chaos to a stable equilibrium; for $β/γ=46$, $μ/γ=0.002$, $γτ=5.5$ the window is $0.023\\le p\\le0.056$, bounded by the invasion threshold and by a boundary crisis beyond a subcritical Neimark--Sacker point. Chaos is supported by independent indicators: a positive Lyapunov exponent with Kaplan--Yorke dimension $1.81$, a matching correlation dimension, the 0-1 test ($K\\approx1$ exactly in the window), a broadband spectrum, ordinal-pattern complexity, sensitive dependence on initial conditions and dense saddle periodic orbits. One-stage contagion, $p=0$ and permanent adoption showed no chaos. In the same window Katriel's equations have a periodic relaxation cycle: the round structure turns this oscillation into chaos and shrinks the oscillatory range in $p$ from $(0.022,0.41)$ to $(0.022,0.056)$. The chaos is thus a property of two-stage contagion with synchronous updating, not an artefact of discretisation.",
+      "authors": [
+        "Francisco J. Muñoz",
+        "Juan Carlos Nuño",
+        "Luca Meacci"
+      ],
+      "categories": [
+        "math.DS",
+        "nlin.CD",
+        "physics.soc-ph"
+      ],
+      "primary_category": "math.DS",
+      "published": "2026-11-10T00:00:00Z",
+      "published_date_precision": "day",
+      "updated": "2026-11-11T00:00:00Z",
+      "link": "https://arxiv.org/abs/2611.08353",
+      "topics": [],
+      "doi": "",
+      "metadata_source": "arXiv OAI-PMH"
+    },
+    {
       "id": "2611.12881",
       "version": 2,
       "title": "The Brown Dwarf Desert is a Mass-Ratio Desert: Astrometric Demographics of 63,254 Stars",
@@ -59154,6 +59180,27 @@
       "published_date_precision": "day",
       "updated": "2026-11-11T00:00:00Z",
       "link": "https://arxiv.org/abs/1309.6045",
+      "topics": [],
+      "doi": "",
+      "metadata_source": "arXiv OAI-PMH"
+    },
+    {
+      "id": "2611.07956",
+      "version": 1,
+      "title": "A Note on the Cut-Locus-Corrected Fréchet Mean Central Limit Theorem",
+      "abstract": "We record three observations concerning \\cite{HLW24}. First, the proof of its Theorem~1 yields the population linearization (13)--(14) at \\textit{any critical point} of the Fréchet function $F_μ$, under its remaining geometric and measure-theoretic assumptions; neither \\textit{isolation} nor a \\textit{nonsingular} Hessian of $F_μ$ is needed. Second, its Theorem~2 is given a shorter proof by applying the M-estimator theorem \\cite[Theorem~5.23, pp.~53--54]{vdV98} to negative squared distance in normal coordinates, as opposed to the Donsker argument used there. Third, the above shorter route also helps us establish a CLT for a measurable selection of strict local empirical Fréchet mean with positive definite Hessian, with the cut locus correction, relaxing the assumptions of uniqueness or global minimality, as in \\cite{HLW24}. Numerical experiments at the end show the agreement of the Hessian of the Fréchet function at \\textit{local} Fréchet means with the (signed) sum of the expected Hessian of the squared distance function and the cut locus correction there.",
+      "authors": [
+        "Susovan Pal"
+      ],
+      "categories": [
+        "math.ST",
+        "stat.TH"
+      ],
+      "primary_category": "math.ST",
+      "published": "2026-11-09T00:00:00Z",
+      "published_date_precision": "day",
+      "updated": "2026-11-11T00:00:00Z",
+      "link": "https://arxiv.org/abs/2611.07956",
       "topics": [],
       "doi": "",
       "metadata_source": "arXiv OAI-PMH"
@@ -87602,56 +87649,6 @@
       "published_date_precision": "day",
       "updated": "2026-11-10T00:00:00Z",
       "link": "https://arxiv.org/abs/2611.11746",
-      "topics": [],
-      "doi": "",
-      "metadata_source": "arXiv OAI-PMH"
-    },
-    {
-      "id": "2611.11745",
-      "version": 1,
-      "title": "Reproducible quantum clustering for single-cell transcriptome atlases",
-      "abstract": "Current single-cell clustering pipelines discard most genes and can yield inconsistent clusters across random seeds. We introduce KQE-2, a training-free hybrid quantum-classical framework for reproducible whole-transcriptome clustering. KQE-2 maps cells into entanglement-free quantum states, enabling exact feature evaluation on classical hardware and direct checks on a quantum processor. Theoretically, we prove that removing entanglement is necessary and sufficient to bound single-qubit feature variance locally. Practically, while retraining scVI shifted 14% of cells and altered rare-type markers and drug targets, KQE-2 delivered identical biology across runs. On standard highly variable genes, the quantum encoding alone raised accuracy on a developing cortex from 0.61 to 0.79. KQE-2 scales to 11.4 million nuclei on one server, outperforming the compared methods on eight of ten complete atlases (and within the best method's run-to-run range on two), and leads on six even under standard downstream clustering.",
-      "authors": [
-        "Henry Han"
-      ],
-      "categories": [
-        "cs.AI",
-        "q-bio.GN",
-        "q-bio.QM"
-      ],
-      "primary_category": "cs.AI",
-      "published": "2026-11-09T00:00:00Z",
-      "published_date_precision": "day",
-      "updated": "2026-11-10T00:00:00Z",
-      "link": "https://arxiv.org/abs/2611.11745",
-      "topics": [
-        "genomics",
-        "entanglement-steering",
-        "hardware"
-      ],
-      "doi": "",
-      "metadata_source": "arXiv OAI-PMH"
-    },
-    {
-      "id": "2611.11744",
-      "version": 1,
-      "title": "Breaking the $\\sqrt{d}$ Communication Barrier in Federated Sampling with Adaptive Hamiltonian Monte Carlo",
-      "abstract": "This work proposes the Adaptive Federated Hamiltonian Monte Carlo (AFHMC) for Bayesian federated learning (FL) tasks. The prior work on HMC applications for FL achieves $O(\\sqrt{d}/ε)$ communication cost under log-convex distributions, already demonstrating its advantage over the Langevin dynamic-based counterpart. Based on a refined analysis, this paper further reveals the benefit of HMC for the FL regime by incorporating a control mechanism for local node shifts. We prove that AFHMC at most requires $O(\\{d/ε^2\\}^{1/3})$ communication cost up to a logarithmic term, which is significantly better than the existing results. Moreover, the proposed method adapts to client heterogeneity. Under low-heterogeneity settings (i.e., the target sampling precision $ε^2$ is higher than the heterogeneity level), the communication rate of AFHMC can be as good as $O(\\log(d/ε^2))$, resembling the communication costs for FL optimization tools. To the best of our knowledge, this provides the first logarithmic communication complexity result for federated sampling, even though it requires low heterogeneity. Numerically, we also justify AFHMC's advantage under the low-heterogeneity regime. Our code is available at https://github.com/laaaarrywang/Adaptive-Federated-HMC",
-      "authors": [
-        "Jiajun Liang",
-        "Linxuan Wang",
-        "Guang Lin",
-        "Qifan Song"
-      ],
-      "categories": [
-        "stat.ML",
-        "cs.LG"
-      ],
-      "primary_category": "stat.ML",
-      "published": "2026-11-09T00:00:00Z",
-      "published_date_precision": "day",
-      "updated": "2026-11-10T00:00:00Z",
-      "link": "https://arxiv.org/abs/2611.11744",
       "topics": [],
       "doi": "",
       "metadata_source": "arXiv OAI-PMH"
