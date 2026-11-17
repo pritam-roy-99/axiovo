@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-16T17:24:08.002485+00:00",
+  "generated_at": "2026-11-17T01:02:13.861835+00:00",
   "source": "official arXiv OAI-PMH and verified submission-date Atom batches, with category fallback",
   "index_scope": "all-category recent OAI harvest (partial if incomplete) and independently verified full submission-day shards; older history remains partial",
   "refresh_methods": [
@@ -52951,6 +52951,27 @@
       "metadata_source": "arXiv OAI-PMH"
     },
     {
+      "id": "2611.14090",
+      "version": 1,
+      "title": "Equivariant Quantisation of Hypertoric Varieties via Symplectic Cuts",
+      "abstract": "We study the equivariant geometric quantisation of a non-compact hypertoric orbifold of complex dimension $2n$ by compact symplectic cuts. When the defining arrangement has a non-empty bounded base region and the fixed lift is integral, we prove that, at every positive regular integral level $d$, the space of sections on the cut is the sum of the fibre-rotation weight spaces of weight at most $d$ in the original quantisation. The higher cohomology of the cut pre-quantum line orbibundle vanishes, so its equivariant index is the character of its actual section space. Using the moment polyptychs introduced in a companion paper (arXiv:2610.37724), we give an orbifold Kawasaki-Riemann-Roch localisation formula for this character. We also compute it as a weighted lattice-point sum: a residual weight $x$ occurs at level $d$ if and only if the arrangement slack function satisfies $\\mathcal{S}(x) \\leq d$, with multiplicity $\\binom{d - \\mathcal{S}(x) + n}{n}$. The examples compare these calculations in rank one, including a cut with an orbifold point, and in rank two, for smooth cuts that are not toric.",
+      "authors": [
+        "Benjamin C. W. Brown"
+      ],
+      "categories": [
+        "math.SG",
+        "math.AG"
+      ],
+      "primary_category": "math.SG",
+      "published": "2026-11-12T00:00:00Z",
+      "published_date_precision": "day",
+      "updated": "2026-11-16T00:00:00Z",
+      "link": "https://arxiv.org/abs/2611.14090",
+      "topics": [],
+      "doi": "",
+      "metadata_source": "arXiv OAI-PMH"
+    },
+    {
       "id": "2611.17337",
       "version": 1,
       "title": "The full Gaia colour-magnitude diagram with white dwarfs reveals a declining Milky Way star formation history",
@@ -97496,30 +97517,6 @@
       "published": "2026-11-11T13:37:13Z",
       "updated": "2026-11-11T13:37:13Z",
       "link": "https://arxiv.org/abs/2611.15466",
-      "topics": [],
-      "doi": ""
-    },
-    {
-      "id": "2611.15465",
-      "version": 1,
-      "title": "On-Edge Acoustic Continual Anomaly Detection: A Cross-Platform Comparative Study",
-      "abstract": "Acoustic Anomaly Detection (AAD) serves as a non-contact approach for machine condition monitoring, yet much of the existing research is evaluated offline and rarely addresses embedded hardware constraints or microphone variations under operational drift. This paper presents a comparative evaluation of on-edge continual AAD across two embedded platforms the ESP32-S3 (with an external I2S digital microphone) and the Arduino Nicla Vision (with an onboard Pulse Density Modulation (PDM) microphone) using a shared detection model. The model utilizes a lightweight ShallowNet encoder and contrastive prototype learning to map spectrograms into a 32-dimensional embedding space. Both boards run an identical TensorFlow Lite for Microcontrollers (TFLM) encoder, performing on-device prototype learning updated via an exponential moving average. A cloud pipeline orchestrated through Firebase and MQTT enables remote data collection and retraining. Evaluated via a controlled speaker-replay protocol using standardized Detection and Classification of Acoustic Scenes and Events (DCASE) Challenge Task 2 machine sounds, the ESP32-S3 achieved 82.35% to 95.00% accuracy across five machine types, while the Nicla Vision achieved 79.41% to 95.00%. The two platforms demonstrated comparable performance, confirming that the lightweight prototypical architecture transfers reliably across distinct hardware and sensor tiers.",
-      "authors": [
-        "Rami Zewail",
-        "Yehia Ehab",
-        "Karim Ali",
-        "Ahmed Mahrous",
-        "Mohamed Awad",
-        "Bassem Mokhtar"
-      ],
-      "categories": [
-        "cs.SD",
-        "cs.LG"
-      ],
-      "primary_category": "cs.SD",
-      "published": "2026-11-11T13:35:36Z",
-      "updated": "2026-11-11T13:35:36Z",
-      "link": "https://arxiv.org/abs/2611.15465",
       "topics": [],
       "doi": ""
     }
