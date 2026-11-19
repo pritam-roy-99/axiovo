@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-18T17:59:11.553559+00:00",
+  "generated_at": "2026-11-19T00:17:01.155271+00:00",
   "source": "official arXiv OAI-PMH and verified submission-date Atom batches, with category fallback",
   "index_scope": "all-category recent OAI harvest (partial if incomplete) and independently verified full submission-day shards; older history remains partial",
   "refresh_methods": [
@@ -3801,7 +3801,7 @@
       "id": "2611.22137",
       "version": 1,
       "title": "Efficient strategies for obtaining accurate kinetics from biased simulations",
-      "abstract": "It has been demonstrated that one can recover the unbiased rate constants for slow conformational transitions by observing transitions driven by a bias potential added along one or several collective variables (CVs). However, the choice of CV, biasing scheme, biasing parameters and the rate estimator can all affect the results and it is not obvious which to choose for a given problem. In this study, we compare accuracy versus computational cost for a previously established benchmark system, a coarse-grained protein with computationally accessible unfolding kinetics. We apply bias to four CVs of decreasing quality in both a time-dependent and quasi-static manner, and compare different estimators for the unfolding rate constant in terms of absolute accuracy to the estimated reference unbiased rate. We show that in the case of gentle biasing, the exponential average time-dependent rate (EATR) framework, which simultaneously fits the unbiased rate constant and a coordinate quality metric $γ$, recovers accurate kinetics in nearly all cases.For poor CVs, estimators equivalent to assuming a good coordinate ($γ=1$) systematically fail regardless of biasing method or parameters. We introduce heuristics to show when we expect the rates to be inaccurate, and identify which combinations of biasing scheme, estimator and number of runs reach a given accuracy at the lowest cost.",
+      "abstract": "It has been demonstrated that one can recover the unbiased rate constants for slow conformational transitions by observing transitions driven by a bias potential added along one or several collective variables (CVs). However, the choice of CV, biasing scheme, biasing parameters and the rate estimator can all affect the results and it is not obvious which to choose for a given problem. In this study, we compare accuracy versus computational cost for a previously established benchmark system, a coarse-grained protein with computationally accessible unfolding kinetics. We apply bias to four CVs of decreasing quality in both a time-dependent and quasi-static manner, and compare different estimators for the unfolding rate constant in terms of absolute accuracy to the estimated reference unbiased rate. We show that in the case of gentle biasing, the exponential average time-dependent rate (EATR) framework, which simultaneously fits the unbiased rate constant and a coordinate quality metric $γ$, recovers accurate kinetics in nearly all cases. For poor CVs, estimators equivalent to assuming a good coordinate ($γ=1$) systematically fail regardless of biasing method or parameters. We introduce heuristics to show when we expect the rates to be inaccurate, and identify which combinations of biasing scheme, estimator and number of runs reach a given accuracy at the lowest cost.",
       "authors": [
         "Triasha Pal",
         "Nicodemo Mazzaferro",
@@ -51460,6 +51460,55 @@
       "metadata_source": "arXiv OAI-PMH"
     },
     {
+      "id": "2611.16246",
+      "version": 1,
+      "title": "What Can a VLA Learn from the Agent That Calls It? Task-Level Experience Distillation for Embodied Navigation",
+      "abstract": "Vision-language-action (VLA) models drive the robot directly from camera views, yet a VLA alone shows three typical failures. It walks past the goal, stops before reaching it, and rarely recovers after going off track. Pairing a VLA with a large language model (LLM) planner fixes these failures, but queries the LLM throughout every episode, adding token costs and latency. We introduce Harness-to-Executor (H2E), a task-level distillation method that pairs an LLM planner and a frozen VLA as a heterogeneous training agent, keeps only sessions that reach the goal, and then trains a VLA alone on them so no LLM is used at test time. In these sessions, the planner gives sub-instructions and moves the robot with its own tools, detours are common, and the planner decides when to stop. H2E therefore labels every motion as a VLA action for the original task, whoever made it. It masks the loss on steps moving away from the goal and assigns end labels to states near it, so the VLA learns where the task ends. H2E sets a new state of the art on REVERIE-CE and NavRAG-CE. It raises an 8B VLA's success rate by 15.6% and 11.1% respectively, surpassing a method trained on 10M samples. The distilled VLA exceeds its agent on unseen episodes with zero LLM tokens and runs 3.7 times faster.",
+      "authors": [
+        "Jinze Tao",
+        "Yuxiao Han",
+        "Kangkang Dong",
+        "Yancong Wei",
+        "Xiaojun Zhu",
+        "Bokui Chen",
+        "Houde Liu"
+      ],
+      "categories": [
+        "cs.RO",
+        "cs.LG"
+      ],
+      "primary_category": "cs.RO",
+      "published": "2026-11-17T00:00:00Z",
+      "published_date_precision": "day",
+      "updated": "2026-11-18T00:00:00Z",
+      "link": "https://arxiv.org/abs/2611.16246",
+      "topics": [],
+      "doi": "",
+      "metadata_source": "arXiv OAI-PMH"
+    },
+    {
+      "id": "2611.16128",
+      "version": 1,
+      "title": "CoordX Types: A Trustless, Swappable Type System for Shared Records",
+      "abstract": "The CoordX Protocol carries signed and encrypted entries between parties. It proves who wrote each entry and who had permission to write it. It does not say what an entry means. That task belongs above the protocol layer. This paper describes the CoordX type system, the layer that gives entries a meaning. A type is a short document that says how to read one part of a shared record: which entries count, what each position means, what a party may do there, and what a party must do next. The type system has two key properties. It is trustless: a type is an ordinary signed object fixed by its digest, and every party evaluates it for itself over entries that the CoordX Protocol has already verified. No party has to trust a server, a registry or another party's software. It is swappable: a type names the interpreter it is written for, so many interpreters, of different capabilities and designs, can be used side by side in one record. We describe how to write type schemas, and we define the expressive power of the schema language. Payloads form a regular language. Entry structure forms a regular tree language. Every rule and every computed value is a total function in the primitive recursive class, so evaluation always halts. We compare this with KQML, FIPA-ACL and CBCL, and we relate it to language-theoretic security.",
+      "authors": [
+        "David Hyland-Wood",
+        "Rob Ewin",
+        "Peter Robinson"
+      ],
+      "categories": [
+        "cs.CR"
+      ],
+      "primary_category": "cs.CR",
+      "published": "2026-11-17T00:00:00Z",
+      "published_date_precision": "day",
+      "updated": "2026-11-18T00:00:00Z",
+      "link": "https://arxiv.org/abs/2611.16128",
+      "topics": [],
+      "doi": "",
+      "metadata_source": "arXiv OAI-PMH"
+    },
+    {
       "id": "2611.21560",
       "version": 2,
       "title": "Optimal Quantum Sensing Algorithms for Discrete-Frequency Spectroscopy",
@@ -88428,50 +88477,6 @@
       "published_date_precision": "day",
       "updated": "2026-11-17T00:00:00Z",
       "link": "https://arxiv.org/abs/2611.20785",
-      "topics": [],
-      "doi": "",
-      "metadata_source": "arXiv OAI-PMH"
-    },
-    {
-      "id": "2611.20784",
-      "version": 1,
-      "title": "On homogeneous hypertournaments",
-      "abstract": "Sullivan recently constructed continuum many countable homogeneous $n$-hypertournaments for every $n\\ge3$ by forbidding configurations he calls pair-cancelling. We show that, for every family $\\mathcal F$ of pair-cancelling $n$-hypertournaments, the class of all linearly ordered finite $\\mathcal F$-free $n$-hypertournaments is Ramsey and has the ordering property. In particular, freely ordered $\\mathbf{H}_4$-free $3$-hypertournaments are Ramsey, answering a question of Cherlin, Hubička, Nešetřil, and the author from 2021. For every odd $n\\ge3$, we give a simple Ramsey expansion with the expansion property for even $n$-hypertournaments by naming an $(n-1)$-hypertournament and a free linear order. We also show that, for $n\\ge6$, no unbounded hereditary strong amalgamation class of finite $n$-hypertournaments has EPPA. Moreover, we prove the failure of EPPA for all Sullivan's classes with $n\\ge4$, and for the even $5$-hypertournaments. We conjecture that even hypertournaments and classes omitting a family of pair-cancelling hypertournaments, together with the homogeneous cyclic order in arity three, are the only countably infinite homogeneous $n$-hypertournaments for $n\\ge3$. We give some supporting evidence.",
-      "authors": [
-        "Matěj Konečný"
-      ],
-      "categories": [
-        "math.CO",
-        "cs.DM",
-        "math.LO"
-      ],
-      "primary_category": "math.CO",
-      "published": "2026-11-16T00:00:00Z",
-      "published_date_precision": "day",
-      "updated": "2026-11-17T00:00:00Z",
-      "link": "https://arxiv.org/abs/2611.20784",
-      "topics": [],
-      "doi": "",
-      "metadata_source": "arXiv OAI-PMH"
-    },
-    {
-      "id": "2611.20783",
-      "version": 1,
-      "title": "On Erdős' last equation",
-      "abstract": "For a positive integer $n\\ge 2$, we look at the number of solutions of the Diophantine equation $$ n(x_1+\\cdots+x_n)=x_1\\cdots x_n. $$ Denoting by $f(n)$ this number we show that $\\liminf_{n\\to\\infty} \\log f(n)/\\log n=0$.",
-      "authors": [
-        "Florian Luca",
-        "István Pink",
-        "Csaba Sándor"
-      ],
-      "categories": [
-        "math.NT"
-      ],
-      "primary_category": "math.NT",
-      "published": "2026-11-16T00:00:00Z",
-      "published_date_precision": "day",
-      "updated": "2026-11-17T00:00:00Z",
-      "link": "https://arxiv.org/abs/2611.20783",
       "topics": [],
       "doi": "",
       "metadata_source": "arXiv OAI-PMH"
