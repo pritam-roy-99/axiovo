@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-25T20:09:45.154998+00:00",
+  "generated_at": "2026-11-25T21:59:45.938175+00:00",
   "source": "official arXiv OAI-PMH and verified submission-date Atom batches, with category fallback",
   "index_scope": "all-category recent OAI harvest (partial if incomplete) and independently verified full submission-day shards; older history remains partial",
   "refresh_methods": [
@@ -4947,13 +4947,15 @@
         "cs.LG"
       ],
       "primary_category": "quant-ph",
-      "published": "2026-11-24T16:46:58Z",
-      "updated": "2026-11-24T16:46:58Z",
+      "published": "2026-11-24T00:00:00Z",
+      "published_date_precision": "day",
+      "updated": "2026-11-25T00:00:00Z",
       "link": "https://arxiv.org/abs/2611.32942",
       "topics": [
         "qmachine-learning"
       ],
-      "doi": ""
+      "doi": "",
+      "metadata_source": "arXiv OAI-PMH"
     },
     {
       "id": "2611.22446",
@@ -55038,6 +55040,25 @@
       "doi": ""
     },
     {
+      "id": "2611.30036",
+      "version": 1,
+      "title": "On the extension of non-faithful and non-normal traces of von Neumann algebras to their affiliated operators",
+      "abstract": "Let $τ$ be a positive tracial functional on a finite von Neumann algebra ${\\mathcal{M}}$, not necessarily normal. For a positive self-adjoint operator $A$ affiliated with ${\\mathcal{M}}$ we define ${τ_{\\mathrm{Y}}}(A)=\\lim_{h\\downarrow0}τ(A(\\mathrm{I}+hA)^{-1})\\in[0,\\infty]$. We show that $τ_{\\mathrm{Y}}(A)=\\sup_Rτ(\\min(A,R \\mathrm{I}))$. We prove that ${τ_{\\mathrm{Y}}}$ is additive on positive affiliated operators, by a form--resolvent comparison valid for arbitrary positive traces. As a consequence, $τ$ has a positive linear extension to the span $\\mathscr D_τ$ of the positive affiliated operators of finite extended trace, and $τ_{\\mathrm{Y}}(T^*T)$ defines a pre-Hilbert structure for every positive trace. For every trace, $τ_{\\mathrm{Y}}(|S+T|)^{2/3}\\le τ_{\\mathrm{Y}}(|S|)^{2/3}+τ_{\\mathrm{Y}}(|T|)^{2/3}$; hence the operators $T$ with $τ_{\\mathrm{Y}}(|T|)<\\infty$ form a ${\\mathcal{M}}$-bimodule $\\mathscr L_Y^1$, on which the linear extension is defined and cyclic. It turns out that $\\mathscr L_Y^1=\\mathscr D_τ$; $d(S,T)={τ_{\\mathrm{Y}}}(|S-T|)^{2/3}$ is a translation-invariant pseudometric on $\\mathscr L^1_Y$ and is a metric iff $τ$ is faithful. On the approximation side, a Chernoff family in ${\\mathcal{M}}$ forces affiliation of its generator. Trace defects of Chernoff families need not converge to ${τ_{\\mathrm{Y}}}(A)$, even for faithful normal traces, while two-sided resolvent comparison suffices. For faithful normal traces, ${τ_{\\mathrm{Y}}}$ is the canonical extension and the associated space $\\mathscr L_Y^p$ coincide with the classical $L^p({\\mathcal{M}},τ)$ as well as their norms ($1\\leq p<\\infty$).",
+      "authors": [
+        "Comlan Edmond Koudjinan"
+      ],
+      "categories": [
+        "math.OA",
+        "math.FA"
+      ],
+      "primary_category": "math.OA",
+      "published": "2026-11-23T04:44:32Z",
+      "updated": "2026-11-23T04:44:32Z",
+      "link": "https://arxiv.org/abs/2611.30036",
+      "topics": [],
+      "doi": ""
+    },
+    {
       "id": "2611.30035",
       "version": 1,
       "title": "TRAE: Trustworthy Automated ESG Annotation via Multi-Agent Consensus and Confidence Assessment",
@@ -85930,31 +85951,6 @@
       "topics": [
         "entanglement-steering"
       ],
-      "doi": "",
-      "metadata_source": "arXiv OAI-PMH"
-    },
-    {
-      "id": "2611.30387",
-      "version": 1,
-      "title": "IP-GNO: An Inductive Physics-Informed Graph Neural Operator for Automated Distribution System State Estimation",
-      "abstract": "Distribution System State Estimation (DSSE) is a crucial tool for real-time monitoring, operation, and control of the new-age distribution systems (DSs) due to intensified voltage fluctuations and operational uncertainties introduced by volatile power injection at the nodes. Existing GNN-based approaches generally exhibit limited generalization across networks with different sizes and topologies, making zero-shot cross-grid transfer to unseen DSs a significant challenge. To overcome the aforementioned challenges, this article proposes an Inductive Physics-Informed Graph Neural Operator (IP-GNO) for scalable and transferable DSSE. The proposed framework frames complex bus voltage estimation as an operator-learning problem inspired by the Neumann series expansion of the inverse bus admittance matrix. An admittance-parameterized kernel, incorporating a self-admittance gate in the zeroth-order term and a persistent source-injection skip connection across network layers, captures the underlying electrical dependencies. Additionally, a Physics-Embedded Tree Encoding (PETE) scheme introduces five grid-size-invariant positional features derived from path impedance and a DC-linearized phase-angle prior. A sine-cosine output formulation is further employed to address phase-angle periodicity and ensure stable training. The proposed IP-GNO module is evaluated on two small (IEEE 33- and 69-bus), two medium (IEEE 123- and 136-bus), and one large (2522-bus) sized DSs. Particularly, its zero-shot cross-grid generalization capability is investigated by training the model exclusively on the IEEE 33-bus system and directly evaluating it on four unseen distribution networks of different sizes without retraining or fine-tuning. A detailed comparative analysis with the existing state-of-the-art DSSE tools proves the superiority of IP-GNO, enabling scalable DSSE across heterogeneous DSs.",
-      "authors": [
-        "Sakshi Kumar",
-        "Chhavi Jhari",
-        "Ajay Singh",
-        "Subho Paul"
-      ],
-      "categories": [
-        "cs.LG",
-        "cs.SY",
-        "eess.SY"
-      ],
-      "primary_category": "cs.LG",
-      "published": "2026-11-23T00:00:00Z",
-      "published_date_precision": "day",
-      "updated": "2026-11-24T00:00:00Z",
-      "link": "https://arxiv.org/abs/2611.30387",
-      "topics": [],
       "doi": "",
       "metadata_source": "arXiv OAI-PMH"
     }
