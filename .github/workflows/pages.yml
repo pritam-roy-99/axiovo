@@ -5,6 +5,7 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+  actions: read
   pages: write
   id-token: write
 # Video generation and browser audits are long-running. Source metadata pushes
@@ -362,6 +363,42 @@ jobs:
         with:
           name: github-pages-${{ github.run_id }}-${{ github.run_attempt }}
           path: ${{ runner.temp }}/axiovo-pages
+      - name: Wait for exact uploaded Pages artifact to become visible
+        timeout-minutes: 3
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ARTIFACT_NAME: github-pages-${{ github.run_id }}-${{ github.run_attempt }}
+        run: |
+          for attempt in {1..12}; do
+            if gh api "repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/artifacts" --paginate --jq '.artifacts[] | select(.name == env.ARTIFACT_NAME and .expired == false) | .id' | grep -Eq '^[0-9]+        id: deployment
+        uses: actions/deploy-pages@v4
+        with:
+          artifact_name: github-pages-${{ github.run_id }}-${{ github.run_attempt }}
+      - name: Verify public release matches tested artifact
+        timeout-minutes: 4
+        run: python scripts/verify_release.py
+      - name: Audit deployed Axiovo pages, live links, navigation and video
+        id: postdeploy_audit
+        continue-on-error: true
+        run: |
+          python scripts/audit_live_site.py
+        env:
+          AXIOVO_BASE_URL: https://pritam-roy-99.github.io/axiovo/
+      - name: Explain post-deployment monitoring failure without undoing publication
+        if: steps.postdeploy_audit.outcome == 'failure'
+        run: |
+          echo '::warning::GitHub Pages was deployed, but external live-site monitoring failed. Inspect postdeploy_audit logs; the deployed artifact remains intact.'
+          echo '### Live-site monitoring warning' >> "$GITHUB_STEP_SUMMARY"
+          echo 'The deployed website may be accessible even though the external verification request failed. This is not evidence that source data or code publication failed.' >> "$GITHUB_STEP_SUMMARY"
+
+; then
+              echo "Exact Pages artifact is visible"
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "::error::Exact Pages artifact did not become visible"
+          exit 1
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
