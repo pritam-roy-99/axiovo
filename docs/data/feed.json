@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-25T21:59:45.938175+00:00",
+  "generated_at": "2026-11-26T00:42:32.964598+00:00",
   "source": "official arXiv OAI-PMH and verified submission-date Atom batches, with category fallback",
   "index_scope": "all-category recent OAI harvest (partial if incomplete) and independently verified full submission-day shards; older history remains partial",
   "refresh_methods": [
@@ -54281,6 +54281,85 @@
       "metadata_source": "arXiv OAI-PMH"
     },
     {
+      "id": "2611.25738",
+      "version": 1,
+      "title": "CACO: Coverage-Aware Coordinated Optimization for Continuous Generative Retrieval",
+      "abstract": "Continuous generative retrievers powered by flow matching and diffusion sample multiple queries in item embedding space for approximate nearest-neighbor (ANN) search under fixed budgets. However, existing generative retrievers can suffer from retrieval overlap under uncoordinated sampling, whereas explicit diversity guidance to broaden the candidate set may induce relevance drift as it lacks direct feedback on the value of additional items. We introduce CACO (Coverage-Aware Coordinated Optimization), a self-supervised post-training framework coordinating queries from frozen flow-matching and diffusion retrievers toward complementary item coverage with negligible latency overhead. Using empirical retrieval frequencies across sampled reference queries as a relevance proxy, CACO formulates a label-free coverage objective that improves recall across all 30 backbone-dataset settings in offline experiments. To avoid the overhead of sampling reference queries at inference, CACO employs a coordinated query adjustment network combining inter-query bidirectional attention with gated relative directions, updating queries via bounded tangent-space projection and spherical retraction. During training, CACO applies tangential antithetic perturbations and counterfactual single-query replacement to measure each query's marginal gain, yielding an unbiased gradient estimator of smoothed set coverage across non-differentiable ANN search. On eight public benchmarks and an in-house 24-partition streaming industrial dataset, CACO improves Recall@100 and Recall@400 by up to 23.7% and 23.9% over the strongest baseline, cuts inter-query overlap by 53.3%-64.9%, and adds only 0.5%-3.0% inference latency.",
+      "authors": [
+        "Pan Zhang",
+        "Nan Zhuang",
+        "Yongkang Zhang",
+        "Kun Xú",
+        "Zhongtao Jiang",
+        "Zhiwei Wang",
+        "Kun Xǔ",
+        "Youhuan Li"
+      ],
+      "categories": [
+        "cs.IR"
+      ],
+      "primary_category": "cs.IR",
+      "published": "2026-11-24T00:00:00Z",
+      "published_date_precision": "day",
+      "updated": "2026-11-25T00:00:00Z",
+      "link": "https://arxiv.org/abs/2611.25738",
+      "topics": [],
+      "doi": "",
+      "metadata_source": "arXiv OAI-PMH"
+    },
+    {
+      "id": "2611.25688",
+      "version": 1,
+      "title": "Anisotropic Coulomb Interaction in Strongly Magnetized Electron Gas at Zero Temperature in Relativistic Quantum Framework",
+      "abstract": "We present a microscopic derivation of Debye screening in a Landau-quantized electron gas subject to a strong magnetic field. By calculating the photon self-energy within the RPA framework, we explore how Landau levels influence the screening properties of the electron gas. Due to the quantum periodicity of Landau levels, the screening behavior is relatively insensitive to variations in the carrier density within each occupation cycle compared to the drastic changes induced by the magnetic field strength. Within a single occupation cycle, the Kohn anomaly dominates the low-density regime; at higher densities, its characteristic momentum shifts into the asymptotic high-momentum regime, rendering its singular contribution less prominent over the active screening domain and allowinga smooth orientation-dependent anisotropy to govern the system. Furthermore, a subtle competition in directional screening is observed between the parallel and perpendicular directions to the field depending on the density domain. At lower field strengths, multiple quantum oscillations emerge from the simultaneous participation of various Landau levels, marking a qualitative transition toward the isotropic three-dimensional limit. Our findings reveal anisotropic screening effects and provide insights into the behavior of charged impurities in such systems.",
+      "authors": [
+        "Tomoyuki Maruyama",
+        "A. Baha Balantekin",
+        "Myung-Ki Cheoun",
+        "Toshitaka Kajino",
+        "Eunseok Hwang"
+      ],
+      "categories": [
+        "nucl-th",
+        "astro-ph.SR"
+      ],
+      "primary_category": "nucl-th",
+      "published": "2026-11-24T00:00:00Z",
+      "published_date_precision": "day",
+      "updated": "2026-11-25T00:00:00Z",
+      "link": "https://arxiv.org/abs/2611.25688",
+      "topics": [
+        "optics-optomechanics"
+      ],
+      "doi": "",
+      "metadata_source": "arXiv OAI-PMH"
+    },
+    {
+      "id": "2611.25595",
+      "version": 1,
+      "title": "LoopedWAM: Looped World Action Models for Elastic Inference",
+      "abstract": "World action models (WAMs) couple generative video modeling with robotic action prediction but typically require large video and action transformers, limiting deployment efficiency. We present LoopedWAM, a compact WAM that recurrently applies a shared six-block core in each expert, executing 30 transformer layers while storing only 12 blocks per expert. To account for their asymmetric inference costs, the video and action experts can operate at different depths: visual features are computed once per query, whereas action computation repeats at every sampling step. We further propose elastic self-distillation, which trains a single elastic checkpoint, LoopedWAM-E, across action-depth and sampling-step budgets. With only 0.58B policy parameters and no robot pretraining, LoopedWAM achieves 96.1% success on LIBERO, 91.9% on RoboTwin 2.0, and 52.2% on RoboCasaGR1, while using $7.4\\times$ less peak GPU memory than Fast-WAM under matched inference measurements. On LIBERO, LoopedWAM-E achieves 96.0% success in 27.6 ms or 95.2% in 24.7 ms on an H100, providing multiple accuracy-latency operating points from a single checkpoint; with two sampling steps and four action loops, it stays within 0.5 points of LoopedWAM on all three benchmarks. Ablations demonstrate that weight-shared depth preserves competitive performance, while aggressive action-depth reduction requires explicit budget-aware training. On a real AgileX PiPER arm, LoopedWAM succeeds in 71.3% of 80 trials across four tasks.",
+      "authors": [
+        "Anh Dao",
+        "Xinxin Liu",
+        "Hang Yu",
+        "Jeffrey A Chan Santiago",
+        "Yuzhang Shang"
+      ],
+      "categories": [
+        "cs.CV",
+        "cs.RO"
+      ],
+      "primary_category": "cs.CV",
+      "published": "2026-11-24T00:00:00Z",
+      "published_date_precision": "day",
+      "updated": "2026-11-25T00:00:00Z",
+      "link": "https://arxiv.org/abs/2611.25595",
+      "topics": [],
+      "doi": "",
+      "metadata_source": "arXiv OAI-PMH"
+    },
+    {
       "id": "2611.31239",
       "version": 2,
       "title": "Lyris: Layout-Guided Long Video Generation with Persistent 3D Memory",
@@ -85877,79 +85956,6 @@
       "link": "https://arxiv.org/abs/2611.30391",
       "topics": [
         "open-systems"
-      ],
-      "doi": "",
-      "metadata_source": "arXiv OAI-PMH"
-    },
-    {
-      "id": "2611.30390",
-      "version": 1,
-      "title": "Trustworthy Speech-Based Autism Screening under Class Imbalance with Uncertainty-Aware HuBERT Ensembles",
-      "abstract": "Early screening of Autism Spectrum Disorder (ASD) is critical for timely clinical intervention, although establishing reliable speech based screening systems remains problematic due to limited clinical data, class imbalance, and the need for reliable uncertainty estimation. We propose an uncertainty-aware ASD screening framework based on self-supervised HuBERT representations, combining Leave-One-Subject-Out (LOSO) crossvalidation, balanced k-bagging, and Monte Carlo (MC) Dropout. Multiple HuBERT models are fine-tuned on balanced subsets, with predictions combined through probability-based ensemble averaging and aggregated at the subject level. Experiments on the Child Pathological Speech Database (CPSD) show strong performance, achieving 86.30% balanced accuracy and 93.74% ROC-AUC at the utterance level, and 95.04% and 96.30%, respectively, at the subject level. Furthermore, predictive entropy effectively reflects classification reliability: incorrectly classified segments show higher entropy than correctly classified ones (0.4605 $\\pm$ 0.2314 vs. 0.1717 $\\pm$ 0.1830), with a significant correlation with errors (r = 0.3981, p = 7.38 x 10 -170 ) and an error-detection ROC-AUC of 0.8359. These results demonstrate the potential of the proposed framework as a robust and uncertainty-aware computer-aided tool for ASD screening.",
-      "authors": [
-        "Nihel Loubna Ghennani",
-        "Mourtada Benazzouz",
-        "Julie Mauclair"
-      ],
-      "categories": [
-        "cs.AI"
-      ],
-      "primary_category": "cs.AI",
-      "published": "2026-11-23T00:00:00Z",
-      "published_date_precision": "day",
-      "updated": "2026-11-24T00:00:00Z",
-      "link": "https://arxiv.org/abs/2611.30390",
-      "topics": [],
-      "doi": "",
-      "metadata_source": "arXiv OAI-PMH"
-    },
-    {
-      "id": "2611.30389",
-      "version": 1,
-      "title": "AgentMoT: An Agentic Mixture-of-Transformers for End-to-End Autonomous Driving",
-      "abstract": "Driving models need to choose which capabilities to use and when to reconsider their decisions. We introduce AgentMoT, a Mixture-of-Transformers with built-in agent reasoning and system scheduling. Combinations of agent, world, and action experts form three jointly trained pathways for direct-action, vision-language-action, and world-action computation. The Router selects a native pathway, while the agent expert supplies reasoning and selects skills. Execution feedback raises wake-up requests, and the agent self-scheduler learns whether to reconsider the task decision or keep it. Mandatory requests invoke the agent directly. The relative-capability principle guides these choices by relating the benefit of additional computation or intervention to its cost. After open-loop initialization, dual-loop evolution trains the Router, agent, and self-scheduler from closed-loop experience while failure-driven updates refine skills and execution feedback. AgentMoT achieves state-of-the-art results on Bench2Drive v0.0.3 and v0.0.4, with 94.48/92.33 driving score and 85.45/82.73% success rate, respectively. With skills disabled, learned routing improves over the strongest fixed pathway by 1.79 driving-score points and 4.09 percentage points of success rate on v0.0.3. Ablation studies further show gains from closed-loop agent learning, two-view queries, and event-triggered wake-up.",
-      "authors": [
-        "Qihang Huang",
-        "Collister Chua",
-        "YuJie Yan",
-        "Shiyu Fang",
-        "Zhan Chen",
-        "Haoran Xu",
-        "Zirui Li",
-        "Chen Lv"
-      ],
-      "categories": [
-        "cs.RO"
-      ],
-      "primary_category": "cs.RO",
-      "published": "2026-11-23T00:00:00Z",
-      "published_date_precision": "day",
-      "updated": "2026-11-24T00:00:00Z",
-      "link": "https://arxiv.org/abs/2611.30389",
-      "topics": [],
-      "doi": "",
-      "metadata_source": "arXiv OAI-PMH"
-    },
-    {
-      "id": "2611.30388",
-      "version": 1,
-      "title": "BASE: A Backend-Agnostic Streaming Embodiment Layer for Full-Duplex Conversational Avatars",
-      "abstract": "Many end-to-end spoken dialogue models can now converse in real time and full duplex, and turning them into 3D avatars requires full-body gestures, listening feedback, and turn-taking. Existing methods couple the motion generator tightly to one dialogue model by reading its internal states or training speech and motion jointly. The motion module must then be retrained whenever the dialogue model changes, cannot be attached to cloud APIs that expose only audio, and entangles role, voice, and motion style. We propose BASE, a backend-agnostic streaming embodiment layer whose only interface to the dialogue model is its emitted speech. First, a conversation state manager driven solely by audio handles speaking, listening, idling, barge-in, and proactive turns on one timeline, while role, voice, motion style, and 3D appearance are set independently. Second, to run an offline 2 s flow-matching gesture model on live audio, we reformulate inference as sliding-window continuation with overlapped look-ahead ensembling, which removes seam jitter. Third, we show that the remaining streaming gap comes from errors accumulating in the self-generated motion history rather than missing future speech; our Drift-Aware History Perturbation (DAHP) reduces this gap in about 50 min on one GPU by injecting inference-like drift into ground-truth training histories, and transfers to a second generator. On BEAT2, streaming BASE reaches an FGD of 0.342, on par with the tightly coupled MIBURI (0.333), and viewers prefer its body motion over MIBURI's in 82% of forced-choice judgments. Without retraining, the same layer drives a cascaded pipeline, three open full-duplex models, and a cloud API in real time.",
-      "authors": [
-        "Chenye Yang",
-        "Jin Jiang",
-        "Shengcai Liao"
-      ],
-      "categories": [
-        "cs.CV"
-      ],
-      "primary_category": "cs.CV",
-      "published": "2026-11-23T00:00:00Z",
-      "published_date_precision": "day",
-      "updated": "2026-11-24T00:00:00Z",
-      "link": "https://arxiv.org/abs/2611.30388",
-      "topics": [
-        "entanglement-steering"
       ],
       "doi": "",
       "metadata_source": "arXiv OAI-PMH"
