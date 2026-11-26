@@ -142,7 +142,9 @@ def main():
             home=page.locator(".axiovo-home-link")
             if home.count():
                 home.click()
-                page.wait_for_url(lambda u: urlsplit(u).path.rstrip("/")==urlsplit(BASE).path.rstrip("/"),timeout=12000)
+                # Match the same readiness criterion used by check(); media and
+                # other subresources must not block verification of the Home link.
+                page.wait_for_url(lambda u: urlsplit(u).path.rstrip("/")==urlsplit(BASE).path.rstrip("/"),wait_until="domcontentloaded",timeout=12000)
                 note("CLICK "+src+" -> Home")
         # Verify homepage's actual video URL and playback metadata.
         if check(page,""):
