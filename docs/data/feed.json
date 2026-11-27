@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-27T04:09:34.037386+00:00",
+  "generated_at": "2026-11-27T22:40:30.261493+00:00",
   "source": "official arXiv OAI-PMH and verified submission-date Atom batches, with category fallback",
   "index_scope": "all-category recent OAI harvest (partial if incomplete) and independently verified full submission-day shards; older history remains partial",
   "refresh_methods": [
@@ -14312,11 +14312,13 @@
         "math.FA"
       ],
       "primary_category": "math.PR",
-      "published": "2026-11-25T13:03:16Z",
-      "updated": "2026-11-25T13:03:16Z",
+      "published": "2026-11-25T00:00:00Z",
+      "published_date_precision": "day",
+      "updated": "2026-11-26T00:00:00Z",
       "link": "https://arxiv.org/abs/2611.34317",
       "topics": [],
-      "doi": ""
+      "doi": "",
+      "metadata_source": "arXiv OAI-PMH"
     },
     {
       "id": "2611.34316",
@@ -14330,11 +14332,13 @@
         "math.FA"
       ],
       "primary_category": "math.FA",
-      "published": "2026-11-25T13:03:10Z",
-      "updated": "2026-11-25T13:03:10Z",
+      "published": "2026-11-25T00:00:00Z",
+      "published_date_precision": "day",
+      "updated": "2026-11-26T00:00:00Z",
       "link": "https://arxiv.org/abs/2611.34316",
       "topics": [],
-      "doi": ""
+      "doi": "",
+      "metadata_source": "arXiv OAI-PMH"
     },
     {
       "id": "2611.34315",
@@ -14349,11 +14353,13 @@
         "math.AT"
       ],
       "primary_category": "math.AT",
-      "published": "2026-11-25T13:03:08Z",
-      "updated": "2026-11-25T13:03:08Z",
+      "published": "2026-11-25T00:00:00Z",
+      "published_date_precision": "day",
+      "updated": "2026-11-26T00:00:00Z",
       "link": "https://arxiv.org/abs/2611.34315",
       "topics": [],
-      "doi": ""
+      "doi": "",
+      "metadata_source": "arXiv OAI-PMH"
     },
     {
       "id": "2611.34314",
@@ -14366,16 +14372,19 @@
       "categories": [
         "math.NA",
         "cs.LG",
+        "cs.NA",
         "stat.CO"
       ],
       "primary_category": "math.NA",
-      "published": "2026-11-25T13:02:13Z",
-      "updated": "2026-11-25T13:02:13Z",
+      "published": "2026-11-25T00:00:00Z",
+      "published_date_precision": "day",
+      "updated": "2026-11-26T00:00:00Z",
       "link": "https://arxiv.org/abs/2611.34314",
       "topics": [
         "computer-ai"
       ],
-      "doi": ""
+      "doi": "",
+      "metadata_source": "arXiv OAI-PMH"
     },
     {
       "id": "2611.34313",
@@ -14392,14 +14401,16 @@
         "quant-ph"
       ],
       "primary_category": "quant-ph",
-      "published": "2026-11-25T13:02:05Z",
-      "updated": "2026-11-25T13:02:05Z",
+      "published": "2026-11-25T00:00:00Z",
+      "published_date_precision": "day",
+      "updated": "2026-11-26T00:00:00Z",
       "link": "https://arxiv.org/abs/2611.34313",
       "topics": [
         "optics-optomechanics",
         "computer-ai"
       ],
-      "doi": ""
+      "doi": "",
+      "metadata_source": "arXiv OAI-PMH"
     },
     {
       "id": "2611.34312",
